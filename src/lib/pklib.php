@@ -1,0 +1,2701 @@
+<?php
+
+/*
+
+  /**
+ * PKMVC Framework 
+ *
+ * @author    Paul Kirkaas
+ * @email     p.kirkaas@gmail.com
+ * @link     
+ * @copyright Copyright (c) 2012-2014 Paul Kirkaas. All rights Reserved
+ * @license   http://opensource.org/licenses/BSD-3-Clause  
+ */
+/**
+ * General, non-symfony utility functions
+ * Paul Kirkaas, 29 November 2012
+ */
+//$defaultTimeZone = date_default_timezone_get ();
+date_default_timezone_set("America/Los_Angeles");
+
+class PkLibConfig {
+
+  static $suppressPkDebug = true;
+
+  public static function getSuppressPkDebug() {
+    return static::$suppressPkDebug;
+  }
+
+  public static function setSuppressPkDebug($suppress = true) {
+    static::$suppressPkDebug = $suppress;
+  }
+
+}
+Class Undefined {
+  public function __get($x) {return null;}
+  public function __set($x, $y) {}
+}
+function isCli() {
+  return php_sapi_name() == 'cli';
+}
+
+/** UnCamelCases a string, or, recursively, an array 
+ * 
+ * @param mixe $arg: String or array of possibly camel cased values
+ * @return mixed: The un_camel_cased result, string or array
+ * @throws Exception
+ */
+function unCamelCase($arg) {
+  if (!$arg || !sizeOf($arg) || is_int($arg)) {
+    return $arg;
+  }
+  if (is_string($arg)) {
+    return unCamelCaseString($arg);
+  }
+  if (is_array($arg)) {
+    $resarr = array();
+    foreach ($arg as $key => $value) {
+      $resarr[$key] = unCamelCase($value);
+    }
+    return $resarr;
+  }
+  // pkdebug("Unexpected arg to unCamelCase:", $arg);
+  // pkstack();
+  throw new PKMVCException("Unexpected arg to unCamelCase: [" . print_r($arg, true) . "]");
+}
+
+function unCamelCaseString($string) {
+  if (!is_string($string)) {
+    throw new \Exception("No string argument to unCamelCase");
+  }
+  if (!strlen($string)) {
+    return $string;
+  }
+  //$str = mb_strtolower(preg_replace("/([A-Z])/", "_$1", $string));
+  $str = strtolower(preg_replace("/([A-Z])/", "_$1", $string));
+  if ($str[0] == '_') {
+    $str = substr($str, 1);
+  }
+  return $str;
+}
+
+function toCamelCase($str, $capitalise_first_char = false) {
+  if (is_int($str)) return $str;
+  if (!is_string($str)) return '';
+  if ($capitalise_first_char) {
+    $str[0] = mb_strtoupper($str[0]);
+  }
+  $func = create_function('$c', 'return mb_strtoupper($c[1]);');
+  return preg_replace_callback('/_([a-z])/', $func, $str);
+}
+
+/** Removes underscores and converts to lower case - so:
+ * fieldName & field_name & fieldname & Field_Name all become the same.
+ * Takes a string or array of strings as arg.
+ * @param string|array $arg: a string or array of strings to collapse.
+ * @return string|array: The collapsed result of arg.
+ */
+function collapsefieldnames($arg) {
+  if (is_string($arg)) {
+    return strtolower(str_replace('_', '', $arg));
+  }
+  if (is_array($arg)) {
+    $retarr = [];
+    foreach ($arg as $key => $value) {
+      $retarr[$key] = collapsefieldnames($value);
+    }
+    return $retarr;
+  }
+  if (is_numeric($arg)) {
+    return $arg;
+  }
+  return '';
+}
+
+/** Returns true if the two string arguments would be equivalent if converted
+ * to lowercase and with underscores removed. so (FieldId equiv to field_id)
+ * @param type $arga
+ * @param type $argb
+ */
+function equivalentcollapsed($arga, $argb) {
+  if (collapsefieldnames($arga) === collapsefieldnames($argb)) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * For any number of arguments, print out the file & line number,
+ * the argument type, and contents/value of the arg -- unless the very last
+ * argument is a boolean false.
+ */
+function pkecho() {
+  $args = func_get_args();
+  $out = call_user_func_array("pkdebug_base", $args);
+  echo "<pre>$out</pre>";
+}
+
+function tmpdbg() {
+  $args = func_get_args();
+  PKMVC\BaseController::addSlot('debug', call_user_func_array("pkdebug_base", $args));
+}
+
+/** Like PkDebug, except first arg is the name of a logfile - 
+ */
+function pkdebugNamedLog() {
+  $args = func_get_args();
+  $logName = array_shift($args);
+  $logPath = getAppLogDir().'/'.$logName;
+  $out = call_user_func_array("pkdebug_base", $args);
+  pkdebugOut($out,$logPath);
+}
+function pkdebug() {
+  $args = func_get_args();
+  $out = call_user_func_array("pkdebug_base", $args);
+  pkdebugOut($out);
+}
+
+/** Take a stab to Try to get function/method/file this function was called from
+ * Not always right because debug_backtrace is inconsistent.
+ * Not top priority now - but useful for DB logging
+ * 
+ * TODO: This version only for calling from within a LOG class - not general
+ * functon yet.
+ * @return assoc array - file, line, function, method, etc.
+ * 
+ */
+//function getCallingFrame($level = 0, $classlevel =0) {
+function getCallingFrame($baseFile = null) {
+  $func = function($stacksize, $stack, $idx, $name, $skipVals, $num = 5) {
+    $i = 0;
+    $str = '';
+    while ($idx < $stacksize) {
+      if (empty($stack[$idx][$name]) || in_array($stack[$idx][$name], $skipVals)) {
+        $idx++;
+        continue;
+      } else {
+        $str.=$stack[$idx][$name] . "<br>\n";
+        $num--;
+        if (!$num) break;
+        $idx++;
+      }
+    }
+    return $str;
+  };
+  $retinfo = ['file' => '', 'function' => '', 'line' => '', 'class' => '', 'type' => ''];
+  $stack = debug_backtrace();
+  if (!$baseFile) $baseFile = __FILE__;
+//  return $stack;
+  $stacksize = sizeof($stack);
+
+  for ($i = 0; $i < $stacksize; $i++) {
+    if (!array_key_exists('file', $stack[$i])) continue;
+    if ($stack[$i]['file'] == $baseFile) break;
+  }
+  $baseIdx = $i + 1;
+  if (!array_key_exists($baseIdx, $stack)) return $retinfo;
+  //$file = keyValOrDefault('file', $stack[$baseIdx],'');
+  //if (!$file) $file =  keyValOrDefault('file', $stack[$baseIdx + 2],'');
+  //$retinfo['file'] = keyValOrDefault('file', $stack[$baseIdx],'');
+  $file = $func($stacksize, $stack, $baseIdx, 'file', [], 5);
+  $retinfo['file'] = $file;
+  //$line = keyValOrDefault('line', $stack[$baseIdx],'');
+  $line = $func($stacksize, $stack, $baseIdx, 'line', [], 5);
+  //if (!$line) $line =  keyValOrDefault('line', $stack[$baseIdx + 2],'');
+  $retinfo['line'] = $line;
+  //$retinfo['line'] = keyValOrDefault('line', $stack[$baseIdx],'');
+  $baseIdx ++;
+  if (!array_key_exists($baseIdx, $stack)) return $retinfo;
+  $retinfo['class'] = keyValOrDefault('class', $stack[$baseIdx], '');
+  //$retinfo['function'] = keyValOrDefault('function', $stack[$baseIdx+2],'');
+  $retinfo['function'] = $func($stacksize, $stack, $baseIdx, 'function', ['call_user_func_array', 'siteLog'], 5);
+  $retinfo['type'] = keyValOrDefault('type', $stack[$baseIdx], '');
+  $retinfo['idx'] = $baseIdx;
+  return $retinfo;
+
+  /** Fix the rest of the code for general use some day
+
+
+
+
+
+
+
+    //$fields =['file', 'line']
+    $idx = 0;
+    while ((empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__))) {
+    $idx++;
+    if ($idx = $stacksize) break;
+    }
+    //$frame = $stack[$idx];
+    if (array_key_exists($idx+$level,$stack)) {
+    $retinfo['file'] = keyValOrDefault('file', $stack[$idx + $level],'');
+    $retinfo['line'] = keyValOrDefault('line', $stack[$idx + $level],'');
+    } else {
+    $retinfo['file'] = '';
+    $retinfo['line'] = '';
+    }
+
+
+    $idx = 0;
+    while ((empty($stack[$idx]['function']) || ($stack[$idx]['function'] === __FUNCTION__))) {
+    $idx++;
+    if ($idx = $stacksize) break;
+    }
+    if (array_key_exists($idx+$level,$stack)) {
+    $retinfo['function'] = keyValOrDefault('function', $stack[$idx + $level],'');
+    } else {
+    $retinfo['function'] = '';
+    }
+
+    $idx = 0;
+    while ((empty($stack[$idx]['class']))) {
+    $idx++;
+    if ($idx = $stacksize) break;
+    }
+
+    if (array_key_exists($idx+$classlevel,$stack)) {
+    $retinfo['class'] = keyValOrDefault('class', $stack[$idx + $classlevel],'');
+    $retinfo['method'] = keyValOrDefault('method', $stack[$idx + $classlevel],'');
+    } else {
+    $retinfo['class'] = '';
+    $retinfo['method'] = '';
+    }
+   * 
+   */
+  /*
+
+
+    $retinfo['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
+    if (isset($stack[1])) {
+    $retinfo['file'] = keyValOrDefault('file', $frame);
+    $retinfo['function'] = keyValOrDefault('function',$frame);
+    $retinfo['line']  = keyValOrDefault('line',$frame);
+    }
+   * 
+   */
+}
+
+/**
+ * Returns the (unlimited) args as a string, arg strings as strings,
+ * array and obj args as var_dumps.
+ * @return string
+ */
+function pkdebug_base() {
+  if (PkLibConfig::getSuppressPkDebug()) return null;
+  $stack = debug_backtrace();
+  $stacksize = sizeof($stack);
+  //$frame = $stack[0];
+  //$frame = $stack[1];
+  //$out = "\n".date('j-M-y; H:i:s').': '.$frame['file'].": ".$frame['function'].': '.$frame['line'].": \n  ";
+  $out = "\nPKDEBUG OUT: STACKSIZE: $stacksize";
+  /*
+    if (!isset($frame['file']) || !isset($frame['line'])) {
+    $out.="\n\nStack Frame; no 'file': ";
+    foreach ($frame as $key=>$val) {
+    if (is_array($val)) $val = '(array)';
+    $out .="[$key]=>[$val] - ";
+    }
+    $out .= "\n\n";
+    // var_dump($stack);
+    }// else {
+   * 
+   */
+  $idx = 0;
+  while ((empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__))) {
+    $idx++;
+  }
+  $frame = $stack[$idx];
+
+  $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
+  //$out .= pkstack() . "\n\n";
+  if (isset($stack[1])) {
+    $out .= "\nFrame $idx: " . date('j-M-y; H:i:s') . ': ' . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
+  } else {
+    $out .= "\n" . date('j-M-y; H:i:s') . ': ' . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
+  }
+  //}
+  $lastarg = func_get_arg(func_num_args() - 1);
+  $dumpobjs = true;
+  if (is_bool($lastarg) && ($lastarg === false)) $dumpobjs = false;
+  $msgs = func_get_args();
+  foreach ($msgs as $msg) {
+    $printMsg = true;
+    $type = typeOf($msg);
+    if (is_bool($msg)) {
+      $msg = stringboolean($msg);
+    }
+    if ($msg instanceOf sfOutputEscaperArrayDecorator) {
+      $printMsg = false;
+      //if ($msg instanceOf Doctrine_Locator_Injectable) {
+    } else if (is_object($msg)) {
+      $printMsg = $dumpobjs;
+//        $msg=$msg->toArray(); 
+    }
+    if ($msg instanceOf Doctrine_Pager) $printMsg = false;
+    //if ($printMsg && (is_object($msg) || is_array($msg))) $msg = json_encode($msg);
+    if ($printMsg && (is_object($msg) || is_array($msg)))
+    //$msg = pkvardump($msg);
+      $msg = displayData($msg);
+    $out .= ('Type: ' . $type . ($printMsg ? ': Payload: ' . $msg : '') . "\n  ");
+  }
+  $out.="END DEBUG OUT\n\n";
+  return $out;
+}
+
+/**
+ * Outputs the stack to the debug out.
+ * @param type $depth
+ */
+function pkstack($depth = 10, $args = false) {
+  $out = pkstack_base($depth, $args);
+  pkdebugOut($out);
+}
+
+/**
+ * Returns the stack as a string
+ * @param type $depth
+ * @return string
+ */
+function pkstack_base($depth = 10, $args = false) {
+  //if (sfConfig::get('release_content_env') != 'dev') return;
+  $stack = debug_backtrace();
+  $stacksize = sizeof($stack);
+  if (!$depth) {
+    $depth = $stacksize;
+  }
+  $frame = $stack[0];
+  $out = "STACKTRACE: " . date('j-M-y; H:i:s') . ": Stack Depth: $stacksize; backtrace depth: $depth\n";
+  //pkdebugOut($out);
+  ////pkdebugOut("Stack Depth: $stacksize; backtrace depth: $depth\n");
+  $i = 0;
+  foreach ($stack as $frame) {
+    //$out = $frame['file'].": ".$frame['line'].": Function: ".$frame['function']." \n  ";
+    if (isset($frame['file']) && ($frame['file'] == __FILE__)) {
+      $i++;
+      continue;
+    }
+    //$out .= pkvardump($frame) . "\n";
+    if (!empty($frame['file'])) $out.=$frame['file'] . ': ';
+    if (!empty($frame['line'])) $out.=$frame['line'] . ': ';
+    if (!empty($frame['function'])) $out.=$frame['function'] . ': ';
+    if (!empty($frame['class'])) $out.=$frame['class'] . ': ';
+    $out.="\n";
+    if ($args) $out .= "Args:" . pkvardump($frame['args']) . "\n";
+    //$out .= "Args:" . print_r($frame['args'],true) . "\n";
+    if (++$i >= $depth) {
+      break;
+    }
+  }
+  return $out;
+}
+
+function pkTypeOf($var) {
+//  if (sfConfig::get('release_content_env') != 'dev') return;
+  if (is_object($var)) return get_class($var);
+  return gettype($var);
+}
+if (!function_exists('typeOf')) {
+  function typeOf($var) {
+    return pkTypeOf($var);
+  }
+}
+
+function ancestry($object) { //Can be object instance or classname
+  $parent = $object;
+  $parents = array();
+  if (is_object($object)) $parents[] = get_class($object);
+  while ($parent = get_parent_class($parent)) {
+    $parents[] = $parent;
+  }
+  return $parents;
+}
+
+/** For debug functions that just echo to the screen --
+ *  catch in a string and return.
+ * @param type $runnable
+ * @return type
+ */
+function pkcatchecho($runnable) {
+  if (!is_callable($runnable)) {
+    return "In pkcatchecho -- the function passed[" .
+            pkvardump($runnable) . "]is not callable...";
+  }
+  $args = func_get_args();
+  array_shift($args);
+  ob_start();
+  call_user_func_array($runnable, $args);
+  //Var_Dump($arg);
+  //print_r($arg);
+  $vardump = ob_get_contents();
+  ob_end_clean();
+  ini_set('xdebug.overload_var_dump', 1);
+  return "<pre>$vardump</pre>";
+}
+
+/**
+ * Returns a string, in the form var_dump or print_r would output.
+ * @param type $arg
+ * @param type $disableXdebug
+ * @return type
+ */
+function pkvardump($arg, $disableXdebug = true) {
+  $useVarDump = true;
+  $useVarDump = false;
+  ini_set('html_errors', 0);
+  ini_set('xdebug.overload_var_dump', 0);
+  if ($useVarDump) {
+    ob_start();
+    Var_Dump($arg);
+    $vardump = ob_get_contents();
+    ob_end_clean();
+  } else {
+    $vardump = print_r($arg, true);
+  }
+  ini_set('xdebug.overload_var_dump', 1);
+  ini_set('html_errors', 1);
+  return $vardump;
+}
+
+/** Sets the path and name for the debug log IF 
+ * PkLibConfig::getSuppressPkDebug() is FALSE
+ * @staticvar type $logpath
+ * @param type $path
+ * @return string
+ */
+function appLogPath($path = null) {
+  if (PkLibConfig::getSuppressPkDebug()) {
+    return getNullPath();
+  }
+  if (isCli()) {
+    $base = __DIR__;
+  } else {
+    $base = $_SERVER['DOCUMENT_ROOT'] . '/..';
+  }
+  $defaultPath = $base . '/logs/app.log';
+  static $logpath = null;
+  if ($path === false) {
+    $logpath = $defaultPath;
+    $res = makePathToFile($logpath);
+    return $logpath;
+  }
+  if (!$path) {
+    if (!$logpath) {
+      $logpath = $defaultPath;
+    }
+    $res = makePathToFile($logpath);
+    return $logpath;
+  }
+  $logpath = $path;
+  $res = makePathToFile($logpath);
+  return $logpath;
+}
+
+function getAppLogDir() {
+  $appLogPath = appLogPath();
+  if ($appLogPath == getNullPath()) return $appLogPath;
+  return dirname($appLogPath);
+}
+
+/** Sets whether the first call to the pkdebug function in a given request
+ * should reset the log file a the start of the request, or append to it.
+ * @staticvar boolean $staticReset
+ * @param boolean|null $reset If given, changes the reset value and returns it.
+ *   if empty, returns the current reset value.
+ * @return boolean
+ */
+function appLogReset($reset = null) {
+  static $staticReset = true;
+  if ($reset === true) {
+    $staticReset = true;
+  } else if ($reset === false) {
+    $staticReset = false;
+  }
+  return $staticReset;
+}
+
+/** Outputs to the destination specified by $useDebugLog
+ * 
+ * @staticvar boolean $first
+ * @param type $str
+ * @return boolean
+ * @throws Exception
+ */
+function pkdebugOut($str, $logpath = null) {
+  if ($logpath) error_log ("Logpath is: [$logpath]");
+  static $first = true;
+  if ($logpath) $reset = false;
+  else $reset = appLogReset();
+  //if ($reset) {
+  try {
+    //$logpath = $_SERVER['DOCUMENT_ROOT'].'/../app/logs/app.log';
+    //$logpath =  WP_CONTENT_DIR.'/app.log';
+    //$logpath = $_SERVER['DOCUMENT_ROOT'] . '/logs/app.log';
+    if (!$logpath) $logpath = appLogPath();
+    if ($first && $reset) {
+      $first = false;
+      $fp = fopen($logpath, 'w+');
+    } else {
+      $fp = fopen($logpath, 'a+');
+    }
+    if (!$fp)
+        throw new Exception("Failed to open DebugLog [$logpath] for writing");
+    fwrite($fp, $str);
+    fclose($fp);
+  } catch (Exception $e) {
+    error_log("Error Writing to Debug Log: " . $e);
+    return false;
+  }
+  //} else {
+  // error_log($str);
+  //}
+  return true;
+}
+
+function getHtmlTagWhitelist() {
+  static $whitelist = "<address><a><abbr><acronym><area><article><aside><b><big><blockquote><br><caption><cite><code><col><del><dd><details><div><dl><dt><em><figure><figcaption><font><footer><h1><h2><h3><h4><h5><h6><header><hgroup><hr><i><img><ins><kbd><label><legend><li><map><menu><nav><p><pre><q><s><span><section><small><strike><strong><sub><summary><sup><table><tbody><td><textarea><tfoot><th><thead><title><tr><tt><u><ul><ol><p>";
+  return $whitelist;
+}
+
+/** Takes a string or multi-dimentional array of text (like from a POST)
+ * and recursively trims it and strips tags except from a whitelist
+ * @param type $input input string or array.
+ */
+//function htmlclean ($arr, $usehtmlspecchars = false) {
+function html_clean(&$arr, $usehtmlspecchars = false) {
+  $whitelist = getHtmlTagWhitelist();
+  if (!$arr) return $arr;
+  if (is_string($arr) || is_numeric($arr)) {
+    return strip_tags(trim($arr), $whitelist);
+  }
+  if (is_object($arr)) {
+    $arr = get_object_vars($arr);
+  }
+  if (!is_array($arr)) {
+    pkdebug("Bad Data Input?:", $arr);
+    throw new Exception("Unexpected input to htmlclean:" . pkvardump($arr));
+  }
+  $retarr = array();
+  foreach ($arr as $key => &$value) {
+    $retarr[$key] = html_clean($value, $usehtmlspecchars);
+  }
+  return $retarr;
+}
+
+/**
+ * Takes a file name or path, and returns the lower-cased extension (ex, 'jpg')
+ * @param string $filePath: The string file path
+ * @return string: the LOWER CASED file extension, if any, with no ".'
+ */
+function getFileExtension($filePath) {
+  $ext = strtolower(substr($filePath, strrpos($filePath, '.') + 1));
+  return $ext;
+}
+
+/**
+ * Removes the protocol, domain, and parameters, just returns
+ * indexed array of route segments. ex, for URL:
+ * http://www.example.com/some/lengthy/path?with=get1&another=get2
+ * ... returns: array('some', 'lengthy', 'path');
+ * @param Boolean|String $default: If the first two segments are missing, should
+ * @param int $depth default = 2: How many segments to set to the default 'index' the base URL
+ * we return the default value for them? Default false, otherwise probably 'index'
+ * @return Array: Route Segments
+ */
+function getRouteSegments($default = false, $depth = 2) {
+  $aseg = $_SERVER['REQUEST_URI'];
+  $breakGets = explode('?', $aseg);
+  $noGet = $breakGets[0];
+  $anarr = explode('/', $noGet);
+  array_shift($anarr);
+  if (isset($anarr[0]) && ($anarr[0] === 'favicon.ico')) return [];
+  if ($default) {
+    for ($i = 0; $i < $depth; $i++) {
+      if (isset($anarr[$i]) && !$anarr[$i] && ($anarr[$i] === 'favicon.ico')) {
+        pkdebug("WTF!:!: Favicon from: aseg:", $aseg);
+      }
+      if (!isset($anarr[$i]) || !$anarr[$i] || ($anarr[$i] === 'favicon.ico')) {
+        $anarr[$i] = 'index';
+      }
+    }
+  }
+  return $anarr;
+}
+
+
+/**
+ * Returns if HTTP request protocol is HTTPS; else false
+ * @return boolean - true if in a request and request is HTTPS; else false
+ */
+function isHttps() {
+  return (!empty($_SERVER)) && (
+      (array_key_exists('HTTPS', $_SERVER) && strtolower($_SERVER["HTTPS"]) === "on") ||
+
+      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
+      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https'))
+    );
+
+          /**
+      (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
+      ($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https')
+    );
+           * 
+           */
+}
+/**
+ * 
+ * @return String: The URL without subdirs, but with protocol (http://, etc)
+ */
+function getBaseUrl() {
+  $pageURL = 'http';
+  //if (filter_server("HTTPS") == 'on') {
+  if (array_key_exists('HTTPS', $_SERVER) && $_SERVER["HTTPS"] == "on") {
+
+    $pageURL .= "s";
+  }
+  $pageURL .= "://";
+  //return $pageURL . filter_server("HTTP_HOST");
+  return $pageURL . $_SERVER["HTTP_HOST"];
+}
+
+function getUrl() {
+  return getFullUrl();
+}
+
+/**
+ * Returns the the full current URL. NOTE! NO FILTERING/SANITIZING!
+ * @return String: full URL
+ */
+function getFullUrl($withgets = true) {
+  $path = getRequestUri($withgets);
+  return fullHost() . $path;
+}
+
+function getRequestUri($withgets = true) {
+  $path = $_SERVER["REQUEST_URI"];
+  if (!$withgets) {
+    $reqArray = explode('?', $_SERVER['REQUEST_URI']);
+    $path = $reqArray[0];
+  }
+  return $path;
+}
+
+/* * Another version, only handles ports & forwarding, etc.
+ * NOTE: THESE URL FUNCTIONS DO NOT FILTER! Just return the raw URL.
+ * 
+ */
+
+function fullHost($use_forwarded_host = false) {
+  $s = $_SERVER;
+  $ssl = (!empty($s['HTTPS']) && $s['HTTPS'] == 'on') ? true : false;
+  $sp = strtolower($s['SERVER_PROTOCOL']);
+  $protocol = substr($sp, 0, strpos($sp, '/')) . (($ssl) ? 's' : '');
+  $port = $s['SERVER_PORT'];
+  $port = ((!$ssl && $port == '80') || ($ssl && $port == '443')) ? '' : ':' . $port;
+  $host = ($use_forwarded_host && isset($s['HTTP_X_FORWARDED_HOST'])) ? $s['HTTP_X_FORWARDED_HOST'] : (isset($s['HTTP_HOST']) ? $s['HTTP_HOST'] : null);
+  $host = isset($host) ? $host : $s['SERVER_NAME'] . $port;
+  return $protocol . '://' . $host;
+}
+
+/**
+ * Returns all components of the page URL, without the 
+ * GET query parameters
+ */
+function getUrlNoQuery() {
+  #Do we want to filter here?
+  $noGetUriArr = explode('?', $_SERVER["REQUEST_URI"]);
+  //var_dump("NO GET URI:", $noGetUriArr);
+  $noGetUri = $noGetUriArr[0];
+  $baseUrl = getBaseUrl();
+  //$baseUrl = substr($baseUrl, 0, -1);
+  $getUrlNoQuery = $baseUrl . $noGetUri;
+  return $getUrlNoQuery;
+}
+
+/**
+ * Returns the URL path components as an array. For example, for:
+ * "http://www.example.com/here/there?arg=none", returns:
+ * <code>array('here','there');</code>
+ * For "http://www.example.com", returns <code>array('');</code>, so can safely
+ * deref the result: <code>$base = getPathArray()[0];</code>
+ * @param String $path: [optional]: The URL or path compoent. If null (default)
+ * uses the current URL.
+ * @return array: The URL path componentes, or array of empty string.
+ */
+function getPathArray($path = null) {
+  if (!$path) {
+    $path = $_SERVER['REQUEST_URI'];
+  }
+  $comps = parse_url($path, PHP_URL_PATH);
+  if (empty($comps['path'])) {
+    return array('');
+  }
+  $pathStr = trim($comps['path'], '/');
+  if (empth($pathStr)) {
+    return array('');
+  }
+  $pathArr = explode('/', $pathStr);
+  return $pathArr;
+}
+
+/** Sets (changes or adds or unsets/clears) a get parameter to a value
+ *
+ * 
+ * @param type $getkey -- the get parameter name
+ * @param type $getval -- the new get parameter value, or if NULL,
+ *   clea's the get parameter
+ * @param type $qstr -- can be null, in which case the current URL is
+ * used and returned with the GET parameter added, or an empty string '',
+ * in which case just a query string is returned, or just a query string,
+ * or another URL
+ */
+function setGet($getkey, $getval = null, $qstr = null) {
+  if ($qstr === '') {
+    if ($getval !== null) {
+      return http_build_query(array($getkey => $getval));
+    } else {
+      return '';
+    }
+  }
+  if ($qstr === null) {
+    $qstr = getUrl();
+  }
+  $start = substr($qstr, 0, 4);
+  $starts = substr($qstr, 0, 5);
+  $col = substr($qstr, 6, 1);
+  $fullurl = false;
+  $preqstr = '';
+  $qm = false;
+  $urlarr = explode('?', $qstr);
+  //$returi = '';
+  if (strpos($qstr, '?') === false) {# No "?" ($qm) in string
+    $qm = false;
+  } else {
+    $qm = true;
+  }
+  if ((($start === 'http') || ($starts === 'https')) && ($col === '/')) { //URL
+    $fullurl = true;
+  }
+  #Check if a "path":
+  if (strpos($qstr, '/') === false) {# No path
+    $ispath = false;
+  } else {
+    $ispath = true;
+  }
+
+
+#This only goes wrong if passed a query string w/o '?', like "akey=avall&bkey=bval"
+#But how to distinguish that from "/path/within/url"?. 
+  if (empty($urlarr[0]) || $qm || $fullurl || $ispath) {
+    $preqstr = array_shift($urlarr);
+  }
+  $quearr = array();
+  if (!empty($urlarr[0])) {
+    parse_str($urlarr[0], $quearr);
+  }
+  if ($getval === null) {
+    unset($quearr[$getkey]);
+  } else {
+    $quearr[$getkey] = $getval;
+  }
+  $retquery = http_build_query($quearr);
+  $returl = $preqstr . '?' . $retquery;
+  pkdebug("qstr: [$qstr]; returl: [$returl], querr:", $quearr, 'urlarr:', $urlarr);
+  return $returl;
+}
+
+/**
+ * Creates a select box with the input
+ * @param $name - String - The HTML Control Name. Makes class from 'class-$name'
+ * #@param $label - String - The label on the control
+ * #@param $key_str - The key of the select option array element
+ * #@param $val_str - The key for the array element to display in the option
+ * @param $arr - Array - The array of key/value pairs
+ * @param $selected - String or Null - if present, the selected value
+ * @param $none - String or Null - if present, the label to show for a new
+ *   entry (value 0), or if null, only allows pre-existing options
+ * @return String -- The HTML Select Box
+ * */
+function makePicker($name, $key, $val, $arr, $selected = null, $none = null) {
+#function makePicker($name, $arr, $selected=null, $none=null) {
+  $select = "<select name='$name' class='$name-sel'>\n";
+  if ($none) $select .= "\n  <option value=''><b>$none</b></option>\n";
+  foreach ($arr as $row) {
+    $selstr = '';
+    if ($selected == $row[$key]) $selstr = " selected='selected' ";
+    $option = "\n  <option value='" . $row[$key] . "' $selstr>" . $row[$val] . "</option>\n";
+    $select .= $option;
+  }
+  $select .= "\n</select>";
+  return $select;
+}
+
+/** No guarantee, but approximate heuristic to determine if an array is
+ * associative or integer indexed.
+ * NOTE: Will return FALSE if array is empty, and TRUE if array is 
+ * indexed but not sequential. 
+ * @param type $array
+ * @return type
+ */
+function is_array_assoc($array) {
+  if (!is_array($array) || !sizeOf($array)) {
+    return false;
+  }
+  return ($array !== array_values($array));
+}
+
+/** Checks that $array is an indexed array. If $sequential = true (default),
+ * also verifies the integer indices are consecutive starting from 0
+ * @param array $array
+ * @param boolean $sequential - if true, indices must be sequential integers.
+ *   if false, indices may be non-sequential, but must be integer or integer 
+ *   equivalents. If false, returns the array with integerish keys converted
+ *   to integers. Like, $array['1'=>'aval', 3=>'bval'] will return:
+ *   [1=>'aval', 3=>'bval'];
+ * @return boolean|array - is the array consecutively integer indexed array?
+ *   If $consecutive == false, returns the array with integerish keys converted
+ *   to integers
+ */
+function is_array_indexed($array, $sequential = true) {
+  if (!is_array($array) || !sizeOf($array)) {
+    return false;
+  }
+  if ($sequential) return ($array === array_values($array));
+  $keys = array_keys($array);
+  $retarr = [];
+  foreach ($keys as $key) {
+    if (($intkey = to_int($key)) === false) return false;
+    $retarr[$intkey] = $array[$key];
+  }
+  return $retarr;
+}
+
+/**
+ * Determines if the value can be output as a string.
+ * @param type $value
+ * @param boolean $nullorfalse - are null and false considered stringish? Default, true
+ * @return boolean: Can the value be output as a string?
+ */
+function is_stringish($value, $nullorfalse = true) {
+  if (is_object($value) && method_exists($value, '__toString')) return true;
+  if (!$nullorfalse && (($value === false) || ($value === null))) {
+    return false;
+  }
+  if (is_null($value)) return true;
+  return is_scalar($value);
+}
+
+/**
+ * Takes any number of arguments as scalars or arrays, or nested arrays, and
+ * returns a 1 dimentional indexed array of the values 
+ * $args: any number of arguments to flatten into an array
+ * @return array: 1 dimensional index array of values
+ */
+if (function_exists('pk_array_flatten')) {
+  error_log("pk_Array_Flatten already defined outside of pklib - might have different behavior!");
+} else {
+
+  function pk_array_flatten(/* $args */) {
+    $args = func_get_args();
+    $return = array();
+    array_walk_recursive($args, function($a) use (&$return) {
+      $return[] = $a;
+    });
+    return $return;
+  }
+
+}
+
+/**
+ * Like array_merge(), except instead of a list of arrays to merge, takes an 
+ * array of arrays to merge, and returns the merged array.
+ * @param Array $arrs: Array of arrays
+ * @return Array: Merged array of arrays
+ */
+function array_merge_array($arrs = []) {
+  $res = [];
+  foreach ($arrs as $arr) {
+    $res = array_merge($res, $arr);
+  }
+  return $res;
+}
+
+/**
+ * Converts a compatable argument to an actual integer type ('7' -> 7), or 
+ * boolean false ('010' -> false, '' -> false).
+ * Totally unnecessary function but more convenient than remembering constant 
+ * @param type $arg
+ * @return: integer if integer, also 0, but boolean false if not an integer
+ * Examples:
+ * to_int($fileObj) === FALSE;
+ * to_int('7') === 7;
+ * to_int('07') === FALSE;
+ * to_int(['a','b']) === FALSE;
+ * to_int(NULL) === FALSE;
+ * to_int('0') === 0;
+ */
+function to_int($arg) {
+  //if (is_int($arg)) return $arg; #Optimization attempt
+  $arg = filter_var($arg, FILTER_VALIDATE_INT);
+  return $arg;
+}
+
+/** Implements filter_var on array variables
+ * 
+ * @param array or string $input: The input to be filtered. Does not filter keys.
+ * @param int $flag: See php filter_var docs
+ * @param mixed $options: See php filter_var docs
+ * @return String or Array: The filtered result.
+ * @throws Exception
+ */
+function filter_var_recursive($input, $flag = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
+  if (is_array($input)) {
+    $ret = array();
+    foreach ($input as $key => $val) {
+      $ret[$key] = filter_var_recursive($val, $flag, $options);
+    }
+    return $ret;
+  } else if (is_scalar($input)) {
+    return filter_var($input, $flag, $options);
+  } else {
+    throw new Exception("Invalid input: " . print_r($input, true));
+  }
+}
+
+/**
+ * Cleans a string for output. Basically, wrap all output in this function, then
+ * can change method used.
+ * @param string $str: The string to clean
+ * @return string: The clean string.
+ */
+function cln_str($str, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS) {
+  return filter_var($str, $filter);
+}
+
+#FOR ALL CUSTOM IMPORT FILTERS !!! SPECIAL HANDLING FOR INPUT ARRAYS!
+#IF INPUT IS AN ARRAY, MUST USE FILTER_REQUIRE_ARRAY AS OPTION!!!
+
+/**
+ * Filters a POST input, according to the parameters
+ */
+function filter_post($key, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
+  return filter_input(INPUT_POST, $key, $filter, $options);
+}
+
+/**
+ * Filters a GET input, according to the parameters
+ */
+function filter_get($key, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
+  return filter_input(INPUT_GET, $key, $filter, $options);
+}
+
+######### Try filtering input arrays
+
+function filter_post_array($filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS) {
+  $post = filter_input_array(INPUT_POST, $filter);
+  return $post;
+}
+
+function filter_get_array($filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS) {
+  $get = filter_input_array(INPUT_GET, $filter);
+  return $get;
+}
+
+/** Performs the equivalent of "filter_input($type = INPUT_REQUEST,...) if that
+ * existed.
+ * @param string $key: The input key for GET/POST/COOKIE
+ * @param integer $filter: The filter type. Defaults to FILTER_SANITIZE_FULL_SPECIAL_CHARS
+ * @param mixed $options: Optional additional options for "filter_input", if any.
+ * @return: The sanitized result, or null.
+ */
+function filter_request($var, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
+  $res = filter_input(INPUT_GET, $var, $filter, $options);
+  if ($res === null) $res = filter_input(INPUT_POST, $var, $filter, $options);
+  if ($res === null) $res = filter_input(INPUT_COOKIE, $var, $filter, $options);
+  return $res;
+}
+
+function filter_server_url($var, $default = '/', $filter = FILTER_VALIDATE_URL, $options = null) {
+  $ret = filter_input(INPUT_SERVER, $var, $filter, $options);
+  if (!$ret) $ret = $default;
+  return $ret;
+}
+
+function filter_server($var, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
+  return filter_input(INPUT_SERVER, $var, $filter, $options);
+}
+
+function filter_url($url) {
+  if (filter_var($url, FILTER_VALIDATE_URL)) {
+    return $url;
+  }
+  return '/';
+}
+
+function cln_arr_val(Array $arr, $key, $filter = FILTER_SANITIZE_STRING) {
+  if (!array_key_exists($key, $arr)) {
+    return null;
+  }
+  return cln_str($arr[$key], $filter);
+}
+
+/**
+ * Encodes a string with HTML special characters -- including single and double
+ * quotes - mainly for use to include an arbitrary string (including HTML
+ * input elements for form templates) in an HTML data-XXX attribute.
+ * IDEMPOTENT!!
+ * @param String $str: The input string, which may contain special HTML chars.
+ * @return String: The HTML Encoded string
+ */
+function html_encode($str) {
+  return filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS, ENT_QUOTES);
+}
+
+/** Takes a PHP array, encodes it to JSON, and then re-encodes it to HTML
+ * string for inclusion in html attribute values
+ * @param array $arr: data to encode
+ */
+function html_encode_array(Array $arr = []) {
+  $json = json_encode($arr);
+  return html_encode($json);
+}
+
+/**
+ * Decodes a string previously encoded for HTML special characters --
+ * including single and double quotes - mainly for use decoding an HTML data-XXX attribute.
+ * @param String $str: The input string, which may contain special HTML chars.
+ * @return String: The HTML Encoded string
+ */
+function html_decode($str) {
+  htmlspecialchars_decode($str, ENT_QUOTES);
+}
+
+/**
+ * Insert the value into the given array (or new array) at the appropriate
+ * depth/key sequence specified by the array of keys. Ex: 
+ * var_dump(insert_into_array(array('car','ford','mustang','engine'), "351 Cleavland"));
+ * Outputs:
+ * array (size=1)
+  'car' =>
+  array (size=1)
+  'ford' =>
+  array (size=1)
+  'mustang' =>
+  array (size=1)
+  'engine' => string '351 Cleavland' (length=13)
+ * @param array $keys: Sequence/depth of keys
+ * @param Mixed $value: Whatever value to assign to the location
+ * @param array|NULL $arr -- Optional array to add to or create 
+ * @param boolean $unset (optional): If value is null, default is to create
+ * the entry with a null value. If $unset==true, unset the key if it exists.
+ * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
+ * @return Array: Array with value set at appropriate vector. If called with
+ * $retar = &insert_into_array(.... $arr);, $retar will be a reference to $arr
+ */
+function &insert_into_arrayBAD($keys, $value, & $arr = null, $unset = false) {
+  if (!is_array($keys)) {
+    $keys = [$keys];
+  }
+  #If there is a value, don't unset, regardless of unset option
+  if ($value) {
+    $unset = false;
+  }
+  if ($arr === null) {
+    $arr = [];
+  }
+  $x = & $arr;
+  $y = &$x;
+  foreach ($keys as $keyval) {
+    $y = &$x;
+    if (is_array($x)) {
+      $x = & $x[$keyval];
+    } else if (is_object($x)) {
+      $x = &$x->$keyval;
+    }
+  }
+  if ($unset) {
+    array_pop($y);
+  } else {
+    $x = $value;
+  }
+  return $arr;
+}
+
+/**
+ * Insert the value into the given array (or new array) at the appropriate
+ * depth/key sequence specified by the array of keys. Ex: 
+ * var_dump(insert_into_array(array('car','ford','mustang','engine'), "351 Cleavland"));
+ * Outputs:
+ * array (size=1)
+  'car' =>
+  array (size=1)
+  'ford' =>
+  array (size=1)
+  'mustang' =>
+  array (size=1)
+  'engine' => string '351 Cleavland' (length=13)
+ * @param array $keys: Sequence/depth of keys
+ * @param Mixed $value: Whatever value to assign to the location
+ * @param array|NULL $arr -- Optional array to add to or create 
+ * @param boolean $unset (optional): If value is null, default is to create
+ * the entry with a null value. If $unset==true, unset the key if it exists.
+ * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
+ * @return Array: Array with value set at appropriate vector. If called with
+ * $retar = &insert_into_array(.... $arr);, $retar will be a reference to $arr
+ */
+function &insert_into_array($keys, $value, &$arr = null, $unset = false) {
+  if (!is_array($keys)) {
+    $keys = [$keys];
+  }
+  #If there is a value, don't unset, regardless of unset option
+  if ($arr === null) {
+    $arr = [];
+  }
+  $x = & $arr;
+  $y = &$x;
+  foreach ($keys as $keyval) {
+    $y = &$x;
+    if (is_object($x)) {
+      $x = &$x->$keyval;
+    } else {
+      $x = & $x[$keyval];
+    }
+  }
+  if ($unset) {
+    array_pop($y);
+  } else {
+    $x = $value;
+  }
+  //$x = $value;
+  return $arr;
+}
+
+/**
+ * Intention here is to unset / pop value at keys level of array
+ * OH -- BUT THIS IS SO NOT RIGHT....
+ * @param array $keys: Sequence of keys to the array value to remove
+ * @param array $arr: The array to pop/unset from...
+ * @return 
+ */
+/* Don't think I need this - fixed the above - but wait & see...
+  function unset_array_keys($keys, &$arr) {
+  if (!is_array($keys)) {
+  $keys = [$keys];
+  }
+  $x = & $arr;
+  $y = &$x;
+  foreach ($keys as $keyval) {
+  $y = &$x;
+  $x = & $x[$keyval];
+  }
+  array_pop($y);
+  }
+ * 
+ */
+
+/**
+ * Examines an array and checks if a key sequence exists
+ * @param array $keys: Array of key sequence, like
+ * array('car','ford','mustang','engine')
+ * @param array $arr: The array to examine if key sequence is set, for ex:
+ * $arr['car']['ford']['mustang']['engine'] = "351 Cleavland";
+ * @return boolean: True if array key chain is set, else false
+ */
+//function array_key_exists_depth(Array $keys, Array $arr) {
+function arrayish_keys_exist($keys, $arr = null) {
+  if (!$arr) return false;
+  if (!is_arrayish($arr)) return false;
+  foreach ($keys as $keyval) {
+    if (!is_arrayish($arr) || !arrayish_key_exists($keyval, $arr)) {
+      return false;
+    }
+    $arr = $arr[$keyval];
+  }
+  return true;
+}
+
+function is_arrayish($arg) {
+  return (is_array($arg) || ($arg instanceOf ArrayAccess));
+}
+
+/** Similar to above (array_keys_exist()), only returns the value at the 
+ * location
+ * @param array|scalar $keys. What to do if null? Return it all...
+ * @param array $arr
+ * @return mixed: The value at the location
+ */
+function arrayish_keys_value($keys, $arr = null) {
+  if (is_scalar($keys)) {
+    $keys = [$keys];
+  }
+  if (!is_array($keys)) {
+    return $arr;
+  }
+  if (!$arr) return false;
+  if (!is_arrayish($arr)) return false;
+  foreach ($keys as $keyval) {
+    if (!is_arrayish($arr) || !arrayish_key_exists($keyval, $arr)) {
+      return false;
+    }
+    $arr = $arr[$keyval];
+  }
+  return $arr;
+}
+
+/**
+ * Like the system "array_key_exists", except for ArrayAccess implementation
+ * as well.
+ * @param int|str $keyval
+ * @param array|ArrayAccess $arr
+ * @return boolean: True if key exists, else false
+ */
+function arrayish_key_exists($keyval, $arr) {
+  if (is_array($arr)) return array_key_exists($keyval, $arr);
+  if ($arr instanceOf ArrayAccess) return $arr->offsetExists($keyval);
+  throw new Exception("Argument (2) to arrayish_key_exists is not arrayable");
+}
+
+/**
+ * Returns Max int key index for array with mixed assoc/idx keys (or Max + 1
+ * if $next == true). 
+ * @param array $arr: The array to find max int key of
+ * @param boolean $next: If true, returns max+1; or 0 if no int keys.
+ * @return null|int: Max int key index in array with mixed assoc/idx keys
+ */
+function max_idx($arr, $next = false) {
+  if (!$arr || !sizeOf($arr)) {
+    if ($next) return 0;
+    return null;
+  }
+
+  $ret = null;
+  $keys = arrayish_keys($arr);
+  foreach ($keys as $key) {
+    if (is_int($key)) {
+      if (($ret === null) || ($key > $ret)) {
+        $ret = $key;
+      }
+    }
+  }
+  if ($next) {
+    if ($ret === null) return 0;
+    return $ret + 1;
+  }
+  return $ret;
+}
+function is_iterable($var) {
+    return (is_array($var) || $var instanceof Traversable);
+}
+/**
+ * Basically, "array_keys()" for objects that implement Iterator
+ * @param array $arr: The array or array-like object
+ * @return Array: The keys of the array or array like object
+ */
+function arrayish_keys($arr) {
+  if (!sizeOf($arr)) {
+    return array();
+  }
+  $keys = array();
+  foreach ($arr as $key => $val) {
+    $keys[] = $key;
+  }
+  return $keys;
+}
+
+/**
+ * Returns a list of all declared classes that are descendants/instances Of
+ * the named class
+ * @TODO: Should really return a hierarchy instead of a flat array..
+ * 
+ * @param string $class: The class to check for descendants of...
+ * @param Boolean $alsome: Also Me? That is, return this class itself? 
+ * @return boolean|array: all declared classes that are descendants of the 
+ * given class
+ */
+function get_descendants($class, $alsome = 0) {
+  if (!class_exists($class)) {
+    return false;
+  }
+  static $descendantsStat = [];
+  if ($alsome) $alsomeint = 1;
+  else $alsomeint = 0;
+  if (array_key_exists($class, $descendantsStat)) {
+    if (array_key_exists($alsomeint, $descendantsStat[$class])) {
+      return $descendantsStat[$class][$alsomeint];
+    } else {
+      $descendantsStat[$class][$alsomeint] = null;
+    }
+  } else {
+    $descendantsStat[$class] = [];
+  }
+  $classes = get_declared_classes();
+  $descendants = array();
+  if ($alsome) {
+    $descendants[] = $class;
+  }
+  foreach ($classes as $aclass) {
+    //if ($aclass instanceOf $class) {
+    if (is_subclass_of($aclass, $class)) {
+      $descendants[] = $aclass;
+    }
+  }
+  $descendantsStat[$class][$alsomeint] = $descendants;
+  return $descendants;
+}
+
+function submitted($onlyPost = false) {
+  //if ((filter_server('REQUEST_METHOD') == 'POST') || (sizeof($_GET) && !$onlyPost)) {
+  if (($_SERVER['REQUEST_METHOD'] == 'POST') || (sizeof($_GET) && !$onlyPost)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+#Form CSRF NONCE functions -- two types - 2 pure low-level PHP Nonce generating
+#and checking, and 2 form interactive function which generate the hidden control
+#and redirect if NONCE not satisfied.
+
+/** Just make a NONCE
+ * @return String: Hex string for inclusion in hidden NONCE input, and for
+ * setting session variable.
+ */
+function makeNonce($len = 128, $prefix = '') {
+  $bytes = openssl_random_pseudo_bytes($len);
+  $hex = bin2hex($bytes);
+  return $prefix.$hex;
+}
+
+/**
+ * Calls "makeNonce()" to generate the NONCE, create a hidden input string, and
+ * set the SESSION variable with the generated NONCE value
+ * @return String: The hidden NONCE input control for direct echoing in a form
+ */
+function formCreateNonce() {
+  $nonce = makeNonce();
+  $control = "<input type='hidden' name='form_nonce' value='$nonce' />\n";
+  $_SESSION['form_nonce'] = $nonce;
+  return $control;
+}
+
+/**
+ * Checks the submitted nonce with the stored session nonce.
+ * @return boolean: Whether the submitted nonce matches the SESSION (expected)
+ * NONCE
+ */
+function checkNonce() {
+  $form_nonce = $_SESSION['form_nonce'];
+  $request_nonce = filter_request('form_nonce');
+  if ($request_nonce == $form_nonce) {
+    return true;
+  } else {
+    pkdebug("FORM NONCE:'$form_nonce'; REQUEST_NONCE: '$request_nonce'");
+    return false;
+  }
+}
+
+/**
+ * Processes the form submission and redirects if NONCE requirement not met.
+ * If not a post, returns successfully. If POSTed NONCE value exists but
+ * doesn't match SESSSION NONCE, redirects to default NONCE mismatch page.
+ * If POSTed NONCE doesn't exist, either returns "FALSE", or redirects to 
+ * NONCE mismatch page, depending on options. If POSTed NONCE exists and matches
+ * SESSION NONCE, returns TRUE.
+ */
+function formProcessNonce($nonceFailPage = 'nonce_fail', $ignoreMissing = true) {
+  if (!submitted(true)) {
+    return true;
+  }
+
+  $noncePass = checkNonce();
+  $baseUrl = getBaseUrl();
+  if (!$noncePass) {
+    die("<h2>NONCE failed; see log</h2>");
+    header("Location: $baseUrl/$nonceFailPage");
+  }
+  return true;
+}
+
+/**
+ * Takes a string with white-spaces, punctuation, weird characters, etc,
+ * and returns a nice string w/o spaces, UC chars, etc, for URL or
+ * CSS Classname
+ * @param string $text: The messy text.
+ * @return string: Clean String suitable for a URL or CSS Class or ID name
+ */
+function slugify($text) {
+  // replace non letter or digits by -
+  $text = preg_replace('~[^\\pL\d]+~u', '-', $text);
+  $text = trim($text, '-');
+  // transliterate
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+  $text = mb_strtolower($text);
+  // remove unwanted characters
+  $text = preg_replace('~[^-\w]+~', '', $text);
+  //if (empty($text)) {
+  #Change from 'empty' -- allow for 0
+  if ($text === '') {
+    return 'n-a';
+  }
+  return $text;
+}
+
+/**
+ * NOT FOR PASSWORDS - just to generate a short string probably unique in a
+ * page for HTML 'id'-s 
+ * @param int $length: Length of string to return
+ * @return string: Short, randomish lower case alpha string
+ */
+function generateShortRandomString($length = 5) {
+  return substr(str_shuffle("abcdefghijklmnopqrstuvwxyz"), 0, $length);
+}
+
+/** Makes a urlencoded parameter string from an associative input array.
+ * 
+ * @param array $args: Associative array of get keys/values
+ * @return String: URL encoded string of gets
+ */
+#duh -- just    http_build_query($args);
+/*
+  function makeGets($args = null) {
+  if (empty($args) || !$args || !is_array($args)) {
+  return '';
+  }
+  $getstr = '';
+  foreach ($args as $key => $value) {
+  $getstr.=urlencode($key) . '=' . urlencode($value) . '&';
+  }
+  #Trim terminal '&'...
+  return substr($getstr, 0, -1);
+  }
+ * 
+ */
+
+/**
+ * Takes two values - either of which could be scalar or array, and returns
+ * an array of them combined. Ex:
+ * <tt>combineAsArrays(['hello', 'goodbye'], 'yesterday');</tt> returns:
+ * <tt>['hello', 'goodbye', 'yesterday']</tt>
+ * @param mixed $arg1
+ * @param mixed $arg2
+ * @return array: Values combined as array
+ */
+function combineAsArrays($arg1, $arg2) {
+  $arg1 = toArray($arg1);
+  $arg2 = toArray($arg2);
+  return array_merge($arg1, $arg2);
+}
+
+/**
+ * Examines $arg - if not an array (eg, scaler, null or object), puts it into an array. 
+ * If "$ish" is true, considers an "arrayish" arg as an array.
+ * @param mixed $arg
+ * @param boolean $ish - consider ArrayObjects already arrays?
+ */
+function toArray($arg, $ish = false) {
+  if (is_array($arg)) return $arg;
+  if ($ish && is_arrayish($arg)) return $arg;
+  return [$arg];
+}
+
+/** Takes a string and a terminator; if the terminator is present at the 
+ * end, returns the string with the terminator removed.
+ * @param string $str
+ * @param string $test
+ * @return string|false The input string stripped of terminal/ending $test
+ * else boolean 'FALSE' if doesn't end w. $test
+ */
+function removeEndStr($str, $test = '') {
+  if (!$test) return $str;
+  if (!(substr($str, -strlen($test)) == $test)) {
+    return false;
+  }
+  return substr($str, 0, strlen($str) - strlen($test));
+}
+
+/** Does what perhaps the above function "removeEndStr" should do - that is,
+ * returns the original string if it doesn't end with '$test' str.
+ */
+function removeEndStrIf($str, $test) {
+  $res = removeEndStr($str, $test);
+  if ($res === false) return $str;
+  return $res;
+}
+
+/** Returns $str with initial $test string removed if $str starts with $test,
+ * else false.
+ * @param string $str - the string to examin
+ * @param string $test - the string to remove if $str starts with $test
+ * @return string|false - The $str with initial $test removed if it starts with $test,
+ * else false if it doesn't start with $test.
+ */
+function removeStartStr($str, $test = '') {
+  if (!$test) return $str;
+  if (substr($str, 0, strlen($test)) != $test) return false;
+  return substr($str, strlen($test));
+}
+
+/** Returns $str with prepended $test string removed if str starts w. test;
+ * else returns just the original $str.
+ * @param string $str - the string to examine and remove leading string from
+ * @param string $test - the string to remove from the given string, if it starts 
+ * with it.
+ * @ return string - the initial argument $str string, with $test removed if it exists
+ */
+function removeStartStrIf($str, $test = '') {
+  $res = removeStartStr($str, $test);
+  if ($res !== false) return $res;
+  return $str;
+}
+
+/**
+ * Does the haystack start with the needle? Case Sensitive?
+ * @param string $haystack
+ * @param string $needle
+ * @param boolean $case - true for case sensitive (default), false for ci
+ * @return boolean - does haystack start with needle?
+ */
+function startsWith($haystack, $needle, $case = true) {
+  if ($case) {
+    return (strcmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
+  }
+  return (strcasecmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
+}
+
+/**
+ * For Apache re-writes through an index.php (or other) file - returns the
+ * base URL where the reroute file is - without 'index.php' (default) or 
+ * whatever the reroute file name is - appended. 
+ * @param string $rerouteBase - default: 'index.php'.
+ * The file name Apache calls are routed through
+ * @return string - The URL without the appended filename.
+ */
+function getRootWithoutIndex($rerouteBase = 'index.php') {
+  $root = pktrailingslashit(removeEndStrIf($_SERVER['PHP_SELF'], $rerouteBase));
+  return getBaseUrl() . $root;
+}
+
+/**
+ * Strips off 'www.', if any. Doesn't deal with subdomains - see notes if
+ * this is important.
+ * @return string - domain name (if simple);
+ */
+function getDomain() {
+  $serverName = $_SERVER['SERVER_NAME'];
+  $domain = removeStartStrIf($serverName, 'www.');
+  return $domain;
+}
+
+/** This uses tricks like DNS lookup of IP Address - so can handle more 
+ * complex domains, but also more error prone. Don't use unless necessary.
+ * @return string - domain name
+ */
+function getDomainHard($url = null) {
+  if (!$url) { #Use our URL
+    $url = getBaseUrl();
+  }
+  $dots = substr_count($url, '.');
+  $domain = '';
+  for ($end_pieces = $dots; $end_pieces > 0; $end_pieces--) {
+    $test_domain = end(explode('.', $url, $end_pieces));
+    if (dns_check_record($test_domain, 'A')) {
+      $domain = $test_domain;
+      break;
+    }
+  }
+  return $domain;
+}
+
+/*
+  function getRealPostArray() {
+  if (!$_SERVER['REQUEST_METHOD'] === 'POST') {#Nothing to do
+  return null;
+  }
+  $postdata = file_get_contents("php://input");
+  $post = [];
+  $postraws = explode('&', $postdata);
+  foreach ($postraws as $postraw) { #Each is a string like: 'xxxx=yyyy'
+  $keyvalpair = explode('=',$postraw);
+  if (empty($keyvalpair[1])) {
+  $keyvalpair[1] = null;
+  }
+  $post[urldecode($keyvalpair[0])] = urldecode($keyvalpair[1]);
+  }
+  return $post;
+  }
+ */
+
+/**
+ * Returns a POST array without dots in keys converted to '_' BUT NOTE!
+ * DOES NOT WORK WITH 'enctype' => 'multipart/form-data',
+ * @return null|array: POSTed data without '.' converted to '_' in keys.
+ */
+function getRealPostArray() {
+  if ($_SERVER['REQUEST_METHOD'] !== 'POST') {#Nothing to do
+    return null;
+  }
+  // global $HTTP_RAW_POST_DATA;
+  //static $postdata = '';
+  //$postdata = $HTTP_RAW_POST_DATA;
+  $neverANamePart = '~#~';
+  //if (!$postdata) {
+  $postdata = file_get_contents("php://input");
+  //}
+  pkdebug("POST DATA:", $postdata);
+  $post = [];
+  $rebuiltpairs = [];
+  $postraws = explode('&', $postdata);
+  foreach ($postraws as $postraw) { #Each is a string like: 'xxxx=yyyy'
+    $keyvalpair = explode('=', $postraw);
+    if (empty($keyvalpair[1])) {
+      $keyvalpair[1] = '';
+    }
+    $pos = strpos($keyvalpair[0], '%5B');
+    if ($pos !== false) {
+      $str1 = substr($keyvalpair[0], 0, $pos);
+      $str2 = substr($keyvalpair[0], $pos);
+      $str1 = str_replace('.', $neverANamePart, $str1);
+      $keyvalpair[0] = $str1 . $str2;
+    } else {
+      $keyvalpair[0] = str_replace('.', $neverANamePart, $keyvalpair[0]);
+    }
+    $rebuiltpair = implode('=', $keyvalpair);
+    $rebuiltpairs[] = $rebuiltpair;
+  }
+  $rebuiltpostdata = implode('&', $rebuiltpairs);
+  parse_str($rebuiltpostdata, $post);
+  $fixedpost = [];
+  foreach ($post as $key => $val) {
+    $fixedpost[str_replace($neverANamePart, '.', $key)] = $val;
+  }
+  return $fixedpost;
+}
+
+/**
+ * Attempt to implement var_export output for arrays with square brackets
+ * instead of "array(...)"
+ * 
+ * JUST EXPERIMENTAL - USE ONLY FOR FORM SUGGEST, 
+ * @param mixed $var - what to output
+ */
+function var_export_square($var, $depth = 0, $indent = '  ') {
+  $totalindent = str_repeat($indent, $depth);
+  if (!is_array($var)) {
+    if (is_object($var)) {
+      return var_export($var, 1) . ",";
+    }
+    switch (gettype($var)) {
+      case "string":
+        return '"' . addcslashes($var, "\\\$\"\r\n\t\v\f") . '", ';
+
+      case "boolean":
+        return ($var ? "TRUE" : "FALSE") . ", ";
+
+      case "double":
+      case "integer":
+        return "$var" . ", ";
+      case "NULL":
+        return "NULL, ";
+      default:
+        return "/* WEIRD */ " . var_export($var, 1) . ", ";
+    }
+    //return $totalindent.var_export($var, 1)."\n";
+  }
+  //$output = "[\n" . $totalindent;
+  $output = "[\n" . $totalindent;
+  //$output = $totalindent."[\n";
+  $depth++;
+  foreach ($var as $key => $value) {
+    //$output .=($indent.$totalindent."'$key' =>".var_export_square($value, $depth, $indent).",\n");
+    //$output .=("'$key' =>".var_export_square($value, $depth, $indent).",\n");
+    //$output .=("'$key' => " . var_export_square($value, $depth, $indent) . " ");
+    if (is_string($key)) {
+      $key = "'$key'";
+    } else if (is_null($key)) {
+      $key = "NULL";
+    } else if (is_bool($key)) {
+      $key = ($$key ? "TRUE" : "FALSE");
+    } else if (is_numeric($key)) {
+      
+    }
+    $output .=("$key => " . var_export_square($value, $depth, $indent) . " ");
+  }
+  //$output .= $totalindent."]";
+  //$output .= "]";
+  if ($depth > 1) {
+    $output .= "],\n";
+  } else {
+    $output .= "\n];\n";
+  }
+  return $output;
+}
+
+/**
+ * Displays the data in hopefully readable format. 
+ * @param mixed $data
+ * @param int $level
+ * @param int $indent
+ * @return string - readable deescription of the data
+ */
+function displayData($data, $level = 0, $indent = 2) {
+  $offset = str_repeat(' ', $level * $indent);
+  //if (is_null($data)) return $offset."NULL\n";
+  //if (is_null($data)) return "NULL, ";
+  if (is_null($data)) return "NULL";
+  $type = typeOf($data);
+  //if (is_bool($data)) if ($data) $data = 'TRUE'; else $data='FALSE';
+  //if (is_bool($data)) if ($data) return 'TRUE, '; else return 'FALSE, ';
+  if (is_bool($data)) if ($data) return 'TRUE';
+    else return 'FALSE';
+  //if (is_scalar($data)) return "$offset$type:[$data]\n";
+  if (is_scalar($data)) return "$type:{{$data}}";
+  if (is_array($data)) {
+    //if (!$data) return $offset."[]";
+    //if (!$data) return $offset."[] ";
+    if (!$data) return "[]";
+    $retStr = "[\n";
+    $level ++;
+    $newoffset = str_repeat(' ', $level * $indent);
+    foreach ($data as $key => $val) {
+      //$retStr .= "{$offset}$key=>".displayData($val, $level, $indent)."\n";
+      $retStr .= "{$newoffset}$key=>" . displayData($val, $level, $indent) . "\n";
+    }
+    //return "$retStr\n$offset]";
+    return "$retStr$offset]";
+  }
+  #Something else - obj, probably
+  //return $offset.$type.':'.print_r($data,1);
+  return $offset . $type . ':' . pkvardump($data);
+}
+
+/*
+  function Xrequire_once_all($path, $ext = '.php') {
+  $path = untrailingslashit($path);
+  foreach (glob($path . '/*' . $ext) as $filename) {
+  require_once $filename;
+  }
+  }
+ * 
+ */
+
+function require_once_all($path, $ext = 'php') {
+  //$path = untrailingslashit($path);
+  if (is_dir($path)) {
+    foreach (glob($path . '/*') as $fileordir) {
+      require_once_all($fileordir, $ext);
+    }
+  } else {
+    if (is_file($path) && ($ext === getFileExtension($path))) {
+      //if (is_file($path)){
+      require_once ($path);
+    }
+  }
+}
+
+/**
+ * Return how many dimensions an array/argument has.
+ * My model - if $arg is not an array, return null.
+ * If empty array, return 0.
+ * 
+ * @param mixed $arg: 
+ * @param type $depth
+ * @return null|integer
+ */
+function array_dimension($arg, $depth = 0) {
+  if (!is_array($arg)) {
+    return 'NULL';
+  }
+  if (!sizeOf($arg)) {
+    return '0';
+  }
+  $max_sub_depth = 0;
+  foreach ($arg as $subarray) {
+    $max_sub_depth = max(
+            $max_sub_depth, array_dimension($subarray, $depth + 1)
+    );
+  }
+  return $max_sub_depth + 1;
+}
+
+/**
+ * Takes an array mixed with integer keys with string values and string keys
+ * with any values, and converts all the intKey => stringVal to stringVal => null
+ * (or a passed in default value)-
+ * Ex: ['id', 'name'=>'text','age','date'=>['format'=>'sql']] becomres:
+ * ['id'=>$default, 'name'=>'text', 'age'=>$default, 'date'=>['format'=>'sql]] 
+ * @param array $array
+ * @param mixed $default: default: null
+ * @return array
+ */
+function mixedArrToAssoc($array = null, $default = null) {
+  if (!$array) {
+    return [];
+  }
+  if (is_scalar($array)) {
+    return [$array => $default];
+  }
+  if (!is_array($array)) {
+    return [$array];
+  }
+  $defArr = [];
+  foreach ($array as $key => $value) {
+    if (!is_string($key) && is_string($value)) {
+      $defArr[$value] = $default;
+    } else {
+      $defArr[$key] = $value;
+    }
+  }
+  return $defArr;
+}
+
+/**
+ * Compares two arguments (recursively) to see if they have the same dimensions
+ * and structures. Additional parameters allow true for empty arrays or non-arrays
+ * @param mixed $array1
+ * @param mixed $array2
+ * @param boolean $allowEmpty: return true if both arrays are empty. Default False
+ * @param boolean $allowNotArray: return true if both args are not arrays. Default: False
+ * @param int $depth: How deep to go into the arrays. Default: -l, all the way
+ * @return Boolean: True if args are comprable, false if not.
+ */
+function arrays_compatable($array1, $array2, $allowEmpty = false, $allowNotArray = false, $depth = -1) {
+  $depth = to_int($depth);
+  if ($depth === 0) {
+    return true;
+  }
+  if (!$allowNotArray) {
+    if (!is_array($array1) || !is_array($array2)) {
+      return false;
+    }
+  } else if (!is_array($array1) && !is_array($array2)) {
+    return true;
+  }
+  if (is_array($array1) !== is_array($array2)) {
+    return false;
+  }
+  if (!$allowEmpty) {
+    if (!sizeOf($array1) || !sizeOf($array2)) {
+      return false;
+    }
+  } else if (!sizeOf($array1) && !sizeOf($array2)) {
+    return true;
+  }
+  if (sizeOf($array1) !== sizeOf($array2)) {
+    return false;
+  }
+  $sz = sizeOf($array1);
+  for ($i = 0; $i < $sz; $i++) {
+    $arrEl1 = array_pop($array1);
+    $arrEl2 = array_pop($array2);
+    if (!arrays_compatable($arrEl1, $arrEl2, true, true, $depth - 1)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/* * Quick lazy way to get a list of id's (or other values) from an array like:
+ * [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Sally', ...]] 
+ * With no (deault) arg, get [1,2,..], or if use arg = 'name', get ['Johnny', 'Sally',]
+ */
+
+function getIndexedArrayOfKeyValues($array = null, $key = 'id') {
+  if (!$array || !is_array($array)) {
+    return [];
+  }
+  $resarr = array_map(function ($ar) use($key) {
+    return $ar[$key];
+  }, $array);
+  return $resarr;
+}
+
+/**
+ * CamelCase insensitive equals: Returns boolean false if two strings are NOT
+ * CC equivalent, or else $str2 if they are, where CC equivalent is any of:
+ * "cc_str" == "ccStr". If arg $ci == true, also match: "ccstr"
+ * @param string $str1
+ * @param string $str2
+ * @return boolean or string:
+ */
+function cciEquals($str1, $str2, $ci = true) {
+  if (!$str1 || !$str2 || !is_string($str1) || !is_string($str2)) {
+    return false;
+  }
+  $cmpstr = $str2;
+  $ccStr = toCamelCase($str1);
+  $ucc_str = unCamelCase($str1);
+  if ($ci) {
+    $cmpstr = mb_strtolower($str2);
+    $ccStr = mb_strtolower($ccStr);
+  }
+  if (($ccStr === $cmpstr) || ($ucc_str === $cmpstr)) {
+    return $str2;
+  }
+  return false;
+}
+
+/**
+ * Checks if the given name is found in the array, either in camelCased or
+ * un_camel_cased form.
+ * @param string $name: The name to check, both CC'd and unCC'd
+ * @param Array $array: Array to check
+ * @return mixed: matched name form, or boolean false
+ */
+function cciInArray($name, $array) {
+  if (!$array || !$name) {
+    return false;
+  }
+  $ucc_name = unCamelCase($name);
+  $ccName = toCamelCase($name);
+  if (in_array($ucc_name, $array, true)) {
+    return $ucc_name;
+  }
+  if (in_array($ccName, $array, true)) {
+    return $ccName;
+  }
+  return false;
+}
+
+/** In between in_array($a, $b) & in_array($a,$b, true) -- it will match 
+ * [0] && ['0'], but not 0 & null, etc...
+ * @param type $needle
+ * @param type $haystack
+ */
+function in_array_equivalent($needle, $haystack) {
+  foreach ($haystack as $tst) {
+    if (equivalent($needle, $tst)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * To compare POSTed values to DB values; return:
+ * TRUE for: (1,'1'), (0,'0'),
+ * FALSE for: (0,''), (0,null), (null,[]), (0,[]), ('',[])
+ * But what about: (NULL, ''), (FALSE, null)?
+ * Wait & see...
+ * @param type $a
+ * @param type $b
+ */
+function equivalent($a, $b) {
+  if (is_string($a) && is_int($b)) {
+    $b = "$b";
+  }
+  if (is_string($b) && is_int($a)) {
+    $a = "$a";
+  }
+  /*
+    if ($a === null) {
+    $a = '';
+    }
+    if ($b === null) {
+    $b = '';
+    }
+   * 
+   */
+  return $a === $b;
+}
+
+/** Displays a number as dollar format - or if array arg, totals the numeric 
+ * values of the array and retuns them as a $ formatted string
+ * @param type $num
+ * @param type $prec
+ * @return type
+ */
+function dollar_format($num, $prec = 0) {
+  if (($num === null) || ($num === '')) return '';
+  if (is_array($prec)) {
+    if (array_key_exists('prec', $prec)) {
+      $prec = $$prec['prec'];
+    } else {
+      $prec = 0;
+    }
+  }
+  if (is_array($num)) {
+    $num = array_sum($num);
+  }
+  return '$' . number_format($num, $prec);
+}
+
+/** Returns the key value of the array if it exists, or null
+ * 
+ * @param scalar $key: Key to test
+ * @param array $array: Array to test in
+ * @param boolean $emptyArray: default false; despite the function name, if 
+ * $emptyArray is true, will return an empty array instead of null.
+ * @return mixed or null: The value, if any, for $array[$key], or null
+ */
+/*
+  function keyValOrNull($key = '', $array = [], $emptyArray = null) {
+  if ($emptyArray) {
+  $emptyArray = [];
+  }
+  if (!is_array($array)) {
+  return $emptyArray;
+  }
+  if (!is_scalar($key)) {
+  return $emptyArray;
+  }
+  if (array_key_exists($key, $array)) {
+  return $array[$key];
+  }
+  return $emptyArray;
+  }
+ * 
+ */
+
+/** Like keyValueOrNull, above, but more flexible - returns the value of
+ * the array at the key, or else the default value (null), or as specified
+ * in the $default parameter
+ * @param scalar $key - Key into the array
+ * @param array $array - array to check for the key
+ * @param mixed $default - the default value to return if no key value in array for key, default null
+ * @return mixed - The value of array for $key, if any, or else the default (null)
+ */
+function keyValOrDefault($key = '', $array = [], $default = null) {
+  if (!is_array($array)) {
+    return $default;
+  }
+  if (!is_scalar($key)) {
+    return $default;
+  }
+  if (array_key_exists($key, $array)) {
+    return $array[$key];
+  }
+  return $default;
+}
+
+/**
+ * For possessionDef arrays, returns a value if exists for key, else null
+ * @param array $def
+ * @param string $key
+ * @param $default: Default value to return if none found - defaults to null
+ * @return string|$default if no value found;
+ */
+/*
+  function getKeyValOrDefault($def, $key, $default = null) {
+  if (!is_array($def)) {
+  return $default;
+  }
+  if (array_key_exists($key, $def)) {
+  return $def[$key];
+  }
+  return $default;
+  }
+ * 
+ */
+
+/** Returns only those $key/$value pairs in $array which have
+ * keys in $keys
+ * @param array|scalar $keys: a scalar key / array of keys to check in $array
+ * @param array $array: The array to check
+ * @return array: Subset of the original $array, whose keys are in $keys
+ */
+function array_subset($keys, $array) {
+  if (is_scalar($keys)) {
+    $keys = [$keys];
+  }
+  if (empty($keys) || empty($array) || !is_array($array)) {
+    return [];
+  }
+  $out_array = [];
+  foreach ($array as $key => $value) {
+    if (in_array($key, $keys, TRUE)) {
+      $out_array[$key] = $value;
+    }
+  }
+  return $out_array;
+}
+
+/** Returns the mime-type of the file in the path. NOTE! Relies on the
+ * PECL/finfo / 'fileinfo' extension, which is provided with PHP after 5.3, BUT
+ * NOT ENABLED BY DEFAULT ON WINDOWS! Have to uncomment the extension in php.ini
+ * @param type $filePath: The filesystem path of the file
+ * @return string: MIME file type, as best guessed by PHP
+ */
+function getFileMimeType($filePath) {
+  return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
+}
+
+/** Kind of hokey function that takes two arrays, and returns true if the second
+ * array equals the first, up to the depth of the first. For example, 
+ * ['image'], ['image','gif'] would return true...
+ * @param type $arr1
+ * @param type $arr2
+ * @return boolean: True if $arr2 == $arr1 to depth of $arr1
+ */
+function arrays_equal_to_depth_of_first($arr1, $arr2) {
+  if (is_string($arr1)) {
+    $arr1 = [$arr1];
+  }
+  if (is_string($arr2)) {
+    $arr2 = [$arr2];
+  }
+  if (!is_array($arr1) || !is_array($arr2)) {
+    throw new PKMVCException("Invalid Args: arr1: ["
+    . print_r($arr1, 1) . "]; arr2: [" . print_r($arr2, 1) . "]");
+  }
+  $i = 0;
+  foreach ($arr1 as $el) {
+    if ($el !== $arr2[$i]) {
+      return false;
+    }
+    $i++;
+  }
+  return true;
+}
+
+/**
+ * Creates a presumably really Globally unique file name. Probably.
+ * @param string $suffix: Optional file name suffix, if important...
+ * @return string: Unique file name, no Dir, optionally w. suffix
+ */
+function uniqueName($suffix = '') {
+  /*
+    return base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)).'_'.
+    uniqid();
+   * 
+   */
+  //.'.'.$suffix;
+  return uniqid('upld', 1) . '_' . uniqid();
+}
+
+/**
+ * Takes two arrays that have similar key structures, but then not. Makes an
+ * array that combines the two input arrays up to the key parallels, then
+ * adds the elements where the keys are different. 
+ * Example: Args:
+ * <tt>['idx1' => [ 'idx2' => [ 'name' => "abilito 2 .doc", ],]</tt> and
+ * <tt>['idx1' => [ 'idx2' => [ 'type' => "application/msword", ],]</tt>
+ * <p>
+ * Will return:
+ * <pre>['idx1' => [ 'idx2' => [ 'type' => "application/msword",
+ *                              'name' => "abilito 2 .doc", ]]
+ * </pre>
+ * @param type $arr1
+ * @param type $arr2
+ * @return array: Melded array
+ */
+function array_meld($arr1, $arr2) {
+  if (!is_array($arr1) || !is_array($arr2)) {
+    return combineAsArrays($arr1, $arr2);
+  }
+  $retarr = [];
+  foreach ($arr1 as $key1 => $val1) {
+    $key2 = key($arr2);
+    $val2 = $arr2[$key2];
+    next($arr2);
+    if ($key1 === $key2) {
+      $retarr[$key1] = array_meld($val1, $val2);
+    } else {
+      return array_merge($arr1, $arr2);
+    }
+  }
+  return $retarr;
+}
+
+/** Replaces or deletes any key/values in $arr1 with any comperable values in $arr2
+ * 
+ * @param type $arr1
+ * @param type $arr2
+ */
+#Ah, nevermind - seems I just recreated the built in PHP array_replace_recursiv
+/*
+  function pkarray_replace(&$arr1, $arr2) {
+
+  if (!is_array($arr2) || !is_array($arr1)) return $arr1;
+  if (!sizeOf($arr2)) { #We want to clear arr1 with an empty array
+  $arr1 = $arr2;
+  return $arr1;
+  }
+  foreach ($arr2 as $key=>$val) {
+  if (!$val || !is_array($val) || !(array_key_exists($key,$arr1)) || !is_array($arr1[$key])) {
+  $arr1[$key] = $val;
+  } else { #$val is an array, $arr1[$key] is an array,  recurse
+  array_replace($arr1[$key], $val);
+  }
+  }
+  return $arr1;
+  }
+ * 
+ */
+
+/**
+ * Removes all values of $value from the input array. If $reindex, returns an
+ * a contiguous indexed array of values, otherwise sparse
+ * @param array $array
+ * @param scalar $value
+ * @param type $reindex: Reindex and return compacted indexed array
+ * @return array - with all instances of $value removed
+ */
+function array_remove_by_value($array, $value, $reindex = true) {
+  if (!is_array($array)) {
+    return [];
+  }
+  if ($reindex) {
+    return array_values(array_diff($array, [$value]));
+  }
+  return array_diff($array, [$value]);
+}
+
+/**
+ * 
+ * @return array: Restructured $_FILES array, with the new array keys path/
+ * sequence matching the control name - that is, if the file input name is:
+ * <tt>input type='file' name='my_test_upload[idx1][idx2]'</tt>
+ * the returned "files" array will contain:
+ * 
+ * 'my_test_upload' => [
+  'idx1' => ['idx2' => [
+ *   'name' => "abilito 2 .doc", 
+ *   'type' => "application/msword",
+ *   'tmp_name' => "C:\\Windows\\Temp\\php934C.tmp", 
+ *   'error' => 0,
+ *   'size' => 15360,  ],
+ * 
+ * @return array: The restructured $_FILES array.
+ */
+function transposeFilesUploadsArray() {
+  $files = $_FILES;
+  if (!$files) {
+    return [];
+  }
+  $retarr = [];
+  foreach ($files as $basename => $fileArray) {
+    $retbit = [];
+    foreach ($fileArray as $fileDescKey => &$subArr) {
+      array_walk_recursive($subArr, function(&$item, $key, $newKey) {
+        $item = [$newKey => $item];
+      }, $fileDescKey);
+      if ($retbit) {
+        $retbit = array_meld($retbit, $subArr);
+      } else {
+        $retbit = $subArr;
+      }
+    }
+    $retarr[$basename] = $retbit;
+  }
+  return $retarr;
+}
+
+/**
+ * Converts $arg to a number with maximum $prec decimal places, or less
+ * if not required. For ex: $arg = "10.57366" becomes 10.57. $arg 10 returns 10.
+ * @param mixed $arg: A scalar castable to a number
+ * @param int $prec: Max number of decimal places
+ * @return number: A number with at most $prec decimal places, or less
+ */
+function minDec($arg, $prec = 2) {
+  $factor = pow(10, $prec);
+  return (round($factor * $arg)) / $factor;
+}
+
+/** Lifted straight from WP, but too simple and elegant not to use */
+
+/**
+ * Removes trailing forward slashes and backslashes if they exist.
+ *
+ * The primary use of this is for paths and thus should be used for paths. It is
+ * not restricted to paths and offers no specific path support.
+ *
+ * @since 2.2.0
+ *
+ * @param string $string What to remove the trailing slashes from.
+ * @return string String without the trailing slashes.
+ */
+function pkuntrailingslashit($string) {
+  return rtrim($string, '/\\');
+}
+
+/**
+ * Appends a trailing slash.
+ *
+ * Will remove trailing forward and backslashes if it exists already before adding
+ * a trailing forward slash. This prevents double slashing a string or path.
+ *
+ * The primary use of this is for paths and thus should be used for paths. It is
+ * not restricted to paths and offers no specific path support.
+ *
+ * @since 1.2.0
+ *
+ * @param string $string What to add the trailing slash to.
+ * @return string String with trailing slash added.
+ */
+function pktrailingslashit($string) {
+  return pkuntrailingslashit($string) . '/';
+}
+
+/**
+ * Wrapper for PHP mcrypt_encrypt, with some defaults. MUST USE the balanced
+ * pk_decyrpt function to decrypt. Unlike mcrypt, $key can be any string, and
+ * $data can be any PHP data - string, object, array, etc. Uses PHP serialize
+ * to convert
+ * @param string $key: Any arbitrary sting to use as encryption key
+ * @param mixed $data: Any PHP data to encrypt
+ * @return string: The string representing the encrypted data
+ */
+function pk_encrypt($rawkey, $data, $utf8 = true, $cipher_type = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_CFB) {
+  $iv = mcrypt_create_iv(mcrypt_get_iv_size($cipher_type, $mode));
+  $hkey = substr(hash('sha256', $rawkey), -mcrypt_get_key_size($cipher_type, $mode));
+  $serialized = serialize($data);
+  $rawencrypted = mcrypt_encrypt($cipher_type, $hkey, $serialized, $mode, $iv);
+  if (!$utf8) return 'UNENC'.$iv . $rawencrypted;
+
+  return 'UTF-8'.utf8_encode($iv . $rawencrypted);
+}
+
+/**
+ * Decrypts arbitrary PHP data/object encrypted by pk_encrypt. 
+ * @param type $rawkey
+ * @param type $data
+ * @param type $cipher_type
+ * @param type $mode
+ * @return type
+ */
+function pk_decrypt($rawkey, $data, $cipher_type = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_CFB) {
+  $encstr = substr($data, 0, 5);
+  $data = substr($data, 5);
+  if ($encstr == 'UTF-8') $data= utf8_decode($data);
+  $ivsize = mcrypt_get_iv_size($cipher_type, $mode);
+  $iv = substr($data, 0, $ivsize);
+  $encdata = substr($data, $ivsize);
+  $hkey = substr(hash('sha256', $rawkey), -mcrypt_get_key_size($cipher_type, $mode));
+  $serialized = mcrypt_decrypt($cipher_type, $hkey, $encdata, $mode, $iv);
+  $unserialized = @unserialize($serialized);
+  if ($unserialized === false)
+      throw new Exception("Failed to unserialize. Maybe the decrypt passphrase is wrong?");
+  return $unserialized;
+}
+
+/**
+ * Full array column too complicated to bother with - this is good enough until
+ * upgrade to PHP 5.5, then delete
+ * Returns an indexed array of all values of the array of arrays, for the given
+ * column name/idx
+ */
+if (!function_exists('array_column')) {
+
+  //function array_column(Array $arr, $idx='id') {
+  function array_column(Array $arr, $idx) {
+    if (!sizeOf($arr)) return [];
+    if (!is_scalar($idx) || !isset($arr[0][$idx]))
+        throw new Exception("Invalid key [$idx] for:" . print_r($arr, 1));
+    $retarr = [];
+    foreach ($arr as $item) {
+      $retarr[] = $item[$idx];
+    }
+    return $retarr;
+  }
+
+}
+
+/**
+ * Formats an indexed array of associative arrays in an HTML table. If
+ * $headers exists, uses them as header names, otherwise, uc field name
+ * @param array $arr
+ * @param array $headers
+ * @param array $cssclasses
+ */
+function displayArraysAsTable($arr, $headers = [], $cssclasses = '') {
+  if (!is_array($arr)) return '';
+  if (!is_array($arr[0])) return '';
+  if (!$headers) {
+    $item = $arr[0];
+    $keys = array_keys($item);
+    foreach ($keys as $key) {
+      $headers[] = ucfirst($key);
+    }
+  }
+  if (is_array($cssclasses)) {
+    $cssclasses = implode(' ', $cssclasses);
+  }
+  $out = '';
+  $out .= "\n<table class='$cssclasses'>\n";
+  $out .= "\n<tr>";
+  foreach ($headers as $header) {
+    $out .= "<th>$header</th>";
+  }
+  $out.="</tr>";
+  foreach ($arr as $row) {
+    $out .= "<tr>";
+    foreach ($row as $item) {
+      $out.="<td>$item</td>";
+    }
+    $out .= "</tr>\n";
+  }
+  $out .= "\n</table>\n";
+  return $out;
+}
+
+/**
+ * Mangages Static Cache Arrays of arbitrary depth. Initializes array down to
+ * level depth-1 if no value exists.
+ * 
+ * Functions and static methods can use a static nested array to retain values
+ * that don't need to be recalculated. For example, usage in a Class (with SubClasses):
+ * <pre>
+ * public static function calculateSomething($param) {
+ *   static $cacheArr = [];
+ *   $class = get_called_class();
+ *   if (!manageStaticCache($cacheArr,[$class,$param])) {
+ *     $cacheArr[$class][$param] = someCalculation($class, $param);
+ *   }
+ *   return $cacheArr[$class][$param];
+ * }
+ * </pre>
+ * @param type $cacheArr
+ * @param type $levels
+ * @return boolean true if the value has been set, even if to null, else
+ * false
+ */
+function manageStaticCache(&$cacheArr, $levels = []) {
+  $nl = sizeOf($levels);
+  if (!$levels || !$nl) return false;
+  $tmpArr = &$cacheArr;
+  $depth = 1;
+  foreach ($levels as $level) {
+    if ($depth === $nl) {
+      if (array_key_exists($level, $tmpArr)) {
+        return true;
+      }
+      return false;
+    } else {
+      if (!array_key_exists($level, $tmpArr)) {
+        $tmpArr[$level] = [];
+      }
+      $tmpArr = &$tmpArr[$level];
+    }
+    $depth ++;
+  }
+  return;
+}
+
+/** Converts Unix/PHP time value to SQL format. 
+ * 
+ * @param int $unixtime - If not null, the unix time to convert to SQL format.
+ * If null, return current moment as SQL date/time
+ * @return string The SQL date/time
+ */
+function unixtimeToSql($unixtime = null) {
+  if (!$unixtime) {
+    $unixtime = time();
+  }
+  $mysqldate = date('Y-m-d H:i:s', $unixtime);
+  return $mysqldate;
+}
+
+/**
+ * Converts an SQL formatted date/time string to unix integer timestamp
+ * @param string $sqldate The SQL date/time string. If null, returns current unix time.
+ * @return int the unix timestamp
+ */
+function sqlDateToUnix($sqldate = null) {
+  if ($sqldate) {
+    $unixtime = strtotime($sqldate);
+  } else {
+    $unixtime = time();
+  }
+  return $unixtime;
+}
+function unixDateToFriendly($unixdate = null, $format =  'M j, Y') {
+  return date($format, $unixdate);
+}
+
+function sqlDateToFriendly($sqldate = null, $format = 'M j, Y') {
+  return unixDateToFriendly(sqlDateToUnix($sqldate) ,$format);
+}
+
+function execInBackground($cmd) {
+  if (substr(php_uname(), 0, 7) == "Windows") {
+    pclose(popen("start /B " . $cmd, "r"));
+  } else {
+    exec($cmd);
+  }
+}
+
+/**
+ * Wraps content in 'td' tags and applies
+ * either default or given style to the td - for use in HTML formatted
+ * emails
+ * @param string $text Whatever content you want in your td
+ * @param string $tag Default to 'td', but can be 'th' or whatever
+ * @param string $style The inline CSS Style you want to apply to your td content
+ * @return string HTML element wrapped by tag with inline style
+ */
+function elementWrap($text = '', $tag = 'td', $style = 'border: solid black 1px;') {
+  return "<$tag style='$style'>$text</$tag>";
+}
+
+/** Returns the names or full paths of all files in the directory
+ * 
+ * @param string $dirPath The Directory path to search
+ * @param boolean $fullPath Should return the full path of each file, or just
+ *   the file names? Default true, full file path.
+ * @return boolean|array False if invalid directory path, else an array of
+ * the file names or full paths.
+ */
+function getAllFilesInDir($dirPath, $fullPath = true) {
+  if (!is_dir($dirPath)) return false;
+  $entries = scandir($dirPath);
+  $filePaths = [];
+  foreach ($entries as $entry) {
+    if (($entry === '.') || ($entry === '..')) continue;
+    $tmpPath = "$dirPath/$entry";
+    if (!is_file($tmpPath)) continue;
+    if ($fullPath) {
+      $filePaths[] = $tmpPath;
+    } else {
+      $filePaths[] = $entry;
+    }
+  }
+  return $filePaths;
+}
+
+/** Like array_reverse, except also works on ArrayObjects
+ * 
+ * @param array|ArrayObject $items
+ * @return - the items in reverse order
+ */
+function arrayish_reverse($items) {
+  if (!is_arrayish($items)) return $items;
+  if (is_array($items)) return array_reverse($items);
+  if (!($items instanceOf ArrayObject)) { #can't be bothered
+    return $items;
+  }
+  #So, $items are an instance of ArrayObject or subclass...
+  $itemsArray = $items->getArrayCopy();
+  $revItemsArray = array_reverse($itemsArray);
+  $itemClass = get_class($items);
+  $revItems = new $itemClass($revItemsArray);
+  return $revItems;
+}
+
+/** Allows null with is_scalar */
+function is_scalar_or_null($arg = null) {
+  if ($arg === null) return true;
+  return is_scalar($arg);
+}
+
+function makePathToFile($filePath, $permissions = 0755) {
+  if (file_exists($filePath)) return true;
+  $dirname = dirname($filePath);
+  if (is_dir($dirname)) return true;
+  return mkdir($dirname, $permissions, true);
+}
+
+function is_windows() {
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') return true;
+  return false;
+}
+
+function getNullPath() {
+  if (is_windows()) return 'NUL';
+  return '/dev/null';
+}
+
+/** Returns a string value for true/false. Default is "True" or "False", but
+ * 
+ * @param mixed $val - truish or not
+ * @param string $true - String to return if truish - default "True"
+ * @param string $false - String to return if not truish - default "False"
+ */
+function stringboolean($val, $true = 'TRUE', $false = 'FALSE') {
+  if ($val) return $true;
+  return $false;
+}
+
+/**
+ * (Direct copy from WordPress)
+ * Test if the current browser runs on a mobile device (smart phone, tablet, etc.)
+ * @return bool true|false
+ */
+function pk_is_mobile() {
+	static $is_mobile;
+	if ( isset($is_mobile) )
+		return $is_mobile;
+	if ( empty($_SERVER['HTTP_USER_AGENT']) ) {
+		$is_mobile = false;
+	} elseif ( strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') !== false // many mobile devices (all iPhone, iPad, etc.)
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Android') !== false
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Silk/') !== false
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Kindle') !== false
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'BlackBerry') !== false
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mini') !== false
+		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mobi') !== false ) {
+			$is_mobile = true;
+	} else {
+		$is_mobile = false;
+	}
+	return $is_mobile;
+}
+
+/**
+ * Returns the base class name of the namespaced class or object
+ * @param string|object - the class or object to get the basename of
+ * @return string - the basename of the class/object
+ */
+function getBaseName($class = null) {
+  if (!$class) return false;
+  if (is_string($class)) {
+    $className = $class;
+  } else if (is_object($class)) {
+    $className = get_class($class);
+  }
+  if (strrchr($className, "\\") === false) {
+    return $className;
+  }
+  return substr(strrchr($className, "\\"), 1);
+}
+
+/** Doesn't belong here, but quick and dirty - to assign a "name" to an HTML
+ * form element - if the first argument exists, the second argument is added 
+ * as an array key, or a series of array keys. Either argument can be an array
+ * of strings. 
+ * @param string|array|null $arg1 - the first argument to build the name from
+ * @param string|array|null $arg2 - the second argument to build the name from
+ * @return string - the HTML Form Input Element name
+ * <p>
+ * Examples:
+ * $arg1 = null, $arg2 = 'hello', return 'hello'
+ * $arg1 = 'goodbye', $arg2 = 'hello', return 'goodbye[hello]'
+ * $arg1 = ['goodbye', 'all', 'my', 'old', 'friends'], $arg2 = 'hello',
+ *    return 'goodbye[all][my][old][friends][hello]'
+ * $arg1 = 'goodbye[my][old]',  $arg2 = [2,'friends'],
+ *    return 'goodbye[my][old][2][friends]'
+ * 
+ */
+
+function buildFormInputNameFromSegments($arg1=null, $arg2=null) {
+  $name = '';
+  if (is_scalar($arg1)) $name = (string)$arg1;
+  else if (is_array($arg1)) foreach ($arg1 as $idx =>$val) {
+    if (!is_scalar($val)) throw new Exception ("Invalid value: ".print_r($val,1));
+    if (!$idx) $name = (string)$val;
+    else $name.='['.(string)$val.']';
+  } else if ($arg1) throw new Exception ("Bad arg1: ". print_r($arg1,1));
+  
+  if (($arg2===null) || ($arg2 === '')) return $name;
+  if (!$name && is_scalar($arg2)) return (string)$arg2;
+  if ($name && is_scalar($arg2)) return $name.'['.(string)$arg2.']';
+  if (!is_array($arg2)) throw new Exception ("Bad Arg2: ". print_r($arg2,1));
+  foreach ($arg2 as $key => $val) {
+    if (!is_scalar($val)) throw new Exception ("Invalid value: ".print_r($val,1));
+    if (!$name) $name = (string)$val;
+    else $name .= '['.(string)$val.']';
+  }
+  return $name;
+}
+
+/**
+ * Useful for converting empty strings to null for inserting null to int
+ * fields in DB
+ * @param mixed $value
+ * @return integer|null
+ */
+function intOrNull($value=null) {
+  $int = to_int($value);
+  if ($int !== false) return $int;
+  return null;
+}

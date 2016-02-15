@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <link type='text/css' rel='stylesheet' href='MyStyleSheet.css'/>
+  <title>Scaling Background SVGs</title>
+  <style>
+div.speech-bubble{
+   margin-left: 25px;
+   margin-right: 25px;
+   padding: 10px;
+   color: white;
+   display: inline-block;
+   min-width: 120px; 
+   min-height: 80px; 
+   border-radius: 10px;
+}
+div.speech-bubble.left {
+   background: blue;
+}
+div.speech-bubble.right {
+   background: red;
+}
+div.speech-bubble::before,
+div.speech-bubble::after {
+   content:"";
+   position: absolute;
+   width: 0;
+   height: 0;
+   border-top: 13px solid transparent;
+   border-bottom: 13px solid transparent;
+   margin: 0;
+}
+div.speech-bubble.left::before {
+   border-right: 26px solid blue;
+   margin-left: -35px;
+
+}
+div.speech-bubble.right:after {
+   border-left: 26px solid red;
+   margin-left: 10px;
+}
+  div.inline {
+    display: inline-block;
+    background-color: yellow;
+  }
+  div.block {
+    display: block;
+    background-color: blue;
+  }
+  div.star-2,
+  div.star-1 {
+    width: 200px;
+    height: 200px;
+    border: solid blue 3px;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  div.star-1 {
+    background-image: url('./Full_Star_Yellow.svg');
+  }
+  div.star-1::before {
+    content: '\2713';
+  }
+  div.star-2 {
+    background-image: url('./Play_Star_Yellow-2.svg');
+  }
+  </style>
+</head>
+<body>
+
+
+<div class='star-1'>
+This is a star.
+</div>
+  <h2>Some space...</h2>
+  <div class='speech-bubble left'>This is a left speech bubble.</div>
+  <h2>Some space...</h2>
+<div class='star-2'>
+This is another star.
+</div>
+  <h2>Some space...</h2>
+  <div class='speech-bubble right'>This is a right speech bubble.</div>
+  <h2>Some space...</h2>
+<div class='inline'>
+<div class='block'>
+We have some content....
+</div>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,1425 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 11, 2015, 4:57:29 AM
+    Author     : Paul Kirkaas
+*/
+
+div.container-fluid.theme-showcase,
+html, body {
+  height: 105%;
+  height: 105%;
+  text-align: center;
+}
+/** Restore this if don't want gradient on menues
+div.container-fluid.theme-showcase {
+*/
+div.container-fluid,
+html, body {
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#1a82f7), to(#2F2727));
+  background: -webkit-linear-gradient(top, #2F2727, #1a82f7);
+  background: -moz-linear-gradient(top, #2F2727, #1a82f7);
+  background: -ms-linear-gradient(top, #2F2727, #1a82f7);
+  background: -o-linear-gradient(top, #2F2727, #1a82f7);
+}
+
+div.float-left {
+  float: left;
+}
+
+div.float-right {
+  float: right;
+}
+div.show.val.num {
+  border: solid #aaa 1px;
+  border-radius: 3px;
+  text-align: right;
+  background-color: #ccf;
+  padding: 3px;
+  margin: 3px;
+}
+
+
+
+div.user.view.message.template div.msg-body {
+  background-color: #eee;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  color: #444;
+}
+div.user.view.message.template div.row.head {
+  margin-top: 0;
+  background-color: #440;
+  color: white;
+  border-radius: 10px;
+  font-size: large;
+  padding: 10px;
+  margin-bottom: 5px;
+
+}
+/*
+input.form-control[disabled].disabled {
+*/
+div.multiselect.disabled,
+input[disabled].disabled {
+  background-color: #444;
+}
+input.enabled {
+  border: solid red 1px;
+}
+select.form-control {
+  background-color: #88f;
+  color: white;
+}
+
+div.multiselect {
+  display: inline-block;
+  padding: 3px;
+  margin: 3px;
+  border-radius: 3px;
+  border: solid #aaa 1px;
+}
+
+.padding-left-0 {
+  padding-left: 0;
+}
+div.user.view.message.template,
+div.user.conversations.template,
+div.user.conversation.template {
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
+  border: solid #bbb 1px;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #ffa;
+}
+.section {
+  border: solid #aaf 1px;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+  background-color: rgba(222,222,200,.8);
+}
+label.inline-remember {
+  color: #ccc;
+}
+@keyframes pulse {
+  0% {
+    border: solid red 2px;
+    background-color: rgba(100,100,255,.8);
+  }
+  50% {
+    border: solid blue 2px;
+    background-color: rgba(250,200,100,.8);
+  }
+  100% {
+    border: solid red 2px;
+    background-color: rgba(100,100,255,.8);
+  }
+}
+
+div.num-items, div.item-desc {
+  display: inline-block;
+}
+
+/** This is a new message */
+div.first-view {
+  animation-name: pulse;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+  font-weight: bold;
+}
+
+div.first-view::before {
+  content: "New";
+  font-weight: bold;
+  color: red;
+}
+
+
+div.template {
+  text-align: left;
+  background-color: white;
+  margin-left: auto;
+  margin-right: auto;
+  /*
+  padding: 10px;
+  display: inline-block;
+  */
+  
+}
+div.template.forgot-password {
+  text-align: center;
+}
+li.error-li {
+  color: #800;
+}
+.hidden {
+  display: none;
+}
+div.row.results.head-part div {
+  font-weight: bold;
+}
+div.row.results div {
+  /*
+  border: solid #aaa 1px;
+  */
+}
+
+div.sub-header div.scc-text {
+  color: black;
+  font-family: verdana;
+  margin: 0;
+  padding: 0;
+  font-weight: bold;
+  font-size: large;
+  font-style: oblique;
+  padding-left: 40px;
+  /*
+  margin-left: 40px;
+  */
+}
+div.lead-header div.scc-text a,
+div.lead-header div.scc-text {
+  color: white;
+  text-decoration: none;
+  font-size: x-large;
+  font-family: verdana;
+  font-style: oblique;
+  padding: 5px;
+  padding-left: 10px;
+  /*
+  margin: 5px;
+  */
+}
+
+/*
+div.menu-container {
+  background-color: yellow;
+}
+*/
+
+div.menu-container,
+div.whole-header {
+  /*
+  background-color: #7092BE;
+  */
+  background-color: #79C;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.inline-login a{
+  color: #ccf;
+}
+.inline-login a:hover{
+  text-decoration: none;
+  color: #aaf;
+}
+.block {
+  display: block;
+}
+.inline-login {
+  display: inline-block;
+  margin-top: 4px;
+  zoom: .9;
+}
+span.new-msg-cnt {
+  font-weight: bold;
+  color: #f00;
+}
+
+div.bcc-nopadding {
+  padding: 0;
+}
+div.msgs.part div.a-msg {
+  padding: 5px;
+  margin: 5px;
+  margin-bottom: 8px;
+}
+div.msgs.part div.a-msg div.msg-content {
+  padding: 5px;
+  border: solid #ccc 1px;
+  color: #005;
+  border-radius: 5px;
+}
+div.msgs.part div.a-msg div.ahdr {
+  font-weight: bold;
+  background-color: rgba(255,255,255,.4)
+}
+div.msgs.part div.a-msg.from-them div.ahdr {
+  color: #002;
+}
+div.msgs.part div.a-msg.from-me div.ahdr {
+  color: #200;
+}
+div.msgs.part div.a-msg.from-me {
+  background-color:#cff;
+  text-align: left;
+}
+div.msgs.part div.a-msg.from-them {
+  background-color:#fdf;
+  text-align: right;
+}
+
+
+textarea.bcc-textarea.descob {
+  height: 180px;
+}
+
+
+div.note-form textarea {
+  background-color: #ffd;
+  border: solid #ccc 3px;
+  border-radius: 5px;
+  padding: 5px;
+  
+}
+div.forgot-password-head,
+div.note-form div.note-head {
+  background-color: #aaf;
+  margin: 5px;
+  /*
+  padding: 5px;
+  */
+  border-radius: 5px;
+  text-align: center;
+  color: #400;
+  font-family: 'Lato', Verdana;
+  font-size: large;
+}
+div.input-label.checkbox-lbl {
+  line-height: 3;
+  vertical-align: bottom;
+}
+
+div.template textarea {
+  padding: 5px;
+}
+
+div.margin-bottom-5 {
+  margin-bottom: 5px;
+}
+div.margin-5 {
+  margin: 5px;
+}
+div.padding-10 {
+  padding: 10px;
+}
+.padding-5 {
+  padding: 5px;
+}
+div.margin-top-5 {
+  margin-top: 5px;
+}
+div.margin-top-10 {
+  margin-top: 10px;
+}
+
+div.idx.msg {
+  min-height: 200px;
+  margin-top: 60px;
+  padding: 40px;
+  border: solid white 1px;
+  border-radius: 5px;
+  background-color: #ccf;
+}
+div.idx.err.msg {
+  border: solid red 1px;
+  background-color: #fcc;
+}
+
+div.error {
+  color: #800;
+  font-weight: bold;
+}
+
+div.msgs.part {
+  border: solid #aaa 1px;
+  border-radius: 5px;
+  /*
+  margin: 5px;
+  */
+  padding: 5px;
+  background-color: #eef;
+}
+
+
+div.msgs.part div.msgs-hdr {
+  background-color: blue; 
+}
+.bcc-nav {
+  margin-bottom: 0;
+  min-height: 0;
+  z-index: 55;
+}
+nav.bcc-nav-2 {
+  z-index: 15;
+  margin-bottom: -5px;
+}
+nav.bcc-nav.navbar-inverse div.navbar-header a.navbar-brand:hover,
+nav.bcc-nav.navbar-inverse .navbar-nav > li > a:hover {
+  color: #fff;
+}
+nav.bcc-nav.navbar-inverse div.navbar-header a.navbar-brand,
+nav.bcc-nav.navbar-inverse .navbar-nav > li > a {
+  color: #ddd;
+}
+div.row.results {
+  margin: 2px;
+  padding: 2px;
+  background-color: rgba(220,220,220,.5);
+  border: solid #aaa 1px;
+}
+/** For the Edit Profile Forms */
+div.row.editprofile form {
+  border: solid #ccc 1px;
+  margin: 3px;
+  padding: 3px;
+  border-radius: 3px;
+  background-color: rgba(222,222,222,.5);
+}
+div.row.editprofile form div.row {
+  border: solid #ccc 1px;
+  margin: 3px;
+  padding: 3px;
+  border-radius: 3px;
+  background-color: rgba(222,222,222,.5);
+}
+div.row.editprofile form input {
+  padding-left: 3px;
+}
+div.row.editprofile.hdr {
+  background-color: rgba(200,200,240,.6);
+  border: solid #aaa 1px;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+}
+
+div.row.search.form fieldset.form-group.inline {
+  width: 140px;
+}
+div.row.search.form fieldset.form-group.inline.where-in {
+  width: 200px;
+}
+
+td, th {
+  margin: 2px;
+  padding: 2px;
+  border: solid #aaa 1px;
+}
+
+
+.pkmvc-button:visited,
+.pkmvc-button {
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
+  background-image: linear-gradient(to top, #759ae9, #376fe0);
+  border-top: 1px solid #1f58cc;
+  border-right: 1px solid #1b4db3;
+  border-bottom: 1px solid #174299;
+  border-left: 1px solid #1b4db3;
+  border-radius: 4px;
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+  color: #fff;
+  font: bold 12px/1 "helvetica neue", helvetica, arial, sans-serif;
+  padding: 7px ;
+  margin: 7px;
+  text-shadow: 0 -1px 1px #1a5ad9;
+}
+
+.pkmvc-button:hover {
+    text-decoration: none;
+    color: #ffe;
+    background-image: linear-gradient(to top, #557ac9, #174fc0);
+    cursor: pointer; 
+}
+
+.pkmvc-button:active {
+    border-top: 1px solid #1b4db3;
+    border-right: 1px solid #174299;
+    border-bottom: 1px solid #133780;
+    border-left: 1px solid #174299;
+    box-shadow: inset 0 0 5px 2px #1a47a0, 0 1px 0 #eeeeee;
+}
+
+div .full-width {
+  width: 100%;
+}
+
+form select.select-size,
+form select.select-size option {
+  height: 26px;
+}
+
+html body div div.editprofile form div.no-extra.row,
+html body div div.no-extra {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+div.row.borrower.data,
+div.row.borrower.half {
+  border: solid #ccf 1px;
+  border-radius: 5px;
+  margin: 3px;
+  padding: 3px;
+}
+
+
+
+
+
+div.blocked,
+div.unblocked {
+  width: 35px;
+  height: 35px;
+  border-radius: 5px;
+  background-color: green;
+}
+
+div.blocked {
+  background-color: red;
+}
+
+div.unblocked:hover {
+  cursor: pointer;
+  background-color: #800;
+}
+div.blocked:hover {
+  cursor: pointer;
+  background-color: #080;
+}
+
+div.unblocked::before,
+div.blocked::before {
+  font-size: xx-large;
+  font-weight: bold;
+}
+div.unblocked::before {
+  content: '\2713';
+}
+div.blocked::before {
+  content: '\2718';
+}
+
+div.blocked::after,
+div.unblocked:after {
+  font-size: small;
+  position: relative;
+  right: 80px;
+  line-height: 35px;
+  white-space: pre;
+  display: block;
+  top: -40px;
+}
+
+div.blocked::after {
+  color: #600;
+  content: 'Blocked';
+  font-style: italic;
+}
+
+div.unblocked::after {
+  content: 'Unblocked';
+  color: #686;
+}
+
+div.unblocked:hover::after {
+  color: red;
+  line-height: initial;
+  right: 120px;
+  content: 'Block Messages \a from this User?';
+}
+
+div.blocked:hover::after {
+  line-height: initial;
+  right: 120px;
+  color: green;
+  content: 'Unblock Messages \a from this User?';
+}
+
+
+
+
+
+
+
+div.favorited,
+div.unfavorited {
+  /*
+  background-image: url('../img/Empty_Star.svg');
+  background-image: url('../img/Full_Star_Yellow.svg');
+  background-image: url('../img/Empty_Star.svg');
+  */
+  line-height: initial;
+  width: 35px;
+  height: 35px;
+  background-size: contain;
+}
+
+div.unfavorited {
+  background-image: url('../img/Full-Empty-Star.svg');
+}
+div.favorited {
+  background-image: url('../img/Full-Yellow-Star.svg');
+}
+
+
+div.favorite-toggle.favorited:hover,
+div.favorite-toggle.unfavorited:hover {
+  background-image: url('../img/Full-Half-Star.svg');
+  cursor: pointer;
+}
+
+/*
+div.unfavorited:hover {
+  color: #dd5;
+}
+div.favorited:hover{
+  color: #666;
+}
+*/
+
+div.favorite-toggle.favorited::after,
+div.favorite-toggle.unfavorited::after {
+  position: relative;
+  right: 85px;
+  white-space: pre;
+  line-height: 40px;
+}
+div.favorite-toggle.unfavorited::after {
+  right: 90px;
+  content: "Not a favorite..";
+  color: #884;
+}
+
+div.favorite-toggle.favorited::after {
+  color: #962;
+  content: 'A Favorite!';
+}
+
+div.favorite-toggle.favorited:hover::after {
+  color: #888;
+  content: 'Unfavorite?';
+}
+
+div.favorite-toggle.unfavorited:hover::after {
+  line-height: initial;
+  color: #962;
+  content: "Make them\a a favorite!";
+}
+
+
+div.row.head-1 div.favorite-toggle {
+  margin-left: 25px;
+}
+
+div.row.head-1 {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+
+
+
+
+
+.text-align-left {
+  text-align: left;
+}
+.text-align-right {
+  text-align: right;
+}
+.text-align-center {
+  text-align: center;
+}
+div.user.notes.template div.content {
+  margin: 5px;
+  border: solid #bbb 1px;
+  border-radius: 5px;
+  background-color: #ffb;
+}
+div.user.notes.template h4 {
+  background-color: black;
+  color: white;
+  font-weight: bold;
+  margin: 0;
+  padding: 6px;
+  text-align: center;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+div.row.from.msg {
+  border: solid black 1px;
+  margin: 5px;
+  padding: 5px;
+}
+div.from-usr {
+  text-align: left;
+  color: #400;
+}
+div.to-usr {
+  text-align: right;
+  color: #004;
+}
+
+div.row.from.msg div.msg-button {
+  width: 120px;
+}
+
+div.from.msg div.msg-button {
+}
+div.from.msg {
+  background-color: #ffd;
+  border: solid blue 1px;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+div.row.from.them.msg.from-admin div.from-usr {
+  font-size: x-large;
+  color: #800;
+
+}
+div.row.from.them.msg.from-admin {
+  border: solid red 2px;
+  border-radius: 5px;
+  background-color: white;
+}
+div.row.from.them.msg {
+}
+div.row.from.me.msg {
+  background-color: #fdf;
+}
+div.conversation div.row.conversation.head {
+  margin-top: -5px;
+  margin-bottom: 5px;
+  margin-left: 0;
+  margin-right: 0;
+  background-color: #ccf;
+  padding: 10px;
+  border-radius: 10px;
+}
+div.conversation div.thread.head div.conversant-name {
+  display: inline-block;
+  font-weight: bold;
+  color: #600;
+}
+div.conversation div.thread.head {
+  color: blue;
+  font-size: large;
+  padding: 15px;
+}
+
+div.conversation.template div.from-sender {
+  background-color: #eeb;
+  padding: 15px;
+  border-radius: 15px;
+
+}
+div.conversation.template div.row.from.them div.from-sender {
+  text-align: left;
+}
+div.conversation.template div.row.from.me div.from-sender {
+  text-align: right;
+}
+
+
+
+
+div.conversation div.from.msg.msg-content {
+  background-color: transparent;
+  border: none;
+}
+div.from.msg.msg-content {
+  background-color: white;
+  min-height: 70px;
+  border-radius: 5px;
+}
+
+div.row.borrower.vp {
+  border: solid #ccc 1px;
+  margin: 5px;
+  padding: 5px;
+}
+
+div.row.borrower.vp div.grp {
+  border: solid #ccc 1px;
+  margin: 5px;
+  padding: 5px;
+  background-color: #eea;
+}
+
+div.partial.latest div {
+  margin: 8px;
+  border: solid blue 1px;
+  border-radius: 5px;
+  padding: 5px;
+}
+div.partial.latest {
+  background-color: #Faa;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: solid #aaa 1px;
+  display: inline-block;
+  max-width: 500px;
+}
+
+body div.includeparts {
+  width: 300px;
+  height: 400px;
+  background-color: #f88;
+  border: solid black 2px;
+}
+
+/** Controller/Template styles */
+
+
+
+
+/*
+div.lender-index.template {
+  border: solid #eee 1px;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 10px;
+}
+*/
+
+div.search div.search.notice {
+  font-size: medium;
+  float: right;
+  display: inline-block;
+  padding: 5px;
+  border-radius: 5px;
+  border: solid #aaa 1px;
+}
+div.search div.inactive.search.notice {
+  background-color: #ccc;
+  color: #444;
+}
+div.search div.active.search.notice {
+  background-color: #cfc;
+  color: #040;
+}
+
+div.conversations.template div.conv-link.prof {
+  float: none;
+  display: inline-block;
+}
+
+/** Make a link ordinary again..*/
+a.just-link {
+  color: blue;
+  text-decoration: underline;
+  border: none;
+}
+a.just-link:focus,
+a.just-link:hover {
+  outline: none;
+}
+a.just-link:hover {
+  color: #00c;
+}
+
+div.admin.users.template {
+  border: solid #daa 1px;
+  border-radius: 5px;
+  padding: 5px;
+
+}
+div.admin.users.template div.row {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right: 2px;
+  margin-left: 2px;
+  border-top: solid #aaa 1px;
+}
+div.admin.users.template div.row > div {
+  /*
+  border: solid #aaa 1px;
+  */
+  padding: 2px;
+}
+div.admin.users.template div.row.header >  div {
+  font-weight: bold;
+}
+
+
+div.login.template,
+div.borrower-register-form,
+div.lender-index.template,
+div.index-index {
+  /*
+  //max-width: 700px;
+  padding-right: 40px;
+  padding-left: 40px;
+  */
+  margin-left: auto;
+  margin-right: auto;
+}
+div.login.template div.row.forgot-register  {
+  margin-top: 10px;
+}
+div.login.template form.login {
+  border: solid #aaa 1px;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px;
+  background-color: rgba(222,222,222,.8);
+}
+div.login.template {
+  max-width: 500px;
+  padding: 15px;
+  border-radius: 10px;
+  background-color: #fdd;
+}
+div.login.template h1 {
+  font-size: x-large;
+  line-height: 1;
+  padding: 10px;
+  text-align: center;
+  background-color: #22a;
+  color: white;
+  border-radius: 5px;
+}
+div.login.template div.input {
+  text-align: left;
+}
+div.login.template div.pklbl {
+  text-align: right;
+}
+
+div.index.about.template  {
+  max-width: 850px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-bottom: 40px;
+  border: solid #aaa 1px;
+  border-radius: 10px;
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+
+}
+
+div.index.about.template div.about.body {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 5px;
+  border: solid #ccc 1px;
+  background-color: rgba(200, 200, 220, .5);
+
+}
+div.index.about.template h5 {
+  background-color: #00D2FF;
+  padding: 20px;
+  color: white;
+  border-radius: 10px;
+  font-size: large;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+h3.head-2,
+div.borrower.editprofile.template h3,
+div.lender.editprofile.template h3,
+div.borrower-register-form,
+div.lender-index.template h3,
+div.index.about.template h3,
+div.index-index h3 {
+  text-align: center;
+  font-family: 'Lato', Verdana;
+  color: #68a;
+}
+h3.head-2 {
+  margin-top: 7px;
+}
+.bcc-border {
+  border: solid #ccc 1px;
+  border-radius: 5px;
+  /*
+  margin: 5px;
+  */
+  padding: 5px;
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+
+div.bcc-desc {
+  border: solid #aaa 1px;
+  border-radius: 5px;
+  padding: 5px;
+  background-color: #fee;
+  color: #002;
+}
+
+div.borrower.viewprofile.template {
+  padding: 10px;
+}
+.bcc-right-align {
+  text-align: right;
+}
+
+div.borrower.viewprofile {
+  color: #008;
+}
+div.borrower.viewprofile h6 {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #008;
+  color: white;
+  margin-top: 0;
+  margin-bottom: 1px;
+}
+div.borrower.viewprofile h5 {
+  padding: 8px;
+  border-radius: 5px;
+  background-color: black;
+  color: white;
+}
+h5.h-1-2-3 {
+  font-size: medium;
+  font-style: italic;
+  color: #a55;
+  text-align: center;
+} 
+
+div.borrower.viewprofile div.msgs.part h5 {
+  margin-top: 0;
+}
+h4.h-1-2-3, 
+div.borrower.editprofile h5,
+div.lender-index.template  h4.h-1-2-3, 
+div.index-index h4.h-1-2-3 {
+  color: #800;
+  text-align: center;
+}
+.padding-right-0 {
+  padding-right: 0;
+}
+div.template h1,
+div.template h2,
+div.lender.viewprofile.template h1,
+div.template.lender.search h1,
+div.template.lender.search h2,
+div.template.lender.editprofile h1,
+div.template.contact h1 {
+  margin-top: 0;
+  text-align: center;
+  background-color: #444;
+  color: #ccc;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+div.template.contact form div.input-label {
+  padding-right: 0;
+}
+div.template.editprofile form,
+div.template.contact form {
+  border: solid #aaa 1px;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  background-color: rgba(250, 250,200,.5);
+}
+
+input.boolean.viewable {
+  zoom: 2;
+}
+div.row.lender.search {
+  color: #449;
+}
+div.row.lender.search div.interest span.focus {
+  font-weight: bold;
+} 
+
+div.row.lender.search div.interest {
+  font-style: italic;
+}
+
+div.lender.viewprofile.template div.part {
+  border: solid blue 1px;
+}
+
+
+div.row.lender.search div.name {
+  color: #400;
+  font-weight: bold;
+}
+
+div.row.lender.search {
+  border: solid #aaa 1px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+div.template.contact h2 {
+  text-align: center;
+}
+div.template.editprofile form label,
+div.template.contact form label {
+  background-color: #44a;
+  color: #fff;
+  text-align: center;
+  min-height: 24px;
+  width: 100%;
+  padding-top: 2px;
+}
+div.template.contact form select {
+  min-height: 25px;
+  width: 100%;
+}
+
+div.borrower-intro {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 800px;
+  border: solid #ccc 1px;
+  border-radius: 10px;
+  padding: 20px;
+}
+.italic {
+  font-style: italic;
+}
+.bold {
+  font-weight: bold;
+}
+div.borrower.editprofile h5 {
+  font-weight: bold;
+}
+div.borrower.editprofile h6 {
+  font-size: small;
+  font-style: oblique;
+  color: #800;
+  text-align: center;
+}
+
+.tst-margin {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  margin-right: 0;
+}
+
+.bcc-yn {
+  background-color: #eea;
+  padding: 3px;
+  border-radius: 3px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.bcc-ok {
+  color: black;
+}
+div.index-index.template div.contact {
+  color: black;
+  text-align: center;
+  margin-top: 30px;
+  /*
+  position: relative;;
+  bottom: 00px;
+  width: 100%;
+  left: 0;
+  */
+
+}
+div.index.about.template div.contact h4 {
+  text-align: center;
+}
+div.index.about.template div.contact h4 ,
+div.index-index.template div.contact h4 {
+  font-style: italic;
+  color:#500;;
+  font-weight: bold;
+  font-size: larger;
+}
+a.contact.lnk {
+  margin-top: 15px;
+  display: block;
+}
+
+.bcc-warn {
+  color: #a00;
+}
+
+.bcc-feature-val {
+  padding: 3px;
+  padding-right: 8px;
+  border-radius: 3px;
+  color: white;
+  background-color: #844;
+}
+
+.most-width {
+  width: 90%;
+}
+div.lender-index.template h4.sect-head {
+  position: relative;
+  top: 5px;
+  text-align: center;
+  margin: 20px;
+  margin-top: 0px;
+  padding: 20px;
+  border-radius: 20px;
+  background-color: #500;
+  color: white;
+  font-size: x-large;
+  font-weight: bold;
+}
+div.lender-index.template ul,
+div.index-index ul {
+  font-family: arial;
+  font-size: large;
+  color: #000;
+}
+div.index-index.template {
+  max-width: 850px;
+  /*
+  font-family: 'lato', verdana;
+  */
+  font-family:  verdana;
+  color: #444;
+}
+div.index-index.template div.section li {
+  line-height: 1.8;
+}
+
+div.inline.search-button-box {
+  position: relative;
+  right: 20px;
+  max-width: 200px;
+}
+div.index-index.template div.section,
+div.lender-index.template div.section {
+  padding: 20px;
+line-height: 1.5;
+}
+div.lender-index.template div.auto-margin {
+  font-size: medium;
+  color: #300;
+  line-height: 1.2;
+  max-width: 850px;
+  background-color:#ccf;
+  padding-left: 40px;
+  padding-right: 40px;
+  /*
+  margin-top: -15px;
+  */
+  border-radius: 10px;
+  padding-bottom: 20px;
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+div.index-index.template div.section,
+div.lender-index.template {
+  color: #644;
+  /*
+  padding: 20px;
+  */
+}
+div.lender-index.template {
+  max-width: 850px;
+}
+div.lender-index.template li {
+  color: #433;
+  margin-bottom: 19px;
+}
+.auto-margin {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div.some-att-hd {
+  font-size: large;
+  font-style: italic;
+  color: #400;
+  text-align: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+div.site-name {
+  min-height: 20px;
+  line-height: 1.2;
+  /*
+  color: #9400D3;
+  */
+
+  color: #9000D0;
+  font-style: italic;
+  font-weight: bold;
+}
+div.index-index.template h4.sect-head {
+  margin-top: 0;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  color: #ffc;
+  background-color: #79c;
+}
+
+div.borrower-register-form {
+  max-width: 500px;
+
+}
+div.borrower-register-form div.row {
+  margin: 5px;
+}
+div.borrower-register-form input {
+  min-width: 300px;
+}
+
+span.conversant.name, 
+span.conversant.date {
+  font-weight: bold;
+} 
+
+div.borrower-register-form form div.col-sm-5 {
+  /*
+  text-align: right;
+  */
+}
+div.borrower-register-form form div.col-sm-12 {
+  text-align: center;
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+
+.rowclass-equalheight {
+    display: table;
+}
+
+.colclass-equalheight {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
+}
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+
+
+@media (min-width: 0px) and (max-width: 767px) {
+  .fsi-row-xs-level {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .fsi-row-sm-level {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .fsi-row-md-level {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+@media (min-width: 1200px) {
+  .fsi-row-lg-level {
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+  }
+}
+div.row.conversant.head div {
+  font-weight: bold;
+  color: #008;
+}
+div.row.conversant.head  {
+  background-color: #f88;
+}
+div.row.conversant {
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background-color: #eea;
+  border-radius: 5px;
+  padding: 10px;
+}
+div.speech-bubble{
+   margin-left: 25px;
+   margin-right: 25px;
+   padding: 10px;
+   color: white;
+   display: inline-block;
+   width: 420px; 
+   min-height: 80px; 
+   border-radius: 10px;
+}
+div.speech-bubble.left {
+   background: blue;
+}
+div.speech-bubble.right {
+   background: red;
+}
+div.speech-bubble::before,
+div.speech-bubble::after {
+   content:"";
+   position: absolute;
+   width: 0;
+   height: 0;
+   border-top: 13px solid transparent;
+   border-bottom: 13px solid transparent;
+   margin: 0;
+}
+div.speech-bubble.left::before {
+   border-right: 26px solid blue;
+   margin-left: -35px;
+
+}
+div.speech-bubble.right:after {
+   border-left: 26px solid red;
+   /*
+   margin-left: 410px;
+   */
+   left: 450px;
+   top: 15px;
+}
+div.showHelp.borrower-search-help-button {
+  margin-left: 20px;
+  position: relative;
+  top: -5px;
+}
+div.showHelp.borrower-viewprofile-help-button {
+  margin-left: -50px;
+}
+
+#helpTitle, 
+#helpContent {
+  display: none;
+}
+
+/** For jQuery elements */
+

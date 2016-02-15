@@ -1,0 +1,12 @@
+.idea
+*.swp
+*.log
+*.bak
+*.swo
+*.backup
+tmp/
+logs/
+*-orig.php
+.env
+/storage/*
+nbproject/*
