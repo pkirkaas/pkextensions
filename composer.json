@@ -1,0 +1,21 @@
+{
+  "name": "pkirkaas/PkExtensions",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Paul Kirkaas",
+      "email": "paul.kirkaas@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.5.9",
+  },
+  "autoload": {
+    "psr-4": {
+      "PkExtensions\\": "src/Extensions"
+    },
+    "files": [
+      "src/lib/pklib.php"
+    ]
+  }
+}
