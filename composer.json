@@ -12,7 +12,7 @@
   },
   "autoload": {
     "psr-4": {
-      "PkExtensions\\": "src/Extensions"
+      "PkExtensions\\": "src/Extensions/"
     },
     "files": [
       "src/lib/pklib.php"
