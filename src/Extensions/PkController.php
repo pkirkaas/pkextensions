@@ -5,10 +5,10 @@
  *
  * @author Paul.Kirkaas@gmail.com
  */
-namespace App\Extensions;
+namespace PkExtensions;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
-use App\Extensions\Models\PkModel;
+use PkExtensions\Models\PkModel;
 use Request;
 class PkController extends Controller {
 
