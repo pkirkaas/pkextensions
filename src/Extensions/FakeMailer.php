@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
 use Illuminate\Mail\Message;

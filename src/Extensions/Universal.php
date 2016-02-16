@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 class Universal {
   public $attributes = [];
   public function __get($key) {

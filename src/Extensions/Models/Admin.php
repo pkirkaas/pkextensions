@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions\Models;
+namespace PkExtensions\Models;
 class Admin extends PolymorphicUser {
   public $viewable = false;
   public function fullname() {

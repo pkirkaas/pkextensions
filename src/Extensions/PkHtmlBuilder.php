@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 //use Illuminate\Html\HtmlBuilder;
 use Collective\Html\HtmlBuilder;
 class PkHtmlBuilder extends HtmlBuilder {

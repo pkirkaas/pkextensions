@@ -1,6 +1,6 @@
 <?php
 /** Add to Http/Kernel.php */
-namespace App\Http\Middleware;
+namespace PkExtensions;
 /** Use this middlware to do any environment specific setup */
 use Closure;
 use PkLibConfig; #Defined in pklib

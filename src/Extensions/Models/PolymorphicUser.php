@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions\Models;
+namespace PkExtensions\Models;
 use Illuminate\Database\Eloquent\Model;
 /**
  * Common Abstract base class for the different user types, Lender & Borrower, say,

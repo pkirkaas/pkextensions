@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 /**
  * Abstract class mapping keys to descriptions
  * @author Paul Kirkaas

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Extensions\References;
+namespace PkExtensions\References;
 
-use App\Extensions\PkRefManager;
+use PkExtensions\PkRefManager;
 
 class ZipRef extends PkRefManager {
   public static $milesperlat = 69;

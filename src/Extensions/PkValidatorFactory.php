@@ -1,4 +1,4 @@
-<?php namespace App\Extensions;
+<?php namespace PkExtensions;
 use Illuminate\Validation\Factory;
 
 /** The purpose of this ValidatorFactory extension is to bind custom validation rule closures to the

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Extensions\Traits;
+namespace PkExtensions\Traits;
 
-use App\Extensions\Models\PkModel;
+use PkExtensions\Models\PkModel;
 use Illuminate\Database\Eloquent\Model;
 use \Request;
 

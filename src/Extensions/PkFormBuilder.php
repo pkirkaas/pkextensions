@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 //use Illuminate\Html\FormBuilder;
 use Collective\Html\FormBuilder;
 //use Illuminate\Html\HtmlBuilder;
@@ -7,7 +7,7 @@ use Collective\Html\HtmlBuilder;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
-use App\Models\PkModel;
+use PkExtensions\Models\PkModel;
 
 class PkFormBuilder extends FormBuilder {
 

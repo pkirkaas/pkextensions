@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Illuminate\Support\Facades\Facade;
 
 class PkHtmlFacade extends Facade {

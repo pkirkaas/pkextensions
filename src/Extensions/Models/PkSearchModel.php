@@ -1,6 +1,6 @@
 <?php
-namespace App\Extensions\Models;
-use App\Extensions\Traits\BuildQueryTrait;
+namespace PkExtensions\Models;
+use PkExtensions\Traits\BuildQueryTrait;
 use Illuminate\Database\Eloquent\Model;
 /**
  * Abstract model class to persist and implement searches

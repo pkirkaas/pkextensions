@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 /** Class to work with Blade::declare() to automate the inclusion of mulit-subforms in forms
  * 
  */

@@ -1,5 +1,5 @@
 <?php
-use App\Extensions\Universal;
+use PkExtensions\Universal;
 /** A library of Laravel - specific "helper" functions */
 
 /** Builds a templatable many to one subform, whith exit/create/delete of items.

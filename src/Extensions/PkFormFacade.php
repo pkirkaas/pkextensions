@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Illuminate\Html\FormBuilder;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;

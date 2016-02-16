@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Illuminate\Validation\ValidationServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use PkValidator;

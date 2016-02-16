@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Monolog\Logger;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Processor\WebProcessor;

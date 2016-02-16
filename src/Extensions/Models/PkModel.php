@@ -5,7 +5,7 @@
  * this and set them to false.
  */
 
-namespace App\Extensions\Models;
+namespace PkExtensions\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
 use App\User;

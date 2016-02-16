@@ -1,5 +1,5 @@
 <?php
-namespace App\Extensions;
+namespace PkExtensions;
 use Codesleeve\Stapler\Attachment;
 
 /*

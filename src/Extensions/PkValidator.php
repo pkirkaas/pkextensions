@@ -1,4 +1,4 @@
-<?php namespace App\Extensions;
+<?php namespace PkExtensions;
 use Illuminate\Validation\Validator;
 use Symfony\Component\Translation\TranslatorInterface;
 /** Custom Validator for Laravel */
