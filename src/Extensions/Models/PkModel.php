@@ -5,6 +5,12 @@
  * this and set them to false.
  */
 
+/** TODO! Add static method and array to build Migration files - this will allow
+ * the Model to build the migration file, so all data definitions localized in
+ * the model, but more importantly, THE MODEL WILL KNOW WHAT DB TABLE ATTRIBUTES
+ * it has!
+ */
+
 namespace PkExtensions\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
@@ -16,6 +22,48 @@ use Illuminate\Support\Collection as BaseCollection;
 use \Exception;
 
 abstract class PkModel extends Model {
+
+  /** Actual derived classes will define the $table_fields array with keys that
+   * correspond to table field names, and values that represent their definition.
+   * @var array - keys are table field names, values are table field defs
+   */
+  public static $table_fields = null;
+
+  /** Because the Eloquent Model class needs an instance to get a table name...
+   *
+   * @var null|string - name of the DB table 
+   */
+  public static $statictable = null;
+      /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getStaticTable() {
+        if (isset(static::$statictable)) {
+            return static::$statictable;
+        }
+        return str_replace('\\', '', Str::snake(Str::plural(static::class)));
+    }
+
+    /** TODO - Finish this
+    public static function buildMigrationDefinition() {
+      $tablename = static::getStaticTable();
+      $createclassname = "Create".static::class."Table";
+      $migrationfile = database_path()."/migrations/create_{$tablename}_table.php";
+      $migrationheader = "
+<?php
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+class $createclassname extends Migration {
+  public function up() {
+    Schema::create('$tablename', function (Blueprint \$table) {
+";
+      
+    }
+     *
+     */
+
 
    public static $mySqlIntTypes = ['tinyint','smallint', 'mediumint', 'int', 'bigint'];
    public static $mySqlNumericTypes = ['tinyint','smallint', 'mediumint', 'int',
