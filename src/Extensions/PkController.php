@@ -135,6 +135,15 @@ class PkController extends Controller {
    * @return file - with appropriate header
    */
   public function pkasset($assetpath) {
-    return "This is an asset request with path: ".print_r($assetpath,1);
+    if (!$assetpath || !is_string($assetpath)) throw new Exception ("No asset specified");
+    $assetfilepath = realpath(__DIR__."/../assets/$assetpath");
+    if (!file_exists($assetfilepath)) throw new Exception ("Asset file [$assetfilepath] not found");
+    $mimeType = finfo::file ($assetfilepath ,FILEINFO_MIME_TYPE);
+    header("content-type: $mimeType");
+    header('Content-Description: File Transfer');
+    header('Content-Length: ' . filesize($assetfilepath));
+    readfile($assetfilepath);
+    die();
+    //return "This is an asset request with path: ".print_r($assetpath,1);
   }
 }
