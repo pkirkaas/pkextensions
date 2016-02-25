@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use PkExtensions\Models\PkModel;
 use Request;
+use \Exception;
 class PkController extends Controller {
 
 
@@ -135,9 +136,15 @@ class PkController extends Controller {
    * @return file - with appropriate header
    */
   public function pkasset($assetpath) {
-    if (!$assetpath || !is_string($assetpath)) throw new Exception ("No asset specified");
+    if (!$assetpath || !is_string($assetpath)) { 
+      header("HTTP/1.0 404 Not Found");
+      die();
+    }
     $assetfilepath = realpath(__DIR__."/../assets/$assetpath");
-    if (!file_exists($assetfilepath)) throw new Exception ("Asset file [$assetfilepath] not found");
+    if (!file_exists($assetfilepath)) {
+      header("HTTP/1.0 404 Not Found");
+      die();
+    }
     $mimeType =finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
     header("content-type: $mimeType");
     header('Content-Description: File Transfer');
