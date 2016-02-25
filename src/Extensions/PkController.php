@@ -138,7 +138,7 @@ class PkController extends Controller {
     if (!$assetpath || !is_string($assetpath)) throw new Exception ("No asset specified");
     $assetfilepath = realpath(__DIR__."/../assets/$assetpath");
     if (!file_exists($assetfilepath)) throw new Exception ("Asset file [$assetfilepath] not found");
-    $mimeType = finfo::file ($assetfilepath ,FILEINFO_MIME_TYPE);
+    $mimeType =finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
     header("content-type: $mimeType");
     header('Content-Description: File Transfer');
     header('Content-Length: ' . filesize($assetfilepath));
