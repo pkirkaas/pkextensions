@@ -121,4 +121,20 @@ class PkController extends Controller {
     }
 		return view('showmessage', ['message'=>$message]);
   }
+
+
+  /**
+   * Returns assets (.css, .js, etc) within the PkExtensions package.
+   * This is a kludge, because the router doesn't allow for controllers outside
+   * the default namespace. So controllers which extend PkController should NOT
+   * override this method - the router should call this method on a controller
+   * which extends PkController, but this method will look for assets relative
+   * to the PkController location.
+   * @param string $assetpath - the relative path to the asset within the
+   * PkExtensions package
+   * @return file - with appropriate header
+   */
+  public function pkasset($assetpath) {
+    return "This is an asset request with path: ".print_r($assetpath,1);
+  }
 }
