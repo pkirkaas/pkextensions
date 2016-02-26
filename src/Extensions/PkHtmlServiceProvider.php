@@ -13,13 +13,13 @@ class PkHtmlServiceProvider extends ServiceProvider {
     $this->app->alias('pkhtml', 'Extensions\PkHtmlBuilder');
   }
 	protected function registerPkHtmlBuilder() {
-		$this->app->bindShared('pkhtml', function($app) {
+		$this->app->singleton('pkhtml', function($app) {
 			$html = new PkHtmlBuilder();
       return $html;
 		});
   }
 	protected function registerPkFormBuilder() {
-		$this->app->bindShared('pkform', function($app) {
+		$this->app->singleton('pkform', function($app) {
 			//$form = new PkFormBuilder($app['html'], $app['url'], $app['session.store']->getToken());
 			$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['session.store']->getToken());
 			return $form->setSessionStore($app['session.store']);
