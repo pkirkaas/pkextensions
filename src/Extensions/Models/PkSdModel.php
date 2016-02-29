@@ -1,5 +1,5 @@
 <?php
-namespace Pk\Extensions\Models;
+namespace PkExtensions\Models;
 use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Description of PkSdModel - Extends PkModel to automatically include SoftDeletes

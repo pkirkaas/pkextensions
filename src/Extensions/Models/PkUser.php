@@ -1,5 +1,5 @@
 <?php
-Namespace PkExtensions;
+Namespace PkExtensions\Models;
 use Auth;
 use Exception;
 use Illuminate\Auth\Authenticatable;
