@@ -33,24 +33,22 @@ abstract class PkModel extends Model {
    *
    * @var null|string - name of the DB table 
    */
-  public static $statictable = null;
       /**
      * Get the table associated with the model.
      *
      * @return string
      */
-    public function getStaticTable() {
-        if (isset(static::$statictable)) {
-            return static::$statictable;
-        }
-        return str_replace('\\', '', Str::snake(Str::plural(static::class)));
+    public static function getTableName() {
+      $instance = new static();
+      $table = $instance->getTable();
+      return $table;
     }
 
-    /** TODO - Finish this
     public static function buildMigrationDefinition() {
-      $tablename = static::getStaticTable();
+      $tablename = static::getTableName();
+      $timestamp =  date('Y_m_d_His',time());
       $createclassname = "Create".static::class."Table";
-      $migrationfile = database_path()."/migrations/create_{$tablename}_table.php";
+      $migrationfile = database_path()."/migrations/create_{$timestamp}_{$tablename}_table.php";
       $migrationheader = "
 <?php
 use Illuminate\Database\Schema\Blueprint;
@@ -61,8 +59,6 @@ class $createclassname extends Migration {
 ";
       
     }
-     *
-     */
 
 
    public static $mySqlIntTypes = ['tinyint','smallint', 'mediumint', 'int', 'bigint'];
