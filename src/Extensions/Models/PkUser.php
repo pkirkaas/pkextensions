@@ -23,7 +23,7 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
  */
 class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract {
     use Authenticatable, Authorizable, CanResetPassword;
-
+#Testing if autoupdate
     protected $fillable = [
         'name', 'email', 'password',
     ];
