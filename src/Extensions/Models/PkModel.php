@@ -28,6 +28,9 @@ abstract class PkModel extends Model {
    * @var array - keys are table field names, values are table field defs
    */
   public static $table_fields = null;
+  public static function get_field_names() {
+    return array_keys(static::$table_fields);
+  }
 
   /** Because the Eloquent Model class needs an instance to get a table name...
    *
@@ -40,10 +43,11 @@ abstract class PkModel extends Model {
      */
     public static function getTableName() {
       $instance = new static();
-      $table = $instance->getTable();
-      return $table;
+      $tablename = $instance->getTable();
+      return $tablename;
     }
 
+    /** So not close to ready - finish in spare time .... */
     public static function buildMigrationDefinition() {
       $tablename = static::getTableName();
       $timestamp =  date('Y_m_d_His',time());
