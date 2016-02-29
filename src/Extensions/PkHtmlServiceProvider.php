@@ -14,7 +14,7 @@ class PkHtmlServiceProvider extends ServiceProvider {
   }
 	protected function registerPkHtmlBuilder() {
 		$this->app->singleton('pkhtml', function($app) {
-			$html = new PkHtmlBuilder();
+			$html = new PkHtmlBuilder($app['pkhtml'], $app['url']);
       return $html;
 		});
   }
