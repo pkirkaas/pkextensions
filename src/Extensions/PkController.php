@@ -146,6 +146,12 @@ class PkController extends Controller {
       die();
     }
     $mimeType =finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
+    #Hack for CSS since PHP can't detect that...
+    if ($mimeType === 'text/plain') {
+      $ext = pathinfo($assetfilepath, PATHINFO_EXTENSION);
+      $ext = strtolower($ext);
+      if ($ext === 'css') $mimeType = 'text/css'; 
+    }
     header("content-type: $mimeType");
     header('Content-Description: File Transfer');
     header('Content-Length: ' . filesize($assetfilepath));
