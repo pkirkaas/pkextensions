@@ -20,6 +20,6 @@ class PkValidatorServiceProvider extends ValidationServiceProvider {
   }
 
   public function provides() {
-    return ['pkvalidator'];
+    return ['pkvalidator', 'validation.presence'];
   }
 }
