@@ -14,14 +14,15 @@ class PkHtmlServiceProvider extends ServiceProvider {
   }
 	protected function registerPkHtmlBuilder() {
 		$this->app->singleton('pkhtml', function($app) {
-			$html = new PkHtmlBuilder($app['pkhtml'], $app['url']);
+			//$html = new PkHtmlBuilder($app['pkhtml'], $app['url']);
+			$html = new PkHtmlBuilder($app['url'], $app['view']);
       return $html;
 		});
   }
 	protected function registerPkFormBuilder() {
 		$this->app->singleton('pkform', function($app) {
 			//$form = new PkFormBuilder($app['html'], $app['url'], $app['session.store']->getToken());
-			$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['session.store']->getToken());
+			$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['view'], $app['session.store']->getToken());
 			return $form->setSessionStore($app['session.store']);
 		});
 	}
