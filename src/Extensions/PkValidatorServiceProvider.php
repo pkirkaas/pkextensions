@@ -18,4 +18,8 @@ class PkValidatorServiceProvider extends ValidationServiceProvider {
       return $validator;
     });
   }
+
+  public function provides() {
+    return ['pkvalidator'];
+  }
 }
