@@ -5,6 +5,7 @@ use Collective\Html\FormBuilder;
 //use Illuminate\Html\HtmlBuilder;
 use Collective\Html\HtmlBuilder;
 use Illuminate\Routing\UrlGenerator;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use PkExtensions\Models\PkModel;
@@ -20,8 +21,8 @@ class PkFormBuilder extends FormBuilder {
 	 * @param  string  $csrfToken
 	 * @return void
 	 */
-	public function __construct(HtmlBuilder $html, UrlGenerator $url, $csrfToken) {
-    parent::__construct($html, $url, $csrfToken);
+	public function __construct(HtmlBuilder $html, UrlGenerator $url, Factory $view, $csrfToken) {
+    parent::__construct($html, $url, $view, $csrfToken);
 	}
 
 
