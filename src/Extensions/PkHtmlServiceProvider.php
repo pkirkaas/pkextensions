@@ -9,8 +9,8 @@ class PkHtmlServiceProvider extends ServiceProvider {
 	public function register() {
 		$this->registerPkFormBuilder();
 		$this->registerPkHtmlBuilder();
-    $this->app->alias('pkform', 'Extensions\PkFormBuilder');
-    $this->app->alias('pkhtml', 'Extensions\PkHtmlBuilder');
+    $this->app->alias('pkform', 'PkExtensions\PkFormBuilder');
+    $this->app->alias('pkhtml', 'PkExtensions\PkHtmlBuilder');
   }
 	protected function registerPkHtmlBuilder() {
 		$this->app->singleton('pkhtml', function($app) {
