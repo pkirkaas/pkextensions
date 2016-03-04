@@ -2091,11 +2091,6 @@ function dollar_format($num, $prec = 0) {
 function keyValOrDefault($key = '', $container = [], $default = null) {
   if (is_object($container)) {
       $array = get_all_object_vars($container);
-      //$refcont = get_all_object_vars($container);
-      //$container = array_merge(get_object_vars($container), get_static_vars($container));
-     // pkdebug(//"Merged array of static & Instance values: Method1 Public:", $container
-      //"All obj vars w. reflection - also private?", $array
-       //   );
   } else if (is_array($container)) {
     $array = $container;
   } else {
@@ -2110,6 +2105,11 @@ function keyValOrDefault($key = '', $container = [], $default = null) {
     return $default;
     #If using reflection to get ALL scopes...
   }
+}
+
+/** Just shorter */
+function keyVal($key = '', $container = [], $default = null) {
+  return keyValOrDefault($key,$container, $default);
 }
 
 /** Gets the CURRENT values of the static vars (including NULL) of a OBJECT INSTANCE, EVEN IF MODIFIED BY AN INSTANCE
@@ -2127,12 +2127,19 @@ function get_static_vars($object) {
   return $result;
 }
 
-/** Uses reflection to return (by default) ALL object vars, public, private, 
- * static, but accepts parameters to limit scope
- * @param object $object
+/** Uses reflection to return (by default) ALL object vars and values, public, private, 
+ * static, but accepts parameters to limit scope. Also, can't return magic _get properties
+ * 
+ * #NOTE! If an object is derived from a class that declares a private variable, the name
+ * of the variable will be visible if call $property->setAccessible(true) - BUT THE VALUE WILL NOT
+ * But if the parent declares the property as protected, both the name and value will be available
+ * 
+ * #NOTE! Be careful of var_dump - some values may be recursive!
+ * 
+ * @param object $object - The object to fetch properties from
  * @param INT|NULL $permissions(optional) If set, is the ORed Permissions/Protection levels of attributes to return
  *        default: null -- all constants : ReflectionProperty::IS_STATIC |  ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE
- * @return array object key/value pairs.
+ * @return array key/value pairs of the object. Parent Private property names will be visible, but value will be null.
  */
 function get_all_object_vars($object, $permissions = null) {
   if (!is_object($object)) return null;
