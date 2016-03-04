@@ -16,6 +16,13 @@ class PkController extends Controller {
   public static $tststatvar1 = 'Def in PkController';
   public static $tststatvar2 = 'Def in PkController';
 
+  private static $pkc_priv_stat_null;
+  private static $pkc_priv_stat_set = "Set in PkController";
+  protected $pkc_prot_inst_null;
+  protected $pkc_prot_inst_set = "Set Protected in PkController";
+  private $pkc_priv_inst_null;
+  private $pkc_priv_inst_set = "Set private in PkController";
+
 
 
 

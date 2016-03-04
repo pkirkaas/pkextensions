@@ -2090,17 +2090,22 @@ function dollar_format($num, $prec = 0) {
  */
 function keyValOrDefault($key = '', $container = [], $default = null) {
   if (is_object($container)) {
-      $container = array_merge(get_object_vars($container), get_static_vars($container));
-      pkdebug("Merged array of static & Instance values");
-  }
-  if (!is_array($container)) {
+      $array = get_all_object_vars($container);
+      //$refcont = get_all_object_vars($container);
+      //$container = array_merge(get_object_vars($container), get_static_vars($container));
+     // pkdebug(//"Merged array of static & Instance values: Method1 Public:", $container
+      //"All obj vars w. reflection - also private?", $array
+       //   );
+  } else if (is_array($container)) {
+    $array = $container;
+  } else {
     return $default;
   }
   if (!is_scalar($key)) {
     return $default;
   }
-  if (array_key_exists($key, $container)) {
-    return $container[$key];
+  if (array_key_exists($key, $array)) {
+    return $array[$key];
   } else {
     return $default;
     #If using reflection to get ALL scopes...
@@ -2120,6 +2125,29 @@ function get_static_vars($object) {
     if (!in_array($name,$instanceobjkeys)) $result[$name] = $value;
   }
   return $result;
+}
+
+/** Uses reflection to return (by default) ALL object vars, public, private, 
+ * static, but accepts parameters to limit scope
+ * @param object $object
+ * @param INT|NULL $permissions(optional) If set, is the ORed Permissions/Protection levels of attributes to return
+ *        default: null -- all constants : ReflectionProperty::IS_STATIC |  ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE
+ * @return array object key/value pairs.
+ */
+function get_all_object_vars($object, $permissions = null) {
+  if (!is_object($object)) return null;
+  if ($permissions === null) {
+    $permissions =  ReflectionProperty::IS_STATIC |  ReflectionProperty::IS_PUBLIC
+        | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE;
+  }
+  $reflector = new ReflectionClass($object);
+  $properties = $reflector->getProperties($permissions);
+  $objvars = [];
+  foreach ($properties as $property) {
+    $property->setAccessible(true);
+    $objvars[$property->getName()] = $property->getValue($object);
+  }
+  return $objvars;
 }
 
 /** Returns an array of ancestor class names (including this one)
