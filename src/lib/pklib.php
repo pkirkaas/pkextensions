@@ -429,7 +429,7 @@ function ancestry($heritable) { //Can be object instance or classname
   } else { #Not a class or object
     return false;
   }
-  if (array_key_exists($class,$classhierarchy)) return $classhierarchy[$class];
+  if (array_key_exists($class, $classhierarchy)) return $classhierarchy[$class];
   $parents = [];
   $parent = $class;
   while ($parent = get_parent_class($parent)) {
@@ -2080,32 +2080,46 @@ function dollar_format($num, $prec = 0) {
  * in the $default parameter
  * 
  * TODO: Currently,just access the values in scope (public, whatever) - add option for all attributes?
- * @param scalar $key - Key into the array
- * @param array|object $container - array/object to check for the key #NOTE Object param STILL EXPERIMENTAL - ALSO WON'T WORK FOR MAGIC GETS!
+ * 
+ * Will also return values of class static vars, even if modified in calling instance method!
+ * @param scalar $key - Key into the array or object attributed
+ * @param array|object $container - array/object to check for the key
+ *   #NOTE Object container STILL EXPERIMENTAL - NOT SO USEFUL SINCE ONLY FOR PUBLIC ATTRIBUTES (including static); ALSO WON'T WORK FOR MAGIC GETS!
  * @param mixed $default - the default value to return if no key value in array for key, default null
  * @return mixed - The value of array for $key, if any, or else the default (null)
  */
 function keyValOrDefault($key = '', $container = [], $default = null) {
-  if (!is_array($container) || !is_object($container)) {
+  if (is_object($container)) {
+      $container = array_merge(get_object_vars($container), get_static_vars($container));
+      pkdebug("Merged array of static & Instance values");
+  }
+  if (!is_array($container)) {
     return $default;
   }
   if (!is_scalar($key)) {
     return $default;
   }
-  if (is_array($container)) {
-    if (array_key_exists($key, $container)) {
-      return $container[$key];
-    } else {
-      return $default;
-    }
+  if (array_key_exists($key, $container)) {
+    return $container[$key];
+  } else {
     return $default;
-  } else if (is_object($container)) { #NOTE Object param STILL EXPERIMENTAL - ALSO WON'T WORK FOR MAGIC GETS!
-    
-    return array_merge(get_object_vars($container), get_class_vars(get_class($container)));
     #If using reflection to get ALL scopes...
-    #$ancestorarr = ancestry($container);
-    #Harder to check for all keys here....
   }
+}
+
+/** Gets the CURRENT values of the static vars (including NULL) of a OBJECT INSTANCE, EVEN IF MODIFIED BY AN INSTANCE
+ * @param object $object - the object to fetch static keys/values from, including NULLs.
+ * @return array of current static keys/values for the object instance, including null.
+ */
+function get_static_vars($object) {
+  if (!is_object($object)) return null;
+  $instanceobjkeys = array_keys(get_object_vars($object)); #only returns instance attributes
+  $class = get_class($object);
+  $result = [];
+  foreach  (get_class_vars($class) as $name => $value) {
+    if (!in_array($name,$instanceobjkeys)) $result[$name] = $value;
+  }
+  return $result;
 }
 
 /** Returns an array of ancestor class names (including this one)
@@ -2115,20 +2129,20 @@ function keyValOrDefault($key = '', $container = [], $default = null) {
  * 
  */
 /*
-function getAncestors($objclassname){
+  function getAncestors($objclassname){
   static $classhierarchies = []; #Cache so don't have to execute again for same class
   if (is_obect($objclassname)) {
-    $class= get_class($objclassname);
+  $class= get_class($objclassname);
   } else if (class_exists($objclassname,1)) {
-    $class = $objclassname;
+  $class = $objclassname;
   } else {
-    return false;
+  return false;
   }
   #Have a class name, now ascend hierarchy
   if (array_key_exists($classhierarchies,$class)) return $classhierarchies[$class];
   $classhier = [$class];
-  
-}
+
+  }
  * 
  */
 

@@ -13,6 +13,9 @@ use Request;
 use \Exception;
 class PkController extends Controller {
 
+  public static $tststatvar1 = 'Def in PkController';
+  public static $tststatvar2 = 'Def in PkController';
+
 
 
 
