@@ -31,10 +31,19 @@ class PkLibConfig {
   }
 
 }
+
 Class Undefined {
-  public function __get($x) {return null;}
-  public function __set($x, $y) {}
+
+  public function __get($x) {
+    return null;
+  }
+
+  public function __set($x, $y) {
+    
+  }
+
 }
+
 function isCli() {
   return php_sapi_name() == 'cli';
 }
@@ -145,10 +154,11 @@ function tmpdbg() {
 function pkdebugNamedLog() {
   $args = func_get_args();
   $logName = array_shift($args);
-  $logPath = getAppLogDir().'/'.$logName;
+  $logPath = getAppLogDir() . '/' . $logName;
   $out = call_user_func_array("pkdebug_base", $args);
-  pkdebugOut($out,$logPath);
+  pkdebugOut($out, $logPath);
 }
+
 function pkdebug() {
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
@@ -395,19 +405,37 @@ function pkTypeOf($var) {
   if (is_object($var)) return get_class($var);
   return gettype($var);
 }
+
 if (!function_exists('typeOf')) {
+
   function typeOf($var) {
     return pkTypeOf($var);
   }
+
 }
 
-function ancestry($object) { //Can be object instance or classname
-  $parent = $object;
-  $parents = array();
-  if (is_object($object)) $parents[] = get_class($object);
+/** Returns an array of all ancestor classes of the class name or object
+ * 
+ * @staticvar array $classhierarchy
+ * @param objinstance|classname $heritable
+ * @return boolean|array - false if invalid argument, else array of class hierarchy.
+ */
+function ancestry($heritable) { //Can be object instance or classname
+  static $classhierarchy = []; //Cache the results
+  if (is_object($heritable)) {
+    $class = get_class($heritable);
+  } else if (class_exists($heritable, 1)) {
+    $class = $heritable;
+  } else { #Not a class or object
+    return false;
+  }
+  if (array_key_exists($class,$classhierarchy)) return $classhierarchy[$class];
+  $parents = [];
+  $parent = $class;
   while ($parent = get_parent_class($parent)) {
     $parents[] = $parent;
   }
+  $classhierarchy[$class] = $parents;
   return $parents;
 }
 
@@ -419,7 +447,7 @@ function ancestry($object) { //Can be object instance or classname
 function pkcatchecho($runnable) {
   if (!is_callable($runnable)) {
     return "In pkcatchecho -- the function passed[" .
-            pkvardump($runnable) . "]is not callable...";
+        pkvardump($runnable) . "]is not callable...";
   }
   $args = func_get_args();
   array_shift($args);
@@ -522,7 +550,7 @@ function appLogReset($reset = null) {
  * @throws Exception
  */
 function pkdebugOut($str, $logpath = null) {
-  if ($logpath) error_log ("Logpath is: [$logpath]");
+  if ($logpath) error_log("Logpath is: [$logpath]");
   static $first = true;
   if ($logpath) $reset = false;
   else $reset = appLogReset();
@@ -622,7 +650,6 @@ function getRouteSegments($default = false, $depth = 2) {
   return $anarr;
 }
 
-
 /**
  * Returns if HTTP request protocol is HTTPS; else false
  * @return boolean - true if in a request and request is HTTPS; else false
@@ -630,18 +657,18 @@ function getRouteSegments($default = false, $depth = 2) {
 function isHttps() {
   return (!empty($_SERVER)) && (
       (array_key_exists('HTTPS', $_SERVER) && strtolower($_SERVER["HTTPS"]) === "on") ||
+      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) === 'https') ||
+      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"] === 'https'))
+      );
 
-      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
-      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https'))
+  /**
+    (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
+    ($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https')
     );
-
-          /**
-      (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
-      ($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https')
-    );
-           * 
-           */
+   * 
+   */
 }
+
 /**
  * 
  * @return String: The URL without subdirs, but with protocol (http://, etc)
@@ -1283,9 +1310,11 @@ function max_idx($arr, $next = false) {
   }
   return $ret;
 }
+
 function is_iterable($var) {
-    return (is_array($var) || $var instanceof Traversable);
+  return (is_array($var) || $var instanceof Traversable);
 }
+
 /**
  * Basically, "array_keys()" for objects that implement Iterator
  * @param array $arr: The array or array-like object
@@ -1363,7 +1392,7 @@ function submitted($onlyPost = false) {
 function makeNonce($len = 128, $prefix = '') {
   $bytes = openssl_random_pseudo_bytes($len);
   $hex = bin2hex($bytes);
-  return $prefix.$hex;
+  return $prefix . $hex;
 }
 
 /**
@@ -1811,7 +1840,7 @@ function array_dimension($arg, $depth = 0) {
   $max_sub_depth = 0;
   foreach ($arg as $subarray) {
     $max_sub_depth = max(
-            $max_sub_depth, array_dimension($subarray, $depth + 1)
+        $max_sub_depth, array_dimension($subarray, $depth + 1)
     );
   }
   return $max_sub_depth + 1;
@@ -2046,26 +2075,62 @@ function dollar_format($num, $prec = 0) {
  * 
  */
 
-/** Like keyValueOrNull, above, but more flexible - returns the value of
+/** Returns the value of the key for an Object or Array, else the default (or null)
  * the array at the key, or else the default value (null), or as specified
  * in the $default parameter
+ * 
+ * TODO: Currently,just access the values in scope (public, whatever) - add option for all attributes?
  * @param scalar $key - Key into the array
- * @param array $array - array to check for the key
+ * @param array|object $container - array/object to check for the key #NOTE Object param STILL EXPERIMENTAL - ALSO WON'T WORK FOR MAGIC GETS!
  * @param mixed $default - the default value to return if no key value in array for key, default null
  * @return mixed - The value of array for $key, if any, or else the default (null)
  */
-function keyValOrDefault($key = '', $array = [], $default = null) {
-  if (!is_array($array)) {
+function keyValOrDefault($key = '', $container = [], $default = null) {
+  if (!is_array($container) || !is_object($container)) {
     return $default;
   }
   if (!is_scalar($key)) {
     return $default;
   }
-  if (array_key_exists($key, $array)) {
-    return $array[$key];
+  if (is_array($container)) {
+    if (array_key_exists($key, $container)) {
+      return $container[$key];
+    } else {
+      return $default;
+    }
+    return $default;
+  } else if (is_object($container)) { #NOTE Object param STILL EXPERIMENTAL - ALSO WON'T WORK FOR MAGIC GETS!
+    
+    return array_merge(get_object_vars($container), get_class_vars(get_class($container)));
+    #If using reflection to get ALL scopes...
+    #$ancestorarr = ancestry($container);
+    #Harder to check for all keys here....
   }
-  return $default;
 }
+
+/** Returns an array of ancestor class names (including this one)
+ * - already implemented as 'ancestry()'...
+ * @param object|string $objclassname - either an object instance, or a class name
+ * @return array hierarchy of ancestor class names, starting with this.
+ * 
+ */
+/*
+function getAncestors($objclassname){
+  static $classhierarchies = []; #Cache so don't have to execute again for same class
+  if (is_obect($objclassname)) {
+    $class= get_class($objclassname);
+  } else if (class_exists($objclassname,1)) {
+    $class = $objclassname;
+  } else {
+    return false;
+  }
+  #Have a class name, now ascend hierarchy
+  if (array_key_exists($classhierarchies,$class)) return $classhierarchies[$class];
+  $classhier = [$class];
+  
+}
+ * 
+ */
 
 /**
  * For possessionDef arrays, returns a value if exists for key, else null
@@ -2341,9 +2406,9 @@ function pk_encrypt($rawkey, $data, $utf8 = true, $cipher_type = MCRYPT_RIJNDAEL
   $hkey = substr(hash('sha256', $rawkey), -mcrypt_get_key_size($cipher_type, $mode));
   $serialized = serialize($data);
   $rawencrypted = mcrypt_encrypt($cipher_type, $hkey, $serialized, $mode, $iv);
-  if (!$utf8) return 'UNENC'.$iv . $rawencrypted;
+  if (!$utf8) return 'UNENC' . $iv . $rawencrypted;
 
-  return 'UTF-8'.utf8_encode($iv . $rawencrypted);
+  return 'UTF-8' . utf8_encode($iv . $rawencrypted);
 }
 
 /**
@@ -2357,7 +2422,7 @@ function pk_encrypt($rawkey, $data, $utf8 = true, $cipher_type = MCRYPT_RIJNDAEL
 function pk_decrypt($rawkey, $data, $cipher_type = MCRYPT_RIJNDAEL_128, $mode = MCRYPT_MODE_CFB) {
   $encstr = substr($data, 0, 5);
   $data = substr($data, 5);
-  if ($encstr == 'UTF-8') $data= utf8_decode($data);
+  if ($encstr == 'UTF-8') $data = utf8_decode($data);
   $ivsize = mcrypt_get_iv_size($cipher_type, $mode);
   $iv = substr($data, 0, $ivsize);
   $encdata = substr($data, $ivsize);
@@ -2499,12 +2564,13 @@ function sqlDateToUnix($sqldate = null) {
   }
   return $unixtime;
 }
-function unixDateToFriendly($unixdate = null, $format =  'M j, Y') {
+
+function unixDateToFriendly($unixdate = null, $format = 'M j, Y') {
   return date($format, $unixdate);
 }
 
 function sqlDateToFriendly($sqldate = null, $format = 'M j, Y') {
-  return unixDateToFriendly(sqlDateToUnix($sqldate) ,$format);
+  return unixDateToFriendly(sqlDateToUnix($sqldate), $format);
 }
 
 function execInBackground($cmd) {
@@ -2612,23 +2678,17 @@ function stringboolean($val, $true = 'TRUE', $false = 'FALSE') {
  * @return bool true|false
  */
 function pk_is_mobile() {
-	static $is_mobile;
-	if ( isset($is_mobile) )
-		return $is_mobile;
-	if ( empty($_SERVER['HTTP_USER_AGENT']) ) {
-		$is_mobile = false;
-	} elseif ( strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') !== false // many mobile devices (all iPhone, iPad, etc.)
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Android') !== false
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Silk/') !== false
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Kindle') !== false
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'BlackBerry') !== false
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mini') !== false
-		|| strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mobi') !== false ) {
-			$is_mobile = true;
-	} else {
-		$is_mobile = false;
-	}
-	return $is_mobile;
+  static $is_mobile;
+  if (isset($is_mobile)) return $is_mobile;
+  if (empty($_SERVER['HTTP_USER_AGENT'])) {
+    $is_mobile = false;
+  } elseif (strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile') !== false // many mobile devices (all iPhone, iPad, etc.)
+      || strpos($_SERVER['HTTP_USER_AGENT'], 'Android') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Silk/') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Kindle') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'BlackBerry') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mini') !== false || strpos($_SERVER['HTTP_USER_AGENT'], 'Opera Mobi') !== false) {
+    $is_mobile = true;
+  } else {
+    $is_mobile = false;
+  }
+  return $is_mobile;
 }
 
 /**
@@ -2666,24 +2726,26 @@ function getBaseName($class = null) {
  *    return 'goodbye[my][old][2][friends]'
  * 
  */
-
-function buildFormInputNameFromSegments($arg1=null, $arg2=null) {
+function buildFormInputNameFromSegments($arg1 = null, $arg2 = null) {
   $name = '';
-  if (is_scalar($arg1)) $name = (string)$arg1;
-  else if (is_array($arg1)) foreach ($arg1 as $idx =>$val) {
-    if (!is_scalar($val)) throw new Exception ("Invalid value: ".print_r($val,1));
-    if (!$idx) $name = (string)$val;
-    else $name.='['.(string)$val.']';
-  } else if ($arg1) throw new Exception ("Bad arg1: ". print_r($arg1,1));
-  
-  if (($arg2===null) || ($arg2 === '')) return $name;
-  if (!$name && is_scalar($arg2)) return (string)$arg2;
-  if ($name && is_scalar($arg2)) return $name.'['.(string)$arg2.']';
-  if (!is_array($arg2)) throw new Exception ("Bad Arg2: ". print_r($arg2,1));
+  if (is_scalar($arg1)) $name = (string) $arg1;
+  else if (is_array($arg1))
+      foreach ($arg1 as $idx => $val) {
+      if (!is_scalar($val))
+          throw new Exception("Invalid value: " . print_r($val, 1));
+      if (!$idx) $name = (string) $val;
+      else $name.='[' . (string) $val . ']';
+    } else if ($arg1) throw new Exception("Bad arg1: " . print_r($arg1, 1));
+
+  if (($arg2 === null) || ($arg2 === '')) return $name;
+  if (!$name && is_scalar($arg2)) return (string) $arg2;
+  if ($name && is_scalar($arg2)) return $name . '[' . (string) $arg2 . ']';
+  if (!is_array($arg2)) throw new Exception("Bad Arg2: " . print_r($arg2, 1));
   foreach ($arg2 as $key => $val) {
-    if (!is_scalar($val)) throw new Exception ("Invalid value: ".print_r($val,1));
-    if (!$name) $name = (string)$val;
-    else $name .= '['.(string)$val.']';
+    if (!is_scalar($val))
+        throw new Exception("Invalid value: " . print_r($val, 1));
+    if (!$name) $name = (string) $val;
+    else $name .= '[' . (string) $val . ']';
   }
   return $name;
 }
@@ -2694,7 +2756,7 @@ function buildFormInputNameFromSegments($arg1=null, $arg2=null) {
  * @param mixed $value
  * @return integer|null
  */
-function intOrNull($value=null) {
+function intOrNull($value = null) {
   $int = to_int($value);
   if ($int !== false) return $int;
   return null;

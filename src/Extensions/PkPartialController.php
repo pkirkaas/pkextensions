@@ -9,6 +9,6 @@
  */
 
 namespace PkExtensions;
-class PkPartilController extends PkController {
+class PkPartialController extends PkController {
   //put your code here
 }
