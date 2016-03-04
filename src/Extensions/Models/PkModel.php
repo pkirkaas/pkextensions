@@ -180,11 +180,24 @@ class $createclassname extends Migration {
    * been instantiated; else null. So can set <tt>$var = Amodel::instantiated($var)</tt>
    * and it's either a real object or null.
    * @param static $var
-   * @return \static
+   * @return static|null
    */
   public static function instantiated($var = null) {
-    if ($var instanceOf static && $var->exists) return $var;
+    if ($var instanceOf static && $var->exists && $var->getKey()) return $var;
     return null;
+  }
+
+  /**
+   * Checks to see if the $arg is instantiated and the same instance of this obj.
+   * Ridiculous this is not built in...
+   * @param any $var
+   * $return boolean|static - false if not instantiated or not the same object, else the object
+   */
+  public function is($var) {
+    if(!static::instantiated($var) || !static::instantiated($this)) return false;
+    if(get_class($this) !== get_class($var)) return false;
+    if ($this->getKey() !== $var->getKey()) return false;
+    return $this;
   }
 
   /** The authXXX functions determine if the user is allowed to perform XXX
@@ -193,8 +206,8 @@ class $createclassname extends Migration {
    * @return boolean
    */
   public function authDelete() {
-    return true;
-    if (isCli()) return true;
+    return true; if (isCli()) return true;
+    
     return $this->authUpdate();
   }
 

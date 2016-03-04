@@ -25,7 +25,6 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
  */
 class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract {
     use Authenticatable, Authorizable, CanResetPassword;
-#Testing if autoupdate
     protected $fillable = [
         'name', 'email', 'password',
     ];
@@ -38,5 +37,30 @@ class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableCo
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /** 
+     * Subclasses should implement this
+     * @return boolean
+     */
+    public function isAdmin() {
+      return false;
+    }
+
+    /** Does a lot - returns the current logged in user if they can edit the
+     * given user - but if given user is null, also sets to the current logged 
+     * in user, and if the current logged in user isAdmin, keeps user but returns
+     * the current logged in - else if not logged in, or different from user, returns false.
+     * @param User $user|null - set to current logged in user if emptyl
+     * @return - the current logged in user, or false if not logged in or can't edit user
+     * 
+     */
+    public static function canEdit(&$user) {
+      $me = Auth::user();
+      if (!static::instantiated($me)) return false;
+      if (!static::instantiated($user)) $user = $me;
+      if (!$me->isAdmin() || !$me->is($user)) return false;
+      return $me;
+    }
+
 
 }

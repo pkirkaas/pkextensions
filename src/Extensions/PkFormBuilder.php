@@ -169,7 +169,7 @@ class PkFormBuilder extends FormBuilder {
    * @param string $name - the name of the TABLE field
    * @param string $type - the type of input. If just scalar input, default to 
    *   'text', if choice/array, default to 'select'
-   * @param \App\Extensions\PkModel $object - the object to check for allowable edits
+   * @param PkExtensions\PkModel $object - the object to check for allowable edits
    * @return string - HTML representing the existing display value OR the relevant HTML
    * input control
    */

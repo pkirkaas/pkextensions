@@ -11,6 +11,7 @@ use Illuminate\Support\MessageBag;
 use PkExtensions\Models\PkModel;
 use Request;
 use \Exception;
+use \Closure;
 class PkController extends Controller {
 
   /** Verify if we should process this submit, called by $this->processSubmit();
@@ -27,13 +28,18 @@ class PkController extends Controller {
     $submitname = keyVal('submitname',$opts,'submit');
     $submitvalue = keyVal('submitvalue',$opts,'submit');
     if (Request::input($submitname) != $submitvalue) return false;
+    $closurecheck = keyVal('closurecheck',$opts);
+    if ($closurecheck instanceOf Closure) { 
+      $data = Request::all();
+      return $closurecheck($opts, $data);
+    }
     return true;
   }
 
   /** Submits POST data to the PkModel instance to save updates. 
    * 
    * $opts are an array of Params. The only required is 'pkmodel'
-   * @param \App\Extensions\Models\PkModel OR Collecton/Array of such $pkmodel
+   * @param \PkExtensions\Models\PkModel OR Collecton/Array of such $pkmodel
    * @param array $inits - Associative array of supplimental data to submit
    * @param string|null $modelkey - If we have an array of models to process, what is the post key for them?
    * @return type
@@ -58,7 +64,7 @@ class PkController extends Controller {
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)
-              && is_subclass_of($pkmodel, 'App\\Models\\PkModel')) { #It's a PkModel name
+              && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { #It's a PkModel name
         #So what do we do with that?
       }
      */
@@ -70,7 +76,7 @@ class PkController extends Controller {
         if (is_array($inits)) foreach ($inits as $key => $val) {
           $data[$key] = $val;
         }
-        pkdebug("The POST:", $_POST, 'DATA:', $data);
+        //pkdebug("The POST:", $_POST, 'DATA:', $data);
         $result = $pkmodel->saveRelations($data);
         return $result;
       }
@@ -84,7 +90,7 @@ class PkController extends Controller {
         if ($modelDataArray === false) return false;
         if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) && 
                 !count($pkmodel)) return false;
-        if (!is_subclass_of($modelName, 'App\Extensions\Models\PkModel')) throw new Exception ("[$modelName] does not extend PkModel");
+        if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel')) throw new Exception ("[$modelName] does not extend PkModel");
         #We assume $pkmodel is a collection of the original models, and $modelDataArray
         #contains whatever changes/additions/deletions. We hand off to the Model
         #class to manage.
