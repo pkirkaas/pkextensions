@@ -13,9 +13,26 @@ use Request;
 use \Exception;
 class PkController extends Controller {
 
+  /** Verify if we should process this submit, called by $this->processSubmit();
+   * If method not a POST, return false. Otherwise, check the submit button name and value
+   * $opts are an array of params:
+   * @param boolean $nocheck - default false - ignore checking submit button names or values 
+   * @param string $submitname - default 'submit' - The name of the POST key to check
+   * @param string $submitvalue - default 'submit' - The name of the POST value to check
+   * @return boolean
+   */
+  public function shouldProcessSubmit($opts =[]) {
+    if (Request::method() !== 'POST') return false;
+    if (keyVal('nocheck',$opts)) return true;
+    $submitname = keyVal('submitname',$opts,'submit');
+    $submitvalue = keyVal('submitvalue',$opts,'submit');
+    if (Request::input($submitname) != $submitvalue) return false;
+    return true;
+  }
 
   /** Submits POST data to the PkModel instance to save updates. 
    * 
+   * $opts are an array of Params. The only required is 'pkmodel'
    * @param \App\Extensions\Models\PkModel OR Collecton/Array of such $pkmodel
    * @param array $inits - Associative array of supplimental data to submit
    * @param string|null $modelkey - If we have an array of models to process, what is the post key for them?
@@ -26,13 +43,18 @@ class PkController extends Controller {
    * the model class. We need to get the original set of models, because we don't
    * want to delete models that didn't belong to that collection in the first place...
    * @param PkModel $pkmodel
-   * @param array $inits
+   * @param array $inits - initial/default values if not found in POST
    * @param type $modelkey
-   * @return booleankkk
+   * @return boolean|null - null if shouldn't processSubmit, true if succeds, else false
    */
-  public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
-    if (Request::method() != 'POST') return null;
-       #We are processing a submission
+  //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
+  public function processSubmit( $opts = []) {
+    if (!is_array($opts)) return false;
+    if(!$this->ShouldProcessSubmit($opts)) return null;
+    #We are processing a submission
+    $pkmodel = keyVal('pkmodel',$opts);
+    $inits = keyVal('inits',$opts);
+    $modelkey = keyVal('modelkey',$opts);
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)

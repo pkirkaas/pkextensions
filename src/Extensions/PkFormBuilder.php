@@ -145,6 +145,22 @@ class PkFormBuilder extends FormBuilder {
 
 
   }
+
+    /**
+     * Create a Submit Button as a real button, with resonalbe defaults.
+     *
+     * @param  string $label - to show on the button - default 'Submit'
+     * @param  array  $options default type->submit, name->submit, value->submit
+     * @return \Illuminate\Support\HtmlString
+     */
+    public function submitButton($label = 'Submit', $options = []) {
+        if (! array_key_exists('type', $options)) $options['type'] = 'submit';
+        if (! array_key_exists('name', $options)) $options['name'] = 'submit';
+        if (! array_key_exists('value', $options)) $options['value'] = 'submit';
+
+        return $this->toHtmlString('<button' . $this->html->attributes($options) . '>' . $label . '</button>');
+    }
+
   //public function checkbox($name, $value = 1, $checked = null, $options = [])
 
   /**
