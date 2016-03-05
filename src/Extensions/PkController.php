@@ -17,23 +17,21 @@ class PkController extends Controller {
   /** Verify if we should process this submit, called by $this->processSubmit();
    * If method not a POST, return false. Otherwise, check the submit button name and value
    * $opts are an array of params:
-   * @param boolean $nocheck - default false - ignore checking submit button names or values 
    * @param string $submitname - default 'submit' - The name of the POST key to check
-   * @param string $submitvalue - default 'submit' - The name of the POST value to check
-   * @return boolean
+   * @param string $submitvalue - default NULL - If you don't want to check on the submittd key/value, leave value out
+   * @return boolean - true if we should process the post, else false if it fails a test
    */
   public function shouldProcessSubmit($opts =[]) {
     if (Request::method() !== 'POST') return false;
-    if (keyVal('nocheck',$opts)) return true;
-    $submitname = keyVal('submitname',$opts,'submit');
-    $submitvalue = keyVal('submitvalue',$opts,'submit');
-    if (Request::input($submitname) != $submitvalue) return false;
     $closurecheck = keyVal('closurecheck',$opts);
     if ($closurecheck instanceOf Closure) { 
       $data = Request::all();
-      return $closurecheck($opts, $data);
+      if( !$closurecheck($opts, $data)) return false;
     }
-    return true;
+    $submitname = keyVal('submitname',$opts,'submit');
+    $submitvalue = keyVal('submitvalue',$opts);
+    if (($submitvalue === null) || !$submitname) return true;
+    return Request::input($submitname) == $submitvalue;
   }
 
   /** Submits POST data to the PkModel instance to save updates. 
