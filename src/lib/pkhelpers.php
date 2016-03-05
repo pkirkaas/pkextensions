@@ -15,3 +15,17 @@ function setAppLog() {
   $logPath = $logDir.'/pkapp.log';
   appLogPath($logPath);
 }
+
+##View Helpers
+function pk_showcheck($val = null, $checked = "&#9745;", $unchecked ="&#9744;", $styles = []) {
+  $defaultstyles = ['font-size'=>'xx-large','margin'=>'auto','color'=>'black', 'text-align'=>'center'];
+  $stylestr = '';
+  foreach ($defaultstyles as $key => $value) {
+    $stylestr.="$key:$value; ";
+  }
+  //$stylestr = implode (';',$defaultstyles);
+  if ($val) return "<div style='$stylestr'> $checked </div>";
+   return "<div style='$stylestr'>$unchecked</div>";
+}
+
+
