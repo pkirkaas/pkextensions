@@ -58,4 +58,6 @@ function pk_showcheck($val = null, $checked = "&#9745;", $unchecked ="&#9744;", 
    return "<div style='$stylestr'>$unchecked</div>";
 }
 
-
+function div($content,$attributes) {
+  return PkHtml::tag('div', $content, $attributes);
+}
