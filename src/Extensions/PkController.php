@@ -21,12 +21,15 @@ class PkController extends Controller {
    * @param string $submitvalue - default NULL - If you don't want to check on the submittd key/value, leave value out
    * @return boolean - true if we should process the post, else false if it fails a test
    */
-  public function shouldProcessSubmit($opts =[]) {
+  public function shouldProcessSubmit($opts = null) {
     if (Request::method() !== 'POST') return false;
-    $closurecheck = keyVal('closurecheck',$opts);
+    if (!$opts ) return true;
+    if ($opts instanceOf PkModel) return $opts->shouldProcessPost();
+    if (is_array($opts)) $closurecheck = keyVal('closurecheck',$opts);
+    if ($opts instanceOf Closure) $closurecheck = $opts;
     if ($closurecheck instanceOf Closure) { 
       $data = Request::all();
-      if( !$closurecheck($opts, $data)) return false;
+      if( !$closurecheck($data, $opts)) return false;
     }
     $submitname = keyVal('submitname',$opts,'submit');
     $submitvalue = keyVal('submitvalue',$opts);
@@ -36,8 +39,9 @@ class PkController extends Controller {
 
   /** Submits POST data to the PkModel instance to save updates. 
    * 
-   * $opts are an array of Params. The only required is 'pkmodel'
-   * @param \PkExtensions\Models\PkModel OR Collecton/Array of such $pkmodel
+   * $opts can be an instance of PkModel, or an array of PkModels, or a parameter 
+   *    array of Params containing at least a 'pkmodel' or 'pkmodels' key
+   * @param \PkExtensions\Models\PkModel OR Collecton/Array of such $pkmodels
    * @param array $inits - Associative array of supplimental data to submit
    * @param string|null $modelkey - If we have an array of models to process, what is the post key for them?
    * @return type
@@ -47,18 +51,21 @@ class PkController extends Controller {
    * the model class. We need to get the original set of models, because we don't
    * want to delete models that didn't belong to that collection in the first place...
    * @param PkModel $pkmodel
+   * @param Arrayish PkModels $pkmodels - optional
    * @param array $inits - initial/default values if not found in POST
    * @param type $modelkey
    * @return boolean|null - null if shouldn't processSubmit, true if succeds, else false
    */
   //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
-  public function processSubmit( $opts = []) {
-    if (!is_array($opts)) return false;
+  public function processSubmit( $opts = null, $inits=null) {
     if(!$this->ShouldProcessSubmit($opts)) return null;
-    #We are processing a submission
-    $pkmodel = keyVal('pkmodel',$opts);
-    $inits = keyVal('inits',$opts);
-    $modelkey = keyVal('modelkey',$opts);
+     if ($opts instanceOf PkModel) $pkmodel = $opts;
+    if (is_arrayish($opts)) {
+       #We are processing a submission
+      $pkmodel = keyVal('pkmodel',$opts);
+      $pkmodels = keyVal('pkmodels',$opts);
+      if($inits === null) $ints = keyVal('inits',$opts);
+      $modelkey = keyVal('modelkey',$opts);
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)
@@ -77,9 +84,13 @@ class PkController extends Controller {
         //pkdebug("The POST:", $_POST, 'DATA:', $data);
         $result = $pkmodel->saveRelations($data);
         return $result;
-      }
 
-      if (is_arrayish($pkmodel) && ($modelName = $this->isModelSetSubmit())) {
+      }
+        if (!$pkmodels || !is_arrayish($pkmodels) ) {
+          if(is_arrayish($pkmodel)) $pkmodels = $pkmodel;
+          else $pkmodels = $opts;
+        }
+        if ($modelName = $this->isModelSetSubmit()) {
          #Then we look for a key of 'modelset' in the $data array, which
          #should have the value of a full model name 'App\Models\Item'
          #THEN we look for the Model Name Key in the $data - name the
@@ -87,14 +98,15 @@ class PkController extends Controller {
         $modelDataArray = keyValOrDefault($modelName,$data,false);
         if ($modelDataArray === false) return false;
         if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) && 
-                !count($pkmodel)) return false;
+                !count($pkmodels)) return false;
         if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel')) throw new Exception ("[$modelName] does not extend PkModel");
-        #We assume $pkmodel is a collection of the original models, and $modelDataArray
+        #We assume $pkmodels is a collection of the original models, and $modelDataArray
         #contains whatever changes/additions/deletions. We hand off to the Model
         #class to manage.
-        return $modelName::updateModels($pkmodel, $modelDataArray);
+        return $modelName::updateModels($pkmodels, $modelDataArray);
       }
-      throw new \Exception ("Don't know what to do with pkmodel: ".print_r($pkmodel,1));
+      throw new \Exception ("Don't know what to do with pkmodels: ".print_r($pkmodels,1));
+    }
   }
 
   /** Not an action - but checks if the POST/Submission is for an

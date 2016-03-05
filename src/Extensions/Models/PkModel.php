@@ -19,6 +19,7 @@ use \Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use \Request;
 use \Exception;
 
 abstract class PkModel extends Model {
@@ -668,6 +669,16 @@ class $createclassname extends Migration {
     }
   }
 
+  /** Probably useless method, but a subclass might want to do something with it.
+   * More usefed in the controllers */
+  public function shouldProcessPost($opts=null) {
+    if (Request::method() === 'POST') return true;
+    return false;
+  }
+  
+ public function processPost($opts = null) {
+   return false;
+ }
 
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
