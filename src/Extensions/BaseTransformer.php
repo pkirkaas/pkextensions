@@ -28,9 +28,7 @@ class BaseTransformer {
   public $h1; public $actionset =[]; public $actionsets =[];
   public $transforms = [];
   public function addTransforms(Array $transforms) {
-    pkdebug("transforms:", $transforms);
     foreach ($transforms as $name => $runnable) {
-      //$this->$transforms[$name] = ['function'=>$runnable];
       $this->transforms[$name] = $runnable;
     }
   }
@@ -130,7 +128,6 @@ class BaseTransformer {
     if (!$actionset) $actionset = &$this->actionset;
     $result = $this->result;
     //pkdebug("Result: [$result], actionset:",$actionset);
-    pkdebug("Result: [$result]");
     $return = $this->result;
     /*
     if (in_array($result,$this->thingstohide)) {

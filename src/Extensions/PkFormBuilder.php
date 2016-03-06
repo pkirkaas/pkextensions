@@ -25,6 +25,14 @@ class PkFormBuilder extends FormBuilder {
     parent::__construct($html, $url, $view, $csrfToken);
 	}
 
+  public function open(array $options = []) {
+    $open = parent::open($options);
+    $this->model = keyval('model',$options);
+    return $open;
+  }
+  public function form($content, array $options =[]  ) {
+    return $this->open($options) .$content.$this->close();
+  }
 
   public function setNamePrefix($namePrefix = '') {
     $this->html->name_prefix = $namePrefix;
