@@ -10,4 +10,7 @@ class PkHtmlBuilder extends HtmlBuilder {
     }
     return parent::attributes($attributes);
   }
+    protected function toHtmlString($html) {
+      return $html;
+    }
 }

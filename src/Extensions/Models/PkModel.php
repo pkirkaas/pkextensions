@@ -4,7 +4,6 @@
  * In the default, all auths are true - if you want to default to false, sublcass
  * this and set them to false.
  */
-
 /** TODO! Add static method and array to build Migration files - this will allow
  * the Model to build the migration file, so all data definitions localized in
  * the model, but more importantly, THE MODEL WILL KNOW WHAT DB TABLE ATTRIBUTES
@@ -12,6 +11,8 @@
  */
 
 namespace PkExtensions\Models;
+
+use PkExtensions\BaseTransformer;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
 use App\User;
@@ -24,11 +25,14 @@ use \Exception;
 
 abstract class PkModel extends Model {
 
+  public $transformer;
+
   /** Actual derived classes will define the $table_fields array with keys that
    * correspond to table field names, and values that represent their definition.
    * @var array - keys are table field names, values are table field defs
    */
   public static $table_fields = null;
+
   public static function get_field_names() {
     return array_keys(static::$table_fields);
   }
@@ -37,24 +41,25 @@ abstract class PkModel extends Model {
    *
    * @var null|string - name of the DB table 
    */
-      /**
-     * Get the table associated with the model.
-     *
-     * @return string
-     */
-    public static function getTableName() {
-      $instance = new static();
-      $tablename = $instance->getTable();
-      return $tablename;
-    }
 
-    /** So not close to ready - finish in spare time .... */
-    public static function buildMigrationDefinition() {
-      $tablename = static::getTableName();
-      $timestamp =  date('Y_m_d_His',time());
-      $createclassname = "Create".static::class."Table";
-      $migrationfile = database_path()."/migrations/create_{$timestamp}_{$tablename}_table.php";
-      $migrationheader = "
+  /**
+   * Get the table associated with the model.
+   *
+   * @return string
+   */
+  public static function getTableName() {
+    $instance = new static();
+    $tablename = $instance->getTable();
+    return $tablename;
+  }
+
+  /** So not close to ready - finish in spare time .... */
+  public static function buildMigrationDefinition() {
+    $tablename = static::getTableName();
+    $timestamp = date('Y_m_d_His', time());
+    $createclassname = "Create" . static::class . "Table";
+    $migrationfile = database_path() . "/migrations/create_{$timestamp}_{$tablename}_table.php";
+    $migrationheader = "
 <?php
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -62,13 +67,12 @@ class $createclassname extends Migration {
   public function up() {
     Schema::create('$tablename', function (Blueprint \$table) {
 ";
-      
-    }
+  }
 
+  public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
+  public static $mySqlNumericTypes = ['tinyint', 'smallint', 'mediumint', 'int',
+      'bigint', 'decimal', 'float', 'double', 'real', 'bit', 'boolean', 'serial'];
 
-   public static $mySqlIntTypes = ['tinyint','smallint', 'mediumint', 'int', 'bigint'];
-   public static $mySqlNumericTypes = ['tinyint','smallint', 'mediumint', 'int',
-       'bigint','decimal','float','double','real','bit','boolean','serial'];
   /** POSTs submit an empty string for "no value". For integer table fields, 
    * should we convert the empty string to null? Default for MySQL is to insert
    * 0 for '', when we will usually want NULL so that's default for 
@@ -158,11 +162,11 @@ class $createclassname extends Migration {
     return array_keys(static::getStaticAttributeDefs());
     # If problem w. getting attribute defs ...
     /*
-    if (array_key_exists(static::class,static::$attributeNameArr)) {
-       static::$attributeNameArr[static::class];
-    }
-    $instance = new Static();
-    return $instance->getAttributeNames();
+      if (array_key_exists(static::class,static::$attributeNameArr)) {
+      static::$attributeNameArr[static::class];
+      }
+      $instance = new Static();
+      return $instance->getAttributeNames();
      */
   }
 
@@ -171,12 +175,13 @@ class $createclassname extends Migration {
    * @return Array
    */
   public static function getStaticAttributeDefs() {
-    if (array_key_exists(static::class,static::$attributeDefinitionArr)) {
+    if (array_key_exists(static::class, static::$attributeDefinitionArr)) {
       return static::$attributeDefinitionArr[static::class];
     }
     $instance = new Static();
     return $instance->getAttributeDefs();
   }
+
   /** Returns the object if it is an instance of the Model class, and has
    * been instantiated; else null. So can set <tt>$var = Amodel::instantiated($var)</tt>
    * and it's either a real object or null.
@@ -195,8 +200,9 @@ class $createclassname extends Migration {
    * $return boolean|static - false if not instantiated or not the same object, else the object
    */
   public function is($var) {
-    if(!static::instantiated($var) || !static::instantiated($this)) return false;
-    if(get_class($this) !== get_class($var)) return false;
+    if (!static::instantiated($var) || !static::instantiated($this))
+        return false;
+    if (get_class($this) !== get_class($var)) return false;
     if ($this->getKey() !== $var->getKey()) return false;
     return $this;
   }
@@ -207,8 +213,9 @@ class $createclassname extends Migration {
    * @return boolean
    */
   public function authDelete() {
-    return true; if (isCli()) return true;
-    
+    return true;
+    if (isCli()) return true;
+
     return $this->authUpdate();
   }
 
@@ -259,20 +266,20 @@ class $createclassname extends Migration {
    * of valid options for the field, depending on user and project state, etc.
    * Initially empty, populated by buildFillableOptions(). Something like:
    *   $allFillableOpts = [
-        'hubid' => true,
-        'firstname' => true,
-        'lastname' => true,
-        'company' => true,
-        'title' => true,
-        'phone' => true,
-        'email' => true,
-        'address' => true,
-        'active' => true,
-        //'suspended' => true,
-        //'role_id' => self::refRoles,
-        'role_id' => $this->assignableRoles(),
-        'has_login' => true,
-      ];
+    'hubid' => true,
+    'firstname' => true,
+    'lastname' => true,
+    'company' => true,
+    'title' => true,
+    'phone' => true,
+    'email' => true,
+    'address' => true,
+    'active' => true,
+    //'suspended' => true,
+    //'role_id' => self::refRoles,
+    'role_id' => $this->assignableRoles(),
+    'has_login' => true,
+    ];
    */
   public $fillableOptions = [];
 
@@ -341,27 +348,27 @@ class $createclassname extends Migration {
    * @param type $Model
    */
   public function getAttributeNames() {
-      return array_keys($this->getAttributeDefs());
+    return array_keys($this->getAttributeDefs());
     //return Schema::getColumnListing($model->getTable());
   }
-
 
   /** Returns associative array of table column names as keys, and the
    * column type as value. Caches the result in a static array.
    * @return array - table column names to DB Column type
    */
   public function getAttributeDefs() {
-    if (array_key_exists(static::class,static::$attributeDefinitionArr)) {
+    if (array_key_exists(static::class, static::$attributeDefinitionArr)) {
       return static::$attributeDefinitionArr[static::class];
     }
     $tableName = $this->getTable();
     $tableSchema = Schema::getConnection()->getDatabaseName();
     $results = Schema::getConnection()->select("SELECT COLUMN_NAME, DATA_TYPE
             FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE table_name = '$tableName' AND table_schema = '$tableSchema'") ;
+            WHERE table_name = '$tableName' AND table_schema = '$tableSchema'");
     $assocRes = [];
     foreach ($results as $result) {
-      if (in_array($result->COLUMN_NAME, ['USER','CURRENT_CONNECTIONS' , 'TOTAL_CONNECTIONS' ])) continue;
+      if (in_array($result->COLUMN_NAME, ['USER', 'CURRENT_CONNECTIONS', 'TOTAL_CONNECTIONS']))
+          continue;
       $assocRes[$result->COLUMN_NAME] = $result->DATA_TYPE;
     }
     static::$attributeDefinitionArr[static::class] = $assocRes;
@@ -372,10 +379,68 @@ class $createclassname extends Migration {
    * 
    * @param array $attributes
    */
-    public function __construct(array $attributes = []) {
-      $this->fillable($this->getAttributeNames());
-      parent::__construct($attributes);
+  public function __construct(array $attributes = []) {
+    $this->fillable($this->getAttributeNames());
+    parent::__construct($attributes);
+    $this->transformer = new BaseTransformer($this);
+  }
+
+  public $transformers = [];
+
+  public function __get($key) {
+    $name = removeEndStr($key,'Tfrm');
+    if ($name) return $this->transformer->$key;
+    return parent::__get($key);
+  }
+  public function __call($method, $args=[]) {
+    $name = removeEndStr($method,'Tfrm');
+    if (!$name) return parent::__call($method, $args);
+    return $this->transformer->__call($method, $args);
+  }
+  public function getTransformer($name = null) {
+    if (!is_string($name )) return $this->transformer;
+    else return keyval($name, $this->transformers);
+  }
+
+  public function setTransformerFromArray($info) {
+    if (!$this->transformer instanceOf BaseTransformer) {
+      $this->transformer = new BaseTransformer($this);
     }
+      $this->transformer->setItem($this);
+      pkdebug('info', $info);
+      $this->transformer->addTransforms($info);
+  }
+  public function setTransformer($transinfo, $name = null) {
+    if ($transinfo instanceOf BaseTransformer) {
+      $transformer = $transinfo;
+      $transformer->setItem($this);
+
+      if (is_string($name)) $this->transformers[$name] = $transformer;
+      else $this->transformer = $transformer;
+    } else if (is_array($transinfo)) {
+      #Could be an array of transformer instances, or actionsets for a new transformer
+      reset($transinfo);
+      $first = current($transinfo);
+      pkdebug('FIRST', $first);
+      if (is_array($first)) { #Array of actionset methods
+        if(is_string($name)) {
+          $transformer = keyval($name,$this->transformers,new BaseTransformer($this));
+          $this->transformers[$name] = $transformer;
+        } else {
+          $transformer = $this->getTransformer();
+        }
+        $transformer->addTransforms($transinfo);
+        if (!is_string($name)) $this->transformer = $transformer;
+        else $this->transformers[$name] = $transformer;
+      } else if ($first instanceOf BaseTransformer) { #assume an array of transformers
+        foreach ($transinfo as $key => $value) {
+          $value->setItem($this);
+          if (is_string($key)) $this->transformers[$key] = $value;
+        }
+      }
+    }
+  }
+
   /**
    *
    * @var array - relationshipName as key => 'Full\Model'
@@ -385,7 +450,7 @@ class $createclassname extends Migration {
    * <p>
    * NOTE! ALSO USED FOR CASCADING DELETES!
    */
-  public $load_relations = [ /* 'items' => 'App\Models\Item' */ ];
+  public $load_relations = [ /* 'items' => 'App\Models\Item' */];
 
   /** Checks if user is allowed to delete, and 
    * performs cascading deletes on relations defined in $load_relations
@@ -438,13 +503,12 @@ class $createclassname extends Migration {
     }
     pkdebug("arrayKeys", $arrayKeys);
     foreach ($modelCollection as $model) {
-      
+
       pkdebug("Model Atts:", $model->get());
       if (!in_array($model->$keyName, array_keys($arrayKeys))) $model->delete();
       else $model->saveRelations($arrayKeys[$model->$keyName]);
     }
   }
-
 
   /**
    * <B>DOES THIS JUST DUPLICATE MODEL::push()?</B>
@@ -488,7 +552,7 @@ class $createclassname extends Migration {
     $this->fillFillables($arr);
     $this->save();
     $modelId = $this->id;
-     //pkdebug("POST IS: ", $_POST, 'arr', $arr);
+    //pkdebug("POST IS: ", $_POST, 'arr', $arr);
     foreach ($relations as $relationName => $relationModel) {
       if (!array_key_exists($relationName, $arr)) continue;
       //pkdebug("Processing Relation: [$relationName], [$relationModel]");
@@ -576,7 +640,7 @@ class $createclassname extends Migration {
       $retArr[$attributeName] = $this->$attributeName;
     }
     return $retArr;
-  } 
+  }
 
   /** Returns false, true, or array of valid options (keyed w. db_value=>display_val)
    * BUT don't want to force this - if $model->useBuildFillableOptions == false,
@@ -653,17 +717,20 @@ class $createclassname extends Migration {
    * @param array $opts - whatever opts were sent to save
    */
   public function postSave(Array $opts = []) {
+    
   }
+
   /**
    * @param array $options - comes from "save" options, in case we want to add any
    */
   public function postCreate(Array $options = []) {
+    
   }
 
   public function convertEmptyStringToNullForNumerics() {
     $attributeDefs = $this->getAttributeDefs();
     foreach ($attributeDefs as $name => $type) {
-      if (($this->$name === '') && in_array(strtolower($type),static::$mySqlNumericTypes)) {
+      if (($this->$name === '') && in_array(strtolower($type), static::$mySqlNumericTypes)) {
         $this->$name = null;
       }
     }
@@ -671,14 +738,14 @@ class $createclassname extends Migration {
 
   /** Probably useless method, but a subclass might want to do something with it.
    * More usefed in the controllers */
-  public function shouldProcessPost($opts=null) {
+  public function shouldProcessPost($opts = null) {
     if (Request::method() === 'POST') return true;
     return false;
   }
-  
- public function processPost($opts = null) {
-   return false;
- }
+
+  public function processPost($opts = null) {
+    return false;
+  }
 
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
@@ -688,9 +755,8 @@ class $createclassname extends Migration {
    * @param type $value
    */
   /** Example 
-  public function setLoanamtAttribute($value) {
-        $this->attributes['loanamt'] = intOrNull($value);
-  }
+    public function setLoanamtAttribute($value) {
+    $this->attributes['loanamt'] = intOrNull($value);
+    }
    */
-
 }
