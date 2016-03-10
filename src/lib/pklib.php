@@ -2810,3 +2810,45 @@ function intOrNull($value = null) {
   if ($int !== false) return $int;
   return null;
 }
+
+
+/** Case Insensitive "in_array" - works only with strings, of course
+ * 
+ * @param mixed $needle
+ * @param array $haystack
+ * @param boolean $strict
+ * @return boolean
+ */
+function in_array_ci($needle, $haystack, $strict = false) {
+    return in_array(strtolower($needle), array_map('strtolower', $haystack), $strict);
+}
+
+
+
+/**
+ * Returns a percentage, if arguments valid, else $invalid
+ * @param numeric $a
+ * @param numeric $b
+ * @param string $invalid - what to return if invalid, like "N/A". Default: ''
+ * @return string - the percentage, or $invalid
+ */
+function percentage ($a, $b, $invalid = '') {
+    if (!$b || !is_numeric($b) || !is_numeric($a)) return $invalid;
+    $dr = (int) (($a * 100)/$b);
+    return $dr.'%';
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
