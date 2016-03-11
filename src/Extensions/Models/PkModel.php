@@ -26,7 +26,7 @@ use \Exception;
 abstract class PkModel extends Model {
 
   public $transformer;
-  public static $tableMigrations = ['timestamps()'];
+  public static $timestamp = true;
 
   /** Actual derived classes will define the $table_fields array with keys that
    * correspond to table field names, and values that represent their definition.
@@ -34,8 +34,12 @@ abstract class PkModel extends Model {
    */
   public static $table_field_defs = null;
 
-  public static function get_field_names() {
+  public static function getFieldNames() {
     return array_keys(static::$table_field_defs);
+  }
+
+  public static function getTableFieldDefs() {
+    return static::$table_field_defs;
   }
 
   public static function get_field_type($fieldname) {
@@ -62,18 +66,22 @@ abstract class PkModel extends Model {
     return $tablename;
   }
 
-  public static function buildMigrationFieldDefs() {
+  public static function buildMigrationFieldDefs($fielddefs = [], $change=false) {
+    $changestr = '';
+    if ($change) $changestr = '->change()';
     $out = "\n";
     $spaces = "    ";
-    foreach (static::$table_field_defs as $fieldName => $def) {
+    //foreach (static::$table_field_defs as $fieldName => $def) {
+    foreach ($fielddefs as $fieldName => $def) {
       $methodChain = '';
-      if (is_string($def)) $out.="$spaces\$table->$def('$fieldName');\n";
+      if (is_string($def)) $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
         $type = $def['type'];
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName')";
         if (is_string($methods)) {
-          $fielddef .="->$methods();\n";
+          if($change && ($methods === 'index')) $fielddef .= $changestr.";\n";
+          else $fielddef .="->$methods()$changestr;\n";
           $out .= $fielddef;
           continue;
         }
@@ -83,39 +91,81 @@ abstract class PkModel extends Model {
               $method = $args;
               $args = null;
             }
-            $methodChain .= "->$method($args)";
+            if(!$change || ($method !== 'index')) $methodChain .= "->$method($args)";
           }
         }
-        $out .= $fielddef . $methodChain . ";\n";
+        $out .= $fielddef . $methodChain . "$changestr;\n";
       }
     }
     return $out;
   }
 
   /** So not close to ready - finish in spare time .... */
+  //public static function buildCreateMigrationDefinition() {
+
+  /** Either new, or update if table exists */
   public static function buildMigrationDefinition() {
     $tablename = static::getTableName();
-    $timestamp = date('Y_m_d_His', time());
     $basename = getBaseName(static::class );
     $pbasename = Str::plural($basename);
-    $spaces = "    ";
-    $createclassname = "Create" . $basename. "sTable";
+    $is_timestamped = false;
+    $tableaction = ['table','create'];
+    $create = 1;
+    $spaces = '    ';
+    $allFieldDefs = static::getTableFieldDefs();
+
+    //$tableSchema = Schema::getConnection()->getDatabaseName();
+    if (Schema::hasTable($tablename)) { #This is an update
+      $create = 0;
+      $createorupdate = 'update';
+      #We will only change and add fields here.
+      $currenttablefields = static::getStaticAttributeNames();
+      $is_timestamped = in_array('updated_at', $currenttablefields);
+      $currentmodelfields = static::getFieldNames();
+      $newfields = array_diff($currentmodelfields,$currenttablefields);
+      $newfielddefs = array_subset($newfields,$allFieldDefs);
+      $newfieldstr = static::buildMigrationFieldDefs($newfielddefs);
+      $changedfields = array_intersect($currenttablefields, $currentmodelfields);
+      $droppedfields = array_diff($currenttablefields,$currentmodelfields);
+      $droppedfieldstr = '';
+      foreach ($droppedfields as $droppedfield) {
+        if (!in_array($droppedfield,['created_at','updated_at', 'deleted_at']))
+        $droppedfieldstr .= "$spaces\$table->dropColumn('$droppedfield');\n";
+      }
+      #Possibly changed fields:
+      $changedFieldDefs = array_subset($changedfields,$allFieldDefs);
+      $changedfieldstr = static::buildMigrationFieldDefs($changedFieldDefs, true);
+      $fieldDefStr = $newfieldstr . $changedfieldstr . $droppedfieldstr;
+      $createclassname = "PkUpdate" . $pbasename. "Table";
+    } else {
+      $createorupdate = 'create';
+      $fieldDefStr = static::buildMigrationFieldDefs($allFieldDefs);
+      $createclassname = "PkCreate" . $pbasename. "Table";
+    }
+    //$tabledefs = static::getStaticAttributeDefs();
+    /** Check if the table exists in the DB */
+    //$tableSchema = Schema::getConnection()->getDatabaseName();
+    $timestamp = date('Y_m_d_His', time());
     //$createclassname = "Create" . $tablename. "Table";
     //$migrationfile = database_path() . "/migrations/{$timestamp}_create_{$tablename}_table.php";
-    $migrationfile = database_path() . "/migrations/Generated_from_pk_model_create_{$tablename}_table.php";
+    $migrationfile = database_path() . "/migrations/{$timestamp}_Pk{$createorupdate}_{$tablename}_table.php";
     $migrationheader = "
 <?php
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 class $createclassname extends Migration {
   public function up() {
-    Schema::create('$tablename', function (Blueprint \$table) {
+    Schema::{$tableaction[$create]}('$tablename', function (Blueprint \$table) {
 ";
     $migrationFunctions = '';
+    /*
     foreach (static::$tableMigrations as $tableMigration) {
       $migrationFunctions .= "$spaces\$table->$tableMigration;\n";
     }
-    $fieldDefStr = static::buildMigrationFieldDefs();
+     */
+    if (static::$timestamp && !$is_timestamped) {
+      $migrationFunctions = "$spaces\$table->timestamps();\n";
+    }
     $close = "
     });
   }";
@@ -133,6 +183,7 @@ class $createclassname extends Migration {
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
   }
+
 
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
   public static $mySqlNumericTypes = ['tinyint', 'smallint', 'mediumint', 'int',
