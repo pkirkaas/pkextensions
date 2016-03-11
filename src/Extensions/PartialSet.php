@@ -42,6 +42,10 @@ class PartialSet extends \ArrayObject {
     return array_keys($this->getArrayCopy());
   }
 
+  public function current() {
+    return $this->getIterator()->current();
+  }
+
   public function __toString() {
     $str = ' ';
     if (count($this)) {

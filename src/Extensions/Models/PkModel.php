@@ -26,15 +26,24 @@ use \Exception;
 abstract class PkModel extends Model {
 
   public $transformer;
+  public static $tableMigrations = ['timestamps()'];
 
   /** Actual derived classes will define the $table_fields array with keys that
    * correspond to table field names, and values that represent their definition.
    * @var array - keys are table field names, values are table field defs
    */
-  public static $table_fields = null;
+  public static $table_field_defs = null;
 
   public static function get_field_names() {
-    return array_keys(static::$table_fields);
+    return array_keys(static::$table_field_defs);
+  }
+
+  public static function get_field_type($fieldname) {
+    $fielddef = KeyVal($fieldname, static::$table_field_defs);
+    if (!$fielddef) return false;
+    if (is_string($fielddef)) return $fielddef;
+    if (is_array($fielddef)) return keyval('type', $fielddef);
+    return false;
   }
 
   /** Because the Eloquent Model class needs an instance to get a table name...
@@ -53,12 +62,47 @@ abstract class PkModel extends Model {
     return $tablename;
   }
 
+  public static function buildMigrationFieldDefs() {
+    $out = "\n";
+    $spaces = "    ";
+    foreach (static::$table_field_defs as $fieldName => $def) {
+      $methodChain = '';
+      if (is_string($def)) $out.="$spaces\$table->$def('$fieldName');\n";
+      else if (is_array($def)) {
+        $type = $def['type'];
+        $methods = keyval('methods', $def, []);
+        $fielddef = "$spaces\$table->$type('$fieldName')";
+        if (is_string($methods)) {
+          $fielddef .="->$methods();\n";
+          $out .= $fielddef;
+          continue;
+        }
+        if (is_array($methods)) {
+          foreach ($methods as $method => $args) {
+            if (is_int($method)) {
+              $method = $args;
+              $args = null;
+            }
+            $methodChain .= "->$method($args)";
+          }
+        }
+        $out .= $fielddef . $methodChain . ";\n";
+      }
+    }
+    return $out;
+  }
+
   /** So not close to ready - finish in spare time .... */
   public static function buildMigrationDefinition() {
     $tablename = static::getTableName();
     $timestamp = date('Y_m_d_His', time());
-    $createclassname = "Create" . static::class . "Table";
-    $migrationfile = database_path() . "/migrations/create_{$timestamp}_{$tablename}_table.php";
+    $basename = getBaseName(static::class );
+    $pbasename = Str::plural($basename);
+    $spaces = "    ";
+    $createclassname = "Create" . $basename. "sTable";
+    //$createclassname = "Create" . $tablename. "Table";
+    //$migrationfile = database_path() . "/migrations/{$timestamp}_create_{$tablename}_table.php";
+    $migrationfile = database_path() . "/migrations/Generated_from_pk_model_create_{$tablename}_table.php";
     $migrationheader = "
 <?php
 use Illuminate\Database\Schema\Blueprint;
@@ -67,6 +111,27 @@ class $createclassname extends Migration {
   public function up() {
     Schema::create('$tablename', function (Blueprint \$table) {
 ";
+    $migrationFunctions = '';
+    foreach (static::$tableMigrations as $tableMigration) {
+      $migrationFunctions .= "$spaces\$table->$tableMigration;\n";
+    }
+    $fieldDefStr = static::buildMigrationFieldDefs();
+    $close = "
+    });
+  }";
+    $down = "
+  /**   * Reverse the migrations.  * */
+  public function down() {
+    Schema::drop('$tablename');
+  }
+      ";
+    $closeclass = "\n}\n";
+    $migrationtablecontent = $migrationheader .
+        $fieldDefStr .  $migrationFunctions . $close . $down . $closeclass;
+    //return "migrationcontent: [\n\n$migrationtablecontent\n\nPath:\n\n$migrationfile";
+    $fp = fopen($migrationfile, 'w');
+    fwrite($fp, $migrationtablecontent);
+    fclose($fp);
   }
 
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
@@ -382,23 +447,26 @@ class $createclassname extends Migration {
   public function __construct(array $attributes = []) {
     $this->fillable($this->getAttributeNames());
     parent::__construct($attributes);
-    $this->transformer = new BaseTransformer($this);
+    #For some reason, the below inserts an empty 'name' field in SQL inserts
+    //$this->transformer = new BaseTransformer($this);
   }
 
   public $transformers = [];
 
   public function __get($key) {
-    $name = removeEndStr($key,'Tfrm');
+    $name = removeEndStr($key, 'Tfrm');
     if ($name) return $this->transformer->$key;
     return parent::__get($key);
   }
-  public function __call($method, $args=[]) {
-    $name = removeEndStr($method,'Tfrm');
+
+  public function __call($method, $args = []) {
+    $name = removeEndStr($method, 'Tfrm');
     if (!$name) return parent::__call($method, $args);
     return $this->transformer->__call($method, $args);
   }
+
   public function getTransformer($name = null) {
-    if (!is_string($name )) return $this->transformer;
+    if (!is_string($name)) return $this->transformer;
     else return keyval($name, $this->transformers);
   }
 
@@ -406,10 +474,11 @@ class $createclassname extends Migration {
     if (!$this->transformer instanceOf BaseTransformer) {
       $this->transformer = new BaseTransformer($this);
     }
-      $this->transformer->setItem($this);
-      pkdebug('info', $info);
-      $this->transformer->addTransforms($info);
+    $this->transformer->setItem($this);
+    pkdebug('info', $info);
+    $this->transformer->addTransforms($info);
   }
+
   public function setTransformer($transinfo, $name = null) {
     if ($transinfo instanceOf BaseTransformer) {
       $transformer = $transinfo;
@@ -423,8 +492,8 @@ class $createclassname extends Migration {
       $first = current($transinfo);
       pkdebug('FIRST', $first);
       if (is_array($first)) { #Array of actionset methods
-        if(is_string($name)) {
-          $transformer = keyval($name,$this->transformers,new BaseTransformer($this));
+        if (is_string($name)) {
+          $transformer = keyval($name, $this->transformers, new BaseTransformer($this));
           $this->transformers[$name] = $transformer;
         } else {
           $transformer = $this->getTransformer();
