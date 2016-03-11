@@ -29,7 +29,7 @@ abstract class PkModel extends Model {
   public static $timestamp = true;
   public static $onetimeMigrationFuncs = [
       'updated_at' => 'timestamps()'
-      ];
+  ];
 
   /** Actual derived classes will define the $table_fields array with keys that
    * correspond to table field names, and values that represent their definition.
@@ -69,7 +69,7 @@ abstract class PkModel extends Model {
     return $tablename;
   }
 
-  public static function buildMigrationFieldDefs($fielddefs = [], $change=false) {
+  public static function buildMigrationFieldDefs($fielddefs = [], $change = false) {
     $changestr = '';
     $indices = ['index', 'unique', 'primary'];
     if ($change) $changestr = '->change()';
@@ -78,13 +78,15 @@ abstract class PkModel extends Model {
     //foreach (static::$table_field_defs as $fieldName => $def) {
     foreach ($fielddefs as $fieldName => $def) {
       $methodChain = '';
-      if (is_string($def)) $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
+      if (is_string($def))
+          $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
         $type = $def['type'];
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName')";
         if (is_string($methods)) {
-          if($change && (in_array($methods, $indices))) $fielddef .= $changestr.";\n";
+          if ($change && (in_array($methods, $indices)))
+              $fielddef .= $changestr . ";\n";
           else $fielddef .="->$methods()$changestr;\n";
           $out .= $fielddef;
           continue;
@@ -95,7 +97,8 @@ abstract class PkModel extends Model {
               $method = $args;
               $args = null;
             }
-            if(!$change || !in_array($method , $indices)) $methodChain .= "->$method($args)";
+            if (!$change || !in_array($method, $indices))
+                $methodChain .= "->$method($args)";
           }
         }
         $out .= $fielddef . $methodChain . "$changestr;\n";
@@ -110,10 +113,10 @@ abstract class PkModel extends Model {
   /** Either new, or update if table exists */
   public static function buildMigrationDefinition() {
     $tablename = static::getTableName();
-    $basename = getBaseName(static::class );
+    $basename = getBaseName(static::class);
     $pbasename = Str::plural($basename);
     $is_timestamped = false;
-    $tableaction = ['table','create'];
+    $tableaction = ['table', 'create'];
     $create = 1;
     $spaces = '    ';
     $allFieldDefs = static::getTableFieldDefs();
@@ -127,25 +130,25 @@ abstract class PkModel extends Model {
       $currenttablefields = static::getStaticAttributeNames();
       $is_timestamped = in_array('updated_at', $currenttablefields);
       $currentmodelfields = static::getFieldNames();
-      $newfields = array_diff($currentmodelfields,$currenttablefields);
-      $newfielddefs = array_subset($newfields,$allFieldDefs);
+      $newfields = array_diff($currentmodelfields, $currenttablefields);
+      $newfielddefs = array_subset($newfields, $allFieldDefs);
       $newfieldstr = static::buildMigrationFieldDefs($newfielddefs);
       $changedfields = array_intersect($currenttablefields, $currentmodelfields);
-      $droppedfields = array_diff($currenttablefields,$currentmodelfields);
+      $droppedfields = array_diff($currenttablefields, $currentmodelfields);
       $droppedfieldstr = '';
       foreach ($droppedfields as $droppedfield) {
-        if (!in_array($droppedfield,['created_at','updated_at', 'deleted_at']))
-        $droppedfieldstr .= "$spaces\$table->dropColumn('$droppedfield');\n";
+        if (!in_array($droppedfield, ['created_at', 'updated_at', 'deleted_at']))
+            $droppedfieldstr .= "$spaces\$table->dropColumn('$droppedfield');\n";
       }
       #Possibly changed fields:
-      $changedFieldDefs = array_subset($changedfields,$allFieldDefs);
+      $changedFieldDefs = array_subset($changedfields, $allFieldDefs);
       $changedfieldstr = static::buildMigrationFieldDefs($changedFieldDefs, true);
       $fieldDefStr = $newfieldstr . $changedfieldstr . $droppedfieldstr;
-      $createclassname = "PkUpdate" . $pbasename. "Table";
+      $createclassname = "PkUpdate" . $pbasename . "Table";
     } else {
       $createorupdate = 'create';
       $fieldDefStr = static::buildMigrationFieldDefs($allFieldDefs);
-      $createclassname = "PkCreate" . $pbasename. "Table";
+      $createclassname = "PkCreate" . $pbasename . "Table";
     }
     //$tabledefs = static::getStaticAttributeDefs();
     /** Check if the table exists in the DB */
@@ -164,13 +167,13 @@ class $createclassname extends Migration {
 ";
     $migrationFunctions = '';
     foreach (static::$onetimeMigrationFuncs as $key => $func) {
-      if (!in_array($key, $currenttablefields) )
-      $migrationFunctions .= "$spaces\$table->$func;\n";
+      if (!in_array($key, $currenttablefields))
+          $migrationFunctions .= "$spaces\$table->$func;\n";
     }
     /*
-    foreach (static::$tableMigrations as $tableMigration) {
+      foreach (static::$tableMigrations as $tableMigration) {
       $migrationFunctions .= "$spaces\$table->$tableMigration;\n";
-    }
+      }
      */
     $close = "
     });
@@ -183,13 +186,12 @@ class $createclassname extends Migration {
       ";
     $closeclass = "\n}\n";
     $migrationtablecontent = $migrationheader .
-        $fieldDefStr .  $migrationFunctions . $close . $down . $closeclass;
+        $fieldDefStr . $migrationFunctions . $close . $down . $closeclass;
     //return "migrationcontent: [\n\n$migrationtablecontent\n\nPath:\n\n$migrationfile";
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
   }
-
 
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
   public static $mySqlNumericTypes = ['tinyint', 'smallint', 'mediumint', 'int',
@@ -578,6 +580,24 @@ class $createclassname extends Migration {
    */
   public $load_relations = [ /* 'items' => 'App\Models\Item' */];
 
+  /** For many to many edits. Needless to say, any changes/deletions stop at
+   * the pivot table and do NOT modify the other side of the "Many" relationship
+   * @var array - key names to relationship definitions 
+   */
+  public $load_many_to_many = [
+      /* 'items' => //The key here is what we call the relation when we access it
+       *    [
+       *     'other_model' => 'App\Models\Item' //The class we have many of.
+       *     'pivot_table' => 'user_to_items' //The class we have many of.
+       *            OR
+       *      'pivot_model' => 'UserToItem',
+       *      'my_key' => 'user_id' (Optional if it's just this default
+       *      'other_key' => 'item_id' (Optional if it's just this default
+       *    ],
+       * ['roles' => etc
+       */
+  ];
+
   /** Checks if user is allowed to delete, and 
    * performs cascading deletes on relations defined in $load_relations
    * 
@@ -595,6 +615,27 @@ class $createclassname extends Migration {
             $relationInstance->delete();
           }
         }
+      }
+    }
+    #Now deal with the trickier many-to-many deletes. Have to be sure to delete only the relationships, not the related object
+    #But the Delete for many-to-many is really way easier than the Update - add or delete...
+    foreach (static::$load_many_to_many as $relname => $definition) {
+      $relSet = $this->$relname;
+      if (!$relSet || !count($relSet)) continue;
+      $pivotmodel = keyval('pivot_model', $definition);
+      if (!class_exists($pivotmodel) || !is_a($pivotmodel, self::class, true)) {
+        $pivotmodel = null;
+        $pivottable = keyval('pivot_table', $definition);
+        if (!Schema::hasTable($pivottable)) { #Can't do anything
+          throw new Exception("Niether a valid pivot class nor tabe was defined for [$relname]");
+        }
+      }
+      $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
+      #We have a pivot class or table. Let's try class first, it's classier
+      if ($pivotmodel) {
+        $pivotmodel::where('$foreignKey', $this->getKey())->delete();
+      } else  {# Have to use the table name & Direct DB
+        DB::table($pivottable)->where($mykey, $this->getKey())->delete();
       }
     }
     return parent::delete();
@@ -730,6 +771,138 @@ class $createclassname extends Migration {
     }
     return true;
   }
+
+  /** This relies on the m-m definitions in the static $load_many_to_many array
+   * Much more complicated than just saving one to many, or deleting many to many....
+   * The daya should be an array that contains keys to the relationship matching
+   * the relationship names defined in the object.
+   * 
+   * Like if this class has many-to-many relationships with items and
+   * children, it should have those relationships defined in the class, and
+   * also defined in the static::$load_many_to_many variable, with the key
+   * names of $load_many_to_many the same as the relationship names
+   */
+  public function saveM2MRelations($data = []) {
+    if (empty(static::$load_many_to_many) ||
+      !array_intersect(array_keys(static::$load_many_to_many),array_keys($data))) {
+        return true; #Nothing to do
+    }
+    foreach (static::$load_many_to_many as $relName => $definition) {
+      if (!in_array($relName, array_keys($data))) continue; #Nothing here, keep looking
+      $othermodel = keyval('other_model', $definition);
+      if (!class_exists($othermodel) || !is_a($othermodel, self::class, true)) {
+        throw new Exception("No found other class was defined for [$relName]");
+      }
+      #Have the 'other' class - now find Pivot Class or Table
+      $pivotmodel = keyval('pivot_model', $definition);
+      if (!class_exists($pivotmodel) || !is_a($pivotmodel, self::class, true)) {
+        $pivotmodel = null;
+        $pivottable = keyval('pivot_table', $definition);
+        if (!Schema::hasTable($pivottable)) { #Can't do anything
+          throw new Exception("Niether a valid pivot class nor tabe was defined for [$relName]");
+        }
+      }
+      $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
+      $theirkey = keyval('their_key', $definition, Str::snake(getBaseName($othermodel)) . '_id');
+
+      #Here's where the easy part ends. 
+      $arr = $data[$relName]; 
+      if (!is_arrayish($arr) || !count($arr)) { #Delete it all!
+        $deleteAll = true;
+      } else  { #We have an array of data
+        $otherobjs = $this->$relName;
+        if (!is_arrayish($otherobjs)) {
+          pkdebug("unexpected for [$relName], other objs are:", $otherobjs);
+          continue;
+        }
+        $mycurrentotherobjkeys = [];
+        foreach ($otherobjs as $otherobj) {
+          if (!is_a($otherobj, $othermodel, true)) { #Again, something seriously wrong
+            pkdebug("For [$relName], other model is [$othermodel], but otherobj:", $otherobj);
+            continue;
+          }
+          $mycurrentotherobjkeys[] = "$otherobj->getKey()";
+        }
+        #Great - we have a list of otherobj keys our model pointed to, we have a new 
+        #submitted list of other obj keys - let's go!
+        #But gotta clean up the keys in case some are 3 & some are '3'!
+        #Just make them all strings?
+        $newarr = [];
+        foreach ($arr as $el) $newarr[] = "$el";
+        $addIds = array_diff($newarr, $mycurrentotherobjkeys);
+        $idsToDelete = array_diff( $mycurrentotherobjkeys, $newarr );
+
+      }
+      $thiskeyval = $this->getKey();
+      if($pivotmodel) {
+
+      }
+
+
+
+
+
+
+
+
+
+
+      #We have a pivot class or table. Let's try class first, it's classier
+      if ($pivotmodel) {
+        $pivotmodel::where('$foreignKey', $this->getKey())->delete();
+      } else  {# Have to use the table name & Direct DB
+        DB::table($pivottable)->where($mykey, $this->getKey())->delete();
+      }
+
+
+
+
+
+
+
+
+
+        $pivotclass = null;
+        $pivottable = keyval('pivot_table', $definition);
+        if (!Schema::hasTable($pivottable)) { #Can't do anything
+          throw new Exception("Niether a valid pivot class nor tabe was defined for [$relname]");
+        }
+      $othermodel = keyval('other_model',$definition);
+      $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
+      $otherkey =  keyval('my_key', $definition, Str::snake(getBaseName()) . '_id');
+
+
+      /*
+  public static $load_many_to_many = [
+      'publicgroups' => 
+           [
+            'other_model' => 'App\Models\PublicGroup',
+            'pivot_model' => 'App\Models\PublicGroupToQProfile',
+            //'my_key' => 'user_id',
+            //'other_key' => 'item_id' (Optional if it's just this default
+           ],
+      ];
+       * 
+       */
+      
+    }
+  }
+    /*
+  public $load_many_to_many = [
+      / 'items' => //The key here is what we call the relation when we access it
+       *    [
+       *     'foreign_class' => 'App\Models\Item' //The class we have many of.
+       *     'pivot_table' => 'user_to_items' //The class we have many of.
+       *            OR
+       *      'pivot_model' => 'UserToItem',
+       *      'my_key' => 'user_id' (Optional if it's just this default
+       *      'their_key' => 'item_id' (Optional if it's just this default
+       *    ],
+    
+
+  }
+     * 
+     */
 
   /**
    * Fills this objects fillable fields, if the key exists in the data.
