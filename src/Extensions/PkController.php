@@ -62,9 +62,11 @@ class PkController extends Controller {
      if ($opts instanceOf PkModel) $pkmodel = $opts;
     if (is_arrayish($opts)) {
        #We are processing a submission
+      $customProccessor = keyVal('customProccessor', $opts);
+      if (is_callable($customProccessor))  $customProccessor($opts, $inits);
       $pkmodel = keyVal('pkmodel',$opts);
       $pkmodels = keyVal('pkmodels',$opts);
-      if($inits === null) $ints = keyVal('inits',$opts);
+      if($inits === null) $inits = keyVal('inits',$opts);
       $modelkey = keyVal('modelkey',$opts);
     /*
       #Processing a POST - what to do? Look at args:
@@ -75,7 +77,7 @@ class PkController extends Controller {
      */
       $data = Request::all();
       $tpkm = typeOf($pkmodel);
-      pkdebug("TPO: [$tpkm]");
+      pkdebug("TPO: [$tpkm], Data:",$data);
       //if (!$pkmodel) return false;
       if ($pkmodel instanceOf PkModel) {
         if (is_array($inits)) foreach ($inits as $key => $val) {

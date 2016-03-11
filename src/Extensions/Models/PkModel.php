@@ -27,6 +27,9 @@ abstract class PkModel extends Model {
 
   public $transformer;
   public static $timestamp = true;
+  public static $onetimeMigrationFuncs = [
+      'updated_at' => 'timestamps()'
+      ];
 
   /** Actual derived classes will define the $table_fields array with keys that
    * correspond to table field names, and values that represent their definition.
@@ -68,6 +71,7 @@ abstract class PkModel extends Model {
 
   public static function buildMigrationFieldDefs($fielddefs = [], $change=false) {
     $changestr = '';
+    $indices = ['index', 'unique', 'primary'];
     if ($change) $changestr = '->change()';
     $out = "\n";
     $spaces = "    ";
@@ -80,7 +84,7 @@ abstract class PkModel extends Model {
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName')";
         if (is_string($methods)) {
-          if($change && ($methods === 'index')) $fielddef .= $changestr.";\n";
+          if($change && (in_array($methods, $indices))) $fielddef .= $changestr.";\n";
           else $fielddef .="->$methods()$changestr;\n";
           $out .= $fielddef;
           continue;
@@ -91,7 +95,7 @@ abstract class PkModel extends Model {
               $method = $args;
               $args = null;
             }
-            if(!$change || ($method !== 'index')) $methodChain .= "->$method($args)";
+            if(!$change || !in_array($method , $indices)) $methodChain .= "->$method($args)";
           }
         }
         $out .= $fielddef . $methodChain . "$changestr;\n";
@@ -113,6 +117,7 @@ abstract class PkModel extends Model {
     $create = 1;
     $spaces = '    ';
     $allFieldDefs = static::getTableFieldDefs();
+    $currenttablefields = [];
 
     //$tableSchema = Schema::getConnection()->getDatabaseName();
     if (Schema::hasTable($tablename)) { #This is an update
@@ -158,14 +163,15 @@ class $createclassname extends Migration {
     Schema::{$tableaction[$create]}('$tablename', function (Blueprint \$table) {
 ";
     $migrationFunctions = '';
+    foreach (static::$onetimeMigrationFuncs as $key => $func) {
+      if (!in_array($key, $currenttablefields) )
+      $migrationFunctions .= "$spaces\$table->$func;\n";
+    }
     /*
     foreach (static::$tableMigrations as $tableMigration) {
       $migrationFunctions .= "$spaces\$table->$tableMigration;\n";
     }
      */
-    if (static::$timestamp && !$is_timestamped) {
-      $migrationFunctions = "$spaces\$table->timestamps();\n";
-    }
     $close = "
     });
   }";

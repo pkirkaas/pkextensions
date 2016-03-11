@@ -1421,5 +1421,19 @@ div.showHelp.borrower-viewprofile-help-button {
   display: none;
 }
 
+
+.pk-content,
+.pk-label {
+  border: solid #888 1px;
+  margin: 3px;
+  padding: 3px;
+  border-radius: 3px;
+  background-color: #ddd;
+}
+
+.pk-content {
+  background-color: #eef;
+}
+
 /** For jQuery elements */
 

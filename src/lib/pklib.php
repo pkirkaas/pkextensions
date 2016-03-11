@@ -1991,6 +1991,7 @@ function cciInArray($name, $array) {
  * @param type $haystack
  */
 function in_array_equivalent($needle, $haystack) {
+  if (!is_array($haystack)) return false;
   foreach ($haystack as $tst) {
     if (equivalent($needle, $tst)) {
       return true;
