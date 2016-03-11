@@ -634,7 +634,7 @@ class $createclassname extends Migration {
       #We have a pivot class or table. Let's try class first, it's classier
       if ($pivotmodel) {
         $pivotmodel::where('$foreignKey', $this->getKey())->delete();
-      } else  {# Have to use the table name & Direct DB
+      } else {# Have to use the table name & Direct DB
         DB::table($pivottable)->where($mykey, $this->getKey())->delete();
       }
     }
@@ -784,11 +784,11 @@ class $createclassname extends Migration {
    */
   public function saveM2MRelations($data = []) {
     if (empty(static::$load_many_to_many) ||
-      !array_intersect(array_keys(static::$load_many_to_many),array_keys($data))) {
-        return true; #Nothing to do
+        !array_intersect(array_keys(static::$load_many_to_many), array_keys($data))) {
+      return true; #Nothing to do
     }
     foreach (static::$load_many_to_many as $relName => $definition) {
-      if (!in_array($relName, array_keys($data))) continue; #Nothing here, keep looking
+      if (!in_array($relName, array_keys($data))) continue;#Nothing here, keep looking
       $othermodel = keyval('other_model', $definition);
       if (!class_exists($othermodel) || !is_a($othermodel, self::class, true)) {
         throw new Exception("No found other class was defined for [$relName]");
@@ -806,10 +806,10 @@ class $createclassname extends Migration {
       $theirkey = keyval('their_key', $definition, Str::snake(getBaseName($othermodel)) . '_id');
 
       #Here's where the easy part ends. 
-      $arr = $data[$relName]; 
+      $arr = $data[$relName];
       if (!is_arrayish($arr) || !count($arr)) { #Delete it all!
         $deleteAll = true;
-      } else  { #We have an array of data
+      } else { #We have an array of data
         $otherobjs = $this->$relName;
         if (!is_arrayish($otherobjs)) {
           pkdebug("unexpected for [$relName], other objs are:", $otherobjs);
@@ -828,81 +828,96 @@ class $createclassname extends Migration {
         #But gotta clean up the keys in case some are 3 & some are '3'!
         #Just make them all strings?
         $newarr = [];
-        foreach ($arr as $el) $newarr[] = "$el";
+        foreach ($arr as $el)
+          $newarr[] = "$el";
         $addIds = array_diff($newarr, $mycurrentotherobjkeys);
-        $idsToDelete = array_diff( $mycurrentotherobjkeys, $newarr );
-
+        $idsToDelete = array_diff($mycurrentotherobjkeys, $newarr);
       }
       $thiskeyval = $this->getKey();
-      if($pivotmodel) {
-
-      }
-
-
-
-
-
-
-
-
-
-
-      #We have a pivot class or table. Let's try class first, it's classier
       if ($pivotmodel) {
-        $pivotmodel::where('$foreignKey', $this->getKey())->delete();
-      } else  {# Have to use the table name & Direct DB
-        DB::table($pivottable)->where($mykey, $this->getKey())->delete();
-      }
-
-
-
-
-
-
-
-
-
-        $pivotclass = null;
-        $pivottable = keyval('pivot_table', $definition);
-        if (!Schema::hasTable($pivottable)) { #Can't do anything
-          throw new Exception("Niether a valid pivot class nor tabe was defined for [$relname]");
+        if (!empty($deleteAll)) {
+          $pivotmodel::where($mykey, $thiskeyval)->delete();
+        } else {
+          $pivotmodel::where($mykey, $thiskeyval)->whereIn($theirkey, $idsToDelete)->delete();
+          $data [$mykey] = $thiskeyval;
+          foreach ($addIds as $addId) {
+            $data[$theirkey] = $addId;
+            $pivotmodel::create($data);
+          }
         }
-      $othermodel = keyval('other_model',$definition);
-      $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
-      $otherkey =  keyval('my_key', $definition, Str::snake(getBaseName()) . '_id');
+       
+      } else if ( Schema::hasTable($pivottable)) { #Gotta try it with flat table
+        if (!empty($deleteAll)) {
+          DB::table($pivottable)->where($mykey, $thiskeyval)->delete();
+        } else {
+          DB::table($pivottable)->where($mykey, $thiskeyval)->whereIn($theirkey,$idsToDelete)->delete();
+          $data [$mykey] = $thiskeyval;
+          foreach ($addIds as $addId) {
+            $data[$theirkey] = $addId;
+            DB::table($pivottable)->insert($data);
+          }
+        }
 
-
-      /*
-  public static $load_many_to_many = [
-      'publicgroups' => 
-           [
-            'other_model' => 'App\Models\PublicGroup',
-            'pivot_model' => 'App\Models\PublicGroupToQProfile',
-            //'my_key' => 'user_id',
-            //'other_key' => 'item_id' (Optional if it's just this default
-           ],
-      ];
-       * 
-       */
-      
+      }
     }
   }
-    /*
-  public $load_many_to_many = [
-      / 'items' => //The key here is what we call the relation when we access it
-       *    [
-       *     'foreign_class' => 'App\Models\Item' //The class we have many of.
-       *     'pivot_table' => 'user_to_items' //The class we have many of.
-       *            OR
-       *      'pivot_model' => 'UserToItem',
-       *      'my_key' => 'user_id' (Optional if it's just this default
-       *      'their_key' => 'item_id' (Optional if it's just this default
-       *    ],
-    
 
-  }
-     * 
-     */
+  /*
+    #We have a pivot class or table. Let's try class first, it's classier
+    if ($pivotmodel) {
+    $pivotmodel::where('$foreignKey', $this->getKey())->delete();
+    } else  {# Have to use the table name & Direct DB
+    DB::table($pivottable)->where($mykey, $this->getKey())->delete();
+    }
+
+
+
+
+
+
+
+
+
+    $pivotclass = null;
+    $pivottable = keyval('pivot_table', $definition);
+    if (!Schema::hasTable($pivottable)) { #Can't do anything
+    throw new Exception("Niether a valid pivot class nor tabe was defined for [$relname]");
+    }
+    $othermodel = keyval('other_model',$definition);
+    $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
+    $otherkey =  keyval('my_key', $definition, Str::snake(getBaseName()) . '_id');
+
+   */
+
+  /*
+    public static $load_many_to_many = [
+    'publicgroups' =>
+    [
+    'other_model' => 'App\Models\PublicGroup',
+    'pivot_model' => 'App\Models\PublicGroupToQProfile',
+    //'my_key' => 'user_id',
+    //'other_key' => 'item_id' (Optional if it's just this default
+    ],
+    ];
+   * 
+   */
+
+  /*
+    public $load_many_to_many = [
+    / 'items' => //The key here is what we call the relation when we access it
+   *    [
+   *     'foreign_class' => 'App\Models\Item' //The class we have many of.
+   *     'pivot_table' => 'user_to_items' //The class we have many of.
+   *            OR
+   *      'pivot_model' => 'UserToItem',
+   *      'my_key' => 'user_id' (Optional if it's just this default
+   *      'their_key' => 'item_id' (Optional if it's just this default
+   *    ],
+
+
+    }
+   * 
+   */
 
   /**
    * Fills this objects fillable fields, if the key exists in the data.
