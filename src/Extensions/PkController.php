@@ -1,17 +1,21 @@
 <?php
+
 /**
  * PkController - Base Controller that provides some common
  * methods
  *
  * @author Paul.Kirkaas@gmail.com
  */
+
 namespace PkExtensions;
+
 use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use PkExtensions\Models\PkModel;
 use Request;
 use \Exception;
 use \Closure;
+
 class PkController extends Controller {
 
   /** Verify if we should process this submit, called by $this->processSubmit();
@@ -23,16 +27,16 @@ class PkController extends Controller {
    */
   public function shouldProcessSubmit($opts = null) {
     if (Request::method() !== 'POST') return false;
-    if (!$opts ) return true;
+    if (!$opts) return true;
     if ($opts instanceOf PkModel) return $opts->shouldProcessPost();
-    if (is_array($opts)) $closurecheck = keyVal('closurecheck',$opts);
+    if (is_array($opts)) $closurecheck = keyVal('closurecheck', $opts);
     if ($opts instanceOf Closure) $closurecheck = $opts;
-    if ($closurecheck instanceOf Closure) { 
+    if ($closurecheck instanceOf Closure) {
       $data = Request::all();
-      if( !$closurecheck($data, $opts)) return false;
+      if (!$closurecheck($data, $opts)) return false;
     }
-    $submitname = keyVal('submitname',$opts,'submit');
-    $submitvalue = keyVal('submitvalue',$opts);
+    $submitname = keyVal('submitname', $opts, 'submit');
+    $submitvalue = keyVal('submitvalue', $opts);
     if (($submitvalue === null) || !$submitname) return true;
     return Request::input($submitname) == $submitvalue;
   }
@@ -46,6 +50,7 @@ class PkController extends Controller {
    * @param string|null $modelkey - If we have an array of models to process, what is the post key for them?
    * @return type
    */
+
   /** Experimenting with handling array/collections of models - then, the 
    * 'Submit' button has the name 'modelset', and the fully namespaced value of
    * the model class. We need to get the original set of models, because we don't
@@ -56,58 +61,63 @@ class PkController extends Controller {
    * @param type $modelkey
    * @return boolean|null - null if shouldn't processSubmit, true if succeds, else false
    */
-  //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
-  public function processSubmit( $opts = null, $inits=null) {
-    if(!$this->ShouldProcessSubmit($opts)) return null;
-     if ($opts instanceOf PkModel) $pkmodel = $opts;
-    if (is_arrayish($opts)) {
-       #We are processing a submission
+//public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
+  public function processSubmit($opts = null, $inits = null) {
+    if (!$this->ShouldProcessSubmit($opts)) return null;
+    if ($opts instanceOf PkModel) {
+      $pkmodel = $opts;
+    } else if (is_arrayish($opts)) {
+#We are processing a submission
       $customProccessor = keyVal('customProccessor', $opts);
-      if (is_callable($customProccessor))  $customProccessor($opts, $inits);
-      $pkmodel = keyVal('pkmodel',$opts);
-      $pkmodels = keyVal('pkmodels',$opts);
-      if($inits === null) $inits = keyVal('inits',$opts);
-      $modelkey = keyVal('modelkey',$opts);
+      if (is_callable($customProccessor)) $customProccessor($opts, $inits);
+      $pkmodel = keyVal('pkmodel', $opts);
+      $pkmodels = keyVal('pkmodels', $opts);
+      if ($inits === null) $inits = keyVal('inits', $opts);
+      $modelkey = keyVal('modelkey', $opts);
+    }
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)
-              && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { #It's a PkModel name
-        #So what do we do with that?
+      && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { #It's a PkModel name
+      #So what do we do with that?
       }
      */
-      $data = Request::all();
-      $tpkm = typeOf($pkmodel);
-      pkdebug("TPO: [$tpkm], Data:",$data);
-      //if (!$pkmodel) return false;
-      if ($pkmodel instanceOf PkModel) {
-        if (is_array($inits)) foreach ($inits as $key => $val) {
+    $data = Request::all();
+    $tpkm = typeOf($pkmodel);
+    pkdebug("TPO: [$tpkm], Data:", $data);
+//if (!$pkmodel) return false;
+    if ($pkmodel instanceOf PkModel) {
+      if (is_array($inits))
+          foreach ($inits as $key => $val) {
           $data[$key] = $val;
         }
-        //pkdebug("The POST:", $_POST, 'DATA:', $data);
-        $result = $pkmodel->saveRelations($data);
-        return $result;
+//pkdebug("The POST:", $_POST, 'DATA:', $data);
+      $result = $pkmodel->saveRelations($data);
+      return $result;
+############  Okay, after here is insanity ..... but I had something in mind .....
 
+
+      if (!$pkmodels || !is_arrayish($pkmodels)) {
+        if (is_arrayish($pkmodel)) $pkmodels = $pkmodel;
+        else $pkmodels = $opts;
       }
-        if (!$pkmodels || !is_arrayish($pkmodels) ) {
-          if(is_arrayish($pkmodel)) $pkmodels = $pkmodel;
-          else $pkmodels = $opts;
-        }
-        if ($modelName = $this->isModelSetSubmit()) {
-         #Then we look for a key of 'modelset' in the $data array, which
-         #should have the value of a full model name 'App\Models\Item'
-         #THEN we look for the Model Name Key in the $data - name the
-         #controls by name='App\Models\Item[$idx][id]', etc
-        $modelDataArray = keyValOrDefault($modelName,$data,false);
+      if ($modelName = $this->isModelSetSubmit()) {
+#Then we look for a key of 'modelset' in the $data array, which
+#should have the value of a full model name 'App\Models\Item'
+#THEN we look for the Model Name Key in the $data - name the
+#controls by name='App\Models\Item[$idx][id]', etc
+        $modelDataArray = keyValOrDefault($modelName, $data, false);
         if ($modelDataArray === false) return false;
-        if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) && 
-                !count($pkmodels)) return false;
-        if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel')) throw new Exception ("[$modelName] does not extend PkModel");
-        #We assume $pkmodels is a collection of the original models, and $modelDataArray
-        #contains whatever changes/additions/deletions. We hand off to the Model
-        #class to manage.
+        if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) &&
+            !count($pkmodels)) return false;
+        if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel'))
+            throw new Exception("[$modelName] does not extend PkModel");
+#We assume $pkmodels is a collection of the original models, and $modelDataArray
+#contains whatever changes/additions/deletions. We hand off to the Model
+#class to manage.
         return $modelName::updateModels($pkmodels, $modelDataArray);
       }
-      throw new \Exception ("Don't know what to do with pkmodels: ".print_r($pkmodels,1));
+      throw new \Exception("Don't know what to do with pkmodels: " . print_r($pkmodels, 1));
     }
   }
 
@@ -118,9 +128,9 @@ class PkController extends Controller {
    * @return false | ModelName
    */
   public function isModelSetSubmit() {
-    if(Request::method() !== 'POST') return false;
+    if (Request::method() !== 'POST') return false;
     $data = Request::all();
-    return keyValOrDefault('modelset', $data,false);
+    return keyValOrDefault('modelset', $data, false);
   }
 
   /**
@@ -131,7 +141,7 @@ class PkController extends Controller {
    * @return Redirect Response
    */
   public function error($msg) {
-      return redirect()->route('showerror')->withError(new MessageBag(['error'=>$msg]));
+    return redirect()->route('showerror')->withError(new MessageBag(['error' => $msg]));
   }
 
   /** Ideally, the error will NOT be in the URL, but in the flashed message bag
@@ -139,28 +149,28 @@ class PkController extends Controller {
    * @param type $error
    * @return Redirected to the error page with appropriate error msg.
    */
-  public function showerror($error=null) {
-  if ($error === null) $error = \Session::get('error');
-    if (! $error instanceOf MessageBag) {
-      if (is_string($error)) $error = new MessageBag(['error'=>$error]);
-      else $error = new MessageBag(['error' => print_r($error,1)]);
+  public function showerror($error = null) {
+    if ($error === null) $error = \Session::get('error');
+    if (!$error instanceOf MessageBag) {
+      if (is_string($error)) $error = new MessageBag(['error' => $error]);
+      else $error = new MessageBag(['error' => print_r($error, 1)]);
     }
-		return view('showerror', ['error'=>$error]);
+    return view('showerror', ['error' => $error]);
   }
 
   public function message($msg) {
-    return redirect()->route('showmessage')->withMessage(new MessageBag(['message'=>$msg]));
+    return redirect()->route('showmessage')->withMessage(new MessageBag(['message' => $msg]));
   }
 
-  public function showmessage($message=null) {
-  if ($message === null) $message = \Session::get('message');
-    if (! $message instanceOf MessageBag) {
-      if (is_string($message)) $message = new MessageBag(['message'=>$message]);
-      else $message = new MessageBag(['message' => print_r($message,1)]);
+  public function showmessage($message = null) {
+    if ($message === null) $message = \Session::get('message');
+    if (!$message instanceOf MessageBag) {
+      if (is_string($message))
+          $message = new MessageBag(['message' => $message]);
+      else $message = new MessageBag(['message' => print_r($message, 1)]);
     }
-		return view('showmessage', ['message'=>$message]);
+    return view('showmessage', ['message' => $message]);
   }
-
 
   /**
    * Returns assets (.css, .js, etc) within the PkExtensions package.
@@ -174,28 +184,28 @@ class PkController extends Controller {
    * @return file - with appropriate header
    */
   public function pkasset($assetpath) {
-    if (!$assetpath || !is_string($assetpath)) { 
+    if (!$assetpath || !is_string($assetpath)) {
       header("HTTP/1.0 404 Not Found");
       die();
     }
-    $assetfilepath = realpath(__DIR__."/../assets/$assetpath");
+    $assetfilepath = realpath(__DIR__ . "/../assets/$assetpath");
     if (!file_exists($assetfilepath)) {
       header("HTTP/1.0 404 Not Found");
       die();
     }
-    $mimeType =finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
-    #Hack for CSS since PHP can't detect that...
+    $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
+#Hack for CSS since PHP can't detect that...
     if ($mimeType === 'text/plain') {
       $ext = pathinfo($assetfilepath, PATHINFO_EXTENSION);
       $ext = strtolower($ext);
-      if ($ext === 'css') $mimeType = 'text/css'; 
+      if ($ext === 'css') $mimeType = 'text/css';
     }
     header("content-type: $mimeType");
     header('Content-Description: File Transfer');
     header('Content-Length: ' . filesize($assetfilepath));
     readfile($assetfilepath);
     die();
-    //return "This is an asset request with path: ".print_r($assetpath,1);
+//return "This is an asset request with path: ".print_r($assetpath,1);
   }
 
   /** Sets headers for file export/save
@@ -206,17 +216,18 @@ class PkController extends Controller {
     header("Pragma: public");
     header("Expires: 0"); // set expiration time
     header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-    // browser must download file from server instead of cache
-    // force download dialog
+// browser must download file from server instead of cache
+// force download dialog
     header("Content-Type: application/force-download");
     header("Content-Type: application/octet-stream");
     header("Content-Type: application/download");
 
-    // use the Content-Disposition header to supply a recommended filename and
-    // force the browser to display the save dialog.
+// use the Content-Disposition header to supply a recommended filename and
+// force the browser to display the save dialog.
     header("Content-Disposition: attachment; filename=$filename;");
 
-    //Make sure the browser gets a 200 header
+//Make sure the browser gets a 200 header
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT', true, 200);
   }
+
 }

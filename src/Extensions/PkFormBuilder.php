@@ -138,16 +138,21 @@ class PkFormBuilder extends FormBuilder {
    */
   public function multiselect($name, $list = [], $values=[], $options=[], $unset = null) {
     $values = $this->getValueAttribute($name, $values);
-    $out = "\n<div class='multiselect'>\n";
+    $wrapperclass = keyval('wrapperclass',$options);
+    $allclass = keyval('allclass',$options);
+    unset($options['wrapperclass']);
+    unset($options['allclass']);
+    $out = "\n<div class='multiselect $wrapperclass $allclass '>\n";
     $out .= "\n<input type='hidden' name='$name' value='$unset' />\n";
     //$i = 0;
     foreach ($list as $key => $label) {
       //$i++;
       $checked = in_array_equivalent($key,  $values) ? true : false;
       $options['id'] = $name.'_'.$key;
-      $out .= "\n<div class='pk-checkbox'>";
-      $out .= "<label>";
+      $out .= "\n<div class='pk-checkbox $allclass'>";
+      $out .= "<label class='multiselect-label $allclass '>";
       //$out .= $this->checkbox($name."[$i]",$key,$checked,$options);
+      $options['class'] = keyval('class',$options)." $allclass ";
       $out .= $this->checkbox($name."[]",$key,$checked,$options);
       $out .= "$label</label>\n";
       $out .= "\n</div>";
@@ -211,11 +216,26 @@ class PkFormBuilder extends FormBuilder {
   }
 
   /** Some functions that just combine other functions to take some of the tedium out.. */
+  public function textareaset($name, $value = null, $labeltext = '', $taatts = [], $labatts = [], $wrapatts =[], $extraclasses = '') {
+    $taatts['class'] = keyval('class',$taatts) .  '  text-area pk-input ' . " $extraclasses ";
+    $labatts['class'] = " label pk-label text-area pk-input " . keyval('class',$labatts) . " $extraclasses ";
+    $textarea = $this->textarea($name, $value, $taatts);
+    $label = '';
+    if ($labeltext !== null) $label = $this->label($name, $labeltext, $labatts);
+    if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
+      $wrapatts['class'] = " input-set wrapper inline pk-wrapper  text-area pk-input ".keyval('class', $wrapatts) . " $extraclasses ";
+      $wrapper = div($label.$textarea,$wrapatts);
+      return $wrapper;
+    }
+    
+    return $label.$textarea;
+
+  }
 
   public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
     $labelatts['class'] = " label pk-label select " . keyval('class',$labelatts) . " $extraclasses ";
     $inputatts['class'] = " input pk-input select pkselect ". keyval('class',$inputatts)  . " $extraclasses ";
-    $wrapperatts['class'] = "input-set wrapper pk-wrapper  ".keyval('class', $wrapperatts) . " $extraclasses ";
+    $wrapperatts['class'] = "input-set inline wrapper pk-wrapper  ".keyval('class', $wrapperatts) . " $extraclasses ";
     $label = '';
     if ($labeltext !==null) $label = $this->label($name, $labeltext, $labelatts);
     $select = $this-> select($name, $list, $selected, $inputatts);
@@ -230,13 +250,18 @@ class PkFormBuilder extends FormBuilder {
     $definputclass = " input pk-input $type ";
     $deflabelclass = " label pk-label $type ";
     $labelatts['class'] = $deflabelclass . keyval('class',$labelatts) . " $extraclasses ";
-    $wrapperatts['class'] = "input-set wrapper pk-wrapper $type ".keyval('class', $wrapperatts) . " $extraclasses ";
     $inputatts['class'] = keyval('class',$inputatts) .  $definputclass . " $extraclasses ";
     $input = $this->input($type, $name, $value, $inputatts);
     $label = '';
     if ($labeltext !== null) $label = $this->label($name, $labeltext, $labelatts);
-    $wrapper = div($label.$input,$wrapperatts);
-    return $wrapper;
+    if ($wrapperatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
+      $wrapperatts['class'] = "input-set  inline wrapper pk-wrapper $type ".keyval('class', $wrapperatts) . " $extraclasses ";
+      $wrapper = div($label.$input,$wrapperatts);
+      return $wrapper;
+    }
+    
+    return $label.$input;
+
   }
 }
 

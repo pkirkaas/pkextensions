@@ -375,16 +375,17 @@ function resetFormElement(e) {
  *  This function will automatically attach to any elements that have the
  *  class js-dialog-button. These elements should also have the same data-dialog
  *  value set as the dialog it will launch.
- * @param {type} selector
- * @param {type} opts
+ *  The dialog container can also have a lot of data-xxx options to initialize
+ *  the dialog
+ * @param data-title - the title on the dialog box
+ * @param - you can set most of the options for the dialog box in text-optName attributes
  * @returns {makeDialog.dlg|$}
  */
 
 $('body').on('click', '.js-dialog-button', function (event) {
-  var opts = {};
-  var tst = $(event.target).attr('data-dialog');
-  var dlg = $('.js-dialog-content[data-dialog="' + tst + '"]');
-  console.log(dlg);
+  var src = $(event.target).attr('data-dialog');
+  var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+  //opts.title = dlg.attr('data-title');
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
@@ -397,25 +398,25 @@ $('body').on('click', '.js-dialog-button', function (event) {
     }
   };
   var dialogOptions = dialogDefaults;
-  //If the below options are property names in the opts arg, use them...
+  //If the below options are data-XXX names in the dialog, use them...
   var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
-    'dialogClass', 'title', 'minHeight', 'minWidth'];
-  for (var key in overridableOptions) {
-    var opt = overridableOptions[key];
-    if (opts.hasOwnProperty(opt)) {
-      dialogOptions[opt] = opts[opt];
-    }
+    'dialogClass', 'title', 'minHeight', 'minWidth', 'width'];
+    var optName = optVal = null;
+    for (var key in overridableOptions) {
+    optName = overridableOptions[key];
+    optVal = dlg.attr('data-'+ optName);
+    console.log("KEY",key,'OptName',optName, 'optval', optVal);
+    if (optVal) dialogOptions[optName] = optVal;
+    optName = optVal = null;
   }
-  if (opts && opts.title) {
-    dlg.attr('title', opts.title);
-  }
-  if (opts && opts.html) {
-    dlg.html(opts.html);
-  }
+  console.log("DialogOpts:", dialogOptions);
+  dialogClass=dialogOptions['dialogClass'];
+  console.log('dialoglass',dialogClass);
   dlg.dialog(dialogOptions);
   dlg.title = function (title) {
     dlg.dialog('option', 'title', title);
   };
+  //dlg.dialog('option','dialogClass', dialogClass);
   dlg.dialog('open');
   return dlg;
 

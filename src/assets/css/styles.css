@@ -1444,3 +1444,17 @@ div.showHelp.borrower-viewprofile-help-button {
 
 /** For jQuery elements */
 
+div.multiselect.group.profile {
+  width: 200px;
+}
+
+
+div.edit.profile input.pk-checkbox.multiselect {
+  float: left;
+  width: 25px;
+  margin: 10px;
+}
+
+div.multiselect.group.edit label.multiselect-label {
+  text-align: left;
+}
