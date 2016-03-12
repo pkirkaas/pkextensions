@@ -11,6 +11,7 @@ abstract class PkRefManager {
    * @var array key=>value; key to store in DB, value to display
    */
   public static $refArr = [];
+  public static $label = ['','',''];
 
   /** Obviously, so implementing classes can get / generate their refArray other
    * than relying on static $refArray
@@ -33,4 +34,21 @@ abstract class PkRefManager {
     $refArr = static::getRefArr();
     return array_keys($refArr);
   }
+
+  public static function baseToFieldname($base) {
+    return strtolower($base).'_ref';
+  }
+  public static function baseToModelname($base) {
+    return "Ref".ucfirst($base);
+  }
+
+  public static function tableFieldName() {
+    $baseModel = getBaseName(static::class);
+    $base = removeStartStr($baseModel,'Ref');
+    if (!$base) return false;
+    $lcbase = strtolower($base);
+    return $lcbase.'_ref';
+  }
+
+  
 }
