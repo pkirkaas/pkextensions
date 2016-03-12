@@ -452,6 +452,13 @@ td, th {
     box-shadow: inset 0 0 5px 2px #1a47a0, 0 1px 0 #eeeeee;
 }
 
+.fullheight, 
+div .full-height {
+  height: 100%;
+}
+
+
+.fullwidth, 
 div .full-width {
   width: 100%;
 }

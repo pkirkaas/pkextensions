@@ -136,7 +136,7 @@ class PkFormBuilder extends FormBuilder {
    * @param array $options
    * @param scalar|null $unset - the value if none of the options are selected
    */
-  public function multiselect($name, $list = [], $values=[], $options=[], $unset = null) {
+  public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
     $values = $this->getValueAttribute($name, $values);
     $wrapperclass = keyval('wrapperclass',$options);
     $allclass = keyval('allclass',$options);
@@ -144,9 +144,7 @@ class PkFormBuilder extends FormBuilder {
     unset($options['allclass']);
     $out = "\n<div class='multiselect $wrapperclass $allclass '>\n";
     $out .= "\n<input type='hidden' name='$name' value='$unset' />\n";
-    //$i = 0;
     foreach ($list as $key => $label) {
-      //$i++;
       $checked = in_array_equivalent($key,  $values) ? true : false;
       $options['id'] = $name.'_'.$key;
       $out .= "\n<div class='pk-checkbox $allclass'>";
@@ -216,10 +214,13 @@ class PkFormBuilder extends FormBuilder {
   }
 
   /** Some functions that just combine other functions to take some of the tedium out.. */
-  public function textareaset($name, $value = null, $labeltext = '', $taatts = [], $labatts = [], $wrapatts =[], $extraclasses = '') {
-    $taatts['class'] = keyval('class',$taatts) .  '  text-area pk-input ' . " $extraclasses ";
+  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[], $extraclasses = '') {
+    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
+    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
+    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
+    $inatts['class'] = keyval('class',$inatts) .  '  text-area pk-input ' . " $extraclasses ";
     $labatts['class'] = " label pk-label text-area pk-input " . keyval('class',$labatts) . " $extraclasses ";
-    $textarea = $this->textarea($name, $value, $taatts);
+    $textarea = $this->textarea($name, $value, $inatts);
     $label = '';
     if ($labeltext !== null) $label = $this->label($name, $labeltext, $labatts);
     if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
@@ -232,31 +233,37 @@ class PkFormBuilder extends FormBuilder {
 
   }
 
-  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
-    $labelatts['class'] = " label pk-label select " . keyval('class',$labelatts) . " $extraclasses ";
-    $inputatts['class'] = " input pk-input select pkselect ". keyval('class',$inputatts)  . " $extraclasses ";
-    $wrapperatts['class'] = "input-set inline wrapper pk-wrapper  ".keyval('class', $wrapperatts) . " $extraclasses ";
+  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = [], $extraclasses = '' ) {
+    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
+    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
+    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
+    $labatts['class'] = " label pk-label select " . keyval('class',$labatts) . " $extraclasses ";
+    $inatts['class'] = " input pk-input select pkselect ". keyval('class',$inatts)  . " $extraclasses ";
+    $wrapatts['class'] = "input-set inline wrapper pk-wrapper  ".keyval('class', $wrapatts) . " $extraclasses ";
     $label = '';
-    if ($labeltext !==null) $label = $this->label($name, $labeltext, $labelatts);
-    $select = $this-> select($name, $list, $selected, $inputatts);
-    $wrapper = div($label.$select,$wrapperatts);
+    if ($labeltext !==null) $label = $this->label($name, $labeltext, $labatts);
+    $select = $this-> select($name, $list, $selected, $inatts);
+    $wrapper = div($label.$select,$wrapatts);
     return $wrapper;
   }
   
-  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
-    return $this->inputlabelset('text', $name, $value, $labeltext, $inputatts, $labelatts, $wrapperatts, $extraclasses);
+  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = [], $extraclasses = '' ) {
+    return $this->inputlabelset('text', $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts, $extraclasses);
   }
-  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = [], $extraclasses = '' ) {
+    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
+    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
+    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
     $definputclass = " input pk-input $type ";
     $deflabelclass = " label pk-label $type ";
-    $labelatts['class'] = $deflabelclass . keyval('class',$labelatts) . " $extraclasses ";
-    $inputatts['class'] = keyval('class',$inputatts) .  $definputclass . " $extraclasses ";
-    $input = $this->input($type, $name, $value, $inputatts);
+    $labatts['class'] = $deflabelclass . keyval('class',$labatts) . " $extraclasses ";
+    $inatts['class'] = keyval('class',$inatts) .  $definputclass . " $extraclasses ";
+    $input = $this->input($type, $name, $value, $inatts);
     $label = '';
-    if ($labeltext !== null) $label = $this->label($name, $labeltext, $labelatts);
-    if ($wrapperatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
-      $wrapperatts['class'] = "input-set  inline wrapper pk-wrapper $type ".keyval('class', $wrapperatts) . " $extraclasses ";
-      $wrapper = div($label.$input,$wrapperatts);
+    if ($labeltext !== null) $label = $this->label($name, $labeltext, $labatts);
+    if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
+      $wrapatts['class'] = "input-set  inline wrapper pk-wrapper $type ".keyval('class', $wrapatts) . " $extraclasses ";
+      $wrapper = div($label.$input,$wrapatts);
       return $wrapper;
     }
     
