@@ -208,9 +208,35 @@ class PkFormBuilder extends FormBuilder {
       return $this->$type($name, $valids, $object->$name,  $options);
     }
     throw new \Exception("Invalid 'valids' result from PkModel instance"); 
+  }
 
+  /** Some functions that just combine other functions to take some of the tedium out.. */
 
-
+  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
+    $labelatts['class'] = " label pk-label select " . keyval('class',$labelatts) . " $extraclasses ";
+    $inputatts['class'] = " input pk-input select pkselect ". keyval('class',$inputatts)  . " $extraclasses ";
+    $wrapperatts['class'] = "input-set wrapper pk-wrapper  ".keyval('class', $wrapperatts) . " $extraclasses ";
+    $label = '';
+    if ($labeltext !==null) $label = $this->label($name, $labeltext, $labelatts);
+    $select = $this-> select($name, $list, $selected, $inputatts);
+    $wrapper = div($label.$select,$wrapperatts);
+    return $wrapper;
+  }
+  
+  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
+    return $this->inputlabelset('text', $name, $value, $labeltext, $inputatts, $labelatts, $wrapperatts, $extraclasses);
+  }
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapperatts = [], $extraclasses = '' ) {
+    $definputclass = " input pk-input $type ";
+    $deflabelclass = " label pk-label $type ";
+    $labelatts['class'] = $deflabelclass . keyval('class',$labelatts) . " $extraclasses ";
+    $wrapperatts['class'] = "input-set wrapper pk-wrapper $type ".keyval('class', $wrapperatts) . " $extraclasses ";
+    $inputatts['class'] = keyval('class',$inputatts) .  $definputclass . " $extraclasses ";
+    $input = $this->input($type, $name, $value, $inputatts);
+    $label = '';
+    if ($labeltext !== null) $label = $this->label($name, $labeltext, $labelatts);
+    $wrapper = div($label.$input,$wrapperatts);
+    return $wrapper;
   }
 }
 

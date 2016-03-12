@@ -584,7 +584,7 @@ class $createclassname extends Migration {
    * the pivot table and do NOT modify the other side of the "Many" relationship
    * @var array - key names to relationship definitions 
    */
-  public $load_many_to_many = [
+  public static $load_many_to_many = [
       /* 'items' => //The key here is what we call the relation when we access it
        *    [
        *     'other_model' => 'App\Models\Item' //The class we have many of.
@@ -633,7 +633,7 @@ class $createclassname extends Migration {
       $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
       #We have a pivot class or table. Let's try class first, it's classier
       if ($pivotmodel) {
-        $pivotmodel::where('$foreignKey', $this->getKey())->delete();
+        $pivotmodel::where($mykey, $this->getKey())->delete();
       } else {# Have to use the table name & Direct DB
         DB::table($pivottable)->where($mykey, $this->getKey())->delete();
       }
@@ -719,6 +719,7 @@ class $createclassname extends Migration {
     $this->fillFillables($arr);
     $this->save();
     $modelId = $this->id;
+    $this->saveM2MRelations($arr);
     //pkdebug("POST IS: ", $_POST, 'arr', $arr);
     foreach ($relations as $relationName => $relationModel) {
       if (!array_key_exists($relationName, $arr)) continue;
@@ -783,6 +784,7 @@ class $createclassname extends Migration {
    * names of $load_many_to_many the same as the relationship names
    */
   public function saveM2MRelations($data = []) {
+    pkdebug("Saving Here Data:",$data);
     if (empty(static::$load_many_to_many) ||
         !array_intersect(array_keys(static::$load_many_to_many), array_keys($data))) {
       return true; #Nothing to do
@@ -803,7 +805,7 @@ class $createclassname extends Migration {
         }
       }
       $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');
-      $theirkey = keyval('their_key', $definition, Str::snake(getBaseName($othermodel)) . '_id');
+      $otherkey = keyval('other_key', $definition, Str::snake(getBaseName($othermodel)) . '_id');
 
       #Here's where the easy part ends. 
       $arr = $data[$relName];
@@ -821,28 +823,31 @@ class $createclassname extends Migration {
             pkdebug("For [$relName], other model is [$othermodel], but otherobj:", $otherobj);
             continue;
           }
-          $mycurrentotherobjkeys[] = "$otherobj->getKey()";
+          $otherobjkey =  $otherobj->getKey();
+          $mycurrentotherobjkeys[] = "$otherobjkey";
         }
         #Great - we have a list of otherobj keys our model pointed to, we have a new 
         #submitted list of other obj keys - let's go!
         #But gotta clean up the keys in case some are 3 & some are '3'!
         #Just make them all strings?
+        pkdebug("Array is:", $arr);
         $newarr = [];
-        foreach ($arr as $el)
-          $newarr[] = "$el";
+        foreach ($arr as $el) $newarr[] = "$el";
         $addIds = array_diff($newarr, $mycurrentotherobjkeys);
         $idsToDelete = array_diff($mycurrentotherobjkeys, $newarr);
       }
       $thiskeyval = $this->getKey();
+      $fresh = [];
       if ($pivotmodel) {
         if (!empty($deleteAll)) {
           $pivotmodel::where($mykey, $thiskeyval)->delete();
         } else {
-          $pivotmodel::where($mykey, $thiskeyval)->whereIn($theirkey, $idsToDelete)->delete();
-          $data [$mykey] = $thiskeyval;
+          $pivotmodel::where($mykey, $thiskeyval)->whereIn($otherkey, $idsToDelete)->delete();
+          $fresh [$mykey] = $thiskeyval;
           foreach ($addIds as $addId) {
-            $data[$theirkey] = $addId;
-            $pivotmodel::create($data);
+            $fresh[$otherkey] = $addId;
+            pkdebug("Adding",$fresh);
+            $pivotmodel::create($fresh);
           }
         }
        
@@ -850,11 +855,11 @@ class $createclassname extends Migration {
         if (!empty($deleteAll)) {
           DB::table($pivottable)->where($mykey, $thiskeyval)->delete();
         } else {
-          DB::table($pivottable)->where($mykey, $thiskeyval)->whereIn($theirkey,$idsToDelete)->delete();
-          $data [$mykey] = $thiskeyval;
+          DB::table($pivottable)->where($mykey, $thiskeyval)->whereIn($otherkey,$idsToDelete)->delete();
+          $fresh [$mykey] = $thiskeyval;
           foreach ($addIds as $addId) {
-            $data[$theirkey] = $addId;
-            DB::table($pivottable)->insert($data);
+            $fresh[$otherkey] = $addId;
+            DB::table($pivottable)->insert($fresh);
           }
         }
 
@@ -911,7 +916,7 @@ class $createclassname extends Migration {
    *            OR
    *      'pivot_model' => 'UserToItem',
    *      'my_key' => 'user_id' (Optional if it's just this default
-   *      'their_key' => 'item_id' (Optional if it's just this default
+   *      'other_key' => 'item_id' (Optional if it's just this default
    *    ],
 
 

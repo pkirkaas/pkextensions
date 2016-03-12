@@ -7,68 +7,68 @@
 
 $(function () {
 
-/** Two general kinds of editing/creating/deleting multiple similar items on 
- * the same page - where you might want to make multiple changes to multiple items
- * and save all changes at once - so single Form/ single "Submit" button on page.
- * OR 
- * only create/edit/delete one item at a time - so each item is it's own form,
- * with own submit and delete buttons.
- */
+  /** Two general kinds of editing/creating/deleting multiple similar items on 
+   * the same page - where you might want to make multiple changes to multiple items
+   * and save all changes at once - so single Form/ single "Submit" button on page.
+   * OR 
+   * only create/edit/delete one item at a time - so each item is it's own form,
+   * with own submit and delete buttons.
+   */
 
- /*** Save changes to multple items with single "Submit" ***/
+  /*** Save changes to multple items with single "Submit" ***/
   /** Universal delete - works everywhere if you give the button at least
    * the classes "js btn data-set-delete", and wrap every deletable dataset
    * with '<div class="deletable-data-set"> xxxxxx <div class='js btn data-set-delete'>Delete</div></div>
    */
 
-/**Creating from multiple subforms from Templates --- Wrap the form AND template in.
- * This example for Single form, changing multiple items per submit. 
-  <form method='post'>
-    <div class="templatable-data-sets">
-      <div class='deletable-data-set'>
-        <input type='hidden' name='tablename[0][id]' value='xxx1' />
-        <input type='text' name='tablename[0][fieldname]' value='yyy1' />
-        <span class='js btn data-set-delete'>Delete</span>
-      </div> <!-- Close deletable-data-set -->
-      <div class='deletable-data-set'>
-        <input type='hidden' name='tablename[1][id]' value='xxx2' />
-        <input type='text' name='tablename[1][fieldname]' value='yyy2' />
-        <span class='js btn data-set-delete'>Delete</span>
-      </div> <!-- Close deletable-data-set -->
-      <span class='js btn create-new-data-set' data-itemcount='2'>New?</span>
-      <input type='submit' value='Save' />
-      <fieldset disabled class='template-container' style='display:none;'> 
-        <div class='deletable-data-set'>
-          <input type='hidden' name='tablename[__CNT_TPL__][id]' />
-          <input type='text' name='tablename[__CNT_TPL__][fieldname]'/>
-          <span class='js btn data-set-delete'>Delete</span>
-        </div> <!-- Close deletable-data-set -->
-      </fieldset> <!-- close template container -->
-    </div> <!-- close templatable-data-sets -->
-  </form>
+  /**Creating from multiple subforms from Templates --- Wrap the form AND template in.
+   * This example for Single form, changing multiple items per submit. 
+   <form method='post'>
+   <div class="templatable-data-sets">
+   <div class='deletable-data-set'>
+   <input type='hidden' name='tablename[0][id]' value='xxx1' />
+   <input type='text' name='tablename[0][fieldname]' value='yyy1' />
+   <span class='js btn data-set-delete'>Delete</span>
+   </div> <!-- Close deletable-data-set -->
+   <div class='deletable-data-set'>
+   <input type='hidden' name='tablename[1][id]' value='xxx2' />
+   <input type='text' name='tablename[1][fieldname]' value='yyy2' />
+   <span class='js btn data-set-delete'>Delete</span>
+   </div> <!-- Close deletable-data-set -->
+   <span class='js btn create-new-data-set' data-itemcount='2'>New?</span>
+   <input type='submit' value='Save' />
+   <fieldset disabled class='template-container' style='display:none;'> 
+   <div class='deletable-data-set'>
+   <input type='hidden' name='tablename[__CNT_TPL__][id]' />
+   <input type='text' name='tablename[__CNT_TPL__][fieldname]'/>
+   <span class='js btn data-set-delete'>Delete</span>
+   </div> <!-- Close deletable-data-set -->
+   </fieldset> <!-- close template container -->
+   </div> <!-- close templatable-data-sets -->
+   </form>
+   
+   * 
+   * Then, these two assignments work EVERYWHERE ON THE PAGE
+   */
 
-* 
- * Then, these two assignments work EVERYWHERE ON THE PAGE
- */
 
 
-
-$('body').on('click', '.js.btn.data-set-delete', function (event) {
+  $('body').on('click', '.js.btn.data-set-delete', function (event) {
     $(event.target).closest('div.deletable-data-set').remove();
   });
 
-/** This serves both creating multiple new instances before submitting when
- * itemcount is implemented, AND, just creating a single new instance from the
- * template and hiding the NEW/CREATE button when it is created.
- * <em>The create new dataset button should have <tt>data-itemcount</tt></em> set
- * either to an Int of the current item count (if we will create many new items
- * before submitting) OR ELSE to <tt>single</tt>, in which case it will just 
- * create a new emtpy form from the template and hide itself 
- */
-$('body').on('click', '.js.btn.create-new-data-set', function (event) {
+  /** This serves both creating multiple new instances before submitting when
+   * itemcount is implemented, AND, just creating a single new instance from the
+   * template and hiding the NEW/CREATE button when it is created.
+   * <em>The create new dataset button should have <tt>data-itemcount</tt></em> set
+   * either to an Int of the current item count (if we will create many new items
+   * before submitting) OR ELSE to <tt>single</tt>, in which case it will just 
+   * create a new emtpy form from the template and hide itself 
+   */
+  $('body').on('click', '.js.btn.create-new-data-set', function (event) {
     //Get a copy of the template element
     var tpl = $(event.target).closest('div.templatable-data-sets').find('.template-container').first().html();
-    
+
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
     var newstr = tpl;
@@ -106,8 +106,10 @@ function showHelpDialog() {
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
  * body padding-top to adjust to the height of the menu on window resize and init  */
 function top_pad_body_to_fixed(menu) {
-  if (!menu) menu = '#top-menu-fixed';
-  if (!$(menu).length) return;
+  if (!menu)
+    menu = '#top-menu-fixed';
+  if (!$(menu).length)
+    return;
   var fixed_menu_height = $(menu).height();
   $('body').css('padding-top', fixed_menu_height + 'px');
 }
@@ -116,7 +118,7 @@ function top_pad_body_to_fixed(menu) {
 $(function () {
   top_pad_body_to_fixed();
 });
-$( window ).resize(function() {
+$(window).resize(function () {
   top_pad_body_to_fixed();
 });
 
@@ -364,6 +366,61 @@ function resetFormElement(e) {
  }
  */
 
+/** Pop up quick jQuery Dialog Boxes. See below for better
+ *  - this one is even quicker and dirtier
+ *  A dialog to be initially hidden then displayed at the click of a button
+ *  should wrapped in a div with class 'js-dialog'. The div should also have
+ *  a data-dialog attribute with some unique, arbitrary content, like what it's for.
+ *  
+ *  This function will automatically attach to any elements that have the
+ *  class js-dialog-button. These elements should also have the same data-dialog
+ *  value set as the dialog it will launch.
+ * @param {type} selector
+ * @param {type} opts
+ * @returns {makeDialog.dlg|$}
+ */
+
+$('body').on('click', '.js-dialog-button', function (event) {
+  var opts = {};
+  var tst = $(event.target).attr('data-dialog');
+  var dlg = $('.js-dialog-content[data-dialog="' + tst + '"]');
+  console.log(dlg);
+  var dialogDefaults = {
+    modal: true,
+    autoOpen: false,
+    width: 600,
+    buttons: {
+      //Cancel : function () { $(this).dialog('destroy'); }
+      Cancel: function () {
+        $(this).dialog('close');
+      }
+    }
+  };
+  var dialogOptions = dialogDefaults;
+  //If the below options are property names in the opts arg, use them...
+  var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
+    'dialogClass', 'title', 'minHeight', 'minWidth'];
+  for (var key in overridableOptions) {
+    var opt = overridableOptions[key];
+    if (opts.hasOwnProperty(opt)) {
+      dialogOptions[opt] = opts[opt];
+    }
+  }
+  if (opts && opts.title) {
+    dlg.attr('title', opts.title);
+  }
+  if (opts && opts.html) {
+    dlg.html(opts.html);
+  }
+  dlg.dialog(dialogOptions);
+  dlg.title = function (title) {
+    dlg.dialog('option', 'title', title);
+  };
+  dlg.dialog('open');
+  return dlg;
+
+});
+
 
 /** Makes a jQuery DialogBox - as simply as possible by providing
  * defaults, and customizable by overriding defaults with options.
@@ -383,11 +440,13 @@ function makeDialog(selector, opts) {
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
-    width : 600,
-    buttons : {
-        //Cancel : function () { $(this).dialog('destroy'); }
-        Cancel : function () { $(this).dialog('close'); }
+    width: 600,
+    buttons: {
+      //Cancel : function () { $(this).dialog('destroy'); }
+      Cancel: function () {
+        $(this).dialog('close');
       }
+    }
   };
   var dialogOptions = dialogDefaults;
   //If the below options are property names in the opts arg, use them...
@@ -399,7 +458,7 @@ function makeDialog(selector, opts) {
       dialogOptions[opt] = opts[opt];
     }
   }
-  console.log("OverridableOpts",overridableOptions,'opts', opts,'DialogOpts', dialogOptions);
+  console.log("OverridableOpts", overridableOptions, 'opts', opts, 'DialogOpts', dialogOptions);
   if (opts && opts.title) {
     dlg.attr('title', opts.title);
   }
@@ -414,43 +473,48 @@ function makeDialog(selector, opts) {
 }
 
 /** Example Usage...
-
-function showHelpDialog() {
-  var helpDialog = showHelpDialog.helpDialog;
-  if (!helpDialog) {
-     helpDialog = makeDialog('', {minHeight:500,minWidth:1100});
-     showHelpDialog.helpDialog = helpDialog;
-  }
-  helpDialog.title('Help for this Admin Page');
-  helpDialog.html($('#helpContent').html());
-  helpDialog.dialog('open');
-};
-
-//HTML
-<div id='helpContent'>
-  <div class='help-content'>
-  <h1>Help Header</h1>
-  <p>Do this to accomplish that.
-  </div>
-</div>
-
-//CSS
- #helpContent {
-   display: none;
+ 
+ function showHelpDialog() {
+ var helpDialog = showHelpDialog.helpDialog;
+ if (!helpDialog) {
+ helpDialog = makeDialog('', {minHeight:500,minWidth:1100});
+ showHelpDialog.helpDialog = helpDialog;
  }
-
-*/
+ helpDialog.title('Help for this Admin Page');
+ helpDialog.html($('#helpContent').html());
+ helpDialog.dialog('open');
+ };
+ 
+ //HTML
+ <div id='helpContent'>
+ <div class='help-content'>
+ <h1>Help Header</h1>
+ <p>Do this to accomplish that.
+ </div>
+ </div>
+ 
+ //CSS
+ #helpContent {
+ display: none;
+ }
+ 
+ */
 
 
 
 function containsSubstr(theVar, subStr) {
-  if (!theVar) return false;
-  if (!subStr) return false;
+  if (!theVar)
+    return false;
+  if (!subStr)
+    return false;
   subStr = subStr.toString();
-  if (!subStr) return false;
+  if (!subStr)
+    return false;
   theVar = theVar.toString();
-  if (!theVar) return false;
-  if (theVar.indexOf(subStr) !== -1) return true;
+  if (!theVar)
+    return false;
+  if (theVar.indexOf(subStr) !== -1)
+    return true;
   return false;
 }
 
