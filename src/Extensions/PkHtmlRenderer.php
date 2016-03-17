@@ -34,10 +34,18 @@ class PkHtmlRenderer extends PartialSet {
     $this->tagStack[] = $tag;
     return count($this->tagStack);
   }
-  public function rawcontent($tag, $content = null, $attributes=null, $raw = true) {
-    return $this->content($tag, $content, $attributes, $raw);
+  public function content($content='') {
+    $this[] = hpure($content);
+    return $this;
   }
-  public function content($tag, $content = null, $attributes=null, $raw = false) {
+  public function rawcontent($content='') {
+    $this[] = $content;
+    return $this;
+  }
+  public function rawtagged($tag, $content = null, $attributes=null, $raw = true) {
+    return $this->tagged($tag, $content, $attributes, $raw);
+  }
+  public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $attributes = $this->cleanAttributes($attributes);
     if ($content === true) {
       $spaces = $this->spaceDepth();
@@ -76,13 +84,18 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public function __call($method, $args) {
+    $raw = false;
+    if ($tag = removeStartStr($method,'raw')) {
+      $method = $tag;
+      $raw = true;
+    }
     array_unshift($args,$method);
     if (in_array($method, static::$selfclosing_tags)) {
       return call_user_func_array([$this,'nocontent'], $args);
-    } else if (in_array($method, static::$content_tags)) {
-      return call_user_func_array([$this,'content'], $args);
-    } else if ( ($sub = removeStartStr($method,'raw')) && in_array($sub, static::$content_tags)) {
-      return call_user_func_array([$this,'rawcontent'], $args);
+    } else if (!$raw && in_array($method, static::$content_tags)) {
+      return call_user_func_array([$this,'tagged'], $args);
+    } else if ( $raw  && in_array($method, static::$content_tags)) {
+      return call_user_func_array([$this,'rawtagged'], $args);
     }
     throw new \Exception("Unknown Method: [$method]");
   }
