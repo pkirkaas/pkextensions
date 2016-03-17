@@ -46,14 +46,48 @@ class PartialSet extends \ArrayObject {
     return $this->getIterator()->current();
   }
 
-  public function __toString() {
-    $str = ' ';
-    if (count($this)) {
-      foreach ($this as $item) {
-        $str.= ' ' . $item . $this->separator;
-      }
+  public function decomposeArray($x) {
+    if (!is_array($x)) return $x . $this->separator;
+    $str = $this->separator;
+    foreach ($x as $y) {
+      $str .= $this->decomposeArray($y).$this->separator;
     }
     return $str;
+  }
+  /*
+
+    if (is_arrayish($x)) {
+      $str = '';
+      foreach ($x as $y) {
+        if (!$y) continue;
+        $str.= ' '.$this->decomoseArray($y);
+      }
+      return $str;
+    }
+    if (is_object($x)) return $x->__toString();
+    if (!is_arrayish($x)) return $x.' ';
+    if (!count($x)) return ' ';
+
+    //$str=' ';
+    //foreach ($x as $y) {
+     //// $str.=$this->decomposeArray($y) . ' ';
+    //}
+    return ' ';
+    return $str;
+  }
+   * 
+   */
+
+  public function __toString() {
+    $str = $this->separator;
+    if (count($this)) {
+      foreach ($this as $item) {
+        //$str.= ' ' . $this->decomposeArray($item) . $this->separator;
+        $str.= $this->decomposeArray($item) . $this->separator;
+        //$str.= ' ' . $item . $this->separator;
+      }
+    }
+    return $str . $this->separator;
   }
 
   /** Deep object copy. Can do something more clever with __clone() at some

@@ -25,14 +25,6 @@ html, body {
   background: -ms-linear-gradient(top, #2F2727, #1a82f7);
   background: -o-linear-gradient(top, #2F2727, #1a82f7);
 }
-
-div.float-left {
-  float: left;
-}
-
-div.float-right {
-  float: right;
-}
 div.show.val.num {
   border: solid #aaa 1px;
   border-radius: 3px;
@@ -42,6 +34,14 @@ div.show.val.num {
   margin: 3px;
 }
 
+.avatar {
+  width: 130px;
+  height: 130px;
+  padding: 5px;
+  border: 5px;
+  margin: 5px;
+  border-radius: 5px;
+}
 
 
 div.user.view.message.template div.msg-body {
@@ -59,7 +59,31 @@ div.user.view.message.template div.row.head {
   font-size: large;
   padding: 10px;
   margin-bottom: 5px;
+}
 
+div.row.topspace {
+  margin-top: 20px;
+}
+
+div.something {
+  border: solid #666 1px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #ddf;
+  margin: auto;
+}
+
+div.row.hold-in {
+  padding: 10px;
+  text-align: center;
+}
+
+.pk-content {
+  border: solid #999 1px;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #ffa;
 }
 /*
 input.form-control[disabled].disabled {
@@ -147,6 +171,7 @@ div.template {
   background-color: white;
   margin-left: auto;
   margin-right: auto;
+  border-radius: 10px;
   /*
   padding: 10px;
   display: inline-block;
@@ -212,19 +237,12 @@ div.whole-header {
   background-color: #79C;
 }
 
-.inline {
-  display: inline-block;
-}
-
 .inline-login a{
   color: #ccf;
 }
 .inline-login a:hover{
   text-decoration: none;
   color: #aaf;
-}
-.block {
-  display: block;
 }
 .inline-login {
   display: inline-block;
@@ -302,25 +320,6 @@ div.input-label.checkbox-lbl {
 
 div.template textarea {
   padding: 5px;
-}
-
-div.margin-bottom-5 {
-  margin-bottom: 5px;
-}
-div.margin-5 {
-  margin: 5px;
-}
-div.padding-10 {
-  padding: 10px;
-}
-.padding-5 {
-  padding: 5px;
-}
-div.margin-top-5 {
-  margin-top: 5px;
-}
-div.margin-top-10 {
-  margin-top: 10px;
 }
 
 div.idx.msg {
@@ -452,17 +451,6 @@ td, th {
     box-shadow: inset 0 0 5px 2px #1a47a0, 0 1px 0 #eeeeee;
 }
 
-.fullheight, 
-div .full-height {
-  height: 100%;
-}
-
-
-.fullwidth, 
-div .full-width {
-  width: 100%;
-}
-
 form select.select-size,
 form select.select-size option {
   height: 26px;
@@ -589,15 +577,6 @@ div.favorite-toggle.unfavorited:hover {
   cursor: pointer;
 }
 
-/*
-div.unfavorited:hover {
-  color: #dd5;
-}
-div.favorited:hover{
-  color: #666;
-}
-*/
-
 div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
   position: relative;
@@ -644,15 +623,6 @@ div.row.head-1 {
 
 
 
-.text-align-left {
-  text-align: left;
-}
-.text-align-right {
-  text-align: right;
-}
-.text-align-center {
-  text-align: center;
-}
 div.user.notes.template div.content {
   margin: 5px;
   border: solid #bbb 1px;
@@ -793,19 +763,6 @@ body div.includeparts {
   border: solid black 2px;
 }
 
-/** Controller/Template styles */
-
-
-
-
-/*
-div.lender-index.template {
-  border: solid #eee 1px;
-  padding: 10px;
-  border-radius: 10px;
-  margin: 10px;
-}
-*/
 
 div.search div.search.notice {
   font-size: medium;
@@ -1019,10 +976,6 @@ div.index-index h4.h-1-2-3 {
 }
 div.template h1,
 div.template h2,
-div.lender.viewprofile.template h1,
-div.template.lender.search h1,
-div.template.lender.search h2,
-div.template.lender.editprofile h1,
 div.template.contact h1 {
   margin-top: 0;
   text-align: center;
@@ -1032,6 +985,10 @@ div.template.contact h1 {
   border-radius: 10px;
 }
 
+body div.template>h1 {
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
 div.template.contact form div.input-label {
   padding-right: 0;
 }
@@ -1100,12 +1057,6 @@ div.borrower-intro {
   border: solid #ccc 1px;
   border-radius: 10px;
   padding: 20px;
-}
-.italic {
-  font-style: italic;
-}
-.bold {
-  font-weight: bold;
 }
 div.borrower.editprofile h5 {
   font-weight: bold;
@@ -1245,10 +1196,6 @@ div.lender-index.template {
 div.lender-index.template li {
   color: #433;
   margin-bottom: 19px;
-}
-.auto-margin {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 div.some-att-hd {
@@ -1432,6 +1379,86 @@ div.showHelp.borrower-viewprofile-help-button {
   display: none;
 }
 
+/** For jQuery elements */
+
+div.multiselect.group.profile {
+  width: 200px;
+}
+
+
+div.edit.profile input.pk-checkbox.multiselect {
+  float: left;
+  width: 25px;
+  margin: 10px;
+}
+
+div.multiselect.group.edit label.multiselect-label {
+  text-align: left;
+}
+
+div.profile.question.view.wrapper.set {
+  border: solid #555 1px;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #faa;
+}
+
+.inner-col {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
+  border: solid 1px #ddd;
+}
+
+.top-square-corners {
+  border-top-left-radius: 0px ! important;
+  border-top-right-radius: 0px ! important;
+}
+.top-square-corners {
+  border-top-left-radius: 5px ! important;
+  border-top-right-radius: 5px ! important;
+}
+.bottom-round-corners {
+  border-bottom-left-radius: 5px ! important;
+  border-bottom-right-radius: 5px ! important;
+}
+.bottom-square-corners {
+  border-bottom-left-radius: 0px ! important;
+  border-bottom-right-radius: 0px ! important;
+}
+
+.height300 {
+  height: 300px ! important;
+}
+
+.height200 {
+  height: 200px ! important;
+}
+.height100 {
+  height: 100px ! important;
+}
+
+.width300 {
+  width: 300px ! important;
+}
+
+.width200 {
+  width: 200px ! important;
+}
+.width100 {
+  width: 100px ! important;
+}
+
+.text-align-left {
+  text-align: left ! important;
+}
+.text-align-right {
+  text-align: right ! important;
+}
+.text-align-center {
+  text-align: center ! important;
+}
 
 .pk-content,
 .pk-label {
@@ -1449,19 +1476,124 @@ div.showHelp.borrower-viewprofile-help-button {
   background-color: #eef;
 }
 
-/** For jQuery elements */
+.italic {
+  font-style: italic;
+}
+.bold {
+  font-weight: bold;
+}
+.auto-margin {
+  margin-left: auto ! important;
+  margin-right: auto ! important;
+}
+.block {
+  display: block ! important;
+}
 
-div.multiselect.group.profile {
-  width: 200px;
+div.float-left {
+  float: left ! important;
+}
+
+div.float-right {
+  float: right ! important;
+}
+
+.inline {
+  display: inline-block ! important;
+}
+
+.margin-bottom-5 {
+  margin-bottom: 5px ! important;
+}
+.margin-5 {
+  margin: 5px ! important;
+}
+.padding-10 {
+  padding: 10px ! important;
+}
+.padding-5 {
+  padding: 5px ! important;
+}
+.margin-top-5 {
+  margin-top: 5px ! important;
+}
+.margin-top-10 {
+  margin-top: 10px ! important;
+}
+.light-blue-back {
+  background-color: #aae;
+}
+.light-blue-back-1 {
+  background-color: #aaf;
+}
+.light-blue-back-2 {
+  background-color: #ddf;
+}
+
+.dark-font {
+  color: #444;
+}
+
+.dark-font-1 {
+  color: #345;
+}
+.dark-font-2 {
+  color: #543;
+}
+.mild-border {
+  border: solid #888 1px;
+}
+
+.fullheight, 
+div .full-height {
+  height: 100% ! important;
 }
 
 
-div.edit.profile input.pk-checkbox.multiselect {
-  float: left;
-  width: 25px;
-  margin: 10px;
+.fullwidth, 
+div .full-width {
+  width: 100% ! important;
 }
 
-div.multiselect.group.edit label.multiselect-label {
-  text-align: left;
+.spacing-5 {
+  margin: 5px;
+  padding: 5px;
+  border-radius: 5px;
 }
+.big-box-shadow {
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+ }
+
+.box-shadow {
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+
+
+
+.box-shadow-2 {
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

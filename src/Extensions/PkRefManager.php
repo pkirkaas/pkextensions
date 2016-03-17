@@ -11,18 +11,29 @@ abstract class PkRefManager {
    * @var array key=>value; key to store in DB, value to display
    */
   public static $refArr = [];
-  public static $label = ['','',''];
+  public static $labels = ['','',''];
 
   /** Obviously, so implementing classes can get / generate their refArray other
    * than relying on static $refArray
    * @return array
    */
+  public static function getLabels() {
+    return static::$labels;
+  }
   public static function getRefArr() {
     return static::$refArr;
+  }
+  public static function displayLabel($idx = null) {
+    return keyval($idx,static::getLabels());
   }
   public static function displayValue($key = null) {
     $refArr = static::getRefArr();
     return keyValOrDefault($key,$refArr,'');
+  }
+  public static function giveLabelAndValue($key,$idx) {
+    return ['lablel'=> static::displayLabe($idx),
+        'value' => static::displayValue($key)
+        ];
   }
   public static function notEmpty() {
     $refArr = static::getRefArr();

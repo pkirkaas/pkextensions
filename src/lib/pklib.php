@@ -2839,7 +2839,12 @@ function percentage ($a, $b, $invalid = '') {
     return $dr.'%';
 }
 
-
+/** Just checks if the HTTP Request method was a post
+ * @return boolean
+ */
+function isPost() {
+  return $_SERVER['REQUEST_METHOD'] === 'POST' ;
+}
 
 
 

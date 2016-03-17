@@ -214,61 +214,65 @@ class PkFormBuilder extends FormBuilder {
   }
 
   /** Some functions that just combine other functions to take some of the tedium out.. */
-  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[], $extraclasses = '') {
-    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
-    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
-    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
-    $inatts['class'] = keyval('class',$inatts) .  '  text-area pk-input ' . " $extraclasses ";
-    $labatts['class'] = " label pk-label text-area pk-input " . keyval('class',$labatts) . " $extraclasses ";
+  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[]) {
+    $labatts = $this->mergeClass($labatts);
+    $inatts = $this->mergeClass($inatts);
     $textarea = $this->textarea($name, $value, $inatts);
     $label = '';
     if ($labeltext !== null) $label = $this->label($name, $labeltext, $labatts);
     if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
-      $wrapatts['class'] = " input-set wrapper inline pk-wrapper  text-area pk-input ".keyval('class', $wrapatts) . " $extraclasses ";
-      $wrapper = div($label.$textarea,$wrapatts);
+      $wrapatts = $this->mergeClass($wrapatts);
+      $wrapper = $this->div($label.$textarea,$wrapatts);
       return $wrapper;
     }
-    
     return $label.$textarea;
-
+  }
+  public function mergeClass($arg1, $arg2 = null) {
+    if (is_string($arg1)) $arg1 = ['class' => $arg1 ];
+    if (is_array($arg1)) {
+      $arg1['class'] =  keyval('class',$arg1) . " $arg2 ";
+    }
+    return $arg1;
   }
 
-  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = [], $extraclasses = '' ) {
-    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
-    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
-    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
-    $labatts['class'] = " label pk-label select " . keyval('class',$labatts) . " $extraclasses ";
-    $inatts['class'] = " input pk-input select pkselect ". keyval('class',$inatts)  . " $extraclasses ";
-    $wrapatts['class'] = "input-set inline wrapper pk-wrapper  ".keyval('class', $wrapatts) . " $extraclasses ";
+  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+    $labatts = $this->mergeClass($labatts);
+    $inatts = $this->mergeClass($inatts);
     $label = '';
     if ($labeltext !==null) $label = $this->label($name, $labeltext, $labatts);
     $select = $this-> select($name, $list, $selected, $inatts);
-    $wrapper = div($label.$select,$wrapatts);
-    return $wrapper;
+    if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
+      $wrapatts = $this->mergeClass($wrapatts);
+      $wrapper = $this->div($label.$select,$wrapatts);
+      return $wrapper;
+    } 
+    return $label.$textarea;
   }
   
-  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = [], $extraclasses = '' ) {
-    return $this->inputlabelset('text', $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts, $extraclasses);
+  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = []) {
+    return $this->inputlabelset('text', $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
   }
-  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = [], $extraclasses = '' ) {
-    if (is_string($wrapatts)) $wrapatts = ['class'=>" $wrapatts "];
-    if (is_string($labatts)) $labatts = ['class'=>" $labatts "];
-    if (is_string($inatts)) $inatts = ['class'=>" $inatts "];
-    $definputclass = " input pk-input $type ";
-    $deflabelclass = " label pk-label $type ";
-    $labatts['class'] = $deflabelclass . keyval('class',$labatts) . " $extraclasses ";
-    $inatts['class'] = keyval('class',$inatts) .  $definputclass . " $extraclasses ";
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+    $labatts = $this->mergeClass($labatts);
+    $inatts = $this->mergeClass($inatts);
     $input = $this->input($type, $name, $value, $inatts);
     $label = '';
     if ($labeltext !== null) $label = $this->label($name, $labeltext, $labatts);
     if ($wrapatts !== null) { #If wrappteratts are null, it means we want to skip the wrapper
-      $wrapatts['class'] = "input-set  inline wrapper pk-wrapper $type ".keyval('class', $wrapatts) . " $extraclasses ";
-      $wrapper = div($label.$input,$wrapatts);
+      $wrapatts = $this->mergeClass($wrapatts);
+      $wrapper = $this->div($label.$input,$wrapatts);
       return $wrapper;
     }
-    
     return $label.$input;
-
   }
+
+   public function div($content,$attributes) {
+   if (is_string($attributes)) $attributes = ['class'=>$attributes];
+   return $this->html->tag('div', $content, $attributes);
+}
+
+
+  /** Looks like I'll have to do everything in here.... */
+
 }
 
