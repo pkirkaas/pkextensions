@@ -409,6 +409,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
+  console.log("After all the replacements, dlgHtml:",dlgHtml);
   //if (clone) console.log('clone was true', clone);
   dlg = $(dlgHtml);
   //else  console.log('clone was false', clone);
@@ -427,7 +428,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var dialogOptions = dialogDefaults;
   //If the below options are data-XXX names in the dialog, use them...
   var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
-    'dialogClass', 'title', 'minHeight', 'minWidth', 'width'];
+    'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height'];
     var optName = optVal = null;
     for (var key in overridableOptions) {
     optName = overridableOptions[key];
@@ -438,7 +439,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   }
   //console.log("DialogOpts:", dialogOptions);
   dialogClass=dialogOptions['dialogClass'];
-  console.log('dialoglass',dialogClass);
+  console.log('dialogOptions',dialogOptions);
   dlg.dialog(dialogOptions);
   dlg.title = function (title) {
     dlg.dialog('option', 'title', title);

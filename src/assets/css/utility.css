@@ -1,0 +1,224 @@
+/*
+* These are just general purpose classes that only do a few things themselves, but can be combined */
+
+.section {
+  border: solid #aaf 1px;
+  border-radius: 5px;
+  margin: 5px;
+  padding: 5px;
+  background-color: rgba(222,222,200,.8);
+}
+
+/** Spacing and sizing */
+
+.padding-left-0 { padding-left: 0; }
+.padding-right-0 { padding-right: 0; }
+.background-111 { background-color: #111; }
+.background-112 { background-color: #118; } 
+.background-113 { background-color: #11f; } 
+.background-121 { background-color: #181; }
+.background-122 { background-color: #188; }
+.background-123 { background-color: #18f; }
+.background-131 { background-color: #1f1; }
+.background-132 { background-color: #1f8; }
+.background-133 { background-color: #1ff; }
+
+.background-211 { background-color: #811; }
+.background-212 { background-color: #818; }
+.background-213 { background-color: #81f; }
+.background-221 { background-color: #881; }
+.background-222 { background-color: #888; }
+.background-223 { background-color: #88f; }
+.background-231 { background-color: #8f1; }
+.background-232 { background-color: #8f8; }
+.background-233 { background-color: #8f8; }
+
+
+.background-311 { background-color: #f11; }
+.background-312 { background-color: #f18; }
+.background-313 { background-color: #f1f; }
+.background-321 { background-color: #f81; }
+.background-322 { background-color: #f88; }
+.background-323 { background-color: #f88; }
+.background-331 { background-color: #ff1; }
+.background-332 { background-color: #ff8; }
+.background-333 { background-color: #fff; }
+
+
+.color-111 { color: #111; }
+.color-112 { color: #118; }
+.color-113 { color: #11f; }
+.color-121 { color: #181; }
+.color-122 { color: #188; }
+.color-123 { color: #18f; }
+.color-131 { color: #1f1; }
+.color-132 { color: #1f8; }
+.color-133 { color: #1ff; }
+
+.color-211 { color: #811; }
+.color-212 { color: #818; }
+.color-213 { color: #81f; }
+.color-221 { color: #881; }
+.color-222 { color: #888; }
+.color-223 { color: #88f; }
+.color-231 { color: #8f1; }
+.color-232 { color: #8f8; }
+.color-233 { color: #8f8; }
+
+.color-311 { color: #f11; }
+.color-312 { color: #f18; }
+.color-313 { color: #f1f; }
+.color-321 { color: #f81; }
+.color-322 { color: #f88; }
+.color-323 { color: #f88; }
+.color-331 { color: #ff1; }
+.color-332 { color: #ff8; }
+.color-333 { color: #fff; }
+
+
+.top-square-corners { border-top-left-radius: 0px ! important; border-top-right-radius: 0px ! important; }
+.top-round-corners { border-top-left-radius: 5px ! important; border-top-right-radius: 5px ! important; }
+.bottom-round-corners { border-bottom-left-radius: 5px ! important; border-bottom-right-radius: 5px ! important; }
+.bottom-square-corners { border-bottom-left-radius: 0px ! important; border-bottom-right-radius: 0px ! important; }
+
+.height-300, .height300 { height: 300px ! important; } 
+.height-200, .height200 { height: 200px ! important; }
+.height-100, .height100 { height: 100px ! important; }
+.height-50, .height50 { height: 50px ! important; }
+
+.width-300, .width300 { width: 300px ! important; }
+
+.width-200, .width200 { width: 200px ! important; }
+.width-100, .width100 { width: 100px ! important; }
+.width-50, .width50 { width: 50px ! important; }
+
+.text-align-left { text-align: left ! important; }
+.text-align-right { text-align: right ! important; }
+.text-align-center { text-align: center ! important; }
+.italic { font-style: italic; }
+.bold { font-weight: bold; }
+.auto-margin { margin-left: auto ! important; margin-right: auto ! important; }
+.block { display: block ! important; }
+
+div.float-left { float: left ! important; }
+div.float-right { float: right ! important; }
+
+.inline { display: inline-block ! important; }
+.margin-bottom-5 { margin-bottom: 5px ! important; }
+.margin-5, .margin5 { margin: 5px ! important; }
+.padding10, .padding-10 { padding: 10px ! important; }
+.padding5, .padding-5 { padding: 5px ! important; }
+.margin-top-5 { margin-top: 5px ! important; }
+.margin-top-10 { margin-top: 10px ! important; }
+/*
+.light-blue-back {
+  background-color: #aae;
+}
+.light-blue-back-1 {
+  background-color: #aaf;
+}
+.light-blue-back-2 {
+  background-color: #ddf;
+}
+
+.darkfont,
+.dark-font {
+  color: #444;
+}
+
+.dark-font-1 {
+  color: #345;
+}
+.dark-font-2 {
+  color: #543;
+}
+*/
+.border, .mildborder, .mild-border { border: solid #888 1px; }
+
+.fullheight, div .full-height { height: 100% ! important; }
+.fullwidth, div .full-width { width: 100% ! important; }
+
+.spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
+.big-box-shadow {
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+ }
+
+.box-shadow {
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+
+
+
+.box-shadow-2 {
+  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
+}
+
+/** To use this simple css tooltip, just be sure to put both the item you
+want to hover over, as well as the invisible tooltip, in a no-border,
+no margin, no padding, display-inline-block,position:relative div. It shouldn't
+change the layout almost at all
+
+Just put the tooltip div immediately after the element you want to hover over for
+info
+*/
+div.pk-tooltip { display: none; }
+
+.relative { position: relative ! important; }
+
+/*
+div.pk-tooltip {
+*/
+:hover > div.pk-tooltip {
+  display: inline-block;
+  background-color: #faa;
+  color: #400;
+  border: solid red 1px;
+  border-radius: 5px;
+  margin: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  position: absolute;
+  top: 20%;
+  left: 20%;
+}
+.no-space {
+  margin: 0;
+  padding: 0! important ;
+  border: none! important ;
+  background: none transparent ! important ;
+}
+
+.tooltip-wrapper {
+  position: relative! important ;
+  display: inline-block;
+  margin: 0! important ;
+  padding: 0! important ;
+  border: none! important ;
+  background: none transparent ! important ;
+}
+/** Make a reasonable default */
+.wrapper {
+
+}
+
+
+/* can be combined with other clases to give a look and 
+eel to labels (descriptons), vs user input/repli8es */
+
+.pk-desc {
+  color: #556;
+  font-style: italic;
+  font-family: arial;
+  background-color: #fdd;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.pk-val {
+  color: #544;
+  font-family: verdana;
+  background-color: #fee;
+  padding: 5px;
+  border-radius: 5px;
+}

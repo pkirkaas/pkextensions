@@ -188,7 +188,10 @@ class PkController extends Controller {
         continue;
       }
     }
-    if (!$viewfile) return '';
+    if (!$viewfile) {
+      pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
+      return ' ';
+    }
     if (is_array($data)) {
       ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
       ###########  $out, for example, was a terrible choice!
@@ -213,7 +216,10 @@ class PkController extends Controller {
         continue;
       }
     }
-    if (!$viewfile) return '';
+    if (!$viewfile) {
+      pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
+      return ' ';
+    }
     if (is_array($data)) {
       ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
       ###########  $out, for example, was a terrible choice!

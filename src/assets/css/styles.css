@@ -33,46 +33,6 @@ div.show.val.num {
   padding: 3px;
   margin: 3px;
 }
-
-img.avatar,
-.avatar-med,
-.avatar, .avatar-sm {
-  max-width: 130px;
-  max-height: 130px;
-  padding: 5px;
-  border: 1px;
-  margin: 5px;
-  border-radius: 5px;
-}
-.avatar-med {
-  max-width: 200px;
-  max-height: 200px;
-}
-
-.avatar-desc {
-  width: 130px;
-  padding: 5px;
-  border: 1px;
-  margin: 5px;
-  display: inline-block;
-  background-color: #eee;
-
-}
-
-img.big-picture-dialog {
-  max-width: 700px;
-  max-height: 700px;
-  border-radius: 20px;
-  border: solid blue 5px;
-
-} 
-img.avatar {
-  padding: 0;
-  border: none;
-  max-width: 120px;
-  max-height: 120px;
-}
-
 div.user.view.message.template div.msg-body {
   background-color: #eee;
   padding: 10px;
@@ -136,10 +96,6 @@ div.multiselect {
   border-radius: 3px;
   border: solid #aaa 1px;
 }
-
-.padding-left-0 {
-  padding-left: 0;
-}
 div.user.view.message.template,
 div.user.conversations.template,
 div.user.conversation.template {
@@ -151,31 +107,9 @@ div.user.conversation.template {
   border-radius: 10px;
   background-color: #ffa;
 }
-.section {
-  border: solid #aaf 1px;
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px;
-  background-color: rgba(222,222,200,.8);
-}
 label.inline-remember {
   color: #ccc;
 }
-@keyframes pulse {
-  0% {
-    border: solid red 2px;
-    background-color: rgba(100,100,255,.8);
-  }
-  50% {
-    border: solid blue 2px;
-    background-color: rgba(250,200,100,.8);
-  }
-  100% {
-    border: solid red 2px;
-    background-color: rgba(100,100,255,.8);
-  }
-}
-
 div.num-items, div.item-desc {
   display: inline-block;
 }
@@ -264,19 +198,6 @@ div.whole-header {
   background-color: #7092BE;
   */
   background-color: #79C;
-}
-
-.inline-login a{
-  color: #ccf;
-}
-.inline-login a:hover{
-  text-decoration: none;
-  color: #aaf;
-}
-.inline-login {
-  display: inline-block;
-  margin-top: 4px;
-  zoom: .9;
 }
 span.new-msg-cnt {
   font-weight: bold;
@@ -445,41 +366,6 @@ td, th {
   border: solid #aaa 1px;
 }
 
-
-.pkmvc-button:visited,
-.pkmvc-button {
-  white-space: nowrap;
-  text-align: center;
-  text-decoration: none;
-  background-image: linear-gradient(to top, #759ae9, #376fe0);
-  border-top: 1px solid #1f58cc;
-  border-right: 1px solid #1b4db3;
-  border-bottom: 1px solid #174299;
-  border-left: 1px solid #1b4db3;
-  border-radius: 4px;
-  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
-  color: #fff;
-  font: bold 12px/1 "helvetica neue", helvetica, arial, sans-serif;
-  padding: 7px ;
-  margin: 7px;
-  text-shadow: 0 -1px 1px #1a5ad9;
-}
-
-.pkmvc-button:hover {
-    text-decoration: none;
-    color: #ffe;
-    background-image: linear-gradient(to top, #557ac9, #174fc0);
-    cursor: pointer; 
-}
-
-.pkmvc-button:active {
-    border-top: 1px solid #1b4db3;
-    border-right: 1px solid #174299;
-    border-bottom: 1px solid #133780;
-    border-left: 1px solid #174299;
-    box-shadow: inset 0 0 5px 2px #1a47a0, 0 1px 0 #eeeeee;
-}
-
 form select.select-size,
 form select.select-size option {
   height: 26px;
@@ -503,137 +389,6 @@ div.row.borrower.half {
 
 
 
-
-div.blocked,
-div.unblocked {
-  width: 35px;
-  height: 35px;
-  border-radius: 5px;
-  background-color: green;
-}
-
-div.blocked {
-  background-color: red;
-}
-
-div.unblocked:hover {
-  cursor: pointer;
-  background-color: #800;
-}
-div.blocked:hover {
-  cursor: pointer;
-  background-color: #080;
-}
-
-div.unblocked::before,
-div.blocked::before {
-  font-size: xx-large;
-  font-weight: bold;
-}
-div.unblocked::before {
-  content: '\2713';
-}
-div.blocked::before {
-  content: '\2718';
-}
-
-div.blocked::after,
-div.unblocked:after {
-  font-size: small;
-  position: relative;
-  right: 80px;
-  line-height: 35px;
-  white-space: pre;
-  display: block;
-  top: -40px;
-}
-
-div.blocked::after {
-  color: #600;
-  content: 'Blocked';
-  font-style: italic;
-}
-
-div.unblocked::after {
-  content: 'Unblocked';
-  color: #686;
-}
-
-div.unblocked:hover::after {
-  color: red;
-  line-height: initial;
-  right: 120px;
-  content: 'Block Messages \a from this User?';
-}
-
-div.blocked:hover::after {
-  line-height: initial;
-  right: 120px;
-  color: green;
-  content: 'Unblock Messages \a from this User?';
-}
-
-
-
-
-
-
-
-div.favorited,
-div.unfavorited {
-  /*
-  background-image: url('../img/Empty_Star.svg');
-  background-image: url('../img/Full_Star_Yellow.svg');
-  background-image: url('../img/Empty_Star.svg');
-  */
-  line-height: initial;
-  width: 35px;
-  height: 35px;
-  background-size: contain;
-}
-
-div.unfavorited {
-  background-image: url('../img/Full-Empty-Star.svg');
-}
-div.favorited {
-  background-image: url('../img/Full-Yellow-Star.svg');
-}
-
-
-div.favorite-toggle.favorited:hover,
-div.favorite-toggle.unfavorited:hover {
-  background-image: url('../img/Full-Half-Star.svg');
-  cursor: pointer;
-}
-
-div.favorite-toggle.favorited::after,
-div.favorite-toggle.unfavorited::after {
-  position: relative;
-  right: 85px;
-  white-space: pre;
-  line-height: 40px;
-}
-div.favorite-toggle.unfavorited::after {
-  right: 90px;
-  content: "Not a favorite..";
-  color: #884;
-}
-
-div.favorite-toggle.favorited::after {
-  color: #962;
-  content: 'A Favorite!';
-}
-
-div.favorite-toggle.favorited:hover::after {
-  color: #888;
-  content: 'Unfavorite?';
-}
-
-div.favorite-toggle.unfavorited:hover::after {
-  line-height: initial;
-  color: #962;
-  content: "Make them\a a favorite!";
-}
 
 
 div.row.head-1 div.favorite-toggle {
@@ -1000,9 +755,6 @@ div.index-index h4.h-1-2-3 {
   color: #800;
   text-align: center;
 }
-.padding-right-0 {
-  padding-right: 0;
-}
 div.template h1,
 div.template h2,
 div.template.contact h1 {
@@ -1280,62 +1032,6 @@ div.borrower-register-form form div.col-sm-5 {
 div.borrower-register-form form div.col-sm-12 {
   text-align: center;
 }
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
-}
-
-.rowclass-equalheight {
-    display: table;
-}
-
-.colclass-equalheight {
-    float: none;
-    display: table-cell;
-    vertical-align: top;
-}
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
-}
-
-
-@media (min-width: 0px) and (max-width: 767px) {
-  .fsi-row-xs-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  .fsi-row-sm-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 992px) and (max-width: 1199px) {
-  .fsi-row-md-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 1200px) {
-  .fsi-row-lg-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
 div.row.conversant.head div {
   font-weight: bold;
   color: #008;
@@ -1351,45 +1047,6 @@ div.row.conversant {
   border-radius: 5px;
   padding: 10px;
 }
-div.speech-bubble{
-   margin-left: 25px;
-   margin-right: 25px;
-   padding: 10px;
-   color: white;
-   display: inline-block;
-   width: 420px; 
-   min-height: 80px; 
-   border-radius: 10px;
-}
-div.speech-bubble.left {
-   background: blue;
-}
-div.speech-bubble.right {
-   background: red;
-}
-div.speech-bubble::before,
-div.speech-bubble::after {
-   content:"";
-   position: absolute;
-   width: 0;
-   height: 0;
-   border-top: 13px solid transparent;
-   border-bottom: 13px solid transparent;
-   margin: 0;
-}
-div.speech-bubble.left::before {
-   border-right: 26px solid blue;
-   margin-left: -35px;
-
-}
-div.speech-bubble.right:after {
-   border-left: 26px solid red;
-   /*
-   margin-left: 410px;
-   */
-   left: 450px;
-   top: 15px;
-}
 div.showHelp.borrower-search-help-button {
   margin-left: 20px;
   position: relative;
@@ -1404,9 +1061,6 @@ div.showHelp.borrower-viewprofile-help-button {
   display: none;
 }
 
-.js-dialog-content {
-  display: none ! important;
-}
 
 /** For jQuery elements */
 
@@ -1433,75 +1087,6 @@ div.profile.question.view.wrapper.set {
   background-color: #faa;
 }
 
-.inner-col {
-  margin: 5px;
-  padding: 5px;
-  border-radius: 5px;
-  border: solid 1px #ddd;
-}
-
-.top-square-corners {
-  border-top-left-radius: 0px ! important;
-  border-top-right-radius: 0px ! important;
-}
-.top-square-corners {
-  border-top-left-radius: 5px ! important;
-  border-top-right-radius: 5px ! important;
-}
-.bottom-round-corners {
-  border-bottom-left-radius: 5px ! important;
-  border-bottom-right-radius: 5px ! important;
-}
-.bottom-square-corners {
-  border-bottom-left-radius: 0px ! important;
-  border-bottom-right-radius: 0px ! important;
-}
-
-.height-300,
-.height300 {
-  height: 300px ! important;
-}
-
-.height-200,
-.height200 {
-  height: 200px ! important;
-}
-.height-100,
-.height100 {
-  height: 100px ! important;
-}
-.height-50,
-.height50 {
-  height: 50px ! important;
-}
-
-.width-300,
-.width300 {
-  width: 300px ! important;
-}
-
-.width-200,
-.width200 {
-  width: 200px ! important;
-}
-.width-100,
-.width100 {
-  width: 100px ! important;
-}
-.width-50,
-.width50 {
-  width: 50px ! important;
-}
-
-.text-align-left {
-  text-align: left ! important;
-}
-.text-align-right {
-  text-align: right ! important;
-}
-.text-align-center {
-  text-align: center ! important;
-}
 
 .pk-content,
 .pk-label {
@@ -1519,172 +1104,12 @@ div.profile.question.view.wrapper.set {
   background-color: #eef;
 }
 
-.italic {
-  font-style: italic;
-}
-.bold {
-  font-weight: bold;
-}
-.auto-margin {
-  margin-left: auto ! important;
-  margin-right: auto ! important;
-}
-.block {
-  display: block ! important;
-}
-
-div.float-left {
-  float: left ! important;
-}
-
-div.float-right {
-  float: right ! important;
-}
-
-.inline {
-  display: inline-block ! important;
-}
-
-.margin-bottom-5 {
-  margin-bottom: 5px ! important;
-}
-.margin-5,
-.margin5 {
-  margin: 5px ! important;
-}
-.padding10,
-.padding-10 {
-  padding: 10px ! important;
-}
-.padding5,
-.padding-5 {
-  padding: 5px ! important;
-}
-.margin-top-5 {
-  margin-top: 5px ! important;
-}
-.margin-top-10 {
-  margin-top: 10px ! important;
-}
-.light-blue-back {
-  background-color: #aae;
-}
-.light-blue-back-1 {
-  background-color: #aaf;
-}
-.light-blue-back-2 {
-  background-color: #ddf;
-}
-
-.darkfont,
-.dark-font {
-  color: #444;
-}
-
-.dark-font-1 {
-  color: #345;
-}
-.dark-font-2 {
-  color: #543;
-}
-.border,
-.mildborder,
-.mild-border {
-  border: solid #888 1px;
-}
-
-.fullheight, 
-div .full-height {
-  height: 100% ! important;
-}
-
-
-.fullwidth, 
-div .full-width {
-  width: 100% ! important;
-}
-
-.spacing-5 {
+.inner-col {
   margin: 5px;
   padding: 5px;
   border-radius: 5px;
+  border: solid 1px #ddd;
 }
-.big-box-shadow {
-  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
- }
-
-.box-shadow {
-  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
-}
-
-
-
-.box-shadow-2 {
-  box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
-}
-
-/** To use this simple css tooltip, just be sure to put both the item you
-want to hover over, as well as the invisible tooltip, in a no-border,
-no margin, no padding, display-inline-block,position:relative div. It shouldn't
-change the layout almost at all
-
-Just put the tooltip div immediately after the element you want to hover over for
-info
-*/
-div.pk-tooltip {
-  display: none;
-}
-
-.relative {
-  position: relative ! important;
-}
-
-/*
-div.pk-tooltip {
-*/
-:hover > div.pk-tooltip {
-  display: inline-block;
-  background-color: #faa;
-  color: #400;
-  border: solid red 1px;
-  border-radius: 5px;
-  margin: 5px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 5px;
-  /*
-  position: sticky;
-  */
-  position: absolute;
-  top: 20%;
-  left: 20%;
-}
-/*
-:hover > div.pk-tooltip::before {
-  content: 'How Now Brown Cow?';
-  display: inline-block;
-  position: relative;
-  border: solid blue 2px;
-  margin: 10px;
-  paddint: 10px;
-}
-*/
-
-.tooltip-wrapper {
-  position: relative! important ;
-  display: inline-block! important ;
-  margin: 0! important ;
-  padding: 0! important ;
-  border: none! important ;
-  background: none transparent ! important ;
-}
-/** Make a reasonable default */
-.wrapper {
-
-}
-
-
-
 
 
 
