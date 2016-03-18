@@ -7,6 +7,13 @@ CSS / Styling that when used together create effects, like tooltips, liking some
   display: none;
 }
 
+div.super_test {
+  border: solid black 3px;
+  margin: 20px;
+  padding: 20px;
+  background-color: red;
+  font-size: xx-large;
+}
 
 /** Speach bubble effects */
 div.speech-bubble{
@@ -344,6 +351,6 @@ img.big-picture-dialog {
 img.avatar {
   padding: 0;
   border: none;
-  max-width: 120px;
-  max-height: 120px;
+  max-width: 110px;
+  max-height: 110px;
 }

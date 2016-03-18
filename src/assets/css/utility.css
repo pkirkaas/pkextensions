@@ -1,6 +1,15 @@
 /*
-* These are just general purpose classes that only do a few things themselves, but can be combined */
-
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 11, 2015, 4:57:29 AM
+    Author     : Paul Kirkaas
+*/
+body {
+  
+}
 .section {
   border: solid #aaf 1px;
   border-radius: 5px;
@@ -105,40 +114,20 @@ div.float-right { float: right ! important; }
 
 .inline { display: inline-block ! important; }
 .margin-bottom-5 { margin-bottom: 5px ! important; }
+.padding-0, .padding0 { padding: 0px ! important; }
+.margin-0, .margin0 { margin: 0px ! important; }
 .margin-5, .margin5 { margin: 5px ! important; }
 .padding10, .padding-10 { padding: 10px ! important; }
 .padding5, .padding-5 { padding: 5px ! important; }
 .margin-top-5 { margin-top: 5px ! important; }
 .margin-top-10 { margin-top: 10px ! important; }
-/*
-.light-blue-back {
-  background-color: #aae;
-}
-.light-blue-back-1 {
-  background-color: #aaf;
-}
-.light-blue-back-2 {
-  background-color: #ddf;
-}
-
-.darkfont,
-.dark-font {
-  color: #444;
-}
-
-.dark-font-1 {
-  color: #345;
-}
-.dark-font-2 {
-  color: #543;
-}
-*/
 .border, .mildborder, .mild-border { border: solid #888 1px; }
 
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
+
 .big-box-shadow {
   box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
  }
@@ -179,7 +168,8 @@ div.pk-tooltip {
   margin-right: auto;
   padding: 5px;
   position: absolute;
-  top: 20%;
+  top: 50%;
+  transform:translate(0,-50%);
   left: 20%;
 }
 .no-space {
@@ -221,4 +211,17 @@ eel to labels (descriptons), vs user input/repli8es */
   background-color: #fee;
   padding: 5px;
   border-radius: 5px;
+}
+
+.horizontal-center {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform:translate(0,-50%);
+}
+.vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform:translate(0,-50%);
 }
