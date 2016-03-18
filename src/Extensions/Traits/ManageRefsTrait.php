@@ -22,7 +22,7 @@ trait ManageRefsTrait {
   public function getAllRefs($refBase = 'App\\Models\\') {
     $refmap = [];
     $attributenames = static::getStaticAttributeNames();
-    pkdebug($attributenames);
+    //pkdebug($attributenames);
     foreach ($attributenames as $attributename) {
       $row = $this->getAttributeDetails($attributename);
       if (!is_array($row)) continue;

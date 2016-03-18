@@ -173,6 +173,39 @@ class PkController extends Controller {
   }
 
   /**
+   * Directly renders data into a PHTML template
+   * Uses the same view paths as Blade, but assumes PHTML
+   * @param str $view
+   * @param array $data
+   */
+  public function render($view, $data) {
+    if (!$view || !is_string($view)) return '';
+    $relview = str_replace('.','/', $view);
+    $viewroots = \Config::get('view.paths');
+    $viewfile = null;
+    foreach ($viewroots as $viewroot ) {
+      $testpath = $viewroot.'/'.$relview.'.phtml';
+      pkdebug("Looking for [$testpath]");
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        continue;
+      }
+    }
+    if (!$viewfile) return '';
+    if (is_array($data)) {
+      ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
+      ###########  $out, for example, was a terrible choice!
+      extract($data);
+    }
+    pkdebug("Found VIEWFILE! $viewfile");
+    ob_start();
+    include ($viewfile);
+    $___PKMVC_RENDERER_OUT = ob_get_contents();
+    ob_end_clean();
+    return $___PKMVC_RENDERER_OUT;
+  }
+
+  /**
    * Returns assets (.css, .js, etc) within the PkExtensions package.
    * This is a kludge, because the router doesn't allow for controllers outside
    * the default namespace. So controllers which extend PkController should NOT

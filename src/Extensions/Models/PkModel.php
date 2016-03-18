@@ -38,7 +38,7 @@ abstract class PkModel extends Model {
   public static $table_field_defs = null;
 
   public static function getFieldNames() {
-    return array_keys(static::$table_field_defs);
+    return array_keys(static::getTableFieldDefs());
   }
 
   public static function getTableFieldDefs() {
@@ -46,7 +46,7 @@ abstract class PkModel extends Model {
   }
 
   public static function get_field_type($fieldname) {
-    $fielddef = KeyVal($fieldname, static::$table_field_defs);
+    $fielddef = KeyVal($fieldname, static::getTableFieldDefs());
     if (!$fielddef) return false;
     if (is_string($fielddef)) return $fielddef;
     if (is_array($fielddef)) return keyval('type', $fielddef);

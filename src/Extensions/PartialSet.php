@@ -46,8 +46,15 @@ class PartialSet extends \ArrayObject {
     return $this->getIterator()->current();
   }
 
-  public function decomposeArray($x) {
-    if (!is_array($x)) return $x . $this->separator;
+  public function decomposeArray($x = null) {
+    if (!$x) return ' ';
+    if (!is_array($x)) {
+      if (is_scalar($x) || (is_object($x) && method_exists($x,'__toString'))) {
+        return $x . $this->separator;
+      }
+      pkdebug("X",$x);
+      return ' ';
+    }
     $str = $this->separator;
     foreach ($x as $y) {
       $str .= $this->decomposeArray($y).$this->separator;
@@ -79,14 +86,18 @@ class PartialSet extends \ArrayObject {
    */
 
   public function __toString() {
+    //$todump = [];
     $str = $this->separator;
-    if (count($this)) {
-      foreach ($this as $item) {
-        //$str.= ' ' . $this->decomposeArray($item) . $this->separator;
-        $str.= $this->decomposeArray($item) . $this->separator;
+    if (count($this) && is_arrayish($this)) {
+      foreach ($this as $key => $item) {
+        //$todump[] = ["KEY: $key:" => $item];
+        //pkdebug("KEY: $key:",$item);
+        $str.= ' ' . $this->decomposeArray($item) . $this->separator;
+        //$str.= $this->decomposeArray($item) . $this->separator;
         //$str.= ' ' . $item . $this->separator;
       }
     }
+    //pkdebug($todump);
     return $str . $this->separator;
   }
 
