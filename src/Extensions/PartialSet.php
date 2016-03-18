@@ -47,6 +47,8 @@ class PartialSet extends \ArrayObject {
   }
 
   public function decomposeArray($x = null) {
+    $type=typeOf($x);
+    pkdebug("TYPE: $type");
     if (!$x) return ' ';
     if (!is_array($x)) {
       if (is_scalar($x) || (is_object($x) && method_exists($x,'__toString'))) {

@@ -47,6 +47,7 @@ class PkHtmlRenderer extends PartialSet {
   }
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $attributes = $this->cleanAttributes($attributes);
+    if (!$content) $content = ' ';
     if ($content === true) {
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack($tag);
@@ -62,7 +63,8 @@ class PkHtmlRenderer extends PartialSet {
 
   public function nocontent($tag, $attributes=null) {
     $attributes = $this->cleanAttributes($attributes);
-    $this[] = "<$tag $attributes>\n";
+    pkdebug("TAG: [$tag], atts:",$attributes);
+    $this[] = "<$tag ". PkHtml::attributes($attributes).">\n";
     return $this;
   }
 

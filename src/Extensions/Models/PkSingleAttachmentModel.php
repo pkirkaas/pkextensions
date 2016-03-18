@@ -46,15 +46,16 @@ abstract class PkSingleAttachmentModel extends PkAttachmentModel {
   public $valid = null;
 
   public function __call($method, $args = []) {
-    if ($this->isValid() && method_exists($method,$this->attachment)) {
+    if ($this->isValid() && method_exists($this->attachment,$method)) {
       return call_user_func_array([$this->attachment,$method], $args);
     }
+    pkdebug("Tried call an an invalid method [$method], or the att is invalid?");
     return call_user_func_array(['parent', $method], $args);
 
   }
 
   public static function deleteEmpty() {
-    return static::whereNull('attachment_file_size')->delete();
+    //return static::whereNull('attachment_file_size')->delete();
 
   }
 

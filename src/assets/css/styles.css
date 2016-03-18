@@ -34,13 +34,28 @@ div.show.val.num {
   margin: 3px;
 }
 
-.avatar {
+.avatar-med,
+.avatar, .avatar-sm {
   width: 130px;
   height: 130px;
   padding: 5px;
-  border: 5px;
+  border: 1px;
   margin: 5px;
   border-radius: 5px;
+}
+.avatar-med {
+  width: 200px;
+  height: 200px;
+}
+
+.avatar-desc {
+  width: 130px;
+  padding: 5px;
+  border: 1px;
+  margin: 5px;
+  display: inline-block;
+  background-color: #eee;
+
 }
 
 
