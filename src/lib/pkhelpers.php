@@ -66,3 +66,15 @@ function hpure($input = '') {
   }
   return $htmlpurifier->purify($input);
 }
+
+function makeStyleLinks($relPaths = null) {
+  if (!$relPaths) $relPaths = \Config::get('view.relcsspaths');
+  if (is_string($relPaths)) $relPaths = [$relPaths];
+  $linkstr = "\n";
+  foreach ($relPaths as $relPath) {
+    $linkstr .= "\n
+     <link href='".asset($relPath)."' type='text/css' media='all' rel='stylesheet'>
+       ";
+  }
+  return $linkstr;
+}
