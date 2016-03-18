@@ -382,13 +382,36 @@ function resetFormElement(e) {
  * @returns {makeDialog.dlg|$}
  */
 
+$('body').on('click', 'img.avatar', function (event) {
+  console.log("Clicking..");
+});
+$('body').on('hover', 'img.avatar', function (event) {
+  console.log("Hovering..");
+});
+
+
 $('body').on('click', '.js-dialog-button', function (event) {
+  var param1 = $(event.target).attr('data-param1');
+  var param2 = $(event.target).attr('data-param2');
+  var param3 = $(event.target).attr('data-param3');
   var src = $(event.target).attr('data-dialog');
   var clone = $(event.target).attr('data-clone');
+  clone=true;
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
-  if (clone) dlg = dlg.clone();
-  if (clone) console.log('clone was true', clone);
-  else  console.log('clone was false', clone);
+  var dlgHtml = dlg.prop('outerHTML');
+  console.log('dlgHtml', dlgHtml, 'dlg', dlg);
+  //if (clone) dlg = dlg.clone();
+  /*
+  dlg = dlg.replace(/__TPL_PARAM1__/g, param1);
+  dlg = dlg.replace(/__TPL_PARAM2__/g, param2);
+  dlg = dlg.replace(/__TPL_PARAM3__/g, param3);
+  */
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
+  //if (clone) console.log('clone was true', clone);
+  dlg = $(dlgHtml);
+  //else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
   var dialogDefaults = {
     modal: true,
@@ -409,11 +432,11 @@ $('body').on('click', '.js-dialog-button', function (event) {
     for (var key in overridableOptions) {
     optName = overridableOptions[key];
     optVal = dlg.attr('data-'+ optName);
-    console.log("KEY",key,'OptName',optName, 'optval', optVal);
+    //console.log("KEY",key,'OptName',optName, 'optval', optVal);
     if (optVal) dialogOptions[optName] = optVal;
     optName = optVal = null;
   }
-  console.log("DialogOpts:", dialogOptions);
+  //console.log("DialogOpts:", dialogOptions);
   dialogClass=dialogOptions['dialogClass'];
   console.log('dialoglass',dialogClass);
   dlg.dialog(dialogOptions);

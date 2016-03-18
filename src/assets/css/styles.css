@@ -34,6 +34,7 @@ div.show.val.num {
   margin: 3px;
 }
 
+img.avatar,
 .avatar-med,
 .avatar, .avatar-sm {
   width: 130px;
@@ -58,6 +59,12 @@ div.show.val.num {
 
 }
 
+img.avatar {
+  padding: 0;
+  border: none;
+  width: 120px;
+  height: 120px;
+}
 
 div.user.view.message.template div.msg-body {
   background-color: #eee;
