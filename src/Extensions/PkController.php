@@ -176,7 +176,7 @@ class PkController extends Controller {
    * @param str $view
    * @param array $data
    */
-  public function render($view, $data) {
+  public function render($view, $data=[]) {
     if (!$view || !is_string($view)) return '';
     $relview = str_replace('.','/', $view);
     $viewroots = \Config::get('view.paths');
@@ -199,6 +199,32 @@ class PkController extends Controller {
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
     return $___PKMVC_RENDERER_OUT;
+  }
+
+  public static function staticRender($view, $data=[]) {
+    if (!$view || !is_string($view)) return '';
+    $relview = str_replace('.','/', $view);
+    $viewroots = \Config::get('view.paths');
+    $viewfile = null;
+    foreach ($viewroots as $viewroot ) {
+      $testpath = $viewroot.'/'.$relview.'.phtml';
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        continue;
+      }
+    }
+    if (!$viewfile) return '';
+    if (is_array($data)) {
+      ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
+      ###########  $out, for example, was a terrible choice!
+      extract($data);
+    }
+    ob_start();
+    include ($viewfile);
+    $___PKMVC_RENDERER_OUT = ob_get_contents();
+    ob_end_clean();
+    return $___PKMVC_RENDERER_OUT;
+
   }
 
   /**

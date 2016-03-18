@@ -37,16 +37,16 @@ div.show.val.num {
 img.avatar,
 .avatar-med,
 .avatar, .avatar-sm {
-  width: 130px;
-  height: 130px;
+  max-width: 130px;
+  max-height: 130px;
   padding: 5px;
   border: 1px;
   margin: 5px;
   border-radius: 5px;
 }
 .avatar-med {
-  width: 200px;
-  height: 200px;
+  max-width: 200px;
+  max-height: 200px;
 }
 
 .avatar-desc {
@@ -59,11 +59,18 @@ img.avatar,
 
 }
 
+img.big-picture-dialog {
+  max-width: 700px;
+  max-height: 700px;
+  border-radius: 20px;
+  border: solid blue 5px;
+
+} 
 img.avatar {
   padding: 0;
   border: none;
-  width: 120px;
-  height: 120px;
+  max-width: 120px;
+  max-height: 120px;
 }
 
 div.user.view.message.template div.msg-body {
@@ -1398,7 +1405,7 @@ div.showHelp.borrower-viewprofile-help-button {
 }
 
 .js-dialog-content {
-  display: none;
+  display: none ! important;
 }
 
 /** For jQuery elements */
@@ -1450,26 +1457,40 @@ div.profile.question.view.wrapper.set {
   border-bottom-right-radius: 0px ! important;
 }
 
+.height-300,
 .height300 {
   height: 300px ! important;
 }
 
+.height-200,
 .height200 {
   height: 200px ! important;
 }
+.height-100,
 .height100 {
   height: 100px ! important;
 }
+.height-50,
+.height50 {
+  height: 50px ! important;
+}
 
+.width-300,
 .width300 {
   width: 300px ! important;
 }
 
+.width-200,
 .width200 {
   width: 200px ! important;
 }
+.width-100,
 .width100 {
   width: 100px ! important;
+}
+.width-50,
+.width50 {
+  width: 50px ! important;
 }
 
 .text-align-left {
@@ -1527,12 +1548,15 @@ div.float-right {
 .margin-bottom-5 {
   margin-bottom: 5px ! important;
 }
-.margin-5 {
+.margin-5,
+.margin5 {
   margin: 5px ! important;
 }
+.padding10,
 .padding-10 {
   padding: 10px ! important;
 }
+.padding5,
 .padding-5 {
   padding: 5px ! important;
 }
@@ -1552,6 +1576,7 @@ div.float-right {
   background-color: #ddf;
 }
 
+.darkfont,
 .dark-font {
   color: #444;
 }
@@ -1562,6 +1587,8 @@ div.float-right {
 .dark-font-2 {
   color: #543;
 }
+.border,
+.mildborder,
 .mild-border {
   border: solid #888 1px;
 }
@@ -1596,7 +1623,65 @@ div .full-width {
   box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
 }
 
+/** To use this simple css tooltip, just be sure to put both the item you
+want to hover over, as well as the invisible tooltip, in a no-border,
+no margin, no padding, display-inline-block,position:relative div. It shouldn't
+change the layout almost at all
 
+Just put the tooltip div immediately after the element you want to hover over for
+info
+*/
+div.pk-tooltip {
+  display: none;
+}
+
+.relative {
+  position: relative ! important;
+}
+
+/*
+div.pk-tooltip {
+*/
+:hover > div.pk-tooltip {
+  display: inline-block;
+  background-color: #faa;
+  color: #400;
+  border: solid red 1px;
+  border-radius: 5px;
+  margin: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 5px;
+  /*
+  position: sticky;
+  */
+  position: absolute;
+  top: 20%;
+  left: 20%;
+}
+/*
+:hover > div.pk-tooltip::before {
+  content: 'How Now Brown Cow?';
+  display: inline-block;
+  position: relative;
+  border: solid blue 2px;
+  margin: 10px;
+  paddint: 10px;
+}
+*/
+
+.tooltip-wrapper {
+  position: relative! important ;
+  display: inline-block! important ;
+  margin: 0! important ;
+  padding: 0! important ;
+  border: none! important ;
+  background: none transparent ! important ;
+}
+/** Make a reasonable default */
+.wrapper {
+
+}
 
 
 

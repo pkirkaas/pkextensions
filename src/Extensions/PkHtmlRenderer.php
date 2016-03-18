@@ -78,6 +78,26 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /** Totally misconceived
+  public function wrapToolTip($tooltip, $wrapperClasses =' ', $tooltipClasses = '') {
+    $arrayIterator = $this->getIterator();
+    $currentVal = $arrayIterator->current();
+    $currentKey = $arrayIterator->key();
+    $this->offsetUnset($currentKey);
+    $this->div(RENDEROPEN, "tooltip-wrapper $wrapperClasses");
+    $this->rawcontent($currentVal);
+    $this->tooltip($tooltip,$tooltipClasses);
+    $this->RENDERCLOSE();
+    return $this;
+  }
+   * 
+   */
+
+  public function tooltip($tooltip, $extraclasses = ' ') {
+    $this->rawdiv($tooltip, "pk-tooltip $extraclasses");
+    return $this;
+  }
+
   public function spaceDepth() {
     $size = count($this->tagStack);
     $out = '';
