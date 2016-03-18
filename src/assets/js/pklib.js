@@ -384,7 +384,11 @@ function resetFormElement(e) {
 
 $('body').on('click', '.js-dialog-button', function (event) {
   var src = $(event.target).attr('data-dialog');
+  var clone = $(event.target).attr('data-clone');
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+  if (clone) dlg = dlg.clone();
+  if (clone) console.log('clone was true', clone);
+  else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
   var dialogDefaults = {
     modal: true,

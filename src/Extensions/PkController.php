@@ -84,14 +84,12 @@ class PkController extends Controller {
      */
     $data = Request::all();
     $tpkm = typeOf($pkmodel);
-    pkdebug("TPO: [$tpkm], Data:", $data);
 //if (!$pkmodel) return false;
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))
           foreach ($inits as $key => $val) {
           $data[$key] = $val;
         }
-//pkdebug("The POST:", $_POST, 'DATA:', $data);
       $result = $pkmodel->saveRelations($data);
       return $result;
 ############  Okay, after here is insanity ..... but I had something in mind .....
@@ -185,7 +183,6 @@ class PkController extends Controller {
     $viewfile = null;
     foreach ($viewroots as $viewroot ) {
       $testpath = $viewroot.'/'.$relview.'.phtml';
-      pkdebug("Looking for [$testpath]");
       if (file_exists($testpath)) {
         $viewfile = $testpath;
         continue;
@@ -197,7 +194,6 @@ class PkController extends Controller {
       ###########  $out, for example, was a terrible choice!
       extract($data);
     }
-    pkdebug("Found VIEWFILE! $viewfile");
     ob_start();
     include ($viewfile);
     $___PKMVC_RENDERER_OUT = ob_get_contents();

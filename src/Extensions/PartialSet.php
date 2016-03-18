@@ -52,7 +52,6 @@ class PartialSet extends \ArrayObject {
       if (is_scalar($x) || (is_object($x) && method_exists($x,'__toString'))) {
         return $x . $this->separator;
       }
-      pkdebug("X",$x);
       return ' ';
     }
     $str = $this->separator;
@@ -61,43 +60,15 @@ class PartialSet extends \ArrayObject {
     }
     return $str;
   }
-  /*
-
-    if (is_arrayish($x)) {
-      $str = '';
-      foreach ($x as $y) {
-        if (!$y) continue;
-        $str.= ' '.$this->decomoseArray($y);
-      }
-      return $str;
-    }
-    if (is_object($x)) return $x->__toString();
-    if (!is_arrayish($x)) return $x.' ';
-    if (!count($x)) return ' ';
-
-    //$str=' ';
-    //foreach ($x as $y) {
-     //// $str.=$this->decomposeArray($y) . ' ';
-    //}
-    return ' ';
-    return $str;
-  }
-   * 
-   */
 
   public function __toString() {
     //$todump = [];
     $str = $this->separator;
     if (count($this) && is_arrayish($this)) {
       foreach ($this as $key => $item) {
-        //$todump[] = ["KEY: $key:" => $item];
-        //pkdebug("KEY: $key:",$item);
         $str.= ' ' . $this->decomposeArray($item) . $this->separator;
-        //$str.= $this->decomposeArray($item) . $this->separator;
-        //$str.= ' ' . $item . $this->separator;
       }
     }
-    //pkdebug($todump);
     return $str . $this->separator;
   }
 
