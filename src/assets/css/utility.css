@@ -84,6 +84,7 @@ body {
 .color-332 { color: #ff8; }
 .color-333 { color: #fff; }
 
+.overflowauto, .overflow-auto {overflow:auto;}
 
 .top-square-corners { border-top-left-radius: 0px ! important; border-top-right-radius: 0px ! important; }
 .top-round-corners { border-top-left-radius: 5px ! important; border-top-right-radius: 5px ! important; }
@@ -91,15 +92,27 @@ body {
 .bottom-square-corners { border-bottom-left-radius: 0px ! important; border-bottom-right-radius: 0px ! important; }
 
 .height-300, .height300 { height: 300px ! important; } 
+.minheight-300, .minheight300 { min-height: 300px ! important; } 
 .height-200, .height200 { height: 200px ! important; }
+.minheight-200, .minheight200 { min-height: 200px ! important; }
+.minheight-150, .minheight150 { min-height: 150px ! important; }
+.height-150, .height150 { height: 150px ! important; }
+.minheight-130, .minheight130 { min-height: 130px ! important; }
+.height-130, .height130 { height: 130px ! important; }
 .height-100, .height100 { height: 100px ! important; }
+.minheight-100, .minheight100 { min-height: 100px ! important; }
 .height-50, .height50 { height: 50px ! important; }
+.minheight-50, .minheight50 { min-height: 50px ! important; }
+.height-30, .height30 { height: 30px ! important; }
+.minheight-30, .minheight30 { min-height: 30px ! important; }
 
 .width-300, .width300 { width: 300px ! important; }
 
 .width-200, .width200 { width: 200px ! important; }
+.minwidth-100, .minwidth100 { min-width: 100px ! important; }
 .width-100, .width100 { width: 100px ! important; }
 .width-50, .width50 { width: 50px ! important; }
+.minwidth-50, .minwidth50 { min-width: 50px ! important; }
 
 .text-align-left { text-align: left ! important; }
 .text-align-right { text-align: right ! important; }
@@ -116,6 +129,8 @@ div.float-right { float: right ! important; }
 .margin-bottom-5 { margin-bottom: 5px ! important; }
 .padding-0, .padding0 { padding: 0px ! important; }
 .margin-0, .margin0 { margin: 0px ! important; }
+.margin-1, .margin1 { margin: 1px ! important; }
+.margin-2, .margin2 { margin: 2px ! important; }
 .margin-5, .margin5 { margin: 5px ! important; }
 .padding10, .padding-10 { padding: 10px ! important; }
 .padding5, .padding-5 { padding: 5px ! important; }
@@ -213,6 +228,7 @@ eel to labels (descriptons), vs user input/repli8es */
   border-radius: 5px;
 }
 
+/*You have to attach these three classes to the object you want to center */
 .horizontal-center {
   margin: 0;
   position: absolute;
@@ -224,6 +240,27 @@ eel to labels (descriptons), vs user input/repli8es */
   position: absolute;
   top: 50%;
   transform:translate(0,-50%);
+}
+
+
+/*The block to center in the containing block should have this class. The
+containing block needs to be positioned relatively*/
+/*
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
+*/
+.center {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:translate(-50%,-50%);
+
 }
 
 /*
@@ -244,13 +281,19 @@ eel to labels (descriptons), vs user input/repli8es */
   align-items: center;
   justify-content: center;
 }
-
-/*The block to center in the containing block should have this class. The
-containing block needs to be positioned relatively*/
-.center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
+.vertical-center-flex {
+  position: relative;
+  display: flex;
+  justify-content: center;
 }
+.align-flex-items-start {
+  align-items: flex-start;
+}
+/** Apply to the flex box */
+.flex { display: flex ! important; flex-direction: column; }
+.flexalignstretch {align-items: stretch;}
+.flexjustifyaround {justify-content: space-around;}
+
+/** Apply to the flex items */
+.flexgrow-2, .flexgrow2 { flex-grow: 2; }
+.flexgrow-1, .flexgrow1 { flex-grow: 1; }

@@ -321,10 +321,12 @@ img.avatar,
 .avatar, .avatar-sm {
   max-width: 130px;
   max-height: 130px;
+  /*
   padding: 5px;
   border: 1px;
   margin: 5px;
   border-radius: 5px;
+  */
 }
 .avatar-med {
   max-width: 200px;
@@ -352,6 +354,21 @@ img.avatar {
   padding: 0;
   margin: 0;
   border: none;
-  max-width: 110px;
-  max-height: 110px;
+  max-width: 120px ! important;
+  max-height: 120px ! important;
+}
+.avatar-frame {
+  margin-left: 2px;
+  margin-right: 2px;
+  display: inline-block;
+  width: 121px;
+  height: 121px;
+  border: solid #888 1px;
+  text-align: center;
+  position: relative;
+  /*
+  display: flex;
+  justify-content: center;
+  */
+  background-color: black;
 }
