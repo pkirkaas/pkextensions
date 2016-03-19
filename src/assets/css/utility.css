@@ -225,3 +225,32 @@ eel to labels (descriptons), vs user input/repli8es */
   top: 50%;
   transform:translate(0,-50%);
 }
+
+/*
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+}
+*/
+
+/* Centers a block within an enclosing positioned block*/
+/* Not sure the enclosing block needs this class, but keep in case */
+/* Also seems to work with display: inline-flex */
+/* This doesn't even seem to require that the contained centered box be positioned*/
+.centering {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/*The block to center in the containing block should have this class. The
+containing block needs to be positioned relatively*/
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+}
