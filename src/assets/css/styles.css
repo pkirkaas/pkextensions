@@ -1112,6 +1112,35 @@ div.profile.question.view.wrapper.set {
 }
 
 
+div.refanswer-set {
+  margin: 5px;
+  padding: 5px;
+  border: solid #888 1px;
+  border-radius: 5px;
+  background-color: #eff;
+  width: 300px;
+  height: 100px;
+  text-align: center;
+  display: inline-block;
+}
+
+div.answer-value,
+div.answer-label {
+  width: 90%;
+  margin: 5px;
+  padding: 5px;
+  border: solid #aaa 1px;
+  border-radius: 5px;
+  display: block;
+}
+
+
+/*
+<div class='inline refanswer-set'>
+  <div class='answer-label'><?=$label?></div>
+  <div class='answer-value'><?=$display?></div>
+</div>
+*/
 
 
 
