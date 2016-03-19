@@ -18,6 +18,12 @@ body {
   background-color: rgba(222,222,200,.8);
 }
 
+h3 {
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
 /** Spacing and sizing */
 
 .padding-left-0 { padding-left: 0; }
@@ -91,6 +97,11 @@ body {
 .bottom-round-corners { border-bottom-left-radius: 5px ! important; border-bottom-right-radius: 5px ! important; }
 .bottom-square-corners { border-bottom-left-radius: 0px ! important; border-bottom-right-radius: 0px ! important; }
 
+.width-80pc, .width80pc {width: 80% ! important;}
+.width-90pc, .width90pc {width: 90% ! important;}
+
+
+
 .height-300, .height300 { height: 300px ! important; } 
 .minheight-300, .minheight300 { min-height: 300px ! important; } 
 .height-200, .height200 { height: 200px ! important; }
@@ -99,8 +110,16 @@ body {
 .height-150, .height150 { height: 150px ! important; }
 .minheight-130, .minheight130 { min-height: 130px ! important; }
 .height-130, .height130 { height: 130px ! important; }
+.minheight-120, .minheight120 { min-height: 120px ! important; }
+.height-120, .height120 { height: 120px ! important; }
 .height-100, .height100 { height: 100px ! important; }
 .minheight-100, .minheight100 { min-height: 100px ! important; }
+.height-80, .height80 { height: 80px ! important; }
+.minheight-80, .minheight80 { min-height: 80px ! important; }
+.height-70, .height70 { height: 70px ! important; }
+.minheight-70, .minheight70 { min-height: 70px ! important; }
+.height-60, .height60 { height: 60px ! important; }
+.minheight-60, .minheight60 { min-height: 60px ! important; }
 .height-50, .height50 { height: 50px ! important; }
 .minheight-50, .minheight50 { min-height: 50px ! important; }
 .height-30, .height30 { height: 30px ! important; }
@@ -119,7 +138,7 @@ body {
 .text-align-center { text-align: center ! important; }
 .italic { font-style: italic; }
 .bold { font-weight: bold; }
-.auto-margin { margin-left: auto ! important; margin-right: auto ! important; }
+.auto-margin, .automargin { margin-left: auto ! important; margin-right: auto ! important; }
 .block { display: block ! important; }
 
 div.float-left { float: left ! important; }
@@ -136,6 +155,7 @@ div.float-right { float: right ! important; }
 .padding5, .padding-5 { padding: 5px ! important; }
 .margin-top-5 { margin-top: 5px ! important; }
 .margin-top-10 { margin-top: 10px ! important; }
+.margin-left-5 { margin-left: 5px ! important; }
 .border, .mildborder, .mild-border { border: solid #888 1px; }
 
 .fullheight, div .full-height { height: 100% ! important; }
@@ -215,7 +235,7 @@ eel to labels (descriptons), vs user input/repli8es */
   color: #556;
   font-style: italic;
   font-family: arial;
-  background-color: #fdd;
+  background-color: #efe;
   padding: 5px;
   border-radius: 5px;
 }
@@ -223,20 +243,22 @@ eel to labels (descriptons), vs user input/repli8es */
 .pk-val {
   color: #544;
   font-family: verdana;
-  background-color: #fee;
+  background-color: #fef;
   padding: 5px;
   border-radius: 5px;
 }
 
 /*You have to attach these three classes to the object you want to center */
 .horizontal-center {
-  margin: 0;
+  margin-left: 0;
+  margin-right: 0;
   position: absolute;
   left: 50%;
   transform:translate(0,-50%);
 }
 .vertical-center {
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 0;
   position: absolute;
   top: 50%;
   transform:translate(0,-50%);
