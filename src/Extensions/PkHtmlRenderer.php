@@ -78,6 +78,32 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /**
+   * For Bootstrap - when displaying a collection, make rows and cols
+   * @param arrayish $data
+   * @param string $template
+   * @param type $cols
+   * @param type $class
+   */
+  public function rows($data,$template,$cols=4, $rowclass='', $colclass = '') {
+    if (!is_arrayish($data) ||!count($data)) return $this;
+    $colsize = (int) (12/$cols);
+    $this->div(RENDEROPEN, "row $rowclass");
+    $i = 0;
+    foreach ($data as $datum) {
+      $i++;
+      if (!($i % $cols)) {
+        $this->RENDERCLOSE();
+        $this->div(RENDEROPEN, "row $rowclass");
+      }
+      $this->div(RENDEROPEN, "col-sm-$colsize  $colclass");
+        $this->rawcontent(PkController::staticRender($template,['datum'=>$datum]));
+      $this->RENDERCLOSE();
+    }
+    $this->RENDERCLOSE();
+    return $this;
+  }
+
   /** Totally misconceived
   public function wrapToolTip($tooltip, $wrapperClasses =' ', $tooltipClasses = '') {
     $arrayIterator = $this->getIterator();
@@ -146,68 +172,7 @@ class PkHtmlRenderer extends PartialSet {
     
 
   }
-   * 
-   */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*
   public $parent; #The owning parent of this type
 
   public function __construct($args = []) {
