@@ -10,16 +10,10 @@
 ##Probably something to do with loading and display:none or whatever...
   if (empty($class)) $class='';
 ?>
-<div class="js-dialog-content" data-dialog="<?=$name?>">
-  <iframe src="<?=$src?>" class="<?=$class?>">
-    <html>
-      <head>
-      </head>
-    <body>
-      <div>
+<div class="js-dialog-content" data-dialog="<?=$name?>"
+     
+     >
+  <iframe src="<?=$src?>" class="<?=$class?> fullwidth">
     <?=$content?>
-      </div>
-    </body>
-    </html>
   </iframe>
 </div>

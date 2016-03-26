@@ -399,7 +399,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   clone=true;
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
   var dlgHtml = dlg.prop('outerHTML');
-  console.log('dlgHtml', dlgHtml, 'dlg', dlg);
+  //console.log('dlgHtml', dlgHtml, 'dlg', dlg);
   //if (clone) dlg = dlg.clone();
   /*
   dlg = dlg.replace(/__TPL_PARAM1__/g, param1);
@@ -409,7 +409,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
-  console.log("After all the replacements, dlgHtml:",dlgHtml);
+  //console.log("After all the replacements, dlgHtml:",dlgHtml);
   //if (clone) console.log('clone was true', clone);
   dlg = $(dlgHtml);
   //else  console.log('clone was false', clone);
@@ -427,16 +427,20 @@ $('body').on('click', '.js-dialog-button', function (event) {
   };
   var dialogOptions = dialogDefaults;
   //If the below options are data-XXX names in the dialog, use them...
+  //But the button gets to override the dialog...
   var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
     'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height'];
-    var optName = optVal = null;
-    for (var key in overridableOptions) {
+  var optName = optVal = null;
+  for (var key in overridableOptions) {
     optName = overridableOptions[key];
-    optVal = dlg.attr('data-'+ optName);
+    
+    optVal = $(event.target).attr('data-'+ optName);
+    if (!optVal) optVal = dlg.attr('data-'+ optName);
     //console.log("KEY",key,'OptName',optName, 'optval', optVal);
     if (optVal) dialogOptions[optName] = optVal;
     optName = optVal = null;
   }
+
   //console.log("DialogOpts:", dialogOptions);
   dialogClass=dialogOptions['dialogClass'];
   console.log('dialogOptions',dialogOptions);

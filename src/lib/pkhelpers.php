@@ -70,6 +70,7 @@ function hpure($input = '') {
 function makeStyleLinks($relPaths = null) {
   if (!$relPaths) $relPaths = \Config::get('view.relcsspaths');
   if (is_string($relPaths)) $relPaths = [$relPaths];
+  if (!$relPaths) $relPaths = [];
   $linkstr = "\n";
   foreach ($relPaths as $relPath) {
     $linkstr .= "\n

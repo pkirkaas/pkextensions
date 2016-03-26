@@ -21,7 +21,7 @@ abstract class PkSingleAttachmentModel extends PkAttachmentModel {
   }
 
   public static function getTableFieldDefs() {
-    return array_merge(static::getAttachmentFields(), static::$table_field_defs());
+    return array_merge(static::getAttachmentFields(), static::$table_field_defs);
   }
 
   public function __construct($args = []) {
