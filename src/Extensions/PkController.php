@@ -84,6 +84,7 @@ class PkController extends Controller {
      */
     $data = Request::all();
     $tpkm = typeOf($pkmodel);
+    pkdebug("For type: [$tpkm] The POSTed data:", $data);
 //if (!$pkmodel) return false;
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))
@@ -170,6 +171,9 @@ class PkController extends Controller {
     return view('showmessage', ['message' => $message]);
   }
 
+  public function ajax_header($args = null) {
+    header('content-type: application/json');
+  }
   /**
    * Directly renders data into a PHTML template
    * Uses the same view paths as Blade, but assumes PHTML

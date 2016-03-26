@@ -16,5 +16,12 @@ abstract class PkAttachmentModel extends PkModel    implements StaplerableInterf
     }
     return true;
   }
+  
+  /*
+  public function __call($method, $args = []) {
+     return parent::__call($method, $args);
+  }
+   * 
+   */
 
 }

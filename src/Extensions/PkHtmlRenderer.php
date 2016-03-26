@@ -88,13 +88,13 @@ class PkHtmlRenderer extends PartialSet {
   public function rows($data,$template,$cols=4, $rowclass='', $colclass = '') {
     if (!is_arrayish($data) ||!count($data)) return $this;
     $colsize = (int) (12/$cols);
-    $this->div(RENDEROPEN, "row $rowclass");
+    $this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
     $i = 0;
     foreach ($data as $datum) {
       $i++;
       if (!($i % $cols)) {
         $this->RENDERCLOSE();
-        $this->div(RENDEROPEN, "row $rowclass");
+        $this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
       }
       $this->div(RENDEROPEN, "col-sm-$colsize  $colclass");
         $this->rawcontent(PkController::staticRender($template,['datum'=>$datum]));

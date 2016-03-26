@@ -79,3 +79,22 @@ function makeStyleLinks($relPaths = null) {
   }
   return $linkstr;
 }
+
+/** Route names should be in a config file, and/or the arg array
+ * 
+ */
+function makeAjaxRoutes($extraroutenames = null) {
+  if (is_string($extraroutenames)) $extraroutenames = [$extraroutenames];
+  if (!is_array($extraroutenames)) $extraroutenames = [];
+  $configroutes =   \Config::get('view.ajaxroutenames');
+  if (!$configroutes) $configroutes = [];
+  $routes = array_merge($configroutes,$extraroutenames);
+  $out = "<script>
+    var ajaxroutes = {};
+    ";
+  foreach ($routes as $route) {
+    $out .= "    ajaxroutes.$route = '".route($route)."';\n";
+  }
+  $out .= "</script>\n";
+  return $out;
+}
