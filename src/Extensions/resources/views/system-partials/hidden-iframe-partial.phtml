@@ -1,0 +1,25 @@
+<?php
+/** A hidden iframe, hopefully pop-upable with jQuery Dialog
+ * @param $src - the src URL
+ * @param $name - for the data-dialog name/value
+ * @param $content - whatever should be in the iframe
+ * @param $class (opt) any css classes
+ */
+
+##None of the styling here works! Has to be included IN the $content.
+##Probably something to do with loading and display:none or whatever...
+  if (empty($class)) $class='';
+?>
+<div class="js-dialog-content" data-dialog="<?=$name?>">
+  <iframe src="<?=$src?>" class="<?=$class?>">
+    <html>
+      <head>
+      </head>
+    <body>
+      <div>
+    <?=$content?>
+      </div>
+    </body>
+    </html>
+  </iframe>
+</div>
