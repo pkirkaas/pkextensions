@@ -15,6 +15,15 @@ class PkTestGenerator {
     return $dataArr[mt_rand(0, sizeof($dataArr) - 1)];
   }
 
+  public static $jobTitles = null;
+
+  public static function getRandomJobTitle() {
+    if (static::$jobTitles === null) {
+      static::$jobTitles = require(__DIR__.'/References/JobTitles.php');
+    }
+    return static::getRandomData(static::$jobTitles);
+  }
+
 
 
   /**
@@ -74,30 +83,51 @@ class PkTestGenerator {
    *     default: 'image'
    * @return int - the ID of the newly uploaded file object
    */
-   /*
-  public static function importRandomFileFromDir($dir, $type = 'image') {
+  //public static function importRandomFileFromDir($dir, $type = 'image') {
+  public static $tmpdir = __DIR__.'/tmp';
+  public static function getRandomFilePathFromDir($dir, $type = 'image') {
+    pkdebug("DIR:  [$dir] ");
     if (!is_dir($dir)) {
       pkdebug("Couldn't resolve [$dir] to a directory");
       return null;
     }
+    $tmpdir = static::$tmpdir;
+    if (!is_dir($tmpdir)) {
+      mkdir($tmpdir);
+    }
+
     $entries = scandir($dir);
+    pkdebug("Entries:  ", $entries);
     if (!is_array($entries) || !sizeOf($entries)) {
       pkdebug("No entries in [$dir]. Entries:", $entries);
       return null;
     }
     #Make array of valid file type paths from entries
     $paths = [];
+    //$validentries = [];
     foreach ($entries as $entry) {
       $newpath = pkuntrailingslashit($dir) . "/$entry";
       if (!is_file($newpath)) continue;
-      $valid = BaseFileHandler::validateFiletype($newpath, $type);
-      if ($valid === false) continue;
+     // $validentries[]=$entry;
+
+
+
+
+
+//      $valid = BaseFileHandler::validateFiletype($newpath, $type);
+ //     if ($valid === false) continue;
       $paths[] = $newpath;
     }
-    //pkdebug("For [$dir], got valid paths:", $paths);
+    pkdebug("For [$dir], got valid paths:", $paths);
     #We have a set of valid file paths of the required type. Pick one:
     $path = static::getRandomData($paths);
-    $relPath = BaseFileHandler::relPathFromFullPath($path);
+    $base = basename($path);
+    $copypath = pkuntrailingslashit(static::$tmpdir)."/$base";
+    copy($path,$copypath);
+    //Copy it to 
+    return $copypath;
+    /*
+  //  $relPath = BaseFileHandler::relPathFromFullPath($path);
     //pkdebug("Your rel path:", $relPath);
     $mimeType = getFileMimeType($newpath);
     $newFileObjArgs = [
@@ -114,8 +144,9 @@ class PkTestGenerator {
     return $fileObjId;
     #We have copied a file into our upload dir. Now let's make a file obj of it -
     //}
+     * 
+     */
   }
-  */
 
 
 
