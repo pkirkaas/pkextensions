@@ -578,7 +578,15 @@ class $createclassname extends Migration {
    * <p>
    * NOTE! ALSO USED FOR CASCADING DELETES!
    */
-  public $load_relations = [ /* 'items' => 'App\Models\Item' */];
+  public static $load_relations = [ /* 'items' => 'App\Models\Item' */];
+
+  /** Default, just returns the static setting.
+   * 
+   * @return type
+   */
+  public function getLoadRelations() {
+    return static::$load_relations;
+  }
 
   /** For many to many edits. Needless to say, any changes/deletions stop at
    * the pivot table and do NOT modify the other side of the "Many" relationship
@@ -599,7 +607,7 @@ class $createclassname extends Migration {
   ];
 
   /** Checks if user is allowed to delete, and 
-   * performs cascading deletes on relations defined in $load_relations
+   * performs cascading deletes on relations defined in $this->getLoadRelations()
    * 
    */
   ## RE-ENABLE WHEN EVERYTHING ELSE WORKING - 
@@ -608,7 +616,7 @@ class $createclassname extends Migration {
   public function delete() {
     if (!$this->authDelete())
         throw new Exception("Not authorized to delete this object");
-    foreach (array_keys($this->load_relations) as $relationSet) {
+    foreach (array_keys($this->getLoadRelations()) as $relationSet) {
       if (is_array($relationSet) || $relationSet instanceOf BaseCollection) {
         foreach ($this->relationSet as $relationInstance) {
           if ($relationInstance instanceOf Model) {
@@ -684,13 +692,13 @@ class $createclassname extends Migration {
    * Save direct attributes and 1-many relations; typically from Controller POSTs
    * NOT COMPLETE! Add features to this method as required. Currently, only 
    * works for direct attributes and one-to-many relationships, single level.
-   * DEPENDS on defining <tt>$this->load_relations</tt> using default
+   * DEPENDS on defining <tt>$this->getLoadRelations()</tt> using default
    * foreign key name for this model
    * <p>
    * Saves the argument array (typically from a Form input) to the Model/DB,
    * supporting 1-to-many relationships. 
    * <p>
-   * NOTE: The $load_relations member array must be initialized w. relations in
+   * NOTE: The $getLoadRelations() member array must be initialized w. relations in
    * the model constructor.
    * 
    * @param array $arr -- array of field names and values - with array keys as
@@ -714,7 +722,7 @@ class $createclassname extends Migration {
   public function saveRelations(Array $arr = []) {
     if (!$this->authUpdate())
         throw new Exception("Not authorized to update this object");
-    $relations = $this->load_relations;
+    $relations = $this->getLoadRelations();
     $foreignKey = $this->getForeignKey();
     $this->fillFillables($arr);
     $this->save();
