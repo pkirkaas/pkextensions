@@ -329,10 +329,9 @@ img.avatar,
   */
 }
 .avatar-med {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 160px;
+  max-height: 160px;
 }
-
 .avatar-desc {
   width: 130px;
   padding: 5px;
