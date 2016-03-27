@@ -63,13 +63,43 @@ class PkHtmlRenderer extends PartialSet {
 
   public function nocontent($tag, $attributes=null) {
     $attributes = $this->cleanAttributes($attributes);
-    pkdebug("TAG: [$tag], atts:",$attributes);
+    //pkdebug("TAG: [$tag], atts:",$attributes);
     $this[] = "<$tag ". PkHtml::attributes($attributes).">\n";
     return $this;
   }
 
   public function RENDERCLOSE() {
     return $this->close();
+  }
+
+  public function render($view,$data=[]) {
+    if (!$view || !is_string($view)) return '';
+    $relview = str_replace('.','/', $view);
+    $viewroots = \Config::get('view.paths');
+    $viewfile = null;
+    foreach ($viewroots as $viewroot ) {
+      $testpath = $viewroot.'/'.$relview.'.phtml';
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        continue;
+      }
+    }
+    if (!$viewfile) {
+      pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
+      return $this;
+    }
+
+    if (is_array($data)) {
+      ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
+      ###########  $out, for example, was a terrible choice!
+      extract($data);
+    }
+    ob_start();
+    include ($viewfile);
+    $___PKMVC_RENDERER_OUT = ob_get_contents();
+    ob_end_clean();
+    $this[] = $___PKMVC_RENDERER_OUT;
+    return $this;
   }
 
   public function close() {

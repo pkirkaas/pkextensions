@@ -1,0 +1,15 @@
+<?php
+/* Renders a clickable image that opens a larger dialg view
+ * @param $url - Required - the URL of the image
+ * @param $text - optional descrption : default '';
+ * @param $class - optional - default: avatar
+ */
+
+if (empty($text)) $text = '';
+if (empty($class)) $class = 'avatar';
+?>
+
+<img class="<?=$class?> js-dialog-button" src="<?=$url?>"
+    data-dialog = 'big-picture-dialog'
+    data-param1='<?=$url?>'
+    data-param2= '<?=$text?>' >
