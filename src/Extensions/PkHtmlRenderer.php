@@ -118,7 +118,8 @@ class PkHtmlRenderer extends PartialSet {
   public function rows($data,$template,$cols=4, $rowclass='', $colclass = '', $itemclass='') {
     if (!is_arrayish($data) ||!count($data)) return $this;
     $colsize = (int) (12/$cols);
-    $this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+    //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+    $this->div(RENDEROPEN, "row $rowclass");
     $i = 0;
     foreach ($data as $datum) {
       $this->div(RENDEROPEN, "col-sm-$colsize  $colclass");
@@ -127,7 +128,8 @@ class PkHtmlRenderer extends PartialSet {
       $i++;
       if (!($i % $cols)) {
         $this->RENDERCLOSE();
-        $this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+        //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+        $this->div(RENDEROPEN, "row $rowclass");
       }
     }
     $this->RENDERCLOSE();
