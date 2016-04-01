@@ -86,6 +86,11 @@ $(function () {
   });
 });
 
+$(function () {
+  $('.js-fade-out').fadeOut(8400, function() {
+      $(this).css('display','none');
+  });
+});
 
 function showHelpDialog() {
   var helpDialog = showHelpDialog.helpDialog;
@@ -387,6 +392,51 @@ $('body').on('click', 'img.avatar', function (event) {
 });
 $('body').on('hover', 'img.avatar', function (event) {
   console.log("Hovering..");
+});
+
+$(function () {
+  var dlgonload = $('.dialog-on-load');
+  console.log("Loaded...");
+  if (dlgonload && dlgonload.hasClass('js-dialog-content')) {
+    console.log("We found a dialog on load!");
+
+    //Let's make a dialog box right away!
+    /*
+    var param1 = dlgonload.attr('data-param1');
+    var param2 = dlgonload.attr('data-param2');
+    var param3 = dlgonload.attr('data-param3');
+    var src = dlgonload.attr('data-dialog');
+    var clone = dlgonload.attr('data-clone');
+    */
+    //var dlgHtml = dlgonload.prop('outerHTML');
+    var dialogDefaults = {
+      modal: true,
+      autoOpen: true,
+      width: 600,
+      resizable: true,
+      draggable: true,
+      buttons: {
+        //Cancel : function () { $(this).dialog('destroy'); }
+        Cancel: function () {
+          $(this).dialog('close');
+        }
+      }
+    };
+    var dialogOptions = dialogDefaults;
+    var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
+    'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height'];
+    var optName = optVal = null;
+    for (var key in overridableOptions) {
+      optName = overridableOptions[key];
+      optVal = dlgonload.attr('data-'+ optName);
+      //console.log("KEY",key,'OptName',optName, 'optval', optVal);
+      if (optVal) dialogOptions[optName] = optVal;
+      optName = optVal = null;
+    }
+    dlgonload.dialog(dialogOptions);
+    dlgonload.dialog('open');
+    //return dlgonload;
+  }
 });
 
 

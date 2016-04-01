@@ -1134,6 +1134,16 @@ div.answer-label {
   display: block;
 }
 
+.error-dialog {
+  border: solid red 4px;
+  background-color: #faa;
+  color: #800;
+  font-size: xx-large;
+  text-align: center;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
 
 /*
 <div class='inline refanswer-set'>

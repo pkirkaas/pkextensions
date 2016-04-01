@@ -23,6 +23,8 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
  * 
  * @author Paul
  */
+
+use Request;
 class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract {
     use Authenticatable, Authorizable, CanResetPassword;
     protected $fillable = [
@@ -44,6 +46,24 @@ class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableCo
      */
     public function isAdmin() {
       return false;
+    }
+
+    /** Special handling to reset passwords in a form, then calls parent method
+     */
+    public function saveRelations(Array $arr = []) {
+      if (!$this->authUpdate()) throw new Exception("Not authorized to update this object");
+      ## Check for password reset 
+      if (isset($arr['new_password'])) {
+        $new_password = $arr['new_password'];
+        $confirm_password = keyVal('confirm_password', $arr);
+        if ($new_password !== $confirm_password) {
+          $redirback = redirect()->back()->withInput()->with('error_dialog',"Passwords didn't match");
+          pkdebug("Type of redirback: " , typeOf($redirback));
+          return $redirback;
+        }
+        $arr['password'] = $new_password;
+      }
+      return parent::saveRelations($arr);
     }
 
 }

@@ -1,0 +1,30 @@
+<?php
+/** A "flash" message dialog, pops up in the layout blade if there is a message.
+ * Can be both info message or error message.
+ * @param $msg - required - the text message
+ * @param $type - optional - 'error' or 'info' - default is 'error'
+ * @param $class - optional - any additional CSS classes to apply - default ''
+ * @param $title - optional - The title of the dialog. Defaults according to type
+ */
+if (empty($class)) $class = '';
+if (empty($type) || ($type !== 'info')) {
+  $type = 'error';
+  $dialogClass = 'error-dialog';
+  $defaultTitle = 'Error:';
+} else {
+  $type = 'info';
+  $defaultTitle = 'Notice:';
+  $dialogClass = 'info-dialog';
+}
+if (empty($title)) $title = $defaultTitle;
+
+?>
+<div class='js-dialog-content dialog-on-load'
+           data-dialog="info-dialog"
+           data-title='<?=html_encode($title)?>'
+           data-minHeight='300'
+     >
+      <div class='<?=$dialogClass . ' '.$class?>'>
+        <?=$msg?>
+      </div>
+</div>
