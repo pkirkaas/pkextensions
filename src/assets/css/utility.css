@@ -155,7 +155,7 @@ h3 {
 .text-align-right { text-align: right ! important; }
 .text-align-center { text-align: center ! important; }
 .italic { font-style: italic; }
-.bold { font-weight: bold; }
+.bold { font-weight: bold ! important; }
 .block { display: block ! important; }
 
 div.float-left { float: left ! important; }
@@ -416,4 +416,11 @@ containing block needs to be positioned relatively*/
   background-color: #fec;
   border: solid green 1px;
   height: 90%;
+}
+
+table.no-borders td,
+table.noborders td,
+table.no-borders th,
+table.noborders th {
+  border: none;
 }

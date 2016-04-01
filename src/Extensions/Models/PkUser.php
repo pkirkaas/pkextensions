@@ -61,7 +61,8 @@ class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableCo
           pkdebug("Type of redirback: " , typeOf($redirback));
           return $redirback;
         }
-        $arr['password'] = $new_password;
+        //$arr['password'] = $new_password;
+        $this->password = bcrypt($new_password);
       }
       return parent::saveRelations($arr);
     }

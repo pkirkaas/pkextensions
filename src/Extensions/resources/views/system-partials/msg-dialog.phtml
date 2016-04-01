@@ -5,8 +5,10 @@
  * @param $type - optional - 'error' or 'info' - default is 'error'
  * @param $class - optional - any additional CSS classes to apply - default ''
  * @param $title - optional - The title of the dialog. Defaults according to type
+ * @param $closetext - optional - The text on the 'Close' button. Default: 'Okay'
  */
 if (empty($class)) $class = '';
+if (empty($closetext)) $closetext = 'Okay';
 if (empty($type) || ($type !== 'info')) {
   $type = 'error';
   $dialogClass = 'error-dialog';
@@ -23,6 +25,7 @@ if (empty($title)) $title = $defaultTitle;
            data-dialog="info-dialog"
            data-title='<?=html_encode($title)?>'
            data-minHeight='300'
+           data-closetext='<?=$closetext?>'
      >
       <div class='<?=$dialogClass . ' '.$class?>'>
         <?=$msg?>

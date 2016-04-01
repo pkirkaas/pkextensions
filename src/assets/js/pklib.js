@@ -409,18 +409,27 @@ $(function () {
     var clone = dlgonload.attr('data-clone');
     */
     //var dlgHtml = dlgonload.prop('outerHTML');
+    var closeText = dlgonload.attr('data-closetext');
+    if (! closeText) closeText = 'Okay';
     var dialogDefaults = {
       modal: true,
       autoOpen: true,
       width: 600,
       resizable: true,
       draggable: true,
-      buttons: {
+      buttons: [ {
+          text : closeText,
+          click : function() {
+            $(this).dialog('close');
+          }
+
         //Cancel : function () { $(this).dialog('destroy'); }
-        Cancel: function () {
+        /*
+        Okay: function () {
           $(this).dialog('close');
         }
-      }
+        */
+      } ]
     };
     var dialogOptions = dialogDefaults;
     var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
@@ -464,16 +473,20 @@ $('body').on('click', '.js-dialog-button', function (event) {
   dlg = $(dlgHtml);
   //else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
+  var closeText = $(event.target).attr('data-closetext');
+  if (! closeText) closeText = dlg.attr('data-closetext');
+  if (! closeText) closeText = 'Okay';
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
     width: 600,
-    buttons: {
-      //Cancel : function () { $(this).dialog('destroy'); }
-      Cancel: function () {
-        $(this).dialog('close');
-      }
-    }
+      buttons: [ {
+          text : closeText,
+          click : function() {
+            $(this).dialog('close');
+          }
+        }
+      ]
   };
   var dialogOptions = dialogDefaults;
   //If the below options are data-XXX names in the dialog, use them...
