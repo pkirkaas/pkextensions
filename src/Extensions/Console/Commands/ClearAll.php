@@ -10,6 +10,7 @@ class ClearAll extends Command {
     public function handle() {
       $this->call('config:clear');
       $this->call('cache:clear');
+      $this->call('view:clear');
       $this->call('clear-compiled');
       $this->info("Stuff Cleared");
     }
