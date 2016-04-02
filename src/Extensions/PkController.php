@@ -171,6 +171,18 @@ class PkController extends Controller {
     return view('showmessage', ['message' => $message]);
   }
 
+
+  /** Returns just the controller name, without ending in 'Controller'.
+   * @param boolean - $lc - Return the name in lower case? Default true
+   * @return string - the base controller name
+   */
+  public static function getControllerName($lc = true) {
+    $shortname = (new \ReflectionClass($this))->getShortName();
+    $controllerName = removeEndStr($shortname,'Controller');
+    if ($lc) return to_lower($controllerName);
+    return $controllerName;
+  }
+
   public function ajax_header($args = null) {
     header('content-type: application/json');
   }
