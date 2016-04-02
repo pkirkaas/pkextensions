@@ -1094,15 +1094,22 @@ div.profile.question.view.wrapper.set {
   border: solid #aaa 1px;
   margin: 3px;
   padding: 3px;
-  border-radius: 3px;
-  background-color: #eee;
+  border-radius: 2px;
+  background-color: #ffe;
 }
 .pk-label {
   color: #444;
 }
+div.row.vert-row-sep {
+  border-top: solid #aaa 1px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
 
 .pk-content {
-  background-color: #eef;
+  background-color: #eff;
 }
 
 .inner-col-wrap {

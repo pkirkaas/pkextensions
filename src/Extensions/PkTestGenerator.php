@@ -5,15 +5,60 @@
 namespace PkExtensions;
 
 class PkTestGenerator {
+#This belongs in a localized class, but will do for now
+  public static $comments = [
+      'She is doing better than I expected',
+      'Very good progress since our previous session',
+      "I'm concerned - she seems to be on a downward slope",
+      "It's so harde for her to go through this alone, but she's much better off without him",
+      "His substance abuse seems to be getting worse",
+      "Excellent progress since last time",
+      "The family is so poor they can't focus on other important issues",
+      "The medication seems to be helping",
+      "Her spirit is very good, under the circumstances",
+      "We have to keep an eye on her progress and check which way she's going next time",
+
+  ];
+  public static function getRandomComment() {
+    return static::getRandomData(static::$comments);
+  }
   /**
    * Returns random data item (possibly with invalid data item) from an array 
    * @param array $dataArr
    * @param type $badData
-   * @return type
+   * @return single instance or array, depending on num items
    */
-  public static function getRandomData(Array $dataArr) {
-    return $dataArr[mt_rand(0, sizeof($dataArr) - 1)];
+  public static function getRandomData( $dataArr, $items=1) {
+    if (!$items) throw new \Exception("Invalid value or type for items");
+    if (!is_arrayish($dataArr)) throw new \Exception("dataArr not arrayish");
+    if (is_object($dataArr)) {
+      if (method_exists($dataArr,'getArrayCopy')) {
+        $copy = $dataArr->getArrayCopy();
+      } else if (method_exists($dataArr, 'toArray')) {
+        $copy = $dataArr->toArray();
+      } else {
+        $type = typeOf($dataArr);
+        throw new \Exception("dataArr is type: $type");
+      }
+    }
+    else $copy = (array) $dataArr;
+    $keys = array_keys($copy);
+    $numkeys = count($keys);
+    if ($items === 1) {
+      return $copy[$keys[mt_rand(0,  $numkeys - 1)]];
+    }
+    #More than one item to return; so an array. Unique menbers
+    $retarr = [];
+    for ($i = 0 ; $i < min($numkeys, $items) ; $i++) {
+      $keysleft = array_keys($copy);
+      $numkeysleft = count($keysleft);
+      $key = $keysleft[mt_rand(0,  $numkeysleft - 1)];
+      $retarr[] =  $copy[$key];
+      unset($copy[$key]);
+    }
+    return $retarr;
   }
+
 
   public static $jobTitles = null;
 

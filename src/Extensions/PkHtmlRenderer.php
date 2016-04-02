@@ -42,6 +42,31 @@ class PkHtmlRenderer extends PartialSet {
     $this[] = $content;
     return $this;
   }
+
+  /** Takes to values, puts them each in their own div, then wraps them both in another
+   * 
+   * @param type $value
+   * @param type $label
+   * @param type $valueClass
+   * @param type $labelClass
+   * @param type $wrapperClass
+   */
+  public function wrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='', $raw=null) {
+    $this->div(RENDEROPEN,$wrapperClass);
+    if ($raw === true) {
+      $this->div($label, $labelClass);
+      $this->div($value, $valueClass);
+    } else {
+      $this->div($label, $labelClass);
+      $this->div($value, $valueClass);
+    }
+    $this->RENDERCLOSE();
+    return $this;
+  }
+  public function rawwrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='') {
+    return $this->wrap($value, $label,$valueClass, $labelClass, $wrapperClass, true);
+  }
+
   public function rawtagged($tag, $content = null, $attributes=null, $raw = true) {
     return $this->tagged($tag, $content, $attributes, $raw);
   }
