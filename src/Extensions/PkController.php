@@ -285,6 +285,59 @@ class PkController extends Controller {
 //return "This is an asset request with path: ".print_r($assetpath,1);
   }
 
+  /** Imports a CSV file as an array. Tries to recover from errors and return
+   * as much as possible.
+   * @param string $fileName - The file to try and import
+   * @return array of arrays (rows) - or else an error
+   */
+
+  function importCsv($fileName) {
+    if (!$fileName || !is_string($fileName)) return false;
+    $csvMimeTypes = [
+      'text/plain', 
+      'text/csv', 
+      'text/x-csv',
+      'application/csv',
+      'text/comma-separated-values',
+      'application/x-csv',      
+    ];
+    $fmt = getFileMimeType($fileName);
+    if (!$fmt || !in_array($fmt,$csvMimeTypes,1)) {
+      throw new \Exception("Importinc CSV file: [$fileName], reported MimeType: [$fmt]");
+    }
+    $handle = fopen($fileName, "r");
+    if ($handle === false) return false;
+    $retarr = [];
+    while (($data = fgetcsv($handle)) !== FALSE) {
+      if (!is_array($data) || ((sizeOf($data) ===1 ) && ($data[0]===null))) {
+        continue;
+      }
+      $retarr[] = $data;
+    }
+    return $retarr;
+  }
+
+  /** Exports an array of arrays as a CSV file
+   * 
+   * @param string $fileName - What to call the export file
+   * @param array of arrays - $output_arr - the output
+   * @param array $columnHeaders - optional. If present, and if an array,
+   *   will output them first as column headers for the CSV file.
+   * @return - 
+   */
+
+  public function exportCsv($fileName, Array $output_arr = [], $columnHeaders = null) {
+    $this->setExportHeaders($fileName);
+      $output = fopen("php://output", "w");
+      if ($columnHeaders && is_array($columnHeaders) && sizeOf ($columnHeaders)){
+        fputcsv($output, $columnHeaders);
+      }
+      foreach ($output_arr as $output_line) {
+        fputcsv($output, $output_line);
+      }
+      fclose($output);
+  }
+
   /** Sets headers for file export/save
    * Should be followed by "echo" of data, then die();
    * @param string $filename - suggested filename

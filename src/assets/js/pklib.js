@@ -627,4 +627,55 @@ function generateUUID() {
   });
   return uuid;
 }
-;
+
+
+/** Play with FullCalendar */
+$(document).ready(function() {
+  /*
+    $('.calendar-schedular').fullCalendar({ 
+      dayClick : function(date, jsevent, view) {
+        console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
+      },
+      height:300,
+      aspectRatio: 1.2,
+      editable:true,
+          events: [
+        {
+            title  : 'event1',
+            start  : '2016-04-01',
+            description : "Hot summer day"
+        },
+        {
+            title  : 'event2',
+            start  : '2016-04-05',
+            end    : '2016-04-07'
+        },
+        {
+            title  : 'event3',
+            start  : '2016-04-09T12:30:00',
+            allDay : false // will make the time show
+        }
+    ]
+    });
+            
+            */
+
+
+});
+/*
+$('body').on('click', '.tst-calander-button', function (event) {
+  console.log("Clicking..");
+   var events = $('.calendar-schedular').fullCalendar('clientEvents'); 
+  $('.calendar-schedular2').fullCalendar({ 
+      height:200,
+      editable:true
+    });
+  //  alert("Block");
+  $.each(events, function (idx, obj) {
+    console.log("For "+idx+' the obj',obj);
+  }); 
+  $('.calendar-schedular2').fullCalendar('addEventSource', events);
+   //var evjson = JSON.stringify(events);
+   //console.log('Client Events:', evjson);
+});
+*/
