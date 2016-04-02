@@ -1091,11 +1091,11 @@ div.profile.question.view.wrapper.set {
 
 .pk-content,
 .pk-label {
-  border: solid #888 1px;
+  border: solid #aaa 1px;
   margin: 3px;
   padding: 3px;
   border-radius: 3px;
-  background-color: #ddd;
+  background-color: #eee;
 }
 .pk-label {
   color: #444;
@@ -1105,6 +1105,13 @@ div.profile.question.view.wrapper.set {
   background-color: #eef;
 }
 
+.inner-col-wrap {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: solid 1px #ddd;
+  background-color: rgba(200,200,255,.2);
+}
 .inner-col {
   margin: 5px;
   padding: 5px;

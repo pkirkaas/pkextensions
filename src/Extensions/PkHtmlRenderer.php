@@ -72,6 +72,62 @@ class PkHtmlRenderer extends PartialSet {
     return $this->close();
   }
 
+  /** Make it look cleaner by just using many of the PkForm shortcuts */
+  public function submitButton($label = 'Submit', $options = []) {
+    $this[] = PkForm::submitButton($label,$options);
+    return $this;
+  }
+
+
+  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[]) {
+    $this[] = PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+    return $this;
+  }
+
+
+  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+     $this[] = PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts);
+     return $this;
+  }
+
+  public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = []) {
+    $this[] = PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
+    return $this;
+  }
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+     $this[] = PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+     return $this;
+  }
+
+  public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
+     $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
+     return $this;
+  }
+
+	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
+	   $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
+     return $this;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
   public function render($view,$data=[]) {
     if (!$view || !is_string($view)) return '';
     $relview = str_replace('.','/', $view);
