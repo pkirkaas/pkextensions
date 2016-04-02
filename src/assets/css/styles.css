@@ -1117,7 +1117,8 @@ div.row.vert-row-sep {
   padding: 10px;
   border-radius: 10px;
   border: solid 1px #ddd;
-  background-color: rgba(200,200,255,.2);
+  background-color: rgba(200,200,255,.4);
+  text-align: center;
 }
 .inner-col {
   margin: 5px;

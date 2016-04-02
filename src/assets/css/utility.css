@@ -149,6 +149,8 @@ h3 {
 .minwidth-100, .minwidth100 { min-width: 100px ! important; }
 .width-100, .width100 { width: 100px ! important; }
 .width-50, .width50 { width: 50px ! important; }
+.width-auto, .widthauto { width: auto ! important; }
+.height-auto, .heightauto { height: auto ! important; }
 .minwidth-50, .minwidth50 { min-width: 50px ! important; }
 
 .text-align-left { text-align: left ! important; }

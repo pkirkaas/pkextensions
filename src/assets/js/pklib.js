@@ -457,6 +457,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var clone = $(event.target).attr('data-clone');
   clone=true;
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+  if (dlg.length === 0) return;
   var dlgHtml = dlg.prop('outerHTML');
   //console.log('dlgHtml', dlgHtml, 'dlg', dlg);
   //if (clone) dlg = dlg.clone();
@@ -628,9 +629,84 @@ function generateUUID() {
   return uuid;
 }
 
+/**
+ * If you create a handler for FullCalendar 'dayClick', it just gets
+ * date, jsEvent, view, [ resourceObj ] . So you want to make the date into
+ * a rudimentary FCEvent object, then pass it to the same handler that
+ * edits events for the 'eventClick' handler, which gets a real FCEvent obj.
+ * @param date - a "Moment" date object.
+ * @returns {Function}
+ */
+function createFCEventObject(date) {
+  
+}
+
+/** Instantiates a jQuery dialog from a template, to edit calendar "Events"
+ * from "FullCalendar"
+ *
+ *Assumes the name of the dialog class is: edit-event-dialog-frame 
+ */
+function createEventEditDialog() {
+  $dlghtml = $('.edit-event-dialog-frame ').prop('outerHTML');
+  var closeText = 'Cancel';
+  var dialogDefaults = {
+    modal: true,
+    autoOpen: false,
+    width: 600,
+      buttons: [ {
+          text : closeText,
+          click : function() {
+            $(this).dialog('destroy');
+          }
+        }
+      ]
+  };
+
+  var dlg = $($dlghtml).dialog($dialogOpts);
+
+}
 
 /** Play with FullCalendar */
 $(document).ready(function() {
+  // Try the time-picker:
+    //$('.tst-timepicker').datetimepicker();
+    $('.tst-colorpicker').colorpicker({
+      defaultPalette: 'web'
+    });
+    $('.tst-timepicker').timepicker({
+      controlType:'select'
+    });
+    $('.view-calendar-schedule').fullCalendar({ 
+      /*
+      dayClick : function(date, jsevent, view) {
+        console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
+      },
+      editable:true,
+    */
+      height:300,
+      aspectRatio: 1.2,
+          events: [
+        {
+            title  : 'event1',
+            start  : '2016-04-01',
+            description : "Hot summer day"
+        },
+        {
+            title  : 'event2',
+            start  : '2016-04-05',
+            end    : '2016-04-07'
+        },
+        {
+            title  : 'event3',
+            start  : '2016-04-09T12:30:00',
+            allDay : false // will make the time show
+        }
+    ]
+    });
+
+    $('.edit-calendar-schedular').fullCalendar({ 
+      editable:true
+    });
   /*
     $('.calendar-schedular').fullCalendar({ 
       dayClick : function(date, jsevent, view) {

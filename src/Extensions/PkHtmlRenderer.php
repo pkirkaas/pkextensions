@@ -99,6 +99,7 @@ class PkHtmlRenderer extends PartialSet {
 
   /** Make it look cleaner by just using many of the PkForm shortcuts */
   public function submitButton($label = 'Submit', $options = []) {
+      if (is_string($options)) $options = ['class'=>$options];
     $this[] = PkForm::submitButton($label,$options);
     return $this;
   }
@@ -125,11 +126,17 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
+      if (is_string($options)) $options = ['class'=>$options];
      $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
      return $this;
   }
 
+    public function text($name, $value = null, $options = []) {
+      if (is_string($options)) $options = ['class'=>$options];
+      $this[] = PkForm::text($name, $value, $options);
+    }
 	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
+      if (is_string($options)) $options = ['class'=>$options];
 	   $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
      return $this;
   }

@@ -1,7 +1,6 @@
 /* JS for Larave/BootStrap SBB 
  */
 
-
 $(function () {
   $("input.datepicker").datepicker({
     dateFormat: 'yy-mm-dd'
