@@ -4,6 +4,7 @@
 
 namespace PkExtensions;
 
+
 class PkTestGenerator {
 #This belongs in a localized class, but will do for now
   public static $comments = [
@@ -19,6 +20,67 @@ class PkTestGenerator {
       "We have to keep an eye on her progress and check which way she's going next time",
 
   ];
+
+  /** Used to hold registered method names, data sources, and rules for using
+   * registered reference files to provde sample data
+   * @var array 
+   */
+  public static $externalReferences = [];
+
+  /** The reference might be a file name, or an array. The method name is used
+   * as the key to the info array in __staticCall()
+   * @param type $reference
+   * @param type $methodName
+   * @param type $rules
+   */
+  public static function registerReferences($reference, $methodName, $rules = null) {
+    $row = [];
+    if (is_arrayish($reference)) $row['cache'] = $reference;
+    else if (is_string($reference)) $row['file'] = $reference;
+    else throw new \Excepton ("We don't know what to do with the datasource");
+    $row['rules'] = $rules;
+    static::$externalReferences[$methodName] = $row;
+    return;
+  }
+
+  /** Basic
+   * 
+   * @param type $method
+   * @param type $args
+   * @return type
+   */
+  public static function __callStatic($method, $args) {
+    if (!arra_key_exists($method, static::$externalReferences)) {
+      return call_user_func_array(['parent',$method], $args);
+    }
+    $row = static::$externalReferences[$method];
+    if (!array_key_exists('cache', $row)) {
+      $row['cache'] = include($row['file']);
+    }
+    switch (count($args)) {
+      case 0 : return static::getRandomData($row['cache']);
+      case 1 : return static::getRandomData($row['cache'], $args[0]);
+    }
+
+  }
+
+  /** Returns the season (and by defaul Year) from an SQL or Unix date */
+
+  public static function getSeasonFromDate($date, $wyr = 1, $sql = true) {
+    if ($sql) $date = strtotime($date);
+    if ($wyr) $yr = '  '. date('Y', $date);
+    else $yr = '';
+    $m = (int)(date('n', $date));
+    if (($m < 3) || ($m > 10) ) return 'Winter'.$yr;
+    if ($m < 6) return 'Spring'.$yr;
+    if ($m < 9 ) return 'Summer'.$yr;
+    return 'Fall'.$yr;
+  }
+
+
+
+
+
   public static function getRandomComment() {
     return static::getRandomData(static::$comments);
   }
@@ -90,6 +152,14 @@ class PkTestGenerator {
     $now = time();
     $rndTime = $now + ($rndOffset * $day);
     return $rndTime;
+  }
+
+  /** Get a date about n months in the future or past */
+  public static function getRandomDateOffset($n, $days = 30) {
+    if ($n < 0 ) $m = $n - 1;
+    else $m = $n + 1;
+    $m = (int) (1.5 * $m);
+    return static::getRandomDateFromRange($n, $m, $days);
   }
 
 

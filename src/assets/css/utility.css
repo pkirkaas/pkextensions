@@ -160,8 +160,8 @@ h3 {
 .bold { font-weight: bold ! important; }
 .block { display: block ! important; }
 
-div.float-left { float: left ! important; }
-div.float-right { float: right ! important; }
+.float-left, .floatleft { float: left ! important; }
+.float-right, .floatrignt { float: right ! important; }
 
 .inline { display: inline-block ! important; }
 

@@ -661,6 +661,10 @@ function getStringDateFromMoment(arg) {
 
 function FCeventToArr(FCevent) {
   var arr = {};
+  arr.guid =FCevent.guid; 
+  if (!(FCevent.guid)) {
+    arr.guid = generateUUID();
+  }
   arr.title = FCevent.title;
   // if ((typeof(FCevent.s) )
   arr.start = getStringDateFromMoment(FCevent.start);
@@ -724,17 +728,31 @@ function FCeventsToArrays(FCevents) {
   return bevarr;
 }
 
+function in_array(key, arr) {
+  var ktype = typeof(key);
+    console.log("Looking for "+key+" of type: "+ktype+" in", arr);
+    var res = false;
+  $.each(arr, function(idx, val) {
+    vtype = typeof(val);
+    console.log("Checking if "+val+" of type: "+vtype);
+    if (key === val) { console.log("Yes they match"); res = true; }
+    else console.log ("No match");
+  });
+  if (res) console.log("Returning true fom in_array");
+  else  console.log("Returning false fom in_array");
+  return res;
+}
 
 function    regesterEventsIndividually(decoded) {
   var res;
   console.log('Entered individualEvent Reg');
-  $.each(decoded, function(idx,val) {
+  $.each(decoded, function (idx, val) {
     if (!val.title) {
-      console.log ('Creating a title');
+      console.log('Creating a title');
       val.title = generateUUID();
     }
     res = $('.edit-calendar-schedular').fullCalendar('renderEvent', val, true);
-    console.log("In individual loads: " + idx +" the val is:", val, ' The result was: ', res);
+    console.log("In individual loads: " + idx + " the val is:", val, ' The result was: ', res);
 
   });
 }
@@ -745,34 +763,34 @@ function    regesterEventsIndividually(decoded) {
 
 function ajaxFetchEvents() {
   /*
-  if (repository.fetchedEvents == 1) {
-    console.log ("Already fetched calendar Events");
-    return;
-  }
-  */
+   if (repository.fetchedEvents == 1) {
+   console.log ("Already fetched calendar Events");
+   return;
+   }
+   */
   console.log('Fetching events');
   var model_id = $('.edit-calendar-schedular').attr('data-modelid');
   var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
-  if (! fetchUrl || !model_id) {
-    console_log ("Could't find the parameters for the fetch");
+  if (!fetchUrl || !model_id) {
+    console_log("Could't find the parameters for the fetch");
   }
   $.ajax({
     url: fetchUrl,
-    data: {model_id:model_id},
+    data: {model_id: model_id},
     dataType: 'json',
     method: 'POST',
     success: function (result) {
-    //  console.log("The AJAX FETCH result:", result);
-      var decoded = JSON.parse(result);
+        console.log("The AJAX FETCH result:", result);
+     // var decoded = JSON.parse(result);
       ///console.log("The decoded FETCH result:", decoded);
-      $('.edit-calendar-schedular').fullCalendar( 'addEventSource', decoded );
-      regesterEventsIndividually(decoded);
-      if (decoded && result) {
+      //$('.edit-calendar-schedular').fullCalendar('addEventSource', decoded);
+      //regesterEventsIndividually(decoded);
+      //if (decoded && result) {
         //console.log("We decided the reusult was okay");
-   //     repository.fetchedEvents = 1;
-      } else {
-        console.log("We ran the AJAX fetch, but didn't get useful results");
-      }
+        //     repository.fetchedEvents = 1;
+      //} else {
+       // console.log("We ran the AJAX fetch, but didn't get useful results");
+     // }
     }
   });
 }
@@ -794,7 +812,7 @@ function ajaxPostEvents() {
   //console.log("The Stringiried json:", jsonEvents);
   $.ajax({
     url: saveUrl,
-    data: {jsonEvents: jsonEvents, model_id:model_id},
+    data: {jsonEvents: jsonEvents, model_id: model_id},
     dataType: 'json',
     method: 'POST',
     success: function (result) {
@@ -806,15 +824,62 @@ function ajaxPostEvents() {
 
 function createFCEventObject(date) {
   //console.log('The date is:', date);
-   ajaxFetchEvents();
+  //ajaxFetchEvents();
   var FCevent = {start: date,
     id: generateUUID()
   };
   return createEventEditDialog(FCevent);
 }
 
+function deleteDupEvents(obj) {
+  var ttype = typeof(this.guids);
+  if (typeof(this.guids) === 'undefined') {
+    console.log("Type",ttype);
+    this.guids = [];
+  }
+  var tmpguid = obj.guid;
+  console.log("Examining:", obj, 'guids', this.guids, 'tmp', tmpguid);
+  if (!(obj.guid)) { console.log("Deleting because no GUID"); return true;}
+  //if (($.inArray(tmpguid, this.guids))!== -1) { console.log("Deleting because in GUIDS ARRAy",tmpguid, this.guids); return true;} 
+  if (in_array(tmpguid, this.guids)) { console.log("Deleting because in GUIDS ARRAy",tmpguid, this.guids); return true;} 
+  this.guids.push(tmpguid);
+  console.log('We keep this one:', obj);
+  return false;
+}
+$(document).ready(function () {
+  $('body').on('click', '.delete-events', function (event) {
+    //$('.edit-calendar-schedular').fullCalendar('removeEvents', function(event){ return true;});
+    $('.edit-calendar-schedular').fullCalendar('removeEvents', deleteDupEvents);
+  });
+  $('body').on('click', '.fetch-events', function (event) {
+    console.log('Asking Calendar to fetch');
+    $('.edit-calendar-schedular').fullCalendar('refetchEvents');
+  });
+  $('body').on('click', '.set-event-src', function (event) {
+            //'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    var model_id = $('.edit-calendar-schedular').attr('data-modelid');
+    var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
+    var jsonSrc = {
+      url : fetchUrl,
+      type : 'POST',
+      data : {
+        model_id : model_id,
+        _token  : $('meta[name="csrf-token"]').attr('content')
+      }, 
+      error : function () {alert ("There was an error fetching");}
+    };
+    console.log('Setting the JSON Event Src to: ', jsonSrc);
+    $('.edit-calendar-schedular').fullCalendar('addEventSource', jsonSrc);
+
+  });
+});
+
 function arrToFCevent(arr) {
   var FCevent = {};
+  FCevent.guid = arr['guid'];
+  if (!arr['guid']) {
+    FCevent.guid = generateUUID();
+  }
   FCevent.title = arr['title'];
   FCevent.start = arr['start'];
   FCevent.end = arr['end'];
@@ -828,6 +893,9 @@ function arrToFCevent(arr) {
   return FCevent;
 }
 
+function forceRender() {
+  $('.edit-calendar-schedular').fullCalendar('render');
+}
 
 /** Play with FullCalendar */
 $(document).ready(function () {
@@ -838,10 +906,12 @@ $(document).ready(function () {
     $.each(sa, function (i, field) {
       values[field.name] = field.value;
     });
+    if (!values.guid) values.guid =  generateUUID();
+    if (!values.guid) console.log("I just assigned it");
     var FCevent = arrToFCevent(values);
     $('.edit-calendar-schedular').fullCalendar(
             'renderEvent', FCevent, true);
-    form.closest('.ui-dialog-content').dialog('destroy'); 
+    form.closest('.ui-dialog-content').dialog('destroy');
     return false;
 
   });
@@ -867,26 +937,59 @@ $(document).ready(function () {
     ]
   });
 
-  //console.log("About to start full Calendar");
+    var model_id = $('.edit-calendar-schedular').attr('data-modelid');
+    var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
+    var jsonSrc = {
+      url : fetchUrl,
+      type : 'POST',
+      data : {
+        model_id : model_id,
+        _token  : $('meta[name="csrf-token"]').attr('content')
+      }, 
+      error : function () {alert ("There was an error fetching");}
+    };
+  console.log("About to start full Calendar, the src obj:", jsonSrc);
   $('.edit-calendar-schedular').fullCalendar({
     editable: true,
     dayClick: createFCEventObject,
     eventClick: createEventEditDialog,
-    
-    loading :function() {console.log("LOAD event");ajaxFetchEvents();},   //
-    viewRender : function() {console.log("ViewRender event");ajaxFetchEvents();},  //
-    eventAfterAllRender : function() {console.log("eventAfterAllRender event"); ajaxFetchEvents(); },//
-    widowResize : function() {console.log("windowResize event"); ajaxFetchEvents(); },//
+    eventSources: [ jsonSrc ],
+
+    loading: function () {
+      console.log("LOAD event");
+      //ajaxFetchEvents();
+    }, //
+    viewRender: function () {
+      console.log("ViewRender event");
+      //ajaxFetchEvents();
+    }, //
+    eventAfterAllRender: function () {
+      console.log("eventAfterAllRender event");
+      //ajaxFetchEvents();
+    }, //
+    widowResize: function () {
+      console.log("windowResize event");
+      //ajaxFetchEvents();
+    }, //
     //loading : function() {console.log("The Calendar is LOADING");},
     customButtons: {
+      forceFetchButton: {
+        text: 'Force Fetch',
+        click: ajaxFetchEvents
+      }, 
       myCustomButton: {
         text: 'Save Calendar',
         click: ajaxPostEvents
+      }, 
+      myRenderButton : {
+        text : "Force Render",
+        click : forceRender
       }
     },
+    lazyFetching: false,
     header: {
       left: 'prev,next today myCustomButton',
-      center: 'title',
+      center: 'title, myRenderButton, forceFetchButton',
       right: 'month,agendaWeek,agendaDay'
     }
   });
@@ -945,6 +1048,11 @@ $(document).ready(function () {
 
 
 $(function () {
-  $("#tabs").tabs();
-  //});
+
+  $("#tabs").tabs({
+    activate: function (event, ui) {
+      $('#calendar').fullCalendar('render');
+    },
+    active: 1
+  });
 });

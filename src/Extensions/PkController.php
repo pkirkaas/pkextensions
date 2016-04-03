@@ -328,14 +328,15 @@ class PkController extends Controller {
 
   public function exportCsv($fileName, Array $output_arr = [], $columnHeaders = null) {
     $this->setExportHeaders($fileName);
-      $output = fopen("php://output", "w");
-      if ($columnHeaders && is_array($columnHeaders) && sizeOf ($columnHeaders)){
-        fputcsv($output, $columnHeaders);
-      }
-      foreach ($output_arr as $output_line) {
-        fputcsv($output, $output_line);
-      }
-      fclose($output);
+    $output = fopen("php://output", "w");
+    if ($columnHeaders && is_array($columnHeaders) && sizeOf ($columnHeaders)){
+      fputcsv($output, $columnHeaders);
+    }
+    foreach ($output_arr as $output_line) {
+      fputcsv($output, $output_line);
+    }
+    fclose($output);
+    die();
   }
 
   /** Sets headers for file export/save
