@@ -1,3 +1,4 @@
+var repository = {};
 /** Library of convenient JS/jQuery functions. Not PKMVCFramework Specific
  * @author    Paul Kirkaas
  * @email     p.kirkaas@gmail.com
@@ -388,7 +389,7 @@ function resetFormElement(e) {
  */
 
 $('body').on('click', 'img.avatar', function (event) {
-  console.log("Clicking..");
+  //console.log("Clicking..");
 });
 $('body').on('hover', 'img.avatar', function (event) {
   console.log("Hovering..");
@@ -396,9 +397,9 @@ $('body').on('hover', 'img.avatar', function (event) {
 
 $(function () {
   var dlgonload = $('.dialog-on-load');
-  console.log("Loaded...");
+  //console.log("Loaded...");
   if (dlgonload && dlgonload.hasClass('js-dialog-content')) {
-    console.log("We found a dialog on load!");
+    //console.log("We found a dialog on load!");
 
     //Let's make a dialog box right away!
     /*
@@ -646,34 +647,31 @@ function generateUUID() {
  */
 
 function getStringDateFromMoment(arg) {
-  if (!arg) return '';
-  var type = typeof(arg);
-  if (type === 'string') return arg;
+  if (!arg)
+    return '';
+  var type = typeof (arg);
+  if (type === 'string')
+    return arg;
   if (type === 'object') { //Hope it's a Moment instance
-    console.log("Arg is an object?", arg);
-
-    var fmt1 = 'YYYY-MM-DD HH:mm:ss';
     var fmt3 = 'YYYY-MM-DD HH:mm';
-    var fmt2 = 'yy-mm-dd H:m:s';
     return arg.format(fmt3);
   }
   return '';
 }
 
 function FCeventToArr(FCevent) {
-  var arr = [];
-  arr['title'] = FCevent.title;
- // if ((typeof(FCevent.s) )
-  arr['start'] = getStringDateFromMoment(FCevent.start);
-  arr['end'] = getStringDateFromMoment(FCevent.end);
-  arr['id'] = FCevent.id;
-  arr['allDay'] = FCevent.allDay;
-  arr['backgroundColor'] = FCevent.backgroundColor;
-  arr['color'] = FCevent.color;
-  arr['borderColor'] = FCevent.borderColor;
-  arr['textColor'] = FCevent.textColor;
-  arr['event_type'] = FCevent.event_type;
-  console.log("Converted Event:", arr);
+  var arr = {};
+  arr.title = FCevent.title;
+  // if ((typeof(FCevent.s) )
+  arr.start = getStringDateFromMoment(FCevent.start);
+  arr.end = getStringDateFromMoment(FCevent.end);
+  arr.id = FCevent.id;
+  arr.allDay = FCevent.allDay;
+  arr.backgroundColor = FCevent.backgroundColor;
+  arr.color = FCevent.color;
+  arr.borderColor = FCevent.borderColor;
+  arr.textColor = FCevent.textColor;
+  arr.event_type = FCevent.event_type;
   return arr;
 }
 
@@ -683,22 +681,7 @@ function FCeventToArr(FCevent) {
  *Assumes the name of the dialog class is: edit-event-dialog-frame 
  */
 function createEventEditDialog(FCevent) {
-  console.log('The event is:', FCevent);
-  /*
-  var strdt;
-  var formats = [
-    'YYYY-MM-DD HH:mm:ss',
-    'YYYY-MM-dd HH:mm:ss',
-    'YYYY-MM-d HH:mm:ss',
-    'YYYY-MM-D HH:mm:ss'
-  ];
-  $.each(formats, function (i, val) {
-    strdt = FCevent.start.format(val);
-    console.log('From FC, fmt: ' + val + ';: strdt', strdt);
-
-  });
-  //var strdt = FCevent.start.format('YYYY-MM-DD HH:mm:ss');
-  */
+  console.log("Entering createEvent, FCevent:", FCevent);
   $dlghtml = $('.edit-event-dialog-frame ').prop('outerHTML');
   var closeText = 'Cancel';
   var dialogDefaults = {
@@ -721,53 +704,109 @@ function createEventEditDialog(FCevent) {
     defaultPalette: 'web'
   });
   $('.hook-datetimepicker').datetimepicker({
-    //timeFormat: $.timepicker.ISO_8601,
     dateFormat: 'yy-mm-dd'
-    //timeFormat: $.timepicker.ISO_8601,
-    //dateFormat: $.datepicker.ISO_8601
-    //timeFormat: 'Y-m-d\TH:m:s',
-    //dateFormat: 'Y-m-d\TH:m:s',
-    //dateFormat: 'Y-m-d'
-    //timeFormat: 'Y-m-d'
-    //controlType: 'select'
   });
   /** Now we have to populate the dialog with the FCevent properties */
   var arr = FCeventToArr(FCevent);
   for (var key in arr) {
-    dlg.find('.'+key).val(arr[key]);
+    dlg.find('.' + key).val(arr[key]);
   }
 
 }
 
 function FCeventsToArrays(FCevents) {
- var evarr = [];
- $.each(FCevents, function(idx, FCevent) {
-   evarr.push(FCeventToArr(FCevent));
- });
- return evarr;
-
-}
-function ajaxPostEvents() {
-  console.log("Got called from the calendar");
- var events = $('.edit-event-dialog').fullCalendar('clientEvents'); 
- console.log("The events I got back from the calendar are:", events);
- var evarr = FCeventsToArrays(events);
- console.log("Tried to fetch events and convert. They are:", evarr);
-
-}
-
-/*
-function submitEditFCForm(data) {
-  var values = {};
-  $.each($('#myForm').serializeArray(), function(i, field) {
-      values[field.name] = field.value;
+  var bevarr = [];
+  var singleEv;
+  $.each(FCevents, function (idx, FCevent) {
+    singleEv = FCeventToArr(FCevent);
+    bevarr.push(singleEv);
   });
-
+  return bevarr;
 }
-*/
+
+
+function    regesterEventsIndividually(decoded) {
+  var res;
+  console.log('Entered individualEvent Reg');
+  $.each(decoded, function(idx,val) {
+    if (!val.title) {
+      console.log ('Creating a title');
+      val.title = generateUUID();
+    }
+    res = $('.edit-calendar-schedular').fullCalendar('renderEvent', val, true);
+    console.log("In individual loads: " + idx +" the val is:", val, ' The result was: ', res);
+
+  });
+}
+
+
+
+
+
+function ajaxFetchEvents() {
+  /*
+  if (repository.fetchedEvents == 1) {
+    console.log ("Already fetched calendar Events");
+    return;
+  }
+  */
+  console.log('Fetching events');
+  var model_id = $('.edit-calendar-schedular').attr('data-modelid');
+  var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
+  if (! fetchUrl || !model_id) {
+    console_log ("Could't find the parameters for the fetch");
+  }
+  $.ajax({
+    url: fetchUrl,
+    data: {model_id:model_id},
+    dataType: 'json',
+    method: 'POST',
+    success: function (result) {
+    //  console.log("The AJAX FETCH result:", result);
+      var decoded = JSON.parse(result);
+      ///console.log("The decoded FETCH result:", decoded);
+      $('.edit-calendar-schedular').fullCalendar( 'addEventSource', decoded );
+      regesterEventsIndividually(decoded);
+      if (decoded && result) {
+        //console.log("We decided the reusult was okay");
+   //     repository.fetchedEvents = 1;
+      } else {
+        console.log("We ran the AJAX fetch, but didn't get useful results");
+      }
+    }
+  });
+}
+
+
+function ajaxPostEvents() {
+  //console.log("Got called from the calendar");
+  var events = $('.edit-calendar-schedular').fullCalendar('clientEvents');
+  //console.log("The events I got back from the calendar are:", events);
+  var evarr = FCeventsToArrays(events);
+  //console.log("Tried to fetch events and convert. They are:", evarr);
+  // Get the URLs and Model ID from the Calendar frame
+  var model_id = $('.edit-calendar-schedular').attr('data-modelid');
+  //evarr['model_id'] = model_id;
+  var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
+  var saveUrl = $('.edit-calendar-schedular').attr('data-saveurl');
+  //console.log("Our m/f/s vals are:", model_id, fetchUrl, saveUrl);
+  var jsonEvents = JSON.stringify(evarr);
+  //console.log("The Stringiried json:", jsonEvents);
+  $.ajax({
+    url: saveUrl,
+    data: {jsonEvents: jsonEvents, model_id:model_id},
+    dataType: 'json',
+    method: 'POST',
+    success: function (result) {
+      console.log("The AJAX result:", result);
+    }
+  });
+}
+
 
 function createFCEventObject(date) {
-  console.log('The date is:', date);
+  //console.log('The date is:', date);
+   ajaxFetchEvents();
   var FCevent = {start: date,
     id: generateUUID()
   };
@@ -777,15 +816,15 @@ function createFCEventObject(date) {
 function arrToFCevent(arr) {
   var FCevent = {};
   FCevent.title = arr['title'];
-  FCevent.start = arr['start'] ;
+  FCevent.start = arr['start'];
   FCevent.end = arr['end'];
-  FCevent.id = arr['id']  ;
-  FCevent.allDay = arr['allDay']  ;
+  FCevent.id = arr['id'];
+  FCevent.allDay = arr['allDay'];
   FCevent.backgroundColor = arr['backgroundColor'];
-  FCevent.color = arr['color'] ;
-  FCevent.borderColor = arr['borderColor'] ;
-  FCevent.textColor = arr['textColor'] ;
-  FCevent.event_type =arr['event_type'] ;
+  FCevent.color = arr['color'];
+  FCevent.borderColor = arr['borderColor'];
+  FCevent.textColor = arr['textColor'];
+  FCevent.event_type = arr['event_type'];
   return FCevent;
 }
 
@@ -796,33 +835,17 @@ $(document).ready(function () {
     var form = $(event.target);
     var sa = form.serializeArray();
     var values = {};
-    $.each(sa, function(i, field) {
+    $.each(sa, function (i, field) {
       values[field.name] = field.value;
     });
     var FCevent = arrToFCevent(values);
     $('.edit-calendar-schedular').fullCalendar(
             'renderEvent', FCevent, true);
-    console.log('sa:',sa,'values',values);
+    form.closest('.ui-dialog-content').dialog('destroy'); 
     return false;
 
   });
-  // Try the time-picker:
-  //$('.tst-timepicker').datetimepicker();
-  /*
-  $('.tst-colorpicker').colorpicker({
-    defaultPalette: 'web'
-  });
-  $('.tst-timepicker').timepicker({
-    controlType: 'select'
-  });
-  */
   $('.view-calendar-schedule').fullCalendar({
-    /*
-     dayClick : function(date, jsevent, view) {
-     console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
-     },
-     editable:true,
-     */
     height: 300,
     aspectRatio: 1.2,
     events: [
@@ -844,40 +867,33 @@ $(document).ready(function () {
     ]
   });
 
+  //console.log("About to start full Calendar");
   $('.edit-calendar-schedular').fullCalendar({
     editable: true,
     dayClick: createFCEventObject,
     eventClick: createEventEditDialog,
+    
+    loading :function() {console.log("LOAD event");ajaxFetchEvents();},   //
+    viewRender : function() {console.log("ViewRender event");ajaxFetchEvents();},  //
+    eventAfterAllRender : function() {console.log("eventAfterAllRender event"); ajaxFetchEvents(); },//
+    widowResize : function() {console.log("windowResize event"); ajaxFetchEvents(); },//
+    //loading : function() {console.log("The Calendar is LOADING");},
     customButtons: {
-        myCustomButton: {
-            text: 'Save Calendar',
-            click: ajaxPostEvents
-        }
-    },
-    header : {
-        left: 'prev,next today myCustomButton',
-        center: 'title',
-        right: 'month,agendaWeek,agendaDay'
-    },
-    events: [
-      {
-        title: 'event1',
-        start: '2016-04-01',
-        description: "Hot summer day"
-      },
-      {
-        title: 'event2',
-        start: '2016-04-05',
-        end: '2016-04-07'
-      },
-      {
-        title: 'event3',
-        start: '2016-04-09T12:30:00',
-        allDay: false // will make the time show
+      myCustomButton: {
+        text: 'Save Calendar',
+        click: ajaxPostEvents
       }
-    ]
-
+    },
+    header: {
+      left: 'prev,next today myCustomButton',
+      center: 'title',
+      right: 'month,agendaWeek,agendaDay'
+    }
   });
+
+
+
+
   /*
    $('.calendar-schedular').fullCalendar({ 
    dayClick : function(date, jsevent, view) {
@@ -928,7 +944,7 @@ $(document).ready(function () {
  */
 
 
-  $(function() {
-    $( "#tabs" ).tabs();
-    //});
-  });
+$(function () {
+  $("#tabs").tabs();
+  //});
+});
