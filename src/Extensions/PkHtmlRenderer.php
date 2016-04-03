@@ -54,8 +54,8 @@ class PkHtmlRenderer extends PartialSet {
   public function wrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='', $raw=null) {
     $this->div(RENDEROPEN,$wrapperClass);
     if ($raw === true) {
-      $this->div($label, $labelClass);
-      $this->div($value, $valueClass);
+      $this->rawdiv($label, $labelClass);
+      $this->rawdiv($value, $valueClass);
     } else {
       $this->div($label, $labelClass);
       $this->div($value, $valueClass);
@@ -131,7 +131,11 @@ class PkHtmlRenderer extends PartialSet {
      return $this;
   }
 
-    public function text($name, $value = null, $options = []) {
+  public function hidden($name, $value = null, $options = []) {
+      if (is_string($options)) $options = ['class'=>$options];
+      $this[] = PkForm::hidden($name, $value, $options);
+    }
+  public function text($name, $value = null, $options = []) {
       if (is_string($options)) $options = ['class'=>$options];
       $this[] = PkForm::text($name, $value, $options);
     }
@@ -140,25 +144,6 @@ class PkHtmlRenderer extends PartialSet {
 	   $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
      return $this;
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
   public function render($view,$data=[]) {
     if (!$view || !is_string($view)) return '';

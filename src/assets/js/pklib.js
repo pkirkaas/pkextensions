@@ -87,8 +87,8 @@ $(function () {
 });
 
 $(function () {
-  $('.js-fade-out').fadeOut(8400, function() {
-      $(this).css('display','none');
+  $('.js-fade-out').fadeOut(8400, function () {
+    $(this).css('display', 'none');
   });
 });
 
@@ -402,44 +402,46 @@ $(function () {
 
     //Let's make a dialog box right away!
     /*
-    var param1 = dlgonload.attr('data-param1');
-    var param2 = dlgonload.attr('data-param2');
-    var param3 = dlgonload.attr('data-param3');
-    var src = dlgonload.attr('data-dialog');
-    var clone = dlgonload.attr('data-clone');
-    */
+     var param1 = dlgonload.attr('data-param1');
+     var param2 = dlgonload.attr('data-param2');
+     var param3 = dlgonload.attr('data-param3');
+     var src = dlgonload.attr('data-dialog');
+     var clone = dlgonload.attr('data-clone');
+     */
     //var dlgHtml = dlgonload.prop('outerHTML');
     var closeText = dlgonload.attr('data-closetext');
-    if (! closeText) closeText = 'Okay';
+    if (!closeText)
+      closeText = 'Okay';
     var dialogDefaults = {
       modal: true,
       autoOpen: true,
       width: 600,
       resizable: true,
       draggable: true,
-      buttons: [ {
-          text : closeText,
-          click : function() {
+      buttons: [{
+          text: closeText,
+          click: function () {
             $(this).dialog('close');
           }
 
-        //Cancel : function () { $(this).dialog('destroy'); }
-        /*
-        Okay: function () {
-          $(this).dialog('close');
-        }
-        */
-      } ]
+          //Cancel : function () { $(this).dialog('destroy'); }
+          /*
+           Okay: function () {
+           $(this).dialog('close');
+           }
+           */
+        }]
     };
     var dialogOptions = dialogDefaults;
     var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
-    'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height'];
+      'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height'];
     var optName = optVal = null;
     for (var key in overridableOptions) {
       optName = overridableOptions[key];
-      optVal = dlgonload.attr('data-'+ optName);
+      optVal = dlgonload.attr('data-' + optName);
       //console.log("KEY",key,'OptName',optName, 'optval', optVal);
-      if (optVal) dialogOptions[optName] = optVal;
+      if (optVal)
+        dialogOptions[optName] = optVal;
       optName = optVal = null;
     }
     dlgonload.dialog(dialogOptions);
@@ -455,17 +457,18 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var param3 = $(event.target).attr('data-param3');
   var src = $(event.target).attr('data-dialog');
   var clone = $(event.target).attr('data-clone');
-  clone=true;
+  clone = true;
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
-  if (dlg.length === 0) return;
+  if (dlg.length === 0)
+    return;
   var dlgHtml = dlg.prop('outerHTML');
   //console.log('dlgHtml', dlgHtml, 'dlg', dlg);
   //if (clone) dlg = dlg.clone();
   /*
-  dlg = dlg.replace(/__TPL_PARAM1__/g, param1);
-  dlg = dlg.replace(/__TPL_PARAM2__/g, param2);
-  dlg = dlg.replace(/__TPL_PARAM3__/g, param3);
-  */
+   dlg = dlg.replace(/__TPL_PARAM1__/g, param1);
+   dlg = dlg.replace(/__TPL_PARAM2__/g, param2);
+   dlg = dlg.replace(/__TPL_PARAM3__/g, param3);
+   */
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
@@ -475,19 +478,21 @@ $('body').on('click', '.js-dialog-button', function (event) {
   //else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
   var closeText = $(event.target).attr('data-closetext');
-  if (! closeText) closeText = dlg.attr('data-closetext');
-  if (! closeText) closeText = 'Okay';
+  if (!closeText)
+    closeText = dlg.attr('data-closetext');
+  if (!closeText)
+    closeText = 'Okay';
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
     width: 600,
-      buttons: [ {
-          text : closeText,
-          click : function() {
-            $(this).dialog('close');
-          }
+    buttons: [{
+        text: closeText,
+        click: function () {
+          $(this).dialog('close');
         }
-      ]
+      }
+    ]
   };
   var dialogOptions = dialogDefaults;
   //If the below options are data-XXX names in the dialog, use them...
@@ -497,17 +502,19 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var optName = optVal = null;
   for (var key in overridableOptions) {
     optName = overridableOptions[key];
-    
-    optVal = $(event.target).attr('data-'+ optName);
-    if (!optVal) optVal = dlg.attr('data-'+ optName);
+
+    optVal = $(event.target).attr('data-' + optName);
+    if (!optVal)
+      optVal = dlg.attr('data-' + optName);
     //console.log("KEY",key,'OptName',optName, 'optval', optVal);
-    if (optVal) dialogOptions[optName] = optVal;
+    if (optVal)
+      dialogOptions[optName] = optVal;
     optName = optVal = null;
   }
 
   //console.log("DialogOpts:", dialogOptions);
-  dialogClass=dialogOptions['dialogClass'];
-  console.log('dialogOptions',dialogOptions);
+  dialogClass = dialogOptions['dialogClass'];
+  console.log('dialogOptions', dialogOptions);
   dlg.dialog(dialogOptions);
   dlg.title = function (title) {
     dlg.dialog('option', 'title', title);
@@ -637,8 +644,37 @@ function generateUUID() {
  * @param date - a "Moment" date object.
  * @returns {Function}
  */
-function createFCEventObject(date) {
-  
+
+function getStringDateFromMoment(arg) {
+  if (!arg) return '';
+  var type = typeof(arg);
+  if (type === 'string') return arg;
+  if (type === 'object') { //Hope it's a Moment instance
+    console.log("Arg is an object?", arg);
+
+    var fmt1 = 'YYYY-MM-DD HH:mm:ss';
+    var fmt3 = 'YYYY-MM-DD HH:mm';
+    var fmt2 = 'yy-mm-dd H:m:s';
+    return arg.format(fmt3);
+  }
+  return '';
+}
+
+function FCeventToArr(FCevent) {
+  var arr = [];
+  arr['title'] = FCevent.title;
+ // if ((typeof(FCevent.s) )
+  arr['start'] = getStringDateFromMoment(FCevent.start);
+  arr['end'] = getStringDateFromMoment(FCevent.end);
+  arr['id'] = FCevent.id;
+  arr['allDay'] = FCevent.allDay;
+  arr['backgroundColor'] = FCevent.backgroundColor;
+  arr['color'] = FCevent.color;
+  arr['borderColor'] = FCevent.borderColor;
+  arr['textColor'] = FCevent.textColor;
+  arr['event_type'] = FCevent.event_type;
+  console.log("Converted Event:", arr);
+  return arr;
 }
 
 /** Instantiates a jQuery dialog from a template, to edit calendar "Events"
@@ -646,112 +682,253 @@ function createFCEventObject(date) {
  *
  *Assumes the name of the dialog class is: edit-event-dialog-frame 
  */
-function createEventEditDialog() {
+function createEventEditDialog(FCevent) {
+  console.log('The event is:', FCevent);
+  /*
+  var strdt;
+  var formats = [
+    'YYYY-MM-DD HH:mm:ss',
+    'YYYY-MM-dd HH:mm:ss',
+    'YYYY-MM-d HH:mm:ss',
+    'YYYY-MM-D HH:mm:ss'
+  ];
+  $.each(formats, function (i, val) {
+    strdt = FCevent.start.format(val);
+    console.log('From FC, fmt: ' + val + ';: strdt', strdt);
+
+  });
+  //var strdt = FCevent.start.format('YYYY-MM-DD HH:mm:ss');
+  */
   $dlghtml = $('.edit-event-dialog-frame ').prop('outerHTML');
   var closeText = 'Cancel';
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
     width: 600,
-      buttons: [ {
-          text : closeText,
-          click : function() {
-            $(this).dialog('destroy');
-          }
+    buttons: [{
+        text: closeText,
+        click: function () {
+          $(this).dialog('destroy');
         }
-      ]
+      }
+    ]
   };
 
-  var dlg = $($dlghtml).dialog($dialogOpts);
+
+  var dlg = $($dlghtml).dialog(dialogDefaults);
+  dlg.dialog('open');
+  $('.hook-colorpicker').colorpicker({
+    defaultPalette: 'web'
+  });
+  $('.hook-datetimepicker').datetimepicker({
+    //timeFormat: $.timepicker.ISO_8601,
+    dateFormat: 'yy-mm-dd'
+    //timeFormat: $.timepicker.ISO_8601,
+    //dateFormat: $.datepicker.ISO_8601
+    //timeFormat: 'Y-m-d\TH:m:s',
+    //dateFormat: 'Y-m-d\TH:m:s',
+    //dateFormat: 'Y-m-d'
+    //timeFormat: 'Y-m-d'
+    //controlType: 'select'
+  });
+  /** Now we have to populate the dialog with the FCevent properties */
+  var arr = FCeventToArr(FCevent);
+  for (var key in arr) {
+    dlg.find('.'+key).val(arr[key]);
+  }
 
 }
 
-/** Play with FullCalendar */
-$(document).ready(function() {
-  // Try the time-picker:
-    //$('.tst-timepicker').datetimepicker();
-    $('.tst-colorpicker').colorpicker({
-      defaultPalette: 'web'
-    });
-    $('.tst-timepicker').timepicker({
-      controlType:'select'
-    });
-    $('.view-calendar-schedule').fullCalendar({ 
-      /*
-      dayClick : function(date, jsevent, view) {
-        console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
-      },
-      editable:true,
-    */
-      height:300,
-      aspectRatio: 1.2,
-          events: [
-        {
-            title  : 'event1',
-            start  : '2016-04-01',
-            description : "Hot summer day"
-        },
-        {
-            title  : 'event2',
-            start  : '2016-04-05',
-            end    : '2016-04-07'
-        },
-        {
-            title  : 'event3',
-            start  : '2016-04-09T12:30:00',
-            allDay : false // will make the time show
-        }
-    ]
-    });
+function FCeventsToArrays(FCevents) {
+ var evarr = [];
+ $.each(FCevents, function(idx, FCevent) {
+   evarr.push(FCeventToArr(FCevent));
+ });
+ return evarr;
 
-    $('.edit-calendar-schedular').fullCalendar({ 
-      editable:true
+}
+function ajaxPostEvents() {
+  console.log("Got called from the calendar");
+ var events = $('.edit-event-dialog').fullCalendar('clientEvents'); 
+ console.log("The events I got back from the calendar are:", events);
+ var evarr = FCeventsToArrays(events);
+ console.log("Tried to fetch events and convert. They are:", evarr);
+
+}
+
+/*
+function submitEditFCForm(data) {
+  var values = {};
+  $.each($('#myForm').serializeArray(), function(i, field) {
+      values[field.name] = field.value;
+  });
+
+}
+*/
+
+function createFCEventObject(date) {
+  console.log('The date is:', date);
+  var FCevent = {start: date,
+    id: generateUUID()
+  };
+  return createEventEditDialog(FCevent);
+}
+
+function arrToFCevent(arr) {
+  var FCevent = {};
+  FCevent.title = arr['title'];
+  FCevent.start = arr['start'] ;
+  FCevent.end = arr['end'];
+  FCevent.id = arr['id']  ;
+  FCevent.allDay = arr['allDay']  ;
+  FCevent.backgroundColor = arr['backgroundColor'];
+  FCevent.color = arr['color'] ;
+  FCevent.borderColor = arr['borderColor'] ;
+  FCevent.textColor = arr['textColor'] ;
+  FCevent.event_type =arr['event_type'] ;
+  return FCevent;
+}
+
+
+/** Play with FullCalendar */
+$(document).ready(function () {
+  $('body').on('submit', '.edit-event-dialog', function (event) {
+    var form = $(event.target);
+    var sa = form.serializeArray();
+    var values = {};
+    $.each(sa, function(i, field) {
+      values[field.name] = field.value;
     });
+    var FCevent = arrToFCevent(values);
+    $('.edit-calendar-schedular').fullCalendar(
+            'renderEvent', FCevent, true);
+    console.log('sa:',sa,'values',values);
+    return false;
+
+  });
+  // Try the time-picker:
+  //$('.tst-timepicker').datetimepicker();
   /*
-    $('.calendar-schedular').fullCalendar({ 
-      dayClick : function(date, jsevent, view) {
-        console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
+  $('.tst-colorpicker').colorpicker({
+    defaultPalette: 'web'
+  });
+  $('.tst-timepicker').timepicker({
+    controlType: 'select'
+  });
+  */
+  $('.view-calendar-schedule').fullCalendar({
+    /*
+     dayClick : function(date, jsevent, view) {
+     console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
+     },
+     editable:true,
+     */
+    height: 300,
+    aspectRatio: 1.2,
+    events: [
+      {
+        title: 'event1',
+        start: '2016-04-01',
+        description: "Hot summer day"
       },
-      height:300,
-      aspectRatio: 1.2,
-      editable:true,
-          events: [
-        {
-            title  : 'event1',
-            start  : '2016-04-01',
-            description : "Hot summer day"
-        },
-        {
-            title  : 'event2',
-            start  : '2016-04-05',
-            end    : '2016-04-07'
-        },
-        {
-            title  : 'event3',
-            start  : '2016-04-09T12:30:00',
-            allDay : false // will make the time show
-        }
+      {
+        title: 'event2',
+        start: '2016-04-05',
+        end: '2016-04-07'
+      },
+      {
+        title: 'event3',
+        start: '2016-04-09T12:30:00',
+        allDay: false // will make the time show
+      }
     ]
-    });
-            
-            */
+  });
+
+  $('.edit-calendar-schedular').fullCalendar({
+    editable: true,
+    dayClick: createFCEventObject,
+    eventClick: createEventEditDialog,
+    customButtons: {
+        myCustomButton: {
+            text: 'Save Calendar',
+            click: ajaxPostEvents
+        }
+    },
+    header : {
+        left: 'prev,next today myCustomButton',
+        center: 'title',
+        right: 'month,agendaWeek,agendaDay'
+    },
+    events: [
+      {
+        title: 'event1',
+        start: '2016-04-01',
+        description: "Hot summer day"
+      },
+      {
+        title: 'event2',
+        start: '2016-04-05',
+        end: '2016-04-07'
+      },
+      {
+        title: 'event3',
+        start: '2016-04-09T12:30:00',
+        allDay: false // will make the time show
+      }
+    ]
+
+  });
+  /*
+   $('.calendar-schedular').fullCalendar({ 
+   dayClick : function(date, jsevent, view) {
+   console.log('The Date Clicked on: ',date, 'And the schedular is: ',$('.calendar-schedular'));
+   },
+   height:300,
+   aspectRatio: 1.2,
+   editable:true,
+   events: [
+   {
+   title  : 'event1',
+   start  : '2016-04-01',
+   description : "Hot summer day"
+   },
+   {
+   title  : 'event2',
+   start  : '2016-04-05',
+   end    : '2016-04-07'
+   },
+   {
+   title  : 'event3',
+   start  : '2016-04-09T12:30:00',
+   allDay : false // will make the time show
+   }
+   ]
+   });
+   
+   */
 
 
 });
 /*
-$('body').on('click', '.tst-calander-button', function (event) {
-  console.log("Clicking..");
-   var events = $('.calendar-schedular').fullCalendar('clientEvents'); 
-  $('.calendar-schedular2').fullCalendar({ 
-      height:200,
-      editable:true
-    });
-  //  alert("Block");
-  $.each(events, function (idx, obj) {
-    console.log("For "+idx+' the obj',obj);
-  }); 
-  $('.calendar-schedular2').fullCalendar('addEventSource', events);
-   //var evjson = JSON.stringify(events);
-   //console.log('Client Events:', evjson);
-});
-*/
+ $('body').on('click', '.tst-calander-button', function (event) {
+ console.log("Clicking..");
+ var events = $('.calendar-schedular').fullCalendar('clientEvents'); 
+ $('.calendar-schedular2').fullCalendar({ 
+ height:200,
+ editable:true
+ });
+ //  alert("Block");
+ $.each(events, function (idx, obj) {
+ console.log("For "+idx+' the obj',obj);
+ }); 
+ $('.calendar-schedular2').fullCalendar('addEventSource', events);
+ //var evjson = JSON.stringify(events);
+ //console.log('Client Events:', evjson);
+ });
+ */
+
+
+  $(function() {
+    $( "#tabs" ).tabs();
+    //});
+  });
