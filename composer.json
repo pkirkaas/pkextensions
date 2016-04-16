@@ -10,7 +10,7 @@
   "require": {
     "php": ">=5.5.9",
     "laravelcollective/html": "5.*",
-    "jenssegers/agent' : 'dev-master"
+    "jenssegers/agent" : "dev-master"
   },
   "autoload": {
     "psr-4": {
