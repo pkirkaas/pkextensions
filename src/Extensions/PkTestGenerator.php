@@ -50,7 +50,7 @@ class PkTestGenerator {
    * @return type
    */
   public static function __callStatic($method, $args) {
-    if (!arra_key_exists($method, static::$externalReferences)) {
+    if (!array_key_exists($method, static::$externalReferences)) {
       return call_user_func_array(['parent',$method], $args);
     }
     $row = static::$externalReferences[$method];
@@ -159,7 +159,7 @@ class PkTestGenerator {
     if ($n < 0 ) $m = $n - 1;
     else $m = $n + 1;
     $m = (int) (1.5 * $m);
-    return static::getRandomDateFromRange($n, $m, $days);
+    return static::getRandomSqlDateFromRange($n, $m, $days);
   }
 
 
@@ -187,6 +187,26 @@ class PkTestGenerator {
     //$mysqldate = date('Y-m-d H:i:s', $unixDate);
     $mysqldate = date('Y-m-d', $unixDate);
     return $mysqldate;
+  }
+
+  /* Takes actual dates and returens something in between. Takes Unix or SQL,
+   * and returns the date in the same format 
+   */
+  public static function getRandomDateBetween($date1, $date2) {
+    if (to_int($date1) && $to_int($date2)) {
+      $sql = false;
+    } else if (is_string($date1) && is_string($date2)) {
+      $sql = true;
+      $date1 = strtotime($date1);
+      $date2 = strtotime($date2);
+   } else {
+     throw new \Exception("We don't knwo hwo to deal with the arguments");
+   }
+   $min = min($date1, $date2)/1000;
+   $max = max($date1, $date2)/1000;
+   $rnd = 1000 * mt_rand($min, $max);
+   if (!$sql) return $rnd;
+   return date( 'Y-m-d H:i:s', $rnd );
   }
 
 
