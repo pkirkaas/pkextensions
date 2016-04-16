@@ -1,5 +1,4 @@
-/* JS for Larave/BootStrap SBB 
- */
+/* JS for Social Functionality Support - ratings, messaging, blocking, etc.  */
 
 /* Makes the "Send Message" dialog box / form */
 $('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
