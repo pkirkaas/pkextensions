@@ -25,13 +25,15 @@ gulp.task('sass', function() {
     "import.scss",
     "bower_components/font-awesome/scss/font-awesome.scss",
     "bower_components/jquery-ui/themes/ui-lightness/jquery-ui.css",
-    'vendor/pkirkaas/PkExtensions/src/assets/css/pkextensions.scss',
-    'app/resources/assets/sass/app.scss'
+    'vendor/pkirkaas/PkExtensions/src/assets/css/utility.css',
+    'vendor/pkirkaas/PkExtensions/src/assets/css/styles.css',
+    'vendor/pkirkaas/PkExtensions/src/assets/css/effects.css',
+    'app/resources/assets/sass/lqp.css'
   ])
-	.pipe(sourcemaps.init())
 	.pipe(sass().on('error', sass.logError))
 	//.pipe(minify())
-  .pipe(concat('styles.css'))
+	.pipe(sourcemaps.init())
+  .pipe(concat('stylesheets.css'))
 	.pipe(sourcemaps.write())
 	.pipe(gulp.dest('public/gulped/css'));	
 });
