@@ -1,17 +1,6 @@
 /* JS for Larave/BootStrap SBB 
  */
 
-$(function () {
-  /*
-  $("input.datepicker").datepicker({
-    dateFormat: 'yy-mm-dd'
-  });
-  */
-$.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-});
 /* Makes the "Send Message" dialog box / form */
 $('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
     var tpl = $('.template-container .send-message-dialog').first().prop('outerHTML');
@@ -28,7 +17,6 @@ $('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
       }
     });
   });
-});
 
 $('body').on('click', 'div.blocked-toggle', function (event) {
     var them_id = $(event.target).attr('data-them_id');
