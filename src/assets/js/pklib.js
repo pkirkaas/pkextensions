@@ -638,16 +638,13 @@ function generateUUID() {
 }
 function in_array(key, arr) {
   var ktype = typeof(key);
-    console.log("Looking for "+key+" of type: "+ktype+" in", arr);
     var res = false;
   $.each(arr, function(idx, val) {
     vtype = typeof(val);
-    console.log("Checking if "+val+" of type: "+vtype);
-    if (key === val) { console.log("Yes they match"); res = true; }
-    else console.log ("No match");
+    if (key === val) { 
+      res = true;
+    }
   });
-  if (res) console.log("Returning true fom in_array");
-  else  console.log("Returning false fom in_array");
   return res;
 }
 

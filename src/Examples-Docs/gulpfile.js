@@ -9,6 +9,7 @@ var sourcemaps     = require('gulp-sourcemaps');
 var mainBowerFiles = require('main-bower-files');
 var filter         = require('gulp-filter');
 var addsrc         = require('gulp-add-src');
+//var browserSync = require('browser-sync').create();
 
 
 // Run a complete build
@@ -26,8 +27,9 @@ gulp.task('sass', function() {
     "bower_components/font-awesome/scss/font-awesome.scss",
     "bower_components/jquery-ui/themes/ui-lightness/jquery-ui.css",
     'vendor/pkirkaas/PkExtensions/src/assets/css/utility.css',
-    'vendor/pkirkaas/PkExtensions/src/assets/css/styles.css',
+   // 'vendor/pkirkaas/PkExtensions/src/assets/css/styles.css',
     'vendor/pkirkaas/PkExtensions/src/assets/css/effects.css',
+    'app/resources/assets/sass/lean.scss',
     'app/resources/assets/sass/lqp.css'
   ])
 	.pipe(sass().on('error', sass.logError))
@@ -35,8 +37,23 @@ gulp.task('sass', function() {
 	.pipe(sourcemaps.init())
   .pipe(concat('stylesheets.css'))
 	.pipe(sourcemaps.write())
-	.pipe(gulp.dest('public/gulped/css'));	
+	.pipe(gulp.dest('public/gulped/css'))
+ // .pipe(browserSync.stream())
+  ; 
+  ;	
 });
+
+
+/*
+gulp.task('browser-sync', function() {
+    browserSync.init(['css/*.css','js/*.js'],{
+        proxy: "lsbb-5-2.local",
+        staticServer : {
+          baseDir : './public/gulped/'
+        }
+    });
+});
+*/
 
 // Concat Bower js with our project js, uglify and sourcemap
 gulp.task('js', function() {
@@ -83,4 +100,8 @@ gulp.task('watch', function() {
 
 	gulp.watch( ['app/resources/assets/js/*',
     'vendor/pkirkaas/PkExtensions/src/assets/js/*' ] , ['js']);
+
+  //gulp.watch("gulped/css/*.css").on('change', browserSync.reload);
+
+
 });

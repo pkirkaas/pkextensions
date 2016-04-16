@@ -158,12 +158,14 @@ h3 {
 .text-align-center { text-align: center ! important; }
 .italic { font-style: italic; }
 .bold { font-weight: bold ! important; }
-.block { display: block ! important; }
 
 .float-left, .floatleft { float: left ! important; }
 .float-right, .floatrignt { float: right ! important; }
 
+.block { display: block ! important; }
 .inline { display: inline-block ! important; }
+.hidden { display: none; }
+.invisible { visibility: hidden; }
 
 .padding-0, .padding0 { padding: 0px ! important; }
 .padding-left-0 { padding-left: 0; }
@@ -203,6 +205,8 @@ h3 {
 
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
+
+.most-width, .mostwidth { width: 90%; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
 
@@ -425,4 +429,34 @@ table.noborders td,
 table.no-borders th,
 table.noborders th {
   border: none;
+}
+
+
+input.boolean.viewable {
+  zoom: 2;
+}
+/** Make a link ordinary again..*/
+a.just-link {
+  color: blue;
+  text-decoration: underline;
+  border: none;
+}
+a.just-link:focus,
+a.just-link:hover {
+  outline: none;
+}
+a.just-link:hover {
+  color: #00c;
+}
+
+
+a.undecorated:hover ,
+a.undecorated {
+  text-decoration: none;
+}
+
+
+#helpTitle, 
+#helpContent {
+  display: none;
 }
