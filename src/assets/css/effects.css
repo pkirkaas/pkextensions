@@ -129,10 +129,10 @@ div.unfavorited {
   background-image: url('../img/Empty_Star.svg');
   background-image: url('../img/Full_Star_Yellow.svg');
   background-image: url('../img/Empty_Star.svg');
-  */
   line-height: initial;
-  width: 35px;
-  height: 35px;
+  */
+  width: 2em;
+  height: 2em;
   background-size: contain;
 }
 
@@ -154,7 +154,7 @@ div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
   position: relative;
   white-space: pre;
-  line-height: 40px;
+  line-height: 2em;
 }
 div.favorite-toggle.unfavorited::after {
   display: block;
@@ -191,9 +191,9 @@ div.favorite-toggle.unfavorited:hover::after {
 
 div.blocked,
 div.unblocked {
-  width: 35px;
-  height: 35px;
-  border-radius: 5px;
+  width: 3em;
+  height: 3em;
+  border-radius: .5em;
   background-color: green;
 }
 
@@ -226,9 +226,6 @@ div.blocked::after,
 div.unblocked:after {
   font-size: small;
   position: relative;
-  /*
-  line-height: 15px;
-  */
   white-space: pre;
   display: block;
 }
