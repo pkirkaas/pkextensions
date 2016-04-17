@@ -460,3 +460,8 @@ a.undecorated {
 #helpContent {
   display: none;
 }
+
+.droponhover.dropdown:hover .dropdown-menu,
+.droponhover.dropdown .dropdown-menu:hover {
+  display: block;
+} 

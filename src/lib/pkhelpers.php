@@ -4,6 +4,7 @@
  * 26 Feb 2016
  * Paul Kirkaas
  */
+use Jenssegers\Agent\Agent as MobileDetectAgent;
 use Carbon\Carbon;
 //use PkLibConfig; #Defined in pklib
 
@@ -97,4 +98,9 @@ function makeAjaxRoutes($extraroutenames = null) {
   }
   $out .= "</script>\n";
   return $out;
+}
+
+function isMobile() {
+  $agent = new MobileDetectAgent(); 
+  return ($agent->isMobile() || $agent->isTablet());
 }
