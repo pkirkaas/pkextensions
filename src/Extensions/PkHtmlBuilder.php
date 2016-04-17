@@ -35,10 +35,11 @@ class PkHtmlBuilder extends HtmlBuilder {
    *  So the first item has the additional optional params 'alt_aclass' & 
    * 'alt_liclass'.
    * 
+   * @param boolean $noleadinglink - default: false. If true, even a hover 
+   * drop down will not have a link at first label.
    * @return HTML string - the dropdown menu.
    */
-//public function bsDropMenu($itemLabel, $altLabel, $url, $labelClass='', $otherItems=[]) {
-  public function bsDropMenu(Array $items = []) {
+  public function bsDropMenu(Array $items = [], $noleadinglink=false) {
 
 #Drop menu maybe dynamically generated, so might be only 0 or 1 item
     $sz = count($items);
@@ -64,8 +65,9 @@ class PkHtmlBuilder extends HtmlBuilder {
       $alt_aclass = keyVal('alt_aclass', $itemArr);
       $alt_liclass = keyVal('alt_liclass', $itemArr);
       if ($i === 0) { #It's the first item
-        if (isMobile()) {
-          $menu .= "<li class='dropdown $liclass'>
+        if (isMobile() || $noleadinglink) {
+          $droponhover = isMobile() ? '' : ' droponhover ';
+          $menu .= "<li class='dropdown $droponhover $liclass'>
             <a href='#' class='$aclass dropdown-toggle' data-toggle='dropdown'>
                   $label
             </a>
