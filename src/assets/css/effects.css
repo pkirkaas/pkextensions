@@ -127,19 +127,25 @@ div.speech-bubble.right:after {
   }
 }
 
-/** Management of "Favoriting", in combo with JS / AJAX */
+/** Management of "Favoriting" & Blocking, in combo with JS / AJAX */
 
+.social-control-container {
+  height: 4em;
+  text-align: center;
+}
+
+div.blocked,
+div.unblocked,
 div.favorited,
 div.unfavorited {
-  /*
-  background-image: url('../img/Empty_Star.svg');
-  background-image: url('../img/Full_Star_Yellow.svg');
-  background-image: url('../img/Empty_Star.svg');
-  line-height: initial;
-  */
+  display: inline-block;
   width: 2em;
   height: 2em;
   background-size: contain;
+}
+div.favorited,
+div.unfavorited {
+  transform: translateY(-.5em);
 }
 
 div.unfavorited {
@@ -158,12 +164,13 @@ div.favorite-toggle.unfavorited:hover {
 
 div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
+  transform: translateX(-50%);
+  display: block;
+  margin-top: -.3em;
   position: relative;
   white-space: pre;
-  line-height: 2em;
 }
 div.favorite-toggle.unfavorited::after {
-  display: block;
   top: 2em;
   content: "Not a favorite..";
   color: #884;
@@ -171,36 +178,29 @@ div.favorite-toggle.unfavorited::after {
 
 div.favorite-toggle.favorited::after {
   color: #962;
-  display: block;
-  top: 2em;
   content: 'A Favorite!';
 }
 
 div.favorite-toggle.favorited:hover::after {
   color: #888;
-  display: block;
-  top: 2em;
   content: 'Unfavorite?';
 }
 
 div.favorite-toggle.unfavorited:hover::after {
   color: #962;
-  top: 2em;
-  display: block;
   content: "Favorite them!";
 }
 
 
 
-/** Similar with Favoriting, but for blockign */
+/** Similar with Favoriting, but for blocking */
 
 
 div.blocked,
 div.unblocked {
-  width: 3em;
-  height: 3em;
   border-radius: .5em;
   background-color: green;
+  line-height:  2em;
 }
 
 div.blocked {
@@ -218,7 +218,7 @@ div.blocked:hover {
 
 div.unblocked::before,
 div.blocked::before {
-  font-size: xx-large;
+  font-size: x-large;
   font-weight: bold;
 }
 div.unblocked::before {
@@ -230,35 +230,33 @@ div.blocked::before {
 
 div.blocked::after,
 div.unblocked:after {
+  margin-top: -.3em;
+  white-space: pre;
   font-size: small;
   position: relative;
-  white-space: pre;
   display: block;
+  transform: translateX(-60%);
 }
 
 div.blocked::after {
   color: #600;
-  display: block;
   content: 'Blocked';
   font-style: italic;
 }
 
 div.unblocked::after {
-  display: block;
   content: 'Unblocked';
   color: #686;
 }
 
 div.unblocked:hover::after {
   color: red;
-  display: block;
-  content: 'Block this User?';
+  content: 'Block User?';
 }
 
 div.blocked:hover::after {
   color: green;
-  display: block;
-  content: 'Unblock this User?';
+  content: 'Unblock User?';
 }
 
 
