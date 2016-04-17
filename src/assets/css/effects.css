@@ -17,16 +17,21 @@ div.super_test {
 
 /** Speach bubble effects */
 div.speech-bubble{
-   margin-left: 25px;
-   margin-right: 25px;
-   padding: 10px;
+   margin-left: 2em;;
+   margin-right: 2em;;
+   padding: 1em;
    color: white;
    display: inline-block;
-   width: 420px; 
-   min-height: 80px; 
-   border-radius: 10px;
+   width: 70%; 
+   min-height: 6em; 
+   border-radius: 1em;
+}
+.bubble-content {
+  width: 100%;
+  float: left;
 }
 div.speech-bubble.left {
+   text-align: left;
    background: blue;
 }
 div.speech-bubble.right {
@@ -38,22 +43,23 @@ div.speech-bubble::after {
    position: absolute;
    width: 0;
    height: 0;
-   border-top: 13px solid transparent;
-   border-bottom: 13px solid transparent;
+   border-top: 1.5em solid transparent;
+   border-bottom: 1.5em solid transparent;
    margin: 0;
 }
 div.speech-bubble.left::before {
-   border-right: 26px solid blue;
-   margin-left: -35px;
+   border-right: 2.5em solid blue;
+   margin-left: -3.5em;
 
 }
 div.speech-bubble.right:after {
-   border-left: 26px solid red;
+   border-left: 2.5em solid red;
+   margin-left: .5em;
    /*
    margin-left: 410px;
+   left: 70%;
    */
-   left: 450px;
-   top: 15px;
+   top: 1.8em;
 }
 
 
