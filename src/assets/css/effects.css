@@ -56,6 +56,13 @@ div.speech-bubble.right:after {
    top: 15px;
 }
 
+
+
+
+
+
+
+
 /** Some Bootstrap Mods to make even height columns */
 .row-eq-height {
   display: -webkit-box;
@@ -146,32 +153,36 @@ div.favorite-toggle.unfavorited:hover {
 div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
   position: relative;
-  right: 85px;
   white-space: pre;
   line-height: 40px;
 }
 div.favorite-toggle.unfavorited::after {
-  right: 90px;
+  display: block;
+  top: 2em;
   content: "Not a favorite..";
   color: #884;
 }
 
 div.favorite-toggle.favorited::after {
   color: #962;
+  display: block;
+  top: 2em;
   content: 'A Favorite!';
 }
 
 div.favorite-toggle.favorited:hover::after {
   color: #888;
+  display: block;
+  top: 2em;
   content: 'Unfavorite?';
 }
 
 div.favorite-toggle.unfavorited:hover::after {
-  line-height: initial;
   color: #962;
-  content: "Make them\a a favorite!";
+  top: 2em;
+  display: block;
+  content: "Favorite them!";
 }
-
 
 
 
@@ -215,36 +226,36 @@ div.blocked::after,
 div.unblocked:after {
   font-size: small;
   position: relative;
-  right: 80px;
-  line-height: 35px;
+  /*
+  line-height: 15px;
+  */
   white-space: pre;
   display: block;
-  top: -40px;
 }
 
 div.blocked::after {
   color: #600;
+  display: block;
   content: 'Blocked';
   font-style: italic;
 }
 
 div.unblocked::after {
+  display: block;
   content: 'Unblocked';
   color: #686;
 }
 
 div.unblocked:hover::after {
   color: red;
-  line-height: initial;
-  right: 120px;
-  content: 'Block Messages \a from this User?';
+  display: block;
+  content: 'Block this User?';
 }
 
 div.blocked:hover::after {
-  line-height: initial;
-  right: 120px;
   color: green;
-  content: 'Unblock Messages \a from this User?';
+  display: block;
+  content: 'Unblock this User?';
 }
 
 
@@ -370,4 +381,15 @@ img.avatar {
   justify-content: center;
   */
   background-color: black;
+}
+
+
+@media (max-width: 600px) {
+  div.speech-bubble{
+    width: auto;
+  }
+  div.speech-bubble:before, 
+  div.speech-bubble:after {
+    content: none;
+  } 
 }
