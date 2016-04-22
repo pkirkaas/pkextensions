@@ -831,6 +831,42 @@ function setGet($getkey, $getval = null, $qstr = null) {
   return $returl;
 }
 
+
+/** Sets (changes or adds or unsets/clears) get parameters to values. Only works
+ * with/returns the query string, not the whole URL.
+ * 
+ * @param array $paramArr -- assoc arr of GET [$key => $val]. If $val = '', sets
+ * &key=&nextkey=nextval - but if $val === NULL, clears the 
+ * @param string|null $qstr -- if string, assumed a query string and paramArr added;
+     if '', returned str is just from the $paramArr; if NULL, the current REQUEST QUERY
+     is used, and $paramArr added or replaced into it.
+ * 
+
+ @return string - query string
+ */
+function setGets(array $paramArr, $qstr = null) {
+  if ($qstr === null) {
+    $requri = $_SERVER['REQUEST_URI'];
+    $uriArr = explode('?', $requri);
+    $qstr = empty($uriArr[1]) ? '' : $uriArr[1];
+  }
+  if (!is_string($qstr)) {
+    pkdebug("Bad parameter qstr:", $qstr);
+    return '';
+  }
+
+  $getArr = [];
+  parse_str($qstr, $getArr);
+  foreach ($paramArr as $param => $val) {
+    if ($val === null) {
+      unset($getArr[$param]);
+    } else {
+      $getArr[$param] = $val;
+    }
+  }
+  return http_build_query($getArr);
+}
+
 /**
  * Creates a select box with the input
  * @param $name - String - The HTML Control Name. Makes class from 'class-$name'
