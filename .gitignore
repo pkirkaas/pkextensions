@@ -9,4 +9,6 @@ logs/
 *-orig.php
 .env
 /storage/*
+/vendor/*
+/composer.lock
 nbproject/*
