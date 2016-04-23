@@ -10,6 +10,8 @@ $('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
 		$(tpl).dialog( {
       modal : true,
       width : 600,
+      dialogClass : 'col-sm-8 dialog-responsive',
+      resizable : true,
       buttons : {
         //Cancel : function () { $(this).dialog('close'); }
         Cancel : function () { $(this).dialog('destroy'); }

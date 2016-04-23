@@ -17,16 +17,21 @@ div.super_test {
 
 /** Speach bubble effects */
 div.speech-bubble{
-   margin-left: 25px;
-   margin-right: 25px;
-   padding: 10px;
+   margin-left: 2em;;
+   margin-right: 2em;;
+   padding: 1em;
    color: white;
    display: inline-block;
-   width: 420px; 
-   min-height: 80px; 
-   border-radius: 10px;
+   width: 70%; 
+   min-height: 6em; 
+   border-radius: 1em;
+}
+.bubble-content {
+  width: 100%;
+  float: left;
 }
 div.speech-bubble.left {
+   text-align: left;
    background: blue;
 }
 div.speech-bubble.right {
@@ -38,23 +43,31 @@ div.speech-bubble::after {
    position: absolute;
    width: 0;
    height: 0;
-   border-top: 13px solid transparent;
-   border-bottom: 13px solid transparent;
+   border-top: 1.5em solid transparent;
+   border-bottom: 1.5em solid transparent;
    margin: 0;
 }
 div.speech-bubble.left::before {
-   border-right: 26px solid blue;
-   margin-left: -35px;
+   border-right: 2.5em solid blue;
+   margin-left: -3.5em;
 
 }
 div.speech-bubble.right:after {
-   border-left: 26px solid red;
+   border-left: 2.5em solid red;
+   margin-left: .5em;
    /*
    margin-left: 410px;
+   left: 70%;
    */
-   left: 450px;
-   top: 15px;
+   top: 1.8em;
 }
+
+
+
+
+
+
+
 
 /** Some Bootstrap Mods to make even height columns */
 .row-eq-height {
@@ -114,19 +127,25 @@ div.speech-bubble.right:after {
   }
 }
 
-/** Management of "Favoriting", in combo with JS / AJAX */
+/** Management of "Favoriting" & Blocking, in combo with JS / AJAX */
 
+.social-control-container {
+  height: 4em;
+  text-align: center;
+}
+
+div.blocked,
+div.unblocked,
 div.favorited,
 div.unfavorited {
-  /*
-  background-image: url('../img/Empty_Star.svg');
-  background-image: url('../img/Full_Star_Yellow.svg');
-  background-image: url('../img/Empty_Star.svg');
-  */
-  line-height: initial;
-  width: 35px;
-  height: 35px;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
   background-size: contain;
+}
+div.favorited,
+div.unfavorited {
+  transform: translateY(-.5em);
 }
 
 div.unfavorited {
@@ -145,13 +164,14 @@ div.favorite-toggle.unfavorited:hover {
 
 div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
+  transform: translateX(-50%);
+  display: block;
+  margin-top: -.3em;
   position: relative;
-  right: 85px;
   white-space: pre;
-  line-height: 40px;
 }
 div.favorite-toggle.unfavorited::after {
-  right: 90px;
+  top: 2em;
   content: "Not a favorite..";
   color: #884;
 }
@@ -167,23 +187,20 @@ div.favorite-toggle.favorited:hover::after {
 }
 
 div.favorite-toggle.unfavorited:hover::after {
-  line-height: initial;
   color: #962;
-  content: "Make them\a a favorite!";
+  content: "Favorite them!";
 }
 
 
 
-
-/** Similar with Favoriting, but for blockign */
+/** Similar with Favoriting, but for blocking */
 
 
 div.blocked,
 div.unblocked {
-  width: 35px;
-  height: 35px;
-  border-radius: 5px;
+  border-radius: .5em;
   background-color: green;
+  line-height:  2em;
 }
 
 div.blocked {
@@ -201,7 +218,7 @@ div.blocked:hover {
 
 div.unblocked::before,
 div.blocked::before {
-  font-size: xx-large;
+  font-size: x-large;
   font-weight: bold;
 }
 div.unblocked::before {
@@ -213,13 +230,12 @@ div.blocked::before {
 
 div.blocked::after,
 div.unblocked:after {
+  margin-top: -.3em;
+  white-space: pre;
   font-size: small;
   position: relative;
-  right: 80px;
-  line-height: 35px;
-  white-space: pre;
   display: block;
-  top: -40px;
+  transform: translateX(-60%);
 }
 
 div.blocked::after {
@@ -235,16 +251,12 @@ div.unblocked::after {
 
 div.unblocked:hover::after {
   color: red;
-  line-height: initial;
-  right: 120px;
-  content: 'Block Messages \a from this User?';
+  content: 'Block User?';
 }
 
 div.blocked:hover::after {
-  line-height: initial;
-  right: 120px;
   color: green;
-  content: 'Unblock Messages \a from this User?';
+  content: 'Unblock User?';
 }
 
 
@@ -370,4 +382,15 @@ img.avatar {
   justify-content: center;
   */
   background-color: black;
+}
+
+
+@media (max-width: 600px) {
+  div.speech-bubble{
+    width: auto;
+  }
+  div.speech-bubble:before, 
+  div.speech-bubble:after {
+    content: none;
+  } 
 }

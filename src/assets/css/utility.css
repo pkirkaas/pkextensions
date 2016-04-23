@@ -279,6 +279,7 @@ div.pk-tooltip {
 /* can be combined with other clases to give a look and 
 eel to labels (descriptons), vs user input/repli8es */
 
+/* - Definitely not general utility classes...
 .pk-desc {
   color: #556;
   font-style: italic;
@@ -295,6 +296,7 @@ eel to labels (descriptons), vs user input/repli8es */
   padding: 5px;
   border-radius: 5px;
 }
+*/
 
 /*You have to attach these three classes to the object you want to center */
 .horizontal-center {
@@ -310,7 +312,10 @@ eel to labels (descriptons), vs user input/repli8es */
 .vertical-center {
   margin-top: 0;
   margin-bottom: 0;
+  /** Think it works w. relative? 
   position: absolute;
+  */
+  position: relative;
   top: 50%;
   transform:translate(0,-50%);
 }
@@ -460,3 +465,8 @@ a.undecorated {
 #helpContent {
   display: none;
 }
+
+.droponhover.dropdown:hover .dropdown-menu,
+.droponhover.dropdown .dropdown-menu:hover {
+  display: block;
+} 
