@@ -262,6 +262,7 @@ div.blocked:hover::after {
 
 /** Sope button styling, also for divs, and menus? */
 
+.pkmvc-button:focus,
 .pkmvc-button:visited,
 .pkmvc-button {
   white-space: nowrap;
@@ -383,7 +384,6 @@ img.avatar {
   */
   background-color: black;
 }
-
 
 @media (max-width: 600px) {
   div.speech-bubble{

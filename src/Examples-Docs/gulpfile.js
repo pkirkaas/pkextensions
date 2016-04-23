@@ -22,6 +22,7 @@ gulp.task('default', function() {
 
 // Compile, minify, and sourcemap SCSS
 gulp.task('sass', function() {
+  var bootstrapPartialPath = 'bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 	gulp.src([
     "import.scss",
     "bower_components/font-awesome/scss/font-awesome.scss",
@@ -32,7 +33,9 @@ gulp.task('sass', function() {
     'app/resources/assets/sass/lean.scss',
     'app/resources/assets/sass/lqp.css'
   ])
-	.pipe(sass().on('error', sass.logError))
+	.pipe(sass({
+    includePaths : bootstrapPartialPath
+  }).on('error', sass.logError))
 	//.pipe(minify())
 	.pipe(sourcemaps.init())
   .pipe(concat('stylesheets.css'))

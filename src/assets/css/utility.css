@@ -312,10 +312,10 @@ eel to labels (descriptons), vs user input/repli8es */
 .vertical-center {
   margin-top: 0;
   margin-bottom: 0;
-  /** Think it works w. relative? 
-  position: absolute;
-  */
+  /** Think it works w. relative? But need to play with it more first.
   position: relative;
+  */
+  position: absolute;
   top: 50%;
   transform:translate(0,-50%);
 }
