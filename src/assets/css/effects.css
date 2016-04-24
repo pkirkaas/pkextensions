@@ -164,6 +164,7 @@ div.favorite-toggle.unfavorited:hover {
 
 div.favorite-toggle.favorited::after,
 div.favorite-toggle.unfavorited::after {
+  top: 2em;
   transform: translateX(-50%);
   display: block;
   margin-top: -.3em;
@@ -171,7 +172,6 @@ div.favorite-toggle.unfavorited::after {
   white-space: pre;
 }
 div.favorite-toggle.unfavorited::after {
-  top: 2em;
   content: "Not a favorite..";
   color: #884;
 }

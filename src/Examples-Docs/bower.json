@@ -17,9 +17,9 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap-sass": "bootstrap-sass-official#^3.3.6",
-    "normalize-scss": "^3.0.3",
+    "bootstrap": "^4.0",
     "jquery-ui": "^1.11.4",
-    "font-awesome": "fontawesome#^4.5.0"
+    "font-awesome": "fontawesome#^4.5.0",
+    "tether": "^1.3.1"
   }
 }

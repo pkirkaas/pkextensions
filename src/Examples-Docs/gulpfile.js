@@ -22,11 +22,14 @@ gulp.task('default', function() {
 
 // Compile, minify, and sourcemap SCSS
 gulp.task('sass', function() {
-  var bootstrapPartialPath = 'bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+  //var bootstrapPartialPath = 'bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+  var bootstrapPartialPath = 'bower_components/bootstrap/scss';
 	gulp.src([
-    "import.scss",
+  //  "import.scss",
     "bower_components/font-awesome/scss/font-awesome.scss",
     "bower_components/jquery-ui/themes/ui-lightness/jquery-ui.css",
+    'app/resources/assets/sass/site-bootstrap.scss',
+    //'bower_components/bootstrap/scss/bootstrap-flex.scss',
     'vendor/pkirkaas/PkExtensions/src/assets/css/utility.css',
    // 'vendor/pkirkaas/PkExtensions/src/assets/css/styles.css',
     'vendor/pkirkaas/PkExtensions/src/assets/css/effects.css',
