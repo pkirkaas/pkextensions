@@ -531,20 +531,23 @@ a.undecorated {
 .horizontal-centerer { @include make-horizontal-centerer}
 
 //$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
-
+@mixin make-pk-col {
+  box-sizing: border-box;
+  border: solid blue 1px;
+  /*
+  */
+  display: flex;
+  align-content: center;
+  flex-direction: column;
+  flex-grow: 0;
+  overflow: hidden;
+  flex-shrink: 1;
+}
+.pk-col {@include make-pk-col}
 @each $sz, $breakpoint in $grid-breakpoints {
   @media (min-width: $breakpoint) {
     .pk-col-#{$sz} {
-      box-sizing: border-box;
-      /*
-      border: solid blue 1px;
-      */
-      display: flex;
-      align-content: center;
-      flex-direction: column;
-      flex-grow: 0;
-      overflow: hidden;
-      flex-shrink: 1;
+      @include make-pk-col
     }
     .pk-col-#{$sz} > .pk-row,
      .pk-row-#{$sz}  {
@@ -552,12 +555,12 @@ a.undecorated {
       display: flex;
       flex-grow: 100;
       flex-basis: 100%;
-       flex-wrap: nowrap;
+      flex-wrap: nowrap;
       width: 100%;
     }
   }
   @media (max-width: $breakpoint - 1) {
-     .pk-wraprow-#{$sz}  {
+     .pk-row-#{$sz}  {
         box-sizing: border-box;
         display: flex;
         flex-wrap: wrap;
