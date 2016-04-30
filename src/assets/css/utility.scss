@@ -7,6 +7,10 @@ and open the template in the editor.
     Created on : Oct 11, 2015, 4:57:29 AM
     Author     : Paul Kirkaas
 */
+$grid-breakpoints:(xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
+
+
+
 body {
   
 }
@@ -470,3 +474,93 @@ a.undecorated {
 .droponhover.dropdown .dropdown-menu:hover {
   display: block;
 } 
+
+
+/** The start of a better bootstrap? At least compatible - but this MAKES SURE
+ * Every column of a given (proportional) width IS exactly that width, irrespective
+ * of content, all columns in a row of equal height - rows nestable within columns 
+ * and will grow proportionally to fill the column...
+ * Just add pk-col & pk-row classess to rows and columns to make them fixed
+ */
+.pk-row {
+  box-sizing: border-box;
+}
+
+//$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
+
+@each $sz, $breakpoint in $grid-breakpoints {
+  @media (min-width: $breakpoint) {
+    .pk-col-#{$sz} {
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 0;
+      overflow: hidden;
+      flex-shrink: 1;
+      word-wrap: break-word;
+    }
+    .pk-col-#{$sz} > .pk-row {
+      display: flex;
+      flex-grow: 100;
+      flex-basis: 100%;
+      width: 100%;
+    }
+  }
+}
+
+/*
+.pk-row {
+  padding: .1rem;
+  margin: .2rem;
+  border: solid blue 1px;
+  background-color: #fee;
+  box-sizing: border-box;
+}
+.pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
+.pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
+  border: solid red 1px;
+  box-sizing: border-box;
+  background-color: #aaf;
+  font-weight: bold;
+  min-height: 2em;
+}
+@media (min-width: 500px) {
+  .pk-row {
+    display: flex;
+    flex-grow: 100;
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
+  .pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    overflow: hidden;
+    flex-shrink: 1;
+    word-wrap: break-word;
+  }
+
+  .pk-col-1 { flex-basis: 8.33%; }
+  .pk-col-2 { flex-basis: 16.66%; }
+  .pk-col-3 { flex-basis: 25%; }
+  .pk-col-4 { flex-basis: 33.3%; }
+  .pk-col-5 { flex-basis: 41.65%; }
+  .pk-col-6 { flex-basis: 50%; }
+  .pk-col-7 { flex-basis: 58.3%; }
+  .pk-col-8 { flex-basis: 66.6%; }
+  .pk-col-9 { flex-basis: 75%; }
+  .pk-col-10 { flex-basis: 83.3%; }
+  .pk-col-11 { flex-basis: 91.6%; }
+  .pk-col-12 { flex-basis: 100%; }
+}
+
+@media (max-width: 499px) {
+  .pk-row,
+  .pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
+  .pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
+    display: block;
+  }
+}
+*/

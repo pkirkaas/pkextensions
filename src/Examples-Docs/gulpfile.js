@@ -30,7 +30,7 @@ gulp.task('sass', function() {
     "bower_components/jquery-ui/themes/ui-lightness/jquery-ui.css",
     'app/resources/assets/sass/site-bootstrap.scss',
     //'bower_components/bootstrap/scss/bootstrap-flex.scss',
-    'vendor/pkirkaas/PkExtensions/src/assets/css/utility.css',
+    'vendor/pkirkaas/PkExtensions/src/assets/css/utility.scss',
    // 'vendor/pkirkaas/PkExtensions/src/assets/css/styles.css',
     'vendor/pkirkaas/PkExtensions/src/assets/css/effects.css',
     'app/resources/assets/sass/lean.scss',
