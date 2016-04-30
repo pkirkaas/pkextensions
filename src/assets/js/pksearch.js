@@ -24,7 +24,6 @@ $(function () {
  * matching Search Value control
  */
 function disableDontCares() {
-  console.log("In disableDontCares");
   $('form.search .search-crit').each( function() {
       disableDontCare(this);
   });
@@ -49,12 +48,14 @@ function disableDontCare(target) {
     $(paired_val_ctl).attr('title','Select a criteria to enter a value');
     $(paired_val_ctl).addClass('disabled');
     $(paired_val_ctl).closest('div.multiselect').addClass('disabled');
+    $(paired_val_ctl).closest('div.multiselect').attr('disabled',true);
     $(paired_val_ctl).removeClass('enabled');
   } else {
     $(paired_val_ctl).attr('title','');
     $(paired_val_ctl).attr('disabled',false);
     $(paired_val_ctl).removeClass('disabled');
     $(paired_val_ctl).closest('div.multiselect').removeClass('disabled');
+    $(paired_val_ctl).closest('div.multiselect').attr('disabled',false);
     $(paired_val_ctl).addClass('enabled');
   }
 }

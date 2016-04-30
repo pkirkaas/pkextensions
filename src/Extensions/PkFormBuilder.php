@@ -138,7 +138,7 @@ class PkFormBuilder extends FormBuilder {
    */
   public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
     $values = $this->getValueAttribute($name, $values);
-    $wrapperclass = keyval('wrapperclass',$options);
+    $wrapperclass = keyval('wrapperclass',$options, ' form-control ');
     $allclass = keyval('allclass',$options);
     unset($options['wrapperclass']);
     unset($options['allclass']);

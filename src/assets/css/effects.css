@@ -385,6 +385,23 @@ img.avatar {
   background-color: black;
 }
 
+/** Basic uniform styling for disabled controls - both the native HTML inputs,
+ * which bootstrap applies a style to through the pseudo-selector :disabled -
+ * but that doesn't work with my compound inputs like "multiselect" Components
+ * that want this styling should have the class 'form-control', and have the
+ * class 'disabled'
+ */
+
+/*
+div.multiselect.disabled,
+input[disabled].disabled {
+*/
+.form-control.disabled {
+  background-color: #444;
+  color: #888;
+}
+
+
 @media (max-width: 600px) {
   div.speech-bubble{
     width: auto;
