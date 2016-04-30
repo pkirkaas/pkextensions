@@ -151,15 +151,18 @@ h3 {
 
 .width-200, .width200 { width: 200px ! important; }
 .minwidth-100, .minwidth100 { min-width: 100px ! important; }
+.minwidth-20em, .minwidth20em { min-width: 20em ! important; }
+.minwidth-16em, .minwidth16em { min-width: 16em ! important; }
+.minwidth-25em, .minwidth25em { min-width: 25em ! important; }
 .width-100, .width100 { width: 100px ! important; }
 .width-50, .width50 { width: 50px ! important; }
 .width-auto, .widthauto { width: auto ! important; }
 .height-auto, .heightauto { height: auto ! important; }
 .minwidth-50, .minwidth50 { min-width: 50px ! important; }
 
-.text-align-left { text-align: left ! important; }
-.text-align-right { text-align: right ! important; }
-.text-align-center { text-align: center ! important; }
+.tal, .text-align-left { text-align: left ! important; }
+.tar, .text-align-right { text-align: right ! important; }
+.tac, .text-align-center { text-align: center ! important; }
 .italic { font-style: italic; }
 .bold { font-weight: bold ! important; }
 
@@ -475,6 +478,20 @@ a.undecorated {
   display: block;
 } 
 
+.btn-wrp {
+  padding: 0;
+  text-align: center;
+}
+
+.row-flex, 
+.col-flex {
+  display: flex;
+  flex-wrap: wrap;
+}
+.col-flex {
+  flex-direction: column;
+}
+
 
 /** The start of a better bootstrap? At least compatible - but this MAKES SURE
  * Every column of a given (proportional) width IS exactly that width, irrespective
@@ -482,8 +499,19 @@ a.undecorated {
  * and will grow proportionally to fill the column...
  * Just add pk-col & pk-row classess to rows and columns to make them fixed
  */
+.pk-row-wrap,
 .pk-row {
   box-sizing: border-box;
+  display: flex;
+}
+.pk-row-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-center {
+  align-items: center;
+  align-content: center;
+  justify-content: center;
 }
 
 //$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
@@ -492,19 +520,32 @@ a.undecorated {
   @media (min-width: $breakpoint) {
     .pk-col-#{$sz} {
       box-sizing: border-box;
+      /*
+      border: solid blue 1px;
+      */
       display: flex;
+      align-content: center;
       flex-direction: column;
       flex-grow: 0;
       overflow: hidden;
       flex-shrink: 1;
-      word-wrap: break-word;
     }
-    .pk-col-#{$sz} > .pk-row {
+    .pk-col-#{$sz} > .pk-row,
+     .pk-row-#{$sz}  {
+      box-sizing: border-box;
       display: flex;
       flex-grow: 100;
       flex-basis: 100%;
+       flex-wrap: nowrap;
       width: 100%;
     }
+  }
+  @media (max-width: $breakpoint - 1) {
+      box-sizing: border-box;
+     .pk-row-#{$sz}  {
+       display: flex;
+       flex-wrap: wrap;
+     }
   }
 }
 
