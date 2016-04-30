@@ -306,7 +306,7 @@ eel to labels (descriptons), vs user input/repli8es */
 */
 
 /*You have to attach these three classes to the object you want to center */
-.horizontal-center {
+@mixin make-horizontal-center {
   margin-left: 0;
   margin-right: 0;
   position: absolute;
@@ -316,7 +316,8 @@ eel to labels (descriptons), vs user input/repli8es */
   */
   transform:translate(-50%,0);
 }
-.vertical-center {
+
+@mixin make-vertical-center {
   margin-top: 0;
   margin-bottom: 0;
   /** Think it works w. relative? But need to play with it more first.
@@ -326,6 +327,10 @@ eel to labels (descriptons), vs user input/repli8es */
   top: 50%;
   transform:translate(0,-50%);
 }
+
+
+.horizontal-center { @include make-horizontal-center }
+.vertical-center { @include make-vertical-center }
 
 
 /*The block to center in the containing block should have this class. The
@@ -514,6 +519,17 @@ a.undecorated {
   justify-content: center;
 }
 
+/* Throw in everything here to try to center contents */
+@mixin make-horizontal-centerer {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.horizontal-centerer { @include make-horizontal-centerer}
+
 //$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
 
 @each $sz, $breakpoint in $grid-breakpoints {
@@ -541,67 +557,14 @@ a.undecorated {
     }
   }
   @media (max-width: $breakpoint - 1) {
-      box-sizing: border-box;
-     .pk-row-#{$sz}  {
-       display: flex;
-       flex-wrap: wrap;
+     .pk-wraprow-#{$sz}  {
+        box-sizing: border-box;
+        display: flex;
+        flex-wrap: wrap;
      }
+     .horizontal-center-#{$sz}  { @include make-horizontal-center }
+     .vertical-center-#{$sz}  { @include make-vertical-center }
+      .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}
   }
 }
 
-/*
-.pk-row {
-  padding: .1rem;
-  margin: .2rem;
-  border: solid blue 1px;
-  background-color: #fee;
-  box-sizing: border-box;
-}
-.pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
-.pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
-  border: solid red 1px;
-  box-sizing: border-box;
-  background-color: #aaf;
-  font-weight: bold;
-  min-height: 2em;
-}
-@media (min-width: 500px) {
-  .pk-row {
-    display: flex;
-    flex-grow: 100;
-    flex-basis: 100%;
-    width: 100%;
-  }
-
-  .pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
-  .pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 0;
-    overflow: hidden;
-    flex-shrink: 1;
-    word-wrap: break-word;
-  }
-
-  .pk-col-1 { flex-basis: 8.33%; }
-  .pk-col-2 { flex-basis: 16.66%; }
-  .pk-col-3 { flex-basis: 25%; }
-  .pk-col-4 { flex-basis: 33.3%; }
-  .pk-col-5 { flex-basis: 41.65%; }
-  .pk-col-6 { flex-basis: 50%; }
-  .pk-col-7 { flex-basis: 58.3%; }
-  .pk-col-8 { flex-basis: 66.6%; }
-  .pk-col-9 { flex-basis: 75%; }
-  .pk-col-10 { flex-basis: 83.3%; }
-  .pk-col-11 { flex-basis: 91.6%; }
-  .pk-col-12 { flex-basis: 100%; }
-}
-
-@media (max-width: 499px) {
-  .pk-row,
-  .pk-col-1, .pk-col-2, .pk-col-3, .pk-col-4, .pk-col-5, .pk-col-6,
-  .pk-col-7, .pk-col-8, .pk-col-9, .pk-col-10, .pk-col-11, .pk-col-12 {
-    display: block;
-  }
-}
-*/
