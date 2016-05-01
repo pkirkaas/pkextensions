@@ -175,7 +175,7 @@ h3 {
 .hidden { display: none; }
 .invisible { visibility: hidden; }
 
-.padding-0, .padding0 { padding: 0px ! important; }
+.nopadding, .no-padding, .padding-0, .padding0 { padding: 0px ! important; }
 .padding-left-0 { padding-left: 0; }
 .padding-right-0 { padding-right: 0; }
 .padding5, .padding-5 { padding: 5px ! important; }
@@ -505,13 +505,19 @@ a.undecorated {
  * and will grow proportionally to fill the column...
  * Just add pk-col & pk-row classess to rows and columns to make them fixed
  */
+.pk-row-nowrap,
 .pk-row-wrap,
 .pk-row {
   box-sizing: border-box;
   display: flex;
+  flex-grow: 1;
+  
 }
 .pk-row-wrap {
   flex-wrap: wrap;
+}
+.pk-row-nowrap {
+  flex-wrap: nowrap;
 }
 
 .flex-center {
@@ -541,8 +547,12 @@ a.undecorated {
   align-content: center;
   flex-direction: column;
   flex-grow: 0;
+  padding: 0;
   overflow: hidden;
+  flex-shrink: 0;
+  /*
   flex-shrink: 1;
+  */
 }
 .pk-col {@include make-pk-col}
 
@@ -563,11 +573,10 @@ $i: 1;
     $next-bp: 99999 * 1px ;
   }
 
-  @debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
+  //@debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
   
   @media (min-width: $breakpoint) and (max-width: $next-bp) {
-    // Now loop and make explicit .pk-col-md-3, with proper width %
-
+    // Now loop and make explicit - only appliies to this media size
   }
   
   // Now, all definitions for $breakpoint and Higher 
@@ -601,6 +610,11 @@ $i: 1;
         display: flex;
         flex-wrap: wrap;
      }
+     .pk-flex-resize-#{$sz} { //Match the wrap size - if wrapping, should adapt
+       flex-grow: 1;
+       flex-shrink: 1;
+     } 
+
     .horizontal-center-#{$sz}  { @include make-horizontal-center }
     .vertical-center-#{$sz}  { @include make-vertical-center }
     .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}

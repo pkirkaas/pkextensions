@@ -13,9 +13,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
     $sz: map-get($grid-breakpoints, $sz)
   }
   @if type-of($sz) != 'number' {
-    @error ('Bad parameter sz:', $sz);
+    @debug ('Result of sz:', $sz);
+    @error 'Bad parameter sz:';
   }
-  @debug ('Result of sz:', $sz);
   @return $sz;
 }
 
