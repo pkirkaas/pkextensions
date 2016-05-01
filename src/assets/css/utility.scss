@@ -8,7 +8,8 @@ and open the template in the editor.
     Author     : Paul Kirkaas
 */
 $grid-breakpoints:(xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
-
+$grid-columns:               12 !default;
+$grid-gutter-width:          1.875rem !default; // 30px
 
 
 body {
@@ -544,13 +545,47 @@ a.undecorated {
   flex-shrink: 1;
 }
 .pk-col {@include make-pk-col}
+
+
+
+
+//$szlist: map-keys( $grid-breakpoints );
+$bplist: map-values( $grid-breakpoints );
+$cnt: length($bplist);
+$i: 1;
+
 @each $sz, $breakpoint in $grid-breakpoints {
+  //First we do the definitions BETWEEN two breakpoints...
+  $i: $i + 1;
+  @if $i <= $cnt {
+    $next-bp: nth($bplist,$i) - 1;
+  } @else {
+    $next-bp: 99999 * 1px ;
+  }
+
+  @debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
+  
+  @media (min-width: $breakpoint) and (max-width: $next-bp) {
+    // Now loop and make explicit .pk-col-md-3, with proper width %
+
+  }
+  
+  // Now, all definitions for $breakpoint and Higher 
   @media (min-width: $breakpoint) {
-    .pk-col-#{$sz} {
+    @for $colno from 1 through $grid-columns {
+      .pk-col-#{$sz}-#{$colno} {
+        @include make-pk-col;
+        flex-basis: percentage($colno / $grid-columns);
+        flex-grow: 0;
+        flex-shrink: 0;
+      }
+    } 
+    .pk-col-#{$sz} { //Aplied with standard BS columns to all widths > bp
       @include make-pk-col
     }
     .pk-col-#{$sz} > .pk-row,
-     .pk-row-#{$sz}  {
+     .pk-row-#{$sz}-up, //Up means the row will only flex above the size, no wrap
+     .pk-row-#{$sz}  { //No up means it will flex always, but wrap below this size
       box-sizing: border-box;
       display: flex;
       flex-grow: 100;
@@ -559,15 +594,17 @@ a.undecorated {
       width: 100%;
     }
   }
-  @media (max-width: $breakpoint - 1) {
+  // Now, all definitions for $breakpoint and Higher 
+  //Now media query defs for SMALLER than sz
+  @media (max-width: $breakpoint - 1px) {
      .pk-row-#{$sz}  {
         box-sizing: border-box;
         display: flex;
         flex-wrap: wrap;
      }
-     .horizontal-center-#{$sz}  { @include make-horizontal-center }
-     .vertical-center-#{$sz}  { @include make-vertical-center }
-      .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}
+    .horizontal-center-#{$sz}  { @include make-horizontal-center }
+    .vertical-center-#{$sz}  { @include make-vertical-center }
+    .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}
   }
 }
 
