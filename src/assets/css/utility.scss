@@ -612,7 +612,7 @@ $i: 1;
      }
      .pk-flex-resize-#{$sz} { //Match the wrap size - if wrapping, should adapt
        flex-grow: 1;
-       flex-shrink: 1;
+       flex-shrink: 0;
      } 
 
     .horizontal-center-#{$sz}  { @include make-horizontal-center }

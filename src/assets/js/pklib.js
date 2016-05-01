@@ -637,16 +637,33 @@ function generateUUID() {
   return uuid;
 }
 function in_array(key, arr) {
-  var ktype = typeof(key);
-    var res = false;
-  $.each(arr, function(idx, val) {
-    vtype = typeof(val);
-    if (key === val) { 
+  var ktype = typeof (key);
+  var res = false;
+  $.each(arr, function (idx, val) {
+    vtype = typeof (val);
+    if (key === val) {
       res = true;
     }
   });
   return res;
 }
 
+/** Supposedly jQuery functions to safely html encode/decode text (html)
+ * to store in a data-attribute
+ */
+function htmlEncode(value) {
+  if (value) {
+    return jQuery('<div />').text(value).html();
+  } else {
+    return '';
+  }
+}
 
+function htmlDecode(value) {
+  if (value) {
+    return $('<div />').html(value).text();
+  } else {
+    return '';
+  }
+}
 
