@@ -23,7 +23,8 @@ gulp.task('default', function() {
 // Compile, minify, and sourcemap SCSS
 gulp.task('sass', function() {
   //var bootstrapPartialPath = 'bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
-  var bootstrapPartialPath = 'bower_components/bootstrap/scss';
+  var bootstrapPartialPath = ['bower_components/bootstrap/scss',
+    'vendor/pkirkaas/PkExtensions/src/assets/css'];
 	gulp.src([
   //  "import.scss",
     "bower_components/font-awesome/scss/font-awesome.scss",

@@ -1,0 +1,42 @@
+/** Mixins to add to BootStrap (4). Assumes "_variables.scss' is in the GULP path */
+
+@import '_variables';
+// If they weren't previously defined, use defaults
+$grid-breakpoints: (xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
+$grid-columns:               12 !default;
+$grid-gutter-width:          1.875rem !default; // 30px
+
+//First three are to define classes at breakpoints - above, below, and between
+
+@function breakpoint($sz) {
+  @if type-of($sz) == string {
+    $sz: map-get($grid-breakpoints, $sz)
+  }
+  @if type-of($sz) != 'number' {
+    @error ('Bad parameter sz:', $sz);
+  }
+  @debug ('Result of sz:', $sz);
+  @return $sz;
+}
+
+// Can take a BS 'sz' ('xs', 'sm', etc)
+@mixin above-bp($sz) {
+  $breakpoint: breakpoint($sz);
+  @media (min-width: $breakpoint) {
+    @content
+  }
+}
+@mixin below-bp($sz) {
+  $breakpoint: breakpoint($sz);
+  @media (max-width: $breakpoint - 1px) {
+    @content
+  }
+}
+
+@mixin between-bps($min, $max) {
+  $min-breakpoint: breakpoint($min);
+  $max-breakpoint:  breakpoint($max);
+  @media ( min-width: $min-breakpoint ) and (max-width: $max-breakpoint - 1px) {
+    @content
+  }
+}

@@ -594,7 +594,6 @@ $i: 1;
       width: 100%;
     }
   }
-  // Now, all definitions for $breakpoint and Higher 
   //Now media query defs for SMALLER than sz
   @media (max-width: $breakpoint - 1px) {
      .pk-row-#{$sz}  {
