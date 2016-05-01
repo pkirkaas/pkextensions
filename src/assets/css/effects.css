@@ -146,6 +146,7 @@ div.unfavorited {
 div.favorited,
 div.unfavorited {
   transform: translateY(-.5em);
+  margin: auto;
 }
 
 div.unfavorited {

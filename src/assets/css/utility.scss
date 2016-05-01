@@ -200,7 +200,16 @@ h3 {
 .margin-bottom-10 { margin-bottom: 10px ! important; }
 .margin-bottom-20 { margin-bottom: 20px ! important; }
 
-.marginauto, .margin-auto, .auto-margin, .automargin { margin-left: auto ! important; margin-right: auto ! important; }
+.marginauto, .margin-auto, .auto-margin, .automargin {
+  margin-left: auto ! important;
+  margin-right: auto ! important;
+  margin-top: auto ! important;
+  margin-bottom: auto ! important;
+}
+
+.self-center {
+  justify-content: center;
+}
 
 
 .border-light, .border, .mildborder, .mild-border { border: solid #aaa 1px; }
@@ -540,8 +549,8 @@ a.undecorated {
 //$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
 @mixin make-pk-col {
   box-sizing: border-box;
-  border: solid blue 1px;
   /*
+  border: solid blue 1px;
   */
   display: flex;
   align-content: center;
