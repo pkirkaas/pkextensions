@@ -117,22 +117,22 @@ function showHelpDialog() {
  * @returns {undefined}
  */
 
+$(function () {
 $('body').on('click', '.pk-ajax-button', function (event) {
+  console.log("Yes, clicked ajax");
     var ajax_url = htmlDecode($(event.target).attr('data-ajax-url'));
     var ajax_params = htmlDecode($(event.target).attr('data-ajax-params'));
-    var them_id = $(event.target).attr('data-them_id');
-    //var data = {them_id: them_id};
-    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params);
-    /*
+    var ajax_data = parseStr(ajax_params);
+    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params, 'ajax_data', ajax_data);
     var res = $.ajax({
       url: ajax_url,
-      data: ajax_params,
+      data: ajax_data,
       method: 'POST'
     }).done(function (data) {
       console.log('After Ajax Data',data);
     });
-  */
   });
+});
 
 
 
@@ -228,11 +228,18 @@ function refreshNewGet(parmName, parmValue) {
  */
 function getGets() {
   var queryStr = window.location.search.substr(1);
-  var params = {};
-  if (queryStr == '')
-    return params;
-  var prmarr = queryStr.split("&");
+  return parseStr(queryStr);
+}
 
+/** A VERY light weight version of PHP parse_str - converts a simple
+ * HTTP query string (key1=val1&key2=val2..) to a JS Obj 
+ * @param string queryStr
+ * @returns object
+ */
+function parseStr(queryStr) {
+  var params = {};
+  if (!queryStr || (queryStr === '')) return params;
+  var prmarr = queryStr.split("&");
   for (var i = 0; i < prmarr.length; i++) {
     var tmparr = prmarr[i].split("=");
     params[tmparr[0]] = tmparr[1];

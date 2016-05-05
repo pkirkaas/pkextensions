@@ -188,7 +188,7 @@ class PkFormBuilder extends FormBuilder {
      */
     public function ajaxButton($label, $ajax_url, $options = []) {
         $options['type'] = 'button';
-        $options['class'] .= ' pk-ajax-button ';
+        $options['class'] = keyVal('class', $options). ' pk-ajax-button ';
         if (array_key_exists('params', $options)) {
           $options['data-ajax-params'] = http_build_query($options['params']);
           unset ($options['params']);
