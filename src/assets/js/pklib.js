@@ -109,6 +109,34 @@ function showHelpDialog() {
 }
 
 
+
+
+/** Generic attachment of AJAX call to DOM element (button?)
+ * 
+ * @param {type} menu
+ * @returns {undefined}
+ */
+
+$('body').on('click', '.pk-ajax-button', function (event) {
+    var ajax_url = htmlDecode($(event.target).attr('data-ajax-url'));
+    var ajax_params = htmlDecode($(event.target).attr('data-ajax-params'));
+    var them_id = $(event.target).attr('data-them_id');
+    //var data = {them_id: them_id};
+    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params);
+    /*
+    var res = $.ajax({
+      url: ajax_url,
+      data: ajax_params,
+      method: 'POST'
+    }).done(function (data) {
+      console.log('After Ajax Data',data);
+    });
+  */
+  });
+
+
+
+
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
  * body padding-top to adjust to the height of the menu on window resize and init  */
 function top_pad_body_to_fixed(menu) {

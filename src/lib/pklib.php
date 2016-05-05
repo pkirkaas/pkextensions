@@ -655,20 +655,15 @@ function getRouteSegments($default = false, $depth = 2) {
  * @return boolean - true if in a request and request is HTTPS; else false
  */
 function isHttps() {
-  return (!empty($_SERVER)) && (
-      (array_key_exists('HTTPS', $_SERVER) && strtolower($_SERVER["HTTPS"]) === "on") ||
-      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) === 'https') ||
-      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"] === 'https'))
-      );
-
-  /**
-    (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https') ||
-    ($_SERVER["HTTP_X_FORWARDED_PROTO"]==='https')
+//  $env = getenv("MMDEV");
+//  if ($env == 'PAUL') return false;
+  return is_array($_SERVER) && !empty($_SERVER) &&
+    (
+      (array_key_exists('HTTPS', $_SERVER) && (strtolower($_SERVER["HTTPS"]) === "on")) ||
+      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https')) ||
+      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && (strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"])==='https')) 
     );
-   * 
-   */
 }
-
 /**
  * 
  * @return String: The URL without subdirs, but with protocol (http://, etc)

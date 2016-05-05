@@ -178,6 +178,30 @@ class PkFormBuilder extends FormBuilder {
         return $this->toHtmlString('<button' . $this->html->attributes($options) . '>' . $label . '</button>');
     }
 
+    /**
+     * Create an Ajax Button assuming JS support, with resonalbe defaults.
+     *
+     * @param  string $label - to show on the button 
+     * @param string $ajax_url - the ajax url to call. Sets data-ajax-url attribute
+     * @param  array  $options - HTML attributes, plus optional 'params' key=>$params array, converted to data-params
+     * @return \Illuminate\Support\HtmlString
+     */
+    public function ajaxButton($label, $ajax_url, $options = []) {
+        $options['type'] = 'button';
+        $options['class'] .= ' pk-ajax-button ';
+        if (array_key_exists('params', $options)) {
+          $options['data-ajax-params'] = http_build_query($options['params']);
+          unset ($options['params']);
+        }
+        $options['data-ajax-url'] = $ajax_url;
+
+        return $this->toHtmlString("<button "
+            . $this->html->attributes($options) . '>' .
+            $label .
+            '</button>');
+    }
+
+
   //public function checkbox($name, $value = 1, $checked = null, $options = [])
 
   /**
