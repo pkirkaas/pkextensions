@@ -120,15 +120,33 @@ function showHelpDialog() {
 $(function () {
 $('body').on('click', '.pk-ajax-button', function (event) {
   console.log("Yes, clicked ajax");
-    var ajax_url = htmlDecode($(event.target).attr('data-ajax-url'));
-    var ajax_params = htmlDecode($(event.target).attr('data-ajax-params'));
+    var target = $(event.target);
+    var ajax_url = htmlDecode(target.attr('data-ajax-url'));
+    var ajax_params = htmlDecode(target.attr('data-ajax-params'));
     var ajax_data = parseStr(ajax_params);
+    var response_target = target.attr('data-response-target');
+    var response_target_type = target.attr('data-response-target-type');
+    var is_button = target.is('button');
+
+    
+
+
+
     console.log('ajax_url',ajax_url, 'ajax_params', ajax_params, 'ajax_data', ajax_data);
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,
       method: 'POST'
     }).done(function (data) {
+      if (response_target_type === 'attribute') {
+        if (is_button) {
+          target.prop(response_target, data);
+        } else {
+          target.innerHtml = data;
+        }
+      } else { //Click target is a div; apply result to first child
+        
+      }
       console.log('After Ajax Data',data);
     });
   });

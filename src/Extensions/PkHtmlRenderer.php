@@ -29,6 +29,20 @@ class PkHtmlRenderer extends PartialSet {
       'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title',
       'tr', 'tt', 'u', 'ul', 'var', 'video',
     ];
+  public static function contentTag($tag) {
+    if (!$tag || !is_string($tag)) return false;
+    $tag = strtolower($tag);
+    return in_array($tag, static::$content_tags, true);
+  }
+  public static function selfClosingTag($tag) {
+    if (!$tag || !is_string($tag)) return false;
+    $tag = strtolower($tag);
+    return in_array($tag, static::$selfclosing_tags, true);
+  }
+  public static function isTag($tag) {
+    return static::selfClosingTag($tag) || static::contentTag($tag);
+  }
+
   public $tagStack = [];
   public function addTagStack($tag) {
     $this->tagStack[] = $tag;

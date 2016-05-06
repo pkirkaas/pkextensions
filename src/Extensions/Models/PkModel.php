@@ -38,6 +38,9 @@ abstract class PkModel extends Model {
   public static $table_field_defs = null;
 
   public static function getFieldNames() {
+    if (!is_array(static::getTableFieldDefs())) {
+      return null;
+    }
     return array_keys(static::getTableFieldDefs());
   }
 
@@ -82,8 +85,9 @@ abstract class PkModel extends Model {
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
         $type = $def['type'];
+        $type_args=keyVal('type_args',$def) ? ', '.keyVal('type_args', $def) : '';
         $methods = keyval('methods', $def, []);
-        $fielddef = "$spaces\$table->$type('$fieldName')";
+        $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
         if (is_string($methods)) {
           if ($change && (in_array($methods, $indices)))
               $fielddef .= $changestr . ";\n";
@@ -130,6 +134,13 @@ abstract class PkModel extends Model {
       $currenttablefields = static::getStaticAttributeNames();
       $is_timestamped = in_array('updated_at', $currenttablefields);
       $currentmodelfields = static::getFieldNames();
+      if (!$currentmodelfields) die("No table field names defined for Model [$basename]\n");
+      /*
+      if (!$currentmodelfields) {
+        echo ("No table field names defined for Model [$basename]\n");
+        return;
+      }
+      */
       $newfields = array_diff($currentmodelfields, $currenttablefields);
       $newfielddefs = array_subset($newfields, $allFieldDefs);
       $newfieldstr = static::buildMigrationFieldDefs($newfielddefs);
@@ -191,6 +202,7 @@ class $createclassname extends Migration {
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
+    return "Migration Table [$migrationfile] Created\n";
   }
 
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];

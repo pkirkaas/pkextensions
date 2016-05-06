@@ -42,11 +42,11 @@ trait BuildQueryTrait {
    * @return boolean
    */
   public static function isValidCriterion($crit, $type = null) {
-    if ((!$type || ($type == 'numeric')) && in_array($crit, array_keys(static::$numericQueryCrit)))
+    if ((!$type || ($type === 'numeric')) && in_array($crit, array_keys(static::$numericQueryCrit)))
         return true;
-    if ((!$type || ($type == 'string')) && in_array($crit, array_keys(static::$stringQueryCrit)))
+    if ((!$type || ($type === 'string')) && in_array($crit, array_keys(static::$stringQueryCrit)))
         return true;
-    if ((!$type || ($type == 'group')) && in_array($crit, array_keys(static::$groupQueryCrit)))
+    if ((!$type || ($type === 'group')) && in_array($crit, array_keys(static::$groupQueryCrit)))
         return true;
     return false;
   }

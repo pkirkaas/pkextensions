@@ -179,36 +179,116 @@ class PkFormBuilder extends FormBuilder {
     }
 
     /**
-     * Create an Ajax Button assuming JS support, with resonalbe defaults.
+     * Make an Ajax clickable component, assuming JS support.
      *
-     * @param  string $label - to show on the button 
-     * @param string $ajax_url - the ajax url to call. Sets data-ajax-url attribute
-     * @param  array  $options - HTML attributes, plus optionally:
+     * Wraps the arbitrary HTML in a clickable div with class 'pk-ajax-button'
+     * so can use any HTML to make an AJAX call.
+
+     * @param  array|string  $options:
+     *   In simplest form, $options is a string with the ajax-url to call.
+     *   Then just render a button, with content/label $content
+     *   If is_array($options), can contain all arguments - 
+     *    - HTML attributes, plus optionally:
      *  'params' => [$key1=>$val2, $key2=>$val2,] data param arr for AJAX
-     *  'response_target' => 'target_to_recieve_response' - attr or selector
-     *    
-     *    
-     *    
-     *    
+     *   'response_target_type' => Where to send the AJAX result:  One Of:
+     *       'attribute' - write the result to the HTML attribute named in response-target
+     *       'selector' - write the result to the child-component identified by content of 'response-target'
+     *       'function' - call the JS function (named in response-target) with result
+      *    If it's 'selector', JS only looks for DOM elements within
+      *    this component (cousings and descendants), not on the rest of the page.
+     * 
+     *  'response-target' => 'target_to_recieve_response' - attr, selector or function name
+     *     -- if response_target_type === attribute, the JS sets the attribute 
+     *        to the return value of the AJAX call
+     *    -- if response-target-type === selector, JS looks looks in this HTML
+     *       or descendants for a selector that matches, and sets it's inner HTML to
+     *       the AJAX response content.
+     *    -- if response-target-type === function, calls the JS function named here with the AJAX result
+     *   If response_target & response_target_type are not set, JS uses the event
+     *     target as the component and sets its innerHTML to the AJAX response
+     *   If the component type is 'component', the JS sets results on the
+     *     FIRST CHILD of the component - attribute or innerHTML
+     *   If response_target OR response_target_type are set but EMPTY/NULL, the AJAX
+     *   JS does nothing with the response.
+     * 
+     * @param string $type - the type of HTML element to make clickable
+     * @param  string $content - the content of the HTML element, if it's a content type
+     * 
      * @return \Illuminate\Support\HtmlString
      */
-    public function ajaxButton($label, $ajax_url, $options = []) {
-        $options['type'] = 'button';
-        $options['class'] = keyVal('class', $options). ' pk-ajax-button ';
+    public function ajaxElement($options = [], $content = null, $ajax_url=null, $type = 'button') {
+      if (is_string($options)) $options = ['ajax-url'=>$options];
+      if ($ajax_url) $options['ajax-url'] = $ajax_url;
+      if ($content === null) $content = keyVal('content', $options);
+      if ($type === 'component') $type = 'div';
+      if ($type === 'button') $options['type'] = 'button';
+      //$options = static::setAjaxComponentOptions($options, $type);
+      if ($component === 'button') $options['type'] = 'button';
+      $options['class'] = keyVal('class', $options). ' pk-ajax-component ';
+
+      if (array_key_exists('params', $options)) {
+        $options['data-ajax-params'] = http_build_query($options['params']);
+        unset ($options['params']);
+      }
+
+      if (array_key_exists('response-target', $options)) {
+        $options['data-response-target'] = $options['response-target'];
+        unset ($options['response-target']);
+      }
+
+      if (array_key_exists('response-target-type', $options)) {
+        $options['data-response-target-type'] = $options['response-target-type'];
+        unset ($options['response-target-type']);
+      }
+
+      if ($ajax_url) $options['ajax-url'] = $ajax_url;
+      if (!empty($options['ajax-url'])) {
+        $options['data-ajax-url'] = $options['ajax-url'];
+        unset($options['ajax_url']);
+      }
+
+
+
+      if (PkHtmlRenderer::contentTag($type)) {
+        return $this->toHtmlString("<$type"
+            . $this->html->attributes($options) . '>' .
+            $content .  "</<$type>\n");
+      }
+      if (PkHtmlRenderer::selfClosingTag($type)) { #Ignore content
+        return $this->toHtmlString("<$type"
+            . $this->html->attributes($options) . ' />');
+      }
+      throw new PkException ("Invalid args to ajaxElement");
+    }
+
+    /** Convenience function - returns ajaxElement with simple defaults */
+    public function ajaxButton($options=[], $content=null) {
+      return $this->ajaxElement($options, $content);
+    }
+
+    /*
+    protected static function setAjaxComponentOptions($options=[], $ajax_url = null, $component='button') {
+        if ($component === 'button') $options['type'] = 'button';
+        $options['class'] = keyVal('class', $options). ' pk-ajax-component ';
         if (array_key_exists('params', $options)) {
           $options['data-ajax-params'] = http_build_query($options['params']);
           unset ($options['params']);
         }
-        $options['data-ajax-url'] = $ajax_url;
-
-        return $this->toHtmlString("<button "
-            . $this->html->attributes($options) . '>' .
-            $label .
-            '</button>');
+        if (array_key_exists('response-target', $options)) {
+          $options['data-response-target'] = $options['response-target'];
+          unset ($options['response-target']);
+        }
+        if (array_key_exists('response-target-type', $options)) {
+          $options['data-response-target-type'] = $options['response-target-type'];
+          unset ($options['response-target-type']);
+        }
+        if ($ajax_url) $options['ajax-url'] = $ajax_url;
+        if (!empty($options['ajax-url'])) {
+          $options['data-ajax-url'] = $options['ajax-url'];
+          unset($options['ajax_url']);
+        }
+        return $options;
     }
-
-    /*
-    public function ajaxControl($)
      * 
      */
 
