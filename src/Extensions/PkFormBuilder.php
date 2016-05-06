@@ -183,7 +183,13 @@ class PkFormBuilder extends FormBuilder {
      *
      * @param  string $label - to show on the button 
      * @param string $ajax_url - the ajax url to call. Sets data-ajax-url attribute
-     * @param  array  $options - HTML attributes, plus optional 'params' key=>$params array, converted to data-params
+     * @param  array  $options - HTML attributes, plus optionally:
+     *  'params' => [$key1=>$val2, $key2=>$val2,] data param arr for AJAX
+     *  'response_target' => 'target_to_recieve_response' - attr or selector
+     *    
+     *    
+     *    
+     *    
      * @return \Illuminate\Support\HtmlString
      */
     public function ajaxButton($label, $ajax_url, $options = []) {
@@ -200,6 +206,11 @@ class PkFormBuilder extends FormBuilder {
             $label .
             '</button>');
     }
+
+    /*
+    public function ajaxControl($)
+     * 
+     */
 
 
   //public function checkbox($name, $value = 1, $checked = null, $options = [])
