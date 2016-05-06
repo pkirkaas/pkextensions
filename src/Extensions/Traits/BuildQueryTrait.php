@@ -10,8 +10,23 @@ use \Request;
  * query models and query controllers.
  * <p>
  * There are two potential kinds of Models here - a "target" model to be 
- * searched, and a "Query" model which contains the query/search criteria.
+ * searched, and a "Query" model which contains the query/search criteria for the
+ * target model to be searched.
  * <p>
+ * To implement "IN" searches, like "WHERE `typeoffinancing_id IN (4, 8, 12, 14),
+ * create a model/table field 'typeoffinancing_id_val' as a string, and get/set
+ * the set of values as JSON, using accessors/mutators like:
+ * <pre>
+  public function setTypeoffinancingIdValAttribute($value) { #$value is an array of possible values
+    if (!is_array($value)) $value = [$value];
+    $this->attributes['typeoffinancing_id_val'] = json_encode(array_values($value));
+  }
+
+  public function getTypeoffinancingIdValAttribute($value) {
+    if (!$value) return [];
+    return json_decode($value,true);
+  }
+ * </pre>
  * This trait supports "out of the box" direct field queries. 
  * @author Paul Kirkaas
  */
@@ -167,14 +182,19 @@ trait BuildQueryTrait {
   public $querySets = [];
 
   /** Takes an associative array, possibly from a Search Model, possibly from a post,
-   * and only selects matching keys in the form: "xxxx_crit" & "xxxx_val" - and
+   * and only selects matching keys in the form:
+       "xxxx_crit"
+       "xxxx_val"
+       "xxxx_param" (optional parameters for custom querys)
+   * ... and
    * only if the content of those keys is valid. Then builds an array in the 
-   * form of: ['xxxx']=>['crit'=> $crit, 'val'=>$val] and returns it.
+   * form of: ['xxxx']=>['crit'=> $crit, 'val'=>$val, 'param' => $param] and returns it.
    * <p>
    * 'xxxx'/$root: either a field/column name in the base table of the model, 
    * ELSE the name of a method in the custom query trait, like for calculation
-   * of ratios. But this method doesn't know about that, it's the "buildQueryOnModel/Table"
-   * methods that deal with that.
+   * of ratios. But this method doesn't know about that, it's the
+   * "buildQueryOnModel/Table" Class implementing this trait that
+   *  deal with that.
    * @param array $arr
    * @return type
    */
@@ -201,7 +221,8 @@ trait BuildQueryTrait {
       $valfield = $root . '_val';
       if (!array_key_exists($valfield, $arr)) continue;
       $paramfield = $root . '_param';
-      if (!array_key_exists($paramfield, $arr)) $arr[$paramfield] = null;
+      $arr[$paramfield] = keyVal($paramfield, $arr);
+      
       #We have a criterion and value - build our array
       $sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
     }

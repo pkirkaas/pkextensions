@@ -192,10 +192,21 @@ php artisan make:migration QProfile
 
 <p>Any Controller that wants to manage searches should also use <b>BuildQueryTrait</b>
 
+<p>To create a search for Person objects:
+<pre>
+class Person extends PkModel {
+  public static $table_field_defs = [
+    'id' => 'increments',
+    'name' => 'string',
+
+
+</pre>
 <p>A QueryModel to save searches for a Person would look like:
 <pre>
 Class PersonSearch extends PkSearchModel {
+  use PersonSearchTrait; #Trait because also used in PersonController::search() action
   public $targetModel = Person::class; #The model to perform the search on
+
 
 
 
