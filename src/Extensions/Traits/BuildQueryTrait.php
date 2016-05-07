@@ -177,8 +177,11 @@ trait BuildQueryTrait {
             $query = $query->whereNotIn($root, array_values($critset['val']));
             continue;
           } else if ($critset['crit'] === 'BETWEEN') {
-            $max = to_int(keyVal('max',$critset['val'], PHP_INT_MAX));
-            $min = to_int(keyVal('min',$critset['val'], -PHP_INT_MAX));
+          //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
+          //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
+            $min = to_int(keyVal('min',$critset['val']), -PHP_INT_MAX);
+            $max = to_int(keyVal('max',$critset['val']), PHP_INT_MAX);
+            pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
           } else {
@@ -248,8 +251,8 @@ trait BuildQueryTrait {
       if (array_key_exists($maxvalfield, $arr)) $valval['max'] = $arr[$maxvalfield];
       if (array_key_exists($minvalfield, $arr)) $valval['min'] = $arr[$minvalfield];
       if (is_array($valval)) { #At least one of min or max was set for BETWEEN
-        $valval['max'] = keyVal('max', $valval, PHP_INT_MAX);
-        $valval['min'] = keyVal('min', $valval, -PHP_INT_MAX);
+        $valval['max'] = to_int(keyVal('max', $valval), PHP_INT_MAX);
+        $valval['min'] = to_int(keyVal('min', $valval), -PHP_INT_MAX);
       }
       if (array_key_exists($valfield, $arr)) $valval = $arr[$valfield];
       if ($valval === null) continue;

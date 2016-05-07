@@ -978,7 +978,8 @@ function array_merge_array($arrs = []) {
  * Converts a compatable argument to an actual integer type ('7' -> 7), or 
  * boolean false ('010' -> false, '' -> false).
  * Totally unnecessary function but more convenient than remembering constant 
- * @param type $arg
+ * @param scalar $arg - something to convert to an int
+ * @param mixed $default - the default value if can't be converted to an int. Default: false
  * @return: integer if integer, also 0, but boolean false if not an integer
  * Examples:
  * to_int($fileObj) === FALSE;
@@ -988,9 +989,10 @@ function array_merge_array($arrs = []) {
  * to_int(NULL) === FALSE;
  * to_int('0') === 0;
  */
-function to_int($arg) {
+function to_int($arg, $default = false) {
   //if (is_int($arg)) return $arg; #Optimization attempt
   $arg = filter_var($arg, FILTER_VALIDATE_INT);
+  if ($arg === false) $arg = $default;
   return $arg;
 }
 
