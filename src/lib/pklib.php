@@ -651,12 +651,10 @@ function getRouteSegments($default = false, $depth = 2) {
 }
 
 /**
- * Returns if HTTP request protocol is HTTPS; else false
+ * Returns true if HTTP request protocol is HTTPS; else false
  * @return boolean - true if in a request and request is HTTPS; else false
  */
 function isHttps() {
-//  $env = getenv("MMDEV");
-//  if ($env == 'PAUL') return false;
   return is_array($_SERVER) && !empty($_SERVER) &&
     (
       (array_key_exists('HTTPS', $_SERVER) && (strtolower($_SERVER["HTTPS"]) === "on")) ||
@@ -664,19 +662,18 @@ function isHttps() {
       (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && (strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"])==='https')) 
     );
 }
+
+
 /**
  * 
  * @return String: The URL without subdirs, but with protocol (http://, etc)
  */
 function getBaseUrl() {
   $pageURL = 'http';
-  //if (filter_server("HTTPS") == 'on') {
-  if (array_key_exists('HTTPS', $_SERVER) && $_SERVER["HTTPS"] == "on") {
-
+  if (isHttps()) {
     $pageURL .= "s";
   }
   $pageURL .= "://";
-  //return $pageURL . filter_server("HTTP_HOST");
   return $pageURL . $_SERVER["HTTP_HOST"];
 }
 
@@ -709,11 +706,10 @@ function getRequestUri($withgets = true) {
 
 function fullHost($use_forwarded_host = false) {
   $s = $_SERVER;
-  $ssl = (!empty($s['HTTPS']) && $s['HTTPS'] == 'on') ? true : false;
   $sp = strtolower($s['SERVER_PROTOCOL']);
-  $protocol = substr($sp, 0, strpos($sp, '/')) . (($ssl) ? 's' : '');
+  $protocol = substr($sp, 0, strpos($sp, '/')) . ((isHttps()) ? 's' : '');
   $port = $s['SERVER_PORT'];
-  $port = ((!$ssl && $port == '80') || ($ssl && $port == '443')) ? '' : ':' . $port;
+  $port = ((!isHttps() && $port == '80') || (isHttps() && $port == '443')) ? '' : ':' . $port;
   $host = ($use_forwarded_host && isset($s['HTTP_X_FORWARDED_HOST'])) ? $s['HTTP_X_FORWARDED_HOST'] : (isset($s['HTTP_HOST']) ? $s['HTTP_HOST'] : null);
   $host = isset($host) ? $host : $s['SERVER_NAME'] . $port;
   return $protocol . '://' . $host;

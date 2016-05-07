@@ -197,8 +197,8 @@ class PkFormBuilder extends FormBuilder {
       *    If it's 'selector', JS only looks for DOM elements within
       *    this component (cousings and descendants), not on the rest of the page.
      * 
-     *  'response-target' => 'target_to_recieve_response' - attr, selector or function name
-     *     -- if response_target_type === attribute, the JS sets the attribute 
+     *  'response-target' => string: 'name of target_to_recieve_response' - attr, selector or function name
+     *     -- if response-target-type === attribute, the JS sets the attribute 
      *        to the return value of the AJAX call
      *    -- if response-target-type === selector, JS looks looks in this HTML
      *       or descendants for a selector that matches, and sets it's inner HTML to
@@ -211,6 +211,10 @@ class PkFormBuilder extends FormBuilder {
      *   If response_target OR response_target_type are set but EMPTY/NULL, the AJAX
      *   JS does nothing with the response.
      * 
+     *  'response-target-args': if 'target-type' === 'function', response-target-args 
+     *    are an optional associative array of $key=>$values to be passed to the 
+     *    handling function - and merged with the AJAX returned data object.
+     * 
      * @param string $type - the type of HTML element to make clickable
      * @param  string $content - the content of the HTML element, if it's a content type
      * 
@@ -218,37 +222,48 @@ class PkFormBuilder extends FormBuilder {
      */
     public function ajaxElement($options = [], $content = null, $ajax_url=null, $type = 'button') {
       if (is_string($options)) $options = ['ajax-url'=>$options];
-      if ($ajax_url) $options['ajax-url'] = $ajax_url;
-      if ($content === null) $content = keyVal('content', $options);
+      $content = keyVal('content', $options, $content);
+      unset($options['content']);
+
+      $options['data-ajax-url'] = keyVal('ajax-url', $options, $ajax_url);
+      unset($options['ajax-url']);
+
+      $type = keyVal('type', $options, $type);
       if ($type === 'component') $type = 'div';
       if ($type === 'button') $options['type'] = 'button';
-      //$options = static::setAjaxComponentOptions($options, $type);
-      if ($component === 'button') $options['type'] = 'button';
       $options['class'] = keyVal('class', $options). ' pk-ajax-component ';
 
+
+      /*
       if (array_key_exists('params', $options)) {
         $options['data-ajax-params'] = http_build_query($options['params']);
         unset ($options['params']);
       }
+       * 
+       */
 
-      if (array_key_exists('response-target', $options)) {
-        $options['data-response-target'] = $options['response-target'];
-        unset ($options['response-target']);
+      if (empty($options['params'])) $options['data-ajax-params'] = '';
+      else  $options['data-ajax-params'] = http_build_query($options['params']);
+      unset ($options['params']);
+
+
+      $options['data-response-target'] = keyVal('response-target', $options);
+      unset ($options['response-target']);
+
+      $options['data-response-target-type'] = keyVal('response-target-type', $options);
+      unset ($options['response-target-type']);
+
+      /*
+      if (array_key_exists('response-target-args', $options)) {
+        $options['data-response-target-args'] = json_encode($options['response-target-args']);
+        unset ($options['response-target-args']);
       }
-
-      if (array_key_exists('response-target-type', $options)) {
-        $options['data-response-target-type'] = $options['response-target-type'];
-        unset ($options['response-target-type']);
-      }
-
-      if ($ajax_url) $options['ajax-url'] = $ajax_url;
-      if (!empty($options['ajax-url'])) {
-        $options['data-ajax-url'] = $options['ajax-url'];
-        unset($options['ajax_url']);
-      }
-
-
-
+       * 
+       */
+      if (empty($options['response-target-args'])) $options['data-response-target-args'] = '{}';
+      else $options['data-response-target-args'] = json_encode($options['response-target-args']);
+      unset ($options['response-target-args']);
+      pkdebug('options', $options);
       if (PkHtmlRenderer::contentTag($type)) {
         return $this->toHtmlString("<$type"
             . $this->html->attributes($options) . '>' .
@@ -266,31 +281,6 @@ class PkFormBuilder extends FormBuilder {
       return $this->ajaxElement($options, $content);
     }
 
-    /*
-    protected static function setAjaxComponentOptions($options=[], $ajax_url = null, $component='button') {
-        if ($component === 'button') $options['type'] = 'button';
-        $options['class'] = keyVal('class', $options). ' pk-ajax-component ';
-        if (array_key_exists('params', $options)) {
-          $options['data-ajax-params'] = http_build_query($options['params']);
-          unset ($options['params']);
-        }
-        if (array_key_exists('response-target', $options)) {
-          $options['data-response-target'] = $options['response-target'];
-          unset ($options['response-target']);
-        }
-        if (array_key_exists('response-target-type', $options)) {
-          $options['data-response-target-type'] = $options['response-target-type'];
-          unset ($options['response-target-type']);
-        }
-        if ($ajax_url) $options['ajax-url'] = $ajax_url;
-        if (!empty($options['ajax-url'])) {
-          $options['data-ajax-url'] = $options['ajax-url'];
-          unset($options['ajax_url']);
-        }
-        return $options;
-    }
-     * 
-     */
 
 
   //public function checkbox($name, $value = 1, $checked = null, $options = [])

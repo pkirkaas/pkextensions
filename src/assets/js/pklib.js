@@ -112,18 +112,28 @@ function showHelpDialog() {
 
 
 /** Generic attachment of AJAX call to DOM element (button?)
- * 
+ * Attaches to any DOM element with CSS Class of 'pk-ajax-component'.
+ * The 'pk-ajax-component' has one required data-attribute: 'data-ajax-url'.
+ * Optional data-attributes:
+ *  'data-response-type' : string - one of ['attribute', 'selector', 'function']:
+  *    What type of thing should the AJAX response should go to?
+ *  'data-response-target' : string - the name/value of the attribute/selector/function
+ *  'data-response-args' : json-encoded array of optional arguments to merge
+ *     with the AJAX response object, and pass as a single OBJ arg to the function target
+ *  'data-ajax-params' : url-encoded argument/query string
  * @param {type} menu
  * @returns {undefined}
  */
 
 $(function () {
-$('body').on('click', '.pk-ajax-button', function (event) {
+$('body').on('click', '.pk-ajax-component', function (event) {
   console.log("Yes, clicked ajax");
     var target = $(event.target);
     var ajax_url = htmlDecode(target.attr('data-ajax-url'));
     var ajax_params = htmlDecode(target.attr('data-ajax-params'));
     var ajax_data = parseStr(ajax_params);
+    console.log('raw target args:', target.attr('data-response-target-args'));
+    var target_args = JSON.parse(target.attr('data-response-target-args'));
     var response_target = target.attr('data-response-target');
     var response_target_type = target.attr('data-response-target-type');
     var is_button = target.is('button');
@@ -132,7 +142,9 @@ $('body').on('click', '.pk-ajax-button', function (event) {
 
 
 
-    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params, 'ajax_data', ajax_data);
+    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params, 'ajax_data', ajax_data,
+       'target_args', target_args, 'response_target', response_target, 
+       'response_target_type', response_target_type);
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,

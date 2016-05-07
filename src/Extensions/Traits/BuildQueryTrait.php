@@ -192,11 +192,16 @@ trait BuildQueryTrait {
    * <p>
    * 'xxxx'/$root: either a field/column name in the base table of the model, 
    * ELSE the name of a method in the custom query trait, like for calculation
-   * of ratios. But this method doesn't know about that, it's the
+   * of ratios, or "within x miles of ZIP". But this method doesn't know about that, it's the
    * "buildQueryOnModel/Table" Class implementing this trait that
    *  deal with that.
    * @param array $arr
-   * @return type
+   * @return array: [
+   *    'fieldName1'=>['crit'=>$crit1, 'val'=>$val1, 'param'=>$param1,],
+   *    'fieldName2'=>['crit'=>$crit2, 'val'=>$val2, 'param'=>$param2,],
+   *    'customMethodName1'=>['crit'=>$crit3, 'val'=>$val3, 'param'=>$param3,],
+   *  #...
+   * ];
    */
   public function buildQuerySets(Array $arr = []) {
     $this->checkClearPost();
