@@ -3,6 +3,11 @@
 <head>
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
   <title>ReadMe for PkExtensions for Laravel >= 5.1</title>
+  <style>
+  h1 {
+    color: red;
+  }
+  </style>
 </head>
 <body>
 
@@ -12,9 +17,11 @@
 Extensions for Laravel applications.
 -->
 <h1>What are PkExtensions?</h1>
-<p>PkExtensions consist of multiple components, some very Laravel specific, others more generally applicable with PHP/JavaScript/CSS I've found very useful.  
+<p>PkExtensions consist of multiple components, some very Laravel specific, others more generally applicable with PHP/JavaScript/CSS.
 
-<h2>What do they consist of?</h2>
+<p>The guiding principal is to provide a lot of reusable functionality for things developers do all the time - so you don't have to re-implement similar functionality every time. For example, enhanced form inputs (like, multi-select check boxes), bound by specific CSS class names to JavaScript/jQuery event handlers. Which support binding complex, nested, one to many to many forms with hidden templates and deletable data sets - so almost the only code you need to write to implement complex form to abstract DB data structures are the PHP/HTML templates. 
+
+<h2>What do PkExtensions consist of?</h2>
 <p>They consist of:
 <ul>
 <li><b>Laravel Extensions</b>: Classes that extend existing Laravel Classes, like PkModel, PkController, etc.
@@ -22,10 +29,12 @@ Extensions for Laravel applications.
 
 <li><b>Supporting PHP libraries</b>: PHP functions I find really useful. There can be some naming conflicts with other libraries.
 
-<li><b>Supporting JavaScript and SCSS Libraries</b>: I do lots of things where PHP and JS have to co-operate. These libraries help in a very generic way - like automatically building dialog boxes from PHP, just based on css class names and 'data-xxx' attributes. Assumes jQuery & jQuery UI.
+<li><b>Supporting JavaScript, jQuery, CSS and SCSS Libraries</b>: I do lots of things where PHP and JS have to co-operate. These libraries help in a very generic way - like automatically building dialog boxes from PHP, just based on CSS class names and 'data-xxx' attribute names and values. Assumes jQuery & jQuery UI.
+
 </li><b>Artisan helper scripts</b>: Just a couple of commands to:
-  <ul><li>Generate migration files from PkModel class definitions
-      <li>Clear all caches, autoloads, everything in a single command
+  <ul>
+    <li>Generate migration files from PkModel class definitions
+    <li>Clear all caches, autoloads, everything in a single command
   </ul>
 </ul>
 
@@ -38,7 +47,7 @@ Extensions for Laravel applications.
 <h1>Extensions to existing Laravel Classes</h1>
 
 <h2>PkModel</h2>
-<p>This extends Eloquent Model and is the biggest enhancement.
+<p>This extends Eloquent Model and fills in what seemed to be some very obvious gaps.
 
 <h3>public function saveRelations(Array $array = [])</h3>
 <p>For one-to-many Objects, takes the multi-dimensional array of data and updates the Model instance and all its possessions/collections.
@@ -190,15 +199,15 @@ php artisan make:migration QProfile
 <p>Returns all the DB field names from the underlying table.
 
 <h2>PkSearchModel</h2>
-<p>This extends PkModel and helps to build and persist user created searches - like for a dating site:
+<p>This extends PkModel and works with PkController and <tt>BuildQueryTrait</b> to build, execute and persist complex user created searches. Like for a dating site use case:
 
-<p><tt>Find all <b>women</b> WHERE (<b>age gt 21</b> and <b>age lt 45</b>) and <b>Zodiac Sign in one of ('aries', 'gemini', 'capricorn')</b> and <b>religion = "don't care"</b></tt>
+<p><tt>Find all <b>women</b> WHERE (<b>age BETWEEN 27, 45</b>) AND <b>Zodiac Sign in one of ('aries', 'gemini', 'capricorn')</b> AND  <b>religion = "don't care"</b></tt>
 
-<p>This abstract class extends <b>PkModel</b> and uses <b>BuildQueryTrait</b>
+<p>The abstract class PkSearchModel extends <b>PkModel</b> and uses <b>BuildQueryTrait</b>
 
 <p>Any Controller that wants to manage searches should also use <b>BuildQueryTrait</b>
 
-<p>To create a search for Person objects:
+<p>For example, to create a search for Person objects, first define the Person model/class :
 <pre>
 class Person extends PkModel {
   public static $table_field_defs = [
