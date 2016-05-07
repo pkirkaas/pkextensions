@@ -5,14 +5,20 @@
   <title>ReadMe for PkExtensions for Laravel >= 5.1</title>
 </head>
 <body>
+
+<!--
+15-Feb-16 16:40
+@Author: Paul Kirkaas
+Extensions for Laravel applications.
+-->
 <h1>What are PkExtensions?</h1>
-<p>PkExtensions consist of multiple components that I've found very useful in Laravel development.
+<p>PkExtensions consist of multiple components, some very Laravel specific, others more generally applicable with PHP/JavaScript/CSS I've found very useful.  
 
 <h2>What do they consist of?</h2>
 <p>They consist of:
 <ul>
 <li><b>Laravel Extensions</b>: Classes that extend existing Laravel Classes, like PkModel, PkController, etc.
-<li><b>New Utility Classes</b>: Stand-alone classes that I find really useful, that don't depend on Laravel - my favorite is "PartialSet" - an extension of ArrayObject that can contain almost anything and implements <tt>__toString()</tt> so you can just print it out.
+<li><b>New Utility Classes</b>: Stand-alone classes that I find really useful, that don't depend on Laravel - my favorite is "PartialSet" - an extension of ArrayObject that can contain almost anything and implements <tt>__toString()</tt> so you can just print / echo it out.
 
 <li><b>Supporting PHP libraries</b>: PHP functions I find really useful. There can be some naming conflicts with other libraries.
 
@@ -67,7 +73,7 @@ Class Item extends PkModel {
     ];
   #...
 }
-<pre>
+</pre>
 
 <p>If you have an array of data representing the cart and its items, like:
 <pre>
@@ -176,7 +182,7 @@ class QProfile extends PkModel {
 <p>You can generate Migration files by running:
 <pre>
 php artisan make:migration QProfile
-<p>
+</pre>
 
 <p>This will create the initial migration file to create the table <tt>q_profiles</tt>, and if you change/add/remove the Model field definitions in <tt>static $table_field_defs</tt>, the <tt>artisan make:migration QProfile</tt> command will do a reasonable job of creating the Migration Update scripts - though you might have to modify them by hand for complicated changes.
 
@@ -215,19 +221,28 @@ Class PersonSearch extends PkSearchModel {
   public $targetModel = Person::class; #The model to perform the search on
   public static $table_field_defs = [
     'id' => 'increments',
+
+    #Simple scalar comparison - greater than, less than, etc.
     'age_val' => 'integer', #What age is the comparison against?
     'age_crit' => 'string', #What is the criterion? Greater than age_val? Less than?
+
+    # Pick multiple acceptable values
     'religion_id_val' => 'string', #JSON encoded array of acceptable values
     'religion_id_crit' => 'string', #IN? NOT IN?
 
-    'height' => 'integer',
+     #A Range / 'BETWEEN' query:
+    'height_crit' => 'string', #  'BETWEEN' or '0'/Don't Care
+    'height_minval' => 'integer',
+    'height_maxval' => 'integer',
+
+    #Uses a custom method to calculate "within X Miles of ZIP"
     'withinzip_val' => 'integer',
     'withinzip_crit' => 'string', 
 
 
 
 
-
+</pre>
 
 
 </body>
