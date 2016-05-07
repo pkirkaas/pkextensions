@@ -112,59 +112,112 @@ function showHelpDialog() {
 
 
 /** Generic attachment of AJAX call to DOM element (button?)
- * Attaches to any DOM element with CSS Class of 'pk-ajax-component'.
- * The 'pk-ajax-component' has one required data-attribute: 'data-ajax-url'.
+ * Attaches to any DOM element with CSS data attribute of 'data-pk-ajax-element'.
+ * The 'data-pk-ajax-element' has one required data-attribute: 'data-ajax-url'.
  * Optional data-attributes:
- *  'data-response-type' : string - one of ['attribute', 'selector', 'function']:
-  *    What type of thing should the AJAX response should go to?
- *  'data-response-target' : string - the name/value of the attribute/selector/function
- *  'data-response-args' : json-encoded array of optional arguments to merge
+ *  'data-func-target' : string - Name of a JS function to call with the AJAX response
+ *  'data-attr-target' : string - Name of the HTML attribute to set w. AJAX resp
+ *  'data-selector-target' : string - CSS Selector of this or descendent DOM
+ *     element to set innerHTML with result of AJAX call.
+ *  'data-func-arg': optional JSON encoded scalar or array to use with AJAX return to build response
+ *      For Function targets, function called with <tt>func_target(clickTarget, ajax_response, func_arg);</tt>
+ *  'data-attr-arg': optional JSON encoded scalar or array to use with AJAX return to build response
+ *     
+ *  'data-selector-arg': optional JSON encoded scalar or array to use with AJAX return to build response 
  *     with the AJAX response object, and pass as a single OBJ arg to the function target
  *  'data-ajax-params' : url-encoded argument/query string
  * @param {type} menu
  * @returns {undefined}
  */
 
+/*
+ $(function () {
+ $('body').on('click', '[data-pk-ajax-element]', function (event) {
+ alert("Jesus God!");
+ });
+ });
+ */
+
 $(function () {
-$('body').on('click', '.pk-ajax-component', function (event) {
-  console.log("Yes, clicked ajax");
+  $('body').on('click', '[data-pk-ajax-element]', function (event) {
+    console.log("Yes, clicked ajax");
     var target = $(event.target);
     var ajax_url = htmlDecode(target.attr('data-ajax-url'));
     var ajax_params = htmlDecode(target.attr('data-ajax-params'));
     var ajax_data = parseStr(ajax_params);
-    console.log('raw target args:', target.attr('data-response-target-args'));
-    var target_args = JSON.parse(target.attr('data-response-target-args'));
-    var response_target = target.attr('data-response-target');
-    var response_target_type = target.attr('data-response-target-type');
-    var is_button = target.is('button');
+    console.log('raw target args:', target.attr('data-response-target-arg'));
 
-    
+    var func_arg = JSON.parse(target.attr('data-func-arg'));
+    var attr_arg = JSON.parse(target.attr('data-attr-arg'));
+    var selector_arg = JSON.parse(target.attr('data-selector-arg'));
+    var selector_target = target.attr('data-selector-target');
+    var attr_target = target.attr('data-attr-target');
+    var func_target = target.attr('data-func-target');
 
-
-
-    console.log('ajax_url',ajax_url, 'ajax_params', ajax_params, 'ajax_data', ajax_data,
-       'target_args', target_args, 'response_target', response_target, 
-       'response_target_type', response_target_type);
+    console.log('ajax_url: ', ajax_url, ' -- ajax_params: ', ajax_params, ' -- ajax_data: ', ajax_data,
+            '-func_arg: ', func_arg, ' Type FA:', typeof (func_arg), '-func_target: ', func_target,
+            '-selector_arg: ', selector_arg, ' Type SA:', typeof (selector_arg), '-selector_target: ', selector_target,
+            '-attr_arg: ', attr_arg, ' Type AA:', typeof (attr_arg), '-attr_target: ', attr_target
+            );
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,
       method: 'POST'
     }).done(function (data) {
-      if (response_target_type === 'attribute') {
-        if (is_button) {
-          target.prop(response_target, data);
-        } else {
-          target.innerHtml = data;
-        }
-      } else { //Click target is a div; apply result to first child
-        
+      if (func_target && (typeof(window[func_target]) === 'function') ) {
+        window[func_target](target, data, func_arg);
       }
-      console.log('After Ajax Data',data);
+      if (attr_target) {
+        if (typeof (attr_arg) === 'object') {
+          if (typeof (data) !== 'object') { //Use AJAX data return as key to arg
+            var attr_content = attr_arg[data];
+          } else {
+            console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
+                    data, " -- SEL ARG: ", selector_arg);
+            var attr_content = false;
+          }
+        } else { //selector_arg is scalarish...
+          if (typeof (data) === 'object') { //Try using selector arg as key to AJAX return?
+            var attr_content = data[attr_arg];
+          } else { //Both selector_arg & AJAX return data are scalarish - concat
+            var attr_content = data + ' ' + selector_arg;
+          }
+        }
+        if (attr_content !== false) {
+          target.prop(attr_target, htmlEncode(attr_content));
+        }
+      }
+      if (selector_target) {
+        if (typeof (selector_arg) === 'object') {
+          if (typeof (data) !== 'object') { //Use AJAX data return as key to arg
+            var sel_content = selector_arg[data];
+          } else {
+            console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
+                    data, " -- SEL ARG: ", selector_arg);
+            var sel_content = false;
+          }
+        } else { //selector_arg is scalarish...
+          if (typeof (data) === 'object') { //Try using selector arg as key to AJAX return?
+            var sel_content = data[selector_arg];
+          } else { //Both selector_arg & AJAX return data are scalarish - concat
+            var sel_content = data + ' ' + selector_arg;
+          }
+        }
+        if (sel_content !== false) {
+          if (target.is(selector_target))
+            target.html(sel_content);
+          else if (target.find(selector_target).first().length) {
+            target.find(selector_target).first().html(sel_content);
+          }
+        }
+      }
     });
   });
 });
 
-
+function demoResponseTarget(target, data, arg) {
+  console.log("DemoResponseTarget ARGS: ", data, arg, 'target: ', target);
+}
 
 
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
@@ -268,7 +321,8 @@ function getGets() {
  */
 function parseStr(queryStr) {
   var params = {};
-  if (!queryStr || (queryStr === '')) return params;
+  if (!queryStr || (queryStr === ''))
+    return params;
   var prmarr = queryStr.split("&");
   for (var i = 0; i < prmarr.length; i++) {
     var tmparr = prmarr[i].split("=");
