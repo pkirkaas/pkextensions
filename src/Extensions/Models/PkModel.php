@@ -329,6 +329,12 @@ class $createclassname extends Migration {
     return null;
   }
 
+  public function real() {
+    $class = get_class($this);
+    return $class::instantiated($this);
+    //return get_class($this)::instantiated($this);
+  }
+
   /**
    * Checks to see if the $arg is instantiated and the same instance of this obj.
    * Ridiculous this is not built in...
@@ -341,6 +347,10 @@ class $createclassname extends Migration {
     if (get_class($this) !== get_class($var)) return false;
     if ($this->getKey() !== $var->getKey()) return false;
     return $this;
+  }
+
+  public function __debuginfo() {
+    return $this->attributes;
   }
 
   /** The authXXX functions determine if the user is allowed to perform XXX

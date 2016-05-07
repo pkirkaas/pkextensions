@@ -30,6 +30,10 @@ use \Request;
  * This trait supports "out of the box" direct field queries. 
  * @author Paul Kirkaas
  */
+
+/** Note: When using the " IN " set criteria, we use accessors/mutators to 
+ * convert in-memory arrays to JSON strings stored in the DB
+ */ 
 trait BuildQueryTrait {
 
   /** In Implemented Classes, will be set to the class/model to be searched.
@@ -62,6 +66,8 @@ trait BuildQueryTrait {
     if ((!$type || ($type === 'string')) && in_array($crit, array_keys(static::$stringQueryCrit)))
         return true;
     if ((!$type || ($type === 'group')) && in_array($crit, array_keys(static::$groupQueryCrit)))
+        return true;
+    if ((!$type || ($type === 'between')) && in_array($crit, array_keys(static::$betweenQueryCrit)))
         return true;
     return false;
   }
@@ -98,6 +104,10 @@ trait BuildQueryTrait {
       '10' => 'Within 10 miles',
       '20' => 'Within 20 miles',
       '50' => 'Within 50 miles',
+  ];
+  public static $betweenQueryCrit = [
+    '0' => "Don't Care",
+    'BETWEEN' => 'Between',
   ];
 
   #Try building the query on the model first - it's prettier
@@ -148,7 +158,7 @@ trait BuildQueryTrait {
     //pkdebug("TargetFieldNames:", $targetFieldNames);
     if (!empty($this->querySets)) $sets = $this->querySets;
     else $sets = $this->buildQuerySets();
-    pkdebug("Query Sets:", $sets);
+    //pkdebug("Query Sets:", $sets);
     $query = $targetModel::query();
     if (empty($sets)) return $query;
     //pkdebug("NOT empty SETS!");
@@ -165,6 +175,11 @@ trait BuildQueryTrait {
             continue;
           } else if ($critset['crit'] === 'NOTIN') {
             $query = $query->whereNotIn($root, array_values($critset['val']));
+            continue;
+          } else if ($critset['crit'] === 'BETWEEN') {
+            $max = to_int(keyVal('max',$critset['val'], PHP_INT_MAX));
+            $min = to_int(keyVal('min',$critset['val'], -PHP_INT_MAX));
+            $query = $query->whereBetween($root, [$min, $max]);
             continue;
           } else {
             continue;
@@ -223,13 +238,28 @@ trait BuildQueryTrait {
       if ($root === false) continue;#Not a crit
       if ($val === null) continue;
       if (!$this->isValidCriterion($key)) continue;
+      $maxvalfield = $root.'_maxval'; #For 'BETWEEN'comparison
+      $minvalfield = $root.'_minval'; #For 'BETWEEN'comparison
       $valfield = $root . '_val';
-      if (!array_key_exists($valfield, $arr)) continue;
+      $valval = null;
+      #Getting Complicated. $valval can be a scalar for ordinary comparison
+      #If doing an " IN " comparison, $valval is a JSON encoded array.
+      #if doing a "BETWEEN" comparison, $valval is an actual array, ['max'=>$max,'min'=>$min]
+      if (array_key_exists($maxvalfield, $arr)) $valval['max'] = $arr[$maxvalfield];
+      if (array_key_exists($minvalfield, $arr)) $valval['min'] = $arr[$minvalfield];
+      if (is_array($valval)) { #At least one of min or max was set for BETWEEN
+        $valval['max'] = keyVal('max', $valval, PHP_INT_MAX);
+        $valval['min'] = keyVal('min', $valval, -PHP_INT_MAX);
+      }
+      if (array_key_exists($valfield, $arr)) $valval = $arr[$valfield];
+      if ($valval === null) continue;
+      //if (!array_key_exists($valfield, $arr)) continue;
       $paramfield = $root . '_param';
       $arr[$paramfield] = keyVal($paramfield, $arr);
       
       #We have a criterion and value - build our array
-      $sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
+      //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
+      $sets[$root] = ['crit' => $arr[$key], 'val' => $valval, 'param' => $arr[$paramfield]];
     }
     $this->querySets = $sets;
     return $sets;

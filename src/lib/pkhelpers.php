@@ -4,6 +4,7 @@
  * 26 Feb 2016
  * Paul Kirkaas
  */
+use PkExtensions\PartialSet;
 use Jenssegers\Agent\Agent as MobileDetectAgent;
 use Carbon\Carbon;
 //use PkLibConfig; #Defined in pklib
@@ -103,4 +104,46 @@ function makeAjaxRoutes($extraroutenames = null) {
 function isMobile() {
   $agent = new MobileDetectAgent(); 
   return ($agent->isMobile() || $agent->isTablet());
+}
+
+
+
+
+/** Takes a route, parameter name, array of parameter values, and a closure to
+ * generate the labels, then makes a drop down menu, for BootStrap 4
+ * @param string $route - a Laravel route name
+ * @param string|null $paramName - if the route takes a parameter, this is it
+ * @param array $valArr - array of values to be iterated over to generate the 
+ *    dropdown menu links. Usuall Model/Objects
+ * @param Closure $labelClosure - a closure that generates the label for the 
+ *    menu item. Will take the current entry in the $valArr 
+ * @param string|null $head - if empty, only makes menu dropdown items - not the
+ *    full menu wrapped in a li. But if $head is a string, assumes it to be the
+ *    label of the whole menu list, and builds it. Otherwise, they could be concatenated.
+ */
+function makeDropMenu($route, $paramName = null, $valArr = [], $labelClosure = null, $head = null) {
+  $out = new PartialSet();
+  if ($head) {
+    $out[] = "
+          <li class='nav-item dropdown'>
+            <a class='nav-link dropdown-toggle' data-toggle='dropdown'
+               href='#' role='button' aria-haspopup='true' aria-expanded='false'>
+               $head
+          </a>
+          <div class='dropdown-menu'>
+      ";
+  }
+  foreach ($valArr as $val) {
+    $url = route($route,[$paramName=>$val]);
+    $label = $labelClosure($val);
+    $out[] = "<a class='dropdown-item' href='$url'>$label</a> \n ";
+  }
+
+  if ($head) {
+    $out[] = "
+            </div>
+          </li>
+          ";
+  }
+  return $out;
 }

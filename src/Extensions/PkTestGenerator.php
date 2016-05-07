@@ -86,13 +86,20 @@ class PkTestGenerator {
   }
   /**
    * Returns random data item (possibly with invalid data item) from an array 
-   * @param array $dataArr
-   * @param type $badData
+   * @param array $dataArr - source of data - array(ish) is also okay (EG, ArrayObject)
+   * @param integer $items - default: -1 - means return a single item. $items >= 0
+   *   means return an array, empty for $items = 0...
    * @return single instance or array, depending on num items
    */
-  public static function getRandomData( $dataArr, $items=1) {
-    if (!$items) throw new \Exception("Invalid value or type for items");
-    if (!is_arrayish($dataArr)) throw new \Exception("dataArr not arrayish");
+  public static function getRandomData( $dataArr, $items=-1) {
+    try {
+      //if (!$items) throw new \Exception("Invalid value or type for items");
+      if (!$items) return [];
+      if (!is_numeric($items)) throw new \Exception("Invalid value or type for items");
+      if (!is_arrayish($dataArr)) throw new \Exception("dataArr not arrayish");
+    } catch (\Exception $e) {
+      die( $e->getTraceAsString());
+    }
     if (is_object($dataArr)) {
       if (method_exists($dataArr,'getArrayCopy')) {
         $copy = $dataArr->getArrayCopy();
@@ -100,13 +107,17 @@ class PkTestGenerator {
         $copy = $dataArr->toArray();
       } else {
         $type = typeOf($dataArr);
-        throw new \Exception("dataArr is type: $type");
+        try {
+          throw new \Exception("dataArr is type: $type");
+        } catch (\Exception $e) {
+          die( $e->getTraceAsString());
+        }
       }
     }
     else $copy = (array) $dataArr;
     $keys = array_keys($copy);
     $numkeys = count($keys);
-    if ($items === 1) {
+    if ($items === -1) {
       return $copy[$keys[mt_rand(0,  $numkeys - 1)]];
     }
     #More than one item to return; so an array. Unique menbers
@@ -200,7 +211,11 @@ class PkTestGenerator {
       $date1 = strtotime($date1);
       $date2 = strtotime($date2);
    } else {
-     throw new \Exception("We don't knwo hwo to deal with the arguments");
+     try {
+        throw new \Exception("We don't know how to deal with the arguments");
+     } catch (\Exception $e) {
+        die( $e->getTraceAsString());
+     }
    }
    $min = min($date1, $date2)/1000;
    $max = max($date1, $date2)/1000;

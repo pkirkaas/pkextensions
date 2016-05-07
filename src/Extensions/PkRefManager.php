@@ -61,5 +61,27 @@ abstract class PkRefManager {
     return $lcbase.'_ref';
   }
 
+  /** Generates a key/value array for select box, with range of numbers
+   * If $max_label is string, uses the string for the max label, and max-int for value
+   * If $min_label is string, uses the string for the max label, and min-int for value
+   * @param integer $start - starting integer (except for minint)
+   * @param integer $end - ending integer (except for maxint)
+   * @param string $min_label
+   * @param string $max_label
+   * @param integer $step - the incremental step
+   */
+  public static function numberRange($start = 0, $end = 100, $min_label = null, $max_label = null, $step =1) {
+    $result = [];
+    if ($min_label && is_string($min_label)) $result[-PHP_INT_MAX] = $min_label;
+    if (!$step) $step = 1;
+    $i = $start;
+    while ($i <= $end) {
+      $result[$i] = $i;
+      $i += $step;
+    }
+    if ($max_label && is_string($max_label)) $result[PHP_INT_MAX] = $max_label;
+    return $result;
+  }
+
   
 }
