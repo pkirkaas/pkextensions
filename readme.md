@@ -11,7 +11,7 @@
 -   [<span class="toc-section-number">3</span> Eliminate 80% of the JavaScript you write](#eliminate-80-of-the-javascript-you-write)
     -   [<span class="toc-section-number">3.1</span> AJAX handling on click](#ajax-handling-on-click)
     -   [<span class="toc-section-number">3.2</span> jQuery UI Dialogs](#jquery-ui-dialogs)
-    -   [<span class="toc-section-number">3.3</span> Mapping one-&gt;many ORM objects to DB tables and HTML forms for edit/create/delete - with almost no code](#mapping-one-many-orm-objects-to-db-tables-and-html-forms-for-editcreatedelete---with-almost-no-code)
+    -   [<span class="toc-section-number">3.3</span> Binding one-&gt;many ORM objects, DB tables and forms](#binding-one-many-orm-objects-db-tables-and-forms)
 -   [<span class="toc-section-number">4</span> More Features/Extensions](#more-featuresextensions)
     -   [<span class="toc-section-number">4.1</span> PkSearchModel](#pksearchmodel)
 
@@ -223,8 +223,10 @@ A typical dialog process involves a user clicking on something, which pops up a 
 -   **To each template, add the attribute `data-dialog`**: Set it to the value of the corresponding attribute in the clickable element that should launch the dialog.
 -   **But Wait!**: Maybe you have 50 identical buttons on a page, that should pop up the same dialog, only with some different parameters - like a table of users, each with an "Edit" button to bring up a "User Edit" form. But different `user_id`. So each button can have several `data-param` attributes, with value of the corresponding user\_id or whatever. The JS event handler substitutes the value from the button to the popped up dialog form. No extra JS required.
 
-<span class="header-section-number">3.3</span> Mapping one-&gt;many ORM objects to DB tables and HTML forms for edit/create/delete - with almost no code
---------------------------------------------------------------------------------------------------------------------------------------------------------
+<span class="header-section-number">3.3</span> Binding one-&gt;many ORM objects, DB tables and forms
+----------------------------------------------------------------------------------------------------
+
+Edit/create/delete most data and relationships with almost no code.
 
 <span class="header-section-number">4</span> More Features/Extensions
 =====================================================================
