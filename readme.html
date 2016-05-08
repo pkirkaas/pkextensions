@@ -40,7 +40,7 @@ Extensions for Laravel applications.
 
 
 <h2>What is the current status/version?</h2>
-<p>Very much Alpha - changing often, quite a bit of commented out code and experiments - but what works works pretty well and hopefully could be very useful to other developers. 
+<p>Very much Alpha -  continually evolving, quite a bit of commented out code and experiments - but what works works pretty well and hopefully could be very useful to other developers. 
 
 <p>See below for highlights of some of the more interesting features.
 
@@ -111,7 +111,7 @@ $data = [
 $myCart->updateRelations($data);
 </pre>
 
-<p>This command will:
+<p>This method will:
 <ul>
   <li>Update any of the changed cart fields to the values of the corresponding array keys - like 'cart_name'
   <li>Any key field in the data array that's not an attribute of $myCart is ignored (<tt>_token</tt>, for example.
@@ -166,7 +166,7 @@ Class Person extends PkModel {
 
 
 <h3>DB Table Definition to generate Migration Files, etc</h3>
-<p>It seems sort of ridiculous that Model classes don't know what attributes they have until they read the DB. Also, if you have a bunch of Migration files, it's hard to get an overview of all the DB table attributes by inspecting the code.
+<p>It seems ridiculous that Eloquent Model classes don't know what attributes they have until they read the DB. Also, if you have a bunch of Migration files, it's hard to get an overview of all the DB table attributes by inspecting the code.
 
 <h3>PkModel::$table_field_defs, PkModel::buildMigrationFieldDefs(), etc</h3>
 
@@ -198,8 +198,54 @@ php artisan make:migration QProfile
 <h3>static::getStaticAttributeNames()</h3>
 <p>Returns all the DB field names from the underlying table.
 
+<h1>Eliminate 80% of the JavaScript you write to manage Dialogs, AJAX calls, handle forms, etc.</h1>
+<p>You've already written almost the same code dozens of times with just minor variations. Just follow a few conventions with CSS class names and <tt>data-XXX</tt> attributes in your HTML, and it's all done.  If you use Laravel, <tt>PkFormBuilder</tt> extends Laravel Collective <tt>FormBuilder</tt> with methods to create the HTML components that work with the jQuery libraries. 
+
+<h2>AJAX handling on click</h2>
+
+<ul>
+  <li><b>Create a DOM node you want to trigger / process the AJAX</b>: Could be just a button or link, or a complex nested collection of HTML elements. Add an attribute called <tt>data-pk-ajax-element</tt>. It doesn't need a value, jQuery will attach to it. No problem if you have many unrelated AJAX handler components on the same page.
+
+  <p>If you are using Laravel, <tt>PkForm::ajaxElement($options)</tt> builds the HTML component for you.
+
+  <li><b>Add a few more <tt>data-XXX</tt> attributes</b>:
+    <ul>
+      <li><tt>data-ajax-url</tt>: The URL for the AJAX call (the only other required attribute - the rest are optional)
+      <li><tt>data-ajax-params</tt>: An encoded query string of parameters and values. You don't have to encode them, though. Just set <tt>$options['params'] =  ['param1'=>$val1, 'param1'=>$val2, ...]</tt> and leave it to <tt>PkForm::ajaxElement()</tt>.
+      <li>Specify the other behavior you want in the $options values. What you want to do with the AJAX response, etc.
+      <li>See the documented source codes for all the details and options.
+    </ul>
+
+    <li><tt>$('body').on('click', '[data-pk-ajax-element]', function (event) {...</tt> attaches to every element on the page with the 'data-pk-ajax-element' attribute, and submits the AJAX call based on the attributes defined in the target element.
+    <li>The event handler also processes the AJAX result based on the DOM element attributes.
+  </ul>
+
+<h2>jQuery UI Dialogs</h2>
+  <p>A typical dialog process involves a user clicking on something, which pops up a dialog to take some action.
+  <ul>
+    <li><b>On all elements the user clicks to initiate a dialog</b>: Add the CSS class <tt>js-dialog-button</tt>. The JS event handler will attach to that/them.
+    <li><b>Add the attribute <tt>data-dialog</tt></b>: to each, set the value to name of the hidden dialog template the click should activate.
+    <li><b>Create the dialog template(s)</b>: Assign them each the CSS class <tt>js-dialog-content</tt>. The included CSS sets <tt>display: none;<tt>. 
+    <li><b>To each template, add the attribute <tt>data-dialog</tt></b>: Set it to the value of the corresponding attribute in the clickable element that should launch the dialog.
+    <li><b>But Wait!</b>: Maybe you have 50 identical buttons on a page, that should pop up the same dialog, only with some different parameters - like a table of users, each with an "Edit" button to bring up a "User Edit" form. But different <tt>user_id</tt>. So each button can have several <tt>data-param</tt> attributes, with value of the corresponding user_id or whatever. The JS event handler substitutes the value from the button to the popped up dialog form. No extra JS required.
+  </ul>
+
+<h2>Mapping one->many ORM objects to DB tables and HTML forms for edit/create/delete - with almost no code</h2>
+
+
+
+
+
+
+
+
+
+<h1>More Features/Extensions</h1>
+
 <h2>PkSearchModel</h2>
-<p>This extends PkModel and works with PkController and <tt>BuildQueryTrait</b> to build, execute and persist complex user created searches. Like for a dating site use case:
+<p>Supports building persistent complex user created searches/queries.
+
+<p>PkSearchModel extends PkModel and works with PkController and <tt>BuildQueryTrait</b> to build, execute and persist complex user created searches. Like for a dating site use case:
 
 <p><tt>Find all <b>women</b> WHERE (<b>age BETWEEN 27, 45</b>) AND <b>Zodiac Sign in one of ('aries', 'gemini', 'capricorn')</b> AND  <b>religion = "don't care"</b></tt>
 
@@ -222,6 +268,8 @@ class Person extends PkModel {
   #...
 }
 </pre>
+
+<p>Note the static array <tt>$table_field_defs</tt>
 
 <p>A QueryModel to save searches for a Person would look like:
 <pre>
@@ -247,11 +295,11 @@ Class PersonSearch extends PkSearchModel {
     #Uses a custom method to calculate "within X Miles of ZIP"
     'withinzip_val' => 'integer',
     'withinzip_crit' => 'string', 
-
-
-
-
+    #...
+}
 </pre>
+
+
 
 
 </body>
