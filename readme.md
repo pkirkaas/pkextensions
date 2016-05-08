@@ -8,7 +8,7 @@
         -   [<span class="toc-section-number">2.1.3</span> DB Table Definition to generate Migration Files, etc](#db-table-definition-to-generate-migration-files-etc)
         -   [<span class="toc-section-number">2.1.4</span> PkModel::$table\_field\_defs, PkModel::buildMigrationFieldDefs(), etc](#pkmodeltable_field_defs-pkmodelbuildmigrationfielddefs-etc)
         -   [<span class="toc-section-number">2.1.5</span> static::getStaticAttributeNames()](#staticgetstaticattributenames)
--   [<span class="toc-section-number">3</span> Eliminate 80% of the JavaScript you write to manage Dialogs, AJAX calls, handle forms, etc.](#eliminate-80-of-the-javascript-you-write-to-manage-dialogs-ajax-calls-handle-forms-etc.)
+-   [<span class="toc-section-number">3</span> Eliminate 80% of the JavaScript you write](#eliminate-80-of-the-javascript-you-write)
     -   [<span class="toc-section-number">3.1</span> AJAX handling on click](#ajax-handling-on-click)
     -   [<span class="toc-section-number">3.2</span> jQuery UI Dialogs](#jquery-ui-dialogs)
     -   [<span class="toc-section-number">3.3</span> Mapping one-&gt;many ORM objects to DB tables and HTML forms for edit/create/delete - with almost no code](#mapping-one-many-orm-objects-to-db-tables-and-html-forms-for-editcreatedelete---with-almost-no-code)
@@ -193,8 +193,10 @@ This will create the initial migration file to create the table `q_profiles`, an
 
 Returns all the DB field names from the underlying table.
 
-<span class="header-section-number">3</span> Eliminate 80% of the JavaScript you write to manage Dialogs, AJAX calls, handle forms, etc.
-========================================================================================================================================
+<span class="header-section-number">3</span> Eliminate 80% of the JavaScript you write
+======================================================================================
+
+**Managing Dialogs, AJAX calls, Form & DB handling, etc.**
 
 You've already written almost the same code dozens of times with just minor variations. Just follow a few conventions with CSS class names and `data-XXX` attributes in your HTML, and it's all done. If you use Laravel, `PkFormBuilder` extends Laravel Collective `FormBuilder` with methods to create the HTML components that work with the jQuery libraries.
 
