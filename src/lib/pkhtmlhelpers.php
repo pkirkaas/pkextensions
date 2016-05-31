@@ -31,7 +31,7 @@ function grid_layout($items, $params = []) {
        "<div class='row $extra_row_class'>\n");
    $row_closer = keyVal('row_closer', $params, "</div>\n");
    $col_opener = keyVal('col_opener', $params, 
-       "<div class='col-$colWidth-md $extra_col_class'>\n"); 
+       "<div class='col-md-$colWidth $extra_col_class'>\n"); 
    $col_closer = keyVal('col_closer', $params, "</div>\n");
    $renderer = keyVal('renderer' , $params);
 
