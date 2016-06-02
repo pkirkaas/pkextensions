@@ -333,7 +333,7 @@ function pkdebug_base() {
     $printMsg = true;
     $type = typeOf($msg);
     if (is_bool($msg)) {
-      $msg = stringboolean($msg);
+      $msg = $msg ? 'TRUE' : 'FALSE';
     }
     if ($msg instanceOf sfOutputEscaperArrayDecorator) {
       $printMsg = false;
@@ -2747,8 +2747,7 @@ function getNullPath() {
  * @param string $false - String to return if not truish - default "False"
  */
 function stringboolean($val, $true = 'TRUE', $false = 'FALSE') {
-  if ($val) return $true;
-  return $false;
+  return $val ? $true : $false;
 }
 
 /**
