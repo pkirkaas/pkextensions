@@ -2263,6 +2263,24 @@ function getFileMimeType($filePath) {
   return finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
 }
 
+/** Returns the mime type if a valid image file, else false
+ * Primitive ; improve some day
+ * @param string $filePath - a string/path for the file
+ * @return false || string - mime-type
+ */
+function isValidImagePath($filePath) {
+  if (!$filePath || !is_string($filePath) || !file_exists($filePath)) return false;
+  $mimeType = getFileMimeType($filePath);
+  if (!$mimeType || !is_string($mimeType)) return false;
+  $mimeArr = explode('/', $mimeType);
+  //pkdebug("mimeType: [$mimeType], mimeArr:", $mimeArr);
+  if (!$mimeArr || !is_array($mimeArr) ||
+      !(count($mimeArr) === 2) || !($mimeArr[0] === 'image')) return false;
+  
+  //pkdebug("Returninb: $mimeType");
+  return $mimeType;
+}
+
 /** Kind of hokey function that takes two arrays, and returns true if the second
  * array equals the first, up to the depth of the first. For example, 
  * ['image'], ['image','gif'] would return true...

@@ -582,11 +582,16 @@ $i: 1;
     $next-bp: 99999 * 1px ;
   }
 
-  //@debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
+  // Started getting inexplicable error - "Error $next-bp undefined" - but it has to
+  // be, plus sure it worked before, so maybe bug in compiler. But not using now so
+  // comment out.align-content: 
+  /*
+  @debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
   
   @media (min-width: $breakpoint) and (max-width: $next-bp) {
     // Now loop and make explicit - only appliies to this media size
   }
+  */
   
   // Now, all definitions for $breakpoint and Higher 
   @media (min-width: $breakpoint) {
