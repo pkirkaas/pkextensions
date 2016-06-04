@@ -65,42 +65,7 @@ function grid_layout($items, $params = []) {
            Items:\n$item_str\nParams:\n$param_str");
        }
      }
-    $html .= "\n$item\n";
-       //$html .= $renderer($item);
-     //} else if (is_arrayish($item) && is_arrayish($item_keys) && count($item_keys)) {
-
-
-
-
-
-
-
-
-
-
-     //} else if ($item_sprintfmt && is_string($item_sprintfmt) && strlen($item_sprintfmt)) {
-     //} else if (is_arrayish($item) && is_arrayish($item_keys) && count($item_keys)) {
-       #Put specified / keyed elements of item into the 
-      // if ($item_sprintfmt && is_string($item_sprintfmt) && strlen($item_sprintfmt)) {
-       //  $argarr = [];
-        // $argarr[] = $item_sprintfmt;
-         //foreach ($item_keys as $item_key) {
-          // $argarr[] = $item[$item_key];
-        // }
-        // $html = call_user_func_array('sprintf', $argarr);
-       //} else {
-        // $item_str = print_r($items, true);
-        // $param_str = print_r($params, true);
-       //  throw new \Exception("Invalid args to grid_layout:
-        //   Items:\n$item_str\nParams:\n$param_str");
-      // }
-
-     //} else if (is_stringish($item)) {
-      // $html .= $item;
-     //} else {
-     //  return false; #Don't know how to show it
-    // }
-     $html .= $col_closer;
+    $html .= "\n$item\n$col_closer";
      if (($idx < $sz) && (!($idx % $items_per_row))) {
        $html .= ($row_closer."\n".$row_opener);
      }
@@ -108,14 +73,3 @@ function grid_layout($items, $params = []) {
    $html .= $row_closer;
    return $html;
 }
-
-/**
- * Takes arrayish 'items' and returns an array of formatted strings with 
- * 
- */
-
-/* overkill...
-function wrap_items($items,$sprintfmt=null, $keys=null) {
-}
- * 
- */
