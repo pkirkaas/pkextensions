@@ -589,19 +589,17 @@ $(function () {
  * data-param1, data-param2, data-param3 - the value of these attributes is just
  * substituted into the template strings __TPL_PARAM1__, etc, in the hidden template
  * 
- * data-src-sel: Optional selector for an element WITHIN the button
- * data-src-attr: Optional Attribute holding the value in src-selector
- * of the click target above, to be substituted for the template string 
- * __SRC_SEL_ATTR_VAL__
- * 
- * 
  * The Dialog Template: Should have CSS class: 'js-dialog-content'
  *     (which should be defined as "display:none;" in CSS
  * Should have the data attribute: data-dialog=[same as the data-dialog value
  * of the button/element launching it]
  * 
  * Optionally the strings __TPL_PARAM1__ -> 3, replaced as above.
- * Optionally the string 
+ * 
+ * Optionally, any of the following options to jQuery dialog, preceded
+ * by data- (eg, data-modal='true')
+   jQuery Dlg Options: 'modal', 'autoOpen', 'buttons', 'closeOnEscape',
+    'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height';
  * 
  * Example: Button/Clickable:
  * 
@@ -612,45 +610,35 @@ $(function () {
  * 
  * Example Dialog Template:
  * <div class='js-dialog-content' data-dialog='big-picture-dialog'
-  data-width='900' data-title='The Big Picture'
->
-      <img src='__TPL_PARAM1__' class='big-picture-dialog'>
-      <div class="image-desc">__TPL_PARAM2__</div>
-</div>
+ *  data-width='900'
+ *  data-title='The Big Picture'>
+ *      <img src='__TPL_PARAM1__' class='big-picture-dialog'>
+ *     <div class="image-desc">__TPL_PARAM2__</div>
+ * </div>
  */
 
 $('body').on('click', '.js-dialog-button', function (event) {
-  var param1 = $(event.target).attr('data-param1');
-  var param2 = $(event.target).attr('data-param2');
-  var param3 = $(event.target).attr('data-param3');
-  var srcselval = $(event.target).find('data-param3');
   var src = $(event.target).attr('data-dialog');
-  var clone = $(event.target).attr('data-clone');
-  clone = true;
+  if (!src) return;
+  var param1 = $(event.target).attr('data-param1') || '';
+  var param2 = $(event.target).attr('data-param2') || '';
+  var param3 = $(event.target).attr('data-param3') || '';
+  //var clone = $(event.target).attr('data-clone');
+  var clone = true;
   var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
   if (dlg.length === 0)
     return;
   var dlgHtml = dlg.prop('outerHTML');
-  //console.log('dlgHtml', dlgHtml, 'dlg', dlg);
-  //if (clone) dlg = dlg.clone();
-  /*
-   dlg = dlg.replace(/__TPL_PARAM1__/g, param1);
-   dlg = dlg.replace(/__TPL_PARAM2__/g, param2);
-   dlg = dlg.replace(/__TPL_PARAM3__/g, param3);
-   */
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
   //console.log("After all the replacements, dlgHtml:",dlgHtml);
-  //if (clone) console.log('clone was true', clone);
   dlg = $(dlgHtml);
   //else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
   var closeText = $(event.target).attr('data-closetext');
-  if (!closeText)
-    closeText = dlg.attr('data-closetext');
-  if (!closeText)
-    closeText = 'Okay';
+  if (!closeText) closeText = dlg.attr('data-closetext');
+  if (!closeText) closeText = 'Okay';
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
@@ -694,6 +682,26 @@ $('body').on('click', '.js-dialog-button', function (event) {
 
 });
 
+//Do similar for Bootstrap 4 Modals/Dialogs
+$('body').on('click', '.bs4-dialog-button', function (event) {
+  var src = $(event.target).attr('data-bs4-dialog');
+  if (!src) return;
+  var param1 = $(event.target).attr('data-param1') || '';
+  var param2 = $(event.target).attr('data-param2') || '';
+  var param3 = $(event.target).attr('data-param3') || '';
+  //var clone = $(event.target).attr('data-clone');
+  var clone = true;
+  var dlg = $('.bs4-dialog-content[data-bs4-dialog="' + src + '"]');
+  if (dlg.length === 0)
+    return;
+  var dlgHtml = dlg.prop('outerHTML');
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
+  dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
+  //console.log("After all the replacements, dlgHtml:",dlgHtml);
+  dlg = $(dlgHtml);
+  dlg.modal();
+});
 
 /** Makes a jQuery DialogBox - as simply as possible by providing
  * defaults, and customizable by overriding defaults with options.
