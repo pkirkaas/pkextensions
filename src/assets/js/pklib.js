@@ -571,10 +571,59 @@ $(function () {
 });
 
 
+/** This is the generic Dialog Launcher. It attaches to every element
+ * with CSS class: js-dialog-button, and launches a display:none; HTML
+ * Dialog element, with customized parameters - 
+ * 
+ * js-dialog-button can be any type of element (like img), and multiple per page.
+ * Options / data-params for js-dialog-button:
+ * 
+ * The clickable button/target/launcher at minimum should be:
+ * 
+ * CSS Class: 'js-dialog-button'
+ * 
+ * Have the data attribute: 'data-dialog', value: Same as the 'data-dialog'
+ * element of the display:none template.
+ * 
+ * Optional Attributes:
+ * data-param1, data-param2, data-param3 - the value of these attributes is just
+ * substituted into the template strings __TPL_PARAM1__, etc, in the hidden template
+ * 
+ * data-src-sel: Optional selector for an element WITHIN the button
+ * data-src-attr: Optional Attribute holding the value in src-selector
+ * of the click target above, to be substituted for the template string 
+ * __SRC_SEL_ATTR_VAL__
+ * 
+ * 
+ * The Dialog Template: Should have CSS class: 'js-dialog-content'
+ *     (which should be defined as "display:none;" in CSS
+ * Should have the data attribute: data-dialog=[same as the data-dialog value
+ * of the button/element launching it]
+ * 
+ * Optionally the strings __TPL_PARAM1__ -> 3, replaced as above.
+ * Optionally the string 
+ * 
+ * Example: Button/Clickable:
+ * 
+ * <img class="resp-gal-img  img-fluid js-dialog-button "
+ * data-dialog="big-picture-dialog" data-src-sel="img"
+ * data-src-attr="src"
+ * src="http://lkirkaas.local/cmp_gallery/93-ATreeGrowsInAfrica.jpg">
+ * 
+ * Example Dialog Template:
+ * <div class='js-dialog-content' data-dialog='big-picture-dialog'
+  data-width='900' data-title='The Big Picture'
+>
+      <img src='__TPL_PARAM1__' class='big-picture-dialog'>
+      <div class="image-desc">__TPL_PARAM2__</div>
+</div>
+ */
+
 $('body').on('click', '.js-dialog-button', function (event) {
   var param1 = $(event.target).attr('data-param1');
   var param2 = $(event.target).attr('data-param2');
   var param3 = $(event.target).attr('data-param3');
+  var srcselval = $(event.target).find('data-param3');
   var src = $(event.target).attr('data-dialog');
   var clone = $(event.target).attr('data-clone');
   clone = true;
