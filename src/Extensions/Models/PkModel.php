@@ -12,6 +12,7 @@
 
 namespace PkExtensions\Models;
 
+use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\BaseTransformer;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
@@ -25,8 +26,21 @@ use \Exception;
 
 abstract class PkModel extends Model {
 
+  use UtilityMethodsTrait;
+
   public $transformer;
   public static $timestamp = true;
+
+  /** If a sublcass defines 'static $onlyLocal = true", then static::getTableFieldDefs()
+   * will only return static::$table_field_defs;
+   * @var type 
+   */
+  public static $onlyLocal = false;
+
+  #Some field names are created by functions and should never be touched again.
+  #The keys are field names, the values are the functions to be run only once,
+  #if the $key/field name doesn't already exist.
+  #mig
   public static $onetimeMigrationFuncs = [
       'updated_at' => 'timestamps()'
   ];
@@ -38,14 +52,28 @@ abstract class PkModel extends Model {
   public static $table_field_defs = null;
 
   public static function getFieldNames() {
-    if (!is_array(static::getTableFieldDefs())) {
-      return null;
-    }
-    return array_keys(static::getTableFieldDefs());
+    static $fieldNameArr = [];
+    $class = static::class;
+    if (array_key_exists($class, $fieldNameArr)) return $fieldNameArr[$class];
+    $fieldNameArr[$class] = array_keys(static::getTableFieldDefs());
+    return $fieldNameArr[$class];
   }
 
   public static function getTableFieldDefs() {
-    return static::$table_field_defs;
+    if (static::$onlyLocal) return static::$table_field_defs;
+    static $modelFieldDefs = [];
+    $class = static::class;
+    if (array_key_exists($class, $modelFieldDefs)) {
+      return $modelFieldDefs[$class];
+    }
+    $staticFieldDefs = static::$table_field_defs;
+    if (!is_array($staticFieldDefs)) $staticFieldDefs = [];
+    if (($par = get_parent_class($class)) && method_exists($par, __METHOD__)) {
+      $ancestorDefs = $par::getTableFieldDefs();
+      $staticFieldDefs = array_merge($ancestorDefs, $staticFieldDefs);
+    }
+    static::$modelFieldDefs[$class] = $staticFieldDefs;
+    return $staticFieldDefs;
   }
 
   public static function get_field_type($fieldname) {
@@ -57,18 +85,20 @@ abstract class PkModel extends Model {
   }
 
   /** Because the Eloquent Model class needs an instance to get a table name...
-   *
    * @var null|string - name of the DB table 
    */
 
   /**
    * Get the table associated with the model.
-   *
    * @return string
    */
   public static function getTableName() {
+    static $tableNames = [];
+    $class = static::class;
+    if (array_key_exists($class, $tableNames)) return $tableNames[$class];
     $instance = new static();
     $tablename = $instance->getTable();
+    $tableNames[$class] = $tablename;
     return $tablename;
   }
 
@@ -85,7 +115,7 @@ abstract class PkModel extends Model {
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
         $type = $def['type'];
-        $type_args=keyVal('type_args',$def) ? ', '.keyVal('type_args', $def) : '';
+        $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
         if (is_string($methods)) {
@@ -134,13 +164,8 @@ abstract class PkModel extends Model {
       $currenttablefields = static::getStaticAttributeNames();
       $is_timestamped = in_array('updated_at', $currenttablefields);
       $currentmodelfields = static::getFieldNames();
-      if (!$currentmodelfields) die("No table field names defined for Model [$basename]\n");
-      /*
-      if (!$currentmodelfields) {
-        echo ("No table field names defined for Model [$basename]\n");
-        return;
-      }
-      */
+      if (!$currentmodelfields)
+          die("No table field names defined for Model [$basename]\n");
       $newfields = array_diff($currentmodelfields, $currenttablefields);
       $newfielddefs = array_subset($newfields, $allFieldDefs);
       $newfieldstr = static::buildMigrationFieldDefs($newfielddefs);
@@ -181,11 +206,6 @@ class $createclassname extends Migration {
       if (!in_array($key, $currenttablefields))
           $migrationFunctions .= "$spaces\$table->$func;\n";
     }
-    /*
-      foreach (static::$tableMigrations as $tableMigration) {
-      $migrationFunctions .= "$spaces\$table->$tableMigration;\n";
-      }
-     */
     $close = "
     });
   }";
@@ -814,7 +834,7 @@ class $createclassname extends Migration {
    * names of $load_many_to_many the same as the relationship names
    */
   public function saveM2MRelations($data = []) {
-    pkdebug("Saving Here Data:",$data);
+    pkdebug("Saving Here Data:", $data);
     if (empty(static::$load_many_to_many) ||
         !array_intersect(array_keys(static::$load_many_to_many), array_keys($data))) {
       return true; #Nothing to do
@@ -853,7 +873,7 @@ class $createclassname extends Migration {
             pkdebug("For [$relName], other model is [$othermodel], but otherobj:", $otherobj);
             continue;
           }
-          $otherobjkey =  $otherobj->getKey();
+          $otherobjkey = $otherobj->getKey();
           $mycurrentotherobjkeys[] = "$otherobjkey";
         }
         #Great - we have a list of otherobj keys our model pointed to, we have a new 
@@ -862,7 +882,8 @@ class $createclassname extends Migration {
         #Just make them all strings?
         pkdebug("Array is:", $arr);
         $newarr = [];
-        foreach ($arr as $el) $newarr[] = "$el";
+        foreach ($arr as $el)
+          $newarr[] = "$el";
         $addIds = array_diff($newarr, $mycurrentotherobjkeys);
         $idsToDelete = array_diff($mycurrentotherobjkeys, $newarr);
       }
@@ -876,23 +897,21 @@ class $createclassname extends Migration {
           $fresh [$mykey] = $thiskeyval;
           foreach ($addIds as $addId) {
             $fresh[$otherkey] = $addId;
-            pkdebug("Adding",$fresh);
+            pkdebug("Adding", $fresh);
             $pivotmodel::create($fresh);
           }
         }
-       
-      } else if ( Schema::hasTable($pivottable)) { #Gotta try it with flat table
+      } else if (Schema::hasTable($pivottable)) { #Gotta try it with flat table
         if (!empty($deleteAll)) {
           DB::table($pivottable)->where($mykey, $thiskeyval)->delete();
         } else {
-          DB::table($pivottable)->where($mykey, $thiskeyval)->whereIn($otherkey,$idsToDelete)->delete();
+          DB::table($pivottable)->where($mykey, $thiskeyval)->whereIn($otherkey, $idsToDelete)->delete();
           $fresh [$mykey] = $thiskeyval;
           foreach ($addIds as $addId) {
             $fresh[$otherkey] = $addId;
             DB::table($pivottable)->insert($fresh);
           }
         }
-
       }
     }
   }

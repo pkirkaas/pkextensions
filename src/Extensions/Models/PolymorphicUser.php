@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
  * @author Paul Kirkaas
  */
 abstract class PolymorphicUser extends PkModel {
+  /** Subclasses can override the base user Model */
+  public static $userModel = 'App\User';
     function user() {
-      return $this->morphOne('App\User','type');
+      return $this->morphOne(static::$userModel,'type');
     }
     public function __construct(array $attributes = []) {
       $this->fillable=$this->getAttributeNames();
