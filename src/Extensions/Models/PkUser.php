@@ -10,12 +10,8 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-#Comment
-
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Set up some reasonable defaults. 
  */
 
 /**
@@ -25,7 +21,9 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
  */
 
 use Request;
-class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableContract, CanResetPasswordContract {
+class PkUser extends PkModel  
+    implements AuthenticatableContract, AuthorizableContract,
+        CanResetPasswordContract {
     use Authenticatable, Authorizable, CanResetPassword;
     protected $fillable = [
         'name', 'email', 'password',
@@ -39,7 +37,36 @@ class PkUser extends PkModel  implements AuthenticatableContract, AuthorizableCo
     protected $hidden = [
         'password', 'remember_token',
     ];
+  public static $onetimeMigrationFuncs = [
+      'updated_at' => 'timestamps()',
+      'remember_token' => 'rememberToken()',
+      ];
+  public static $table_field_defs = [
+      'id' => 'increments',
+      'name' => ['type'=>'string', 'methods'=>'nullable'],
+      'email' => ['type' => 'string', 'methods' => 'unique'],
+      'password' => 'string',
+      'user_type' =>  ['type'=>'integer', 'methods'=>'nullable'],
+      'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
+    ];
 
+
+  public function authDelete() {
+    return $this->authUpdate();
+  }
+  public function authUpdate() {
+    if (isCli()) return true;
+    if (!static::instantiated($this)) return false;
+    $me = Auth::user();
+    if ($this->is($me) || $me->isAdmin()) return true;
+    
+    return false;
+  }
+
+  /** Profiles are for others viewing - but user accounts are just for users and Admins */
+  public function authRead() {
+    return $this->authUpdate();
+  }
     /** 
      * Subclasses should implement this
      * @return boolean

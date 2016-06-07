@@ -1,5 +1,4 @@
 <?php
-
 namespace PkExtensions\Traits;
 
 use PkExtensions\Models\PkModel;
