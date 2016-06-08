@@ -1,4 +1,10 @@
 <?php
+/** The 2 PolymorphicTraits - PolymorphicBaseTrait & PolymorphicMorphTrait:
+ * This (PolymorphicBaseTrait) is implemented/used by Models that will be the
+ * common basis for the extended "Morph" Models. 
+ * Example: Common Base: User.  Extended 'Morph' type: Borrower, Lender.
+ */
+
 /** Supports the base model that polymorphic extensions share.
  * There could be polymorphic users, polymorphic media, etc, so can't be a single
  * common polymorphic base base - but the base from which the extensions diverge
@@ -21,6 +27,8 @@ Trait PolymorphicBaseTrait {
    * Using the Trait: Implementing PolyBaseModel
    REQUIRED:
    public static $polytypes = ['App\Models\Borrower', 'App\Models\Lender'];
+   public function [$typeName]() { return $this->traitTypeMorphTo() }
+
    * The Type name will be built from the Base class name of the Poly Extended class,
    * so "Lender' & 'Borrower' - that's what willl be stored in the 'type_type' field.
 
@@ -46,23 +54,30 @@ Trait PolymorphicBaseTrait {
    }
 
    public static function getExtensionFieldDefs() {
-     $class = static::class;
-     else $type='type';
+     //$class = static::class;
+     $typeName=static::typeName();
      return [
-       $type.'_id' => ['type'=>'integer','methods'=>'index'],
-       $type.'_type' => 'string',
+       $typeName.'_id' => ['type'=>'integer','methods'=>'index'],
+       $typeName.'_type' => 'string',
        ];
    }
 
-  public function typeName() {
-     if (property_exists($class,'typeName') return static::$typeName;
+   /** Called by the implementing / using model - from the method definition
+    * public function [$typeName] () { return $this
+    * @param type $name
+    * @param type $type
+    * @param type $id
+    */
+   public function traitTypeMorphTo($name = null, $type = null, $id = null) {
+     $name = $name ? $name : static::getTypeName();
+     $type = $type ? $type : static::getTypeName().'_type';
+     $id = $id ? $id : static::getTypeName().'_id';
+     return $this->morphTo($name, $type, $id);
+   }
+
+  public static function typeName() {
+     $class = static::class;
+     if (property_exists($class,'typeName')) return static::$typeName;
      return 'type';
   }
-
-    return $this->morphTo();
-  }
-
-
-
-
 }
