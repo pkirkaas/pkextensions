@@ -59,21 +59,33 @@ abstract class PkModel extends Model {
     return $fieldNameArr[$class];
   }
 
-  public static function getTableFieldDefs() {
+   public static $_modelFieldDefs = [];
+  /** ONLY CALLED BY static::getTableFieldDefs()
+   * So implementing classes can modify defaults methods - adding and 
+   * subtracting fields
+   * 
+   * @staticvar array $modelFieldDefs
+   * @return array
+   */
+  public static function _getTableFieldDefs() {
     if (static::$onlyLocal) return static::$table_field_defs;
-    static $modelFieldDefs = [];
     $class = static::class;
-    if (array_key_exists($class, $modelFieldDefs)) {
-      return $modelFieldDefs[$class];
+    $method = __METHOD__;
+    if (array_key_exists($class, static::$_modelFieldDefs)) {
+      return static::$_modelFieldDefs[$class];
     }
     $staticFieldDefs = static::$table_field_defs;
     if (!is_array($staticFieldDefs)) $staticFieldDefs = [];
     if (($par = get_parent_class($class)) && method_exists($par, __METHOD__)) {
-      $ancestorDefs = $par::getTableFieldDefs();
+      $ancestorDefs = $par::$method();
       $staticFieldDefs = array_merge($ancestorDefs, $staticFieldDefs);
     }
-    static::$modelFieldDefs[$class] = $staticFieldDefs;
+    static::$_modelFieldDefs[$class] = $staticFieldDefs;
     return $staticFieldDefs;
+  }
+
+  public static function getTableFieldDefs() {
+    return static::_getTableFieldDefs();
   }
 
   public static function get_field_type($fieldname) {
