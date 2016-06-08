@@ -68,12 +68,18 @@ abstract class PkModel extends Model {
    * @return array
    */
   public static function _getTableFieldDefs() {
-    if (static::$onlyLocal) return static::$table_field_defs;
+    //if (static::$onlyLocal) return static::$table_field_defs;
     $class = static::class;
     $method = __METHOD__;
+    pkdebug("CLASS: [$class]; METHOD: [$method]; static_modelFD", static::$_modelFieldDefs);
     if (array_key_exists($class, static::$_modelFieldDefs)) {
       return static::$_modelFieldDefs[$class];
     }
+    $defs = static::getAncestorArraysMerged('table_field_defs');
+    static::$_modelFieldDefs[$class] = $defs;
+    pkdebug("DEFS:", $defs);
+    return $defs;
+    /*
     $staticFieldDefs = static::$table_field_defs;
     if (!is_array($staticFieldDefs)) $staticFieldDefs = [];
     if (($par = get_parent_class($class)) && method_exists($par, __METHOD__)) {
@@ -82,6 +88,8 @@ abstract class PkModel extends Model {
     }
     static::$_modelFieldDefs[$class] = $staticFieldDefs;
     return $staticFieldDefs;
+     * 
+     */
   }
 
   public static function getTableFieldDefs() {

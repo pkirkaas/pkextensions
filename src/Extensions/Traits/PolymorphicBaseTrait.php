@@ -27,10 +27,9 @@ Trait PolymorphicBaseTrait {
    * Using the Trait: Implementing PolyBaseModel
    REQUIRED:
    public static $polytypes = ['App\Models\Borrower', 'App\Models\Lender'];
-   public function [$typeName]() { return $this->traitTypeMorphTo() }
+   //public function [$typeName]() { return $this->traitTypeMorphTo() }
 
    * The Type name will be built from the Base class name of the Poly Extended class,
-   * so "Lender' & 'Borrower' - that's what willl be stored in the 'type_type' field.
 
    * OPTIONAL:
    static::$typeName='imageable'; #Makes 'imageable_type' & 'imageable_id'
@@ -39,9 +38,20 @@ Trait PolymorphicBaseTrait {
    */
 
    public static $bases = [];
-   public static function getPolytypes() {
+
+   /** Returns the implementing class's statically decared '$polytypes'
+    * fully namespaced extension array - 
+    *  example: ['App\\Models\\Borrower', 'App\\Models\\Lender']
+    * @return array of namespaced Morph/Extension Model names
+    */
+   public static function getPolyTypes() {
      return static::$polytypes;
    }
+
+   /** Returns array of convenient 'base' names of the extension/morph types -
+    * Example: ['Borrower', 'Lender']
+    * @return array
+    */
    public static function getPolyBases() {
      $class = static::class;
      if (array_key_exists($class, static::$bases)) return static::$bases[$class];
@@ -53,13 +63,27 @@ Trait PolymorphicBaseTrait {
      return static::$bases[$class];
    }
 
-   public static function getExtensionFieldDefs() {
+   public static function getPolyBaseFieldDefs() {
      //$class = static::class;
      $typeName=static::typeName();
      return [
        $typeName.'_id' => ['type'=>'integer','methods'=>'index'],
        $typeName.'_type' => 'string',
        ];
+   }
+
+   public function __call($method, $args=[]) {
+     if ($method === $this->getTypeName()) {
+       return call_user_func_array([$this,'traitTypeMorphTo'],$args);
+     }
+     return parent::__call($method, $args);
+   }
+
+   public static function getTableFieldDefs() {
+     $_fieldDefs = static::_getTableFieldDefs();
+     $_polyBaseFieldDefs = static::getPolyBaseFieldDefs();
+     $joinedFieldDefs = array_merge($_fieldDefs, $_polyBaseFieldDefs);
+     return $joinedFieldDefs;
    }
 
    /** Called by the implementing / using model - from the method definition

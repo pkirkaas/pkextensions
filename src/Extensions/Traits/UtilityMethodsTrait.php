@@ -27,7 +27,7 @@ trait UtilityMethodsTrait {
    *   merging strategy - $possessionDirectDefs are indexed, others assoc.
    * @return Array: Merged array of hierarchy
    */
-  protected static function getAncestorArraysMerged($arrayName, $idx = false) {
+  public static function getAncestorArraysMerged($arrayName, $idx = false) {
     //$thisClass = $class = get_called_class();
     $thisClass = $class = static::class;
     #All static, so cache results...
@@ -50,7 +50,10 @@ trait UtilityMethodsTrait {
          ($par::$$arrayName === false) ) {#If a parent wants stop accension
         break;
       }
-      $retArr[] = $par::$$arrayName;
+      if (($tstArr =$par::$$arrayName) && is_array($tstArr) ) {
+        //$retArr[] = $par::$$arrayName;
+        $retArr[] = $tstArr;
+      }
       $class = $par;
     }
     #Now merge. Reverse order so child settings override ancestors...
@@ -78,6 +81,7 @@ trait UtilityMethodsTrait {
    * @param boolean $idx
    * @return array - the resulting merged arrays.
    */
+  /*
   public static function getAncestorMethodResultsMerged($methodName, $args=null, $idx=false) {
     $thisClass = $class = static::class;
     #All static, so cache results...
@@ -117,4 +121,6 @@ trait UtilityMethodsTrait {
     $fullRetArr[$thisClass][$methodName] = $mgArr;
     return $mgArr;
   }
+   * 
+   */
 }
