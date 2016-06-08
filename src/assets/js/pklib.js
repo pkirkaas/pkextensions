@@ -239,34 +239,6 @@ $(window).resize(function () {
   top_pad_body_to_fixed();
 });
 
-/**
- * Takes an array of GET key/value pairs, adds (or replaces) them, and redirects
- * @param {type} getArr
- */
-function addGetsAndGo(getArr) {
-  var gets = getGets(); //Array of existing GET params
-  var outGets = $.extend({}, gets, getArr);
-  setGetsAndGo(outGets);
-}
-
-/** Takes an array of GET key/value pairs and sets them as the GET
- * parameters to the current path, totally removing any current GET
- * params not in this array.
- * @param {type} getArr
- */
-function setGetsAndGo(getArr) {
-  var queryStr = getArrToStr(getArr);
-  var basePath = getBasePath();
-  window.location = basePath + queryStr;
-}
-
-function getBasePath() {
-  var basePath = window.location.protocol + '//' + window.location.hostname
-          + window.location.pathname;
-  return basePath;
-}
-
-
 /** Deletes the closest parent that matches the selector
  * To delete a row/subform in a multi-row form
  * @param node element - node - usually the button clicked on
@@ -276,89 +248,6 @@ function deleteClosest(element, selector) {
   $(element).closest(selector).remove();
 
 }
-
-
-/**
- * Refresh current page with new GET parameter value
- * Adds the parameter if it doesn't exist, or replaces the current value
- *
- * @param parmName: the name of the GET parameter
- * @param parmValue: the value of the GET parameter
- */
-function refreshNewGet(parmName, parmValue) {
-  var gets = getGets();
-  //Kludge -- if changing perpage, reset page to 1
-  if (parmName == 'perpage') {
-    gets['page'] = '1';
-  }
-  gets[parmName] = parmValue;
-  //Rebuild GET query string
-  var getstr = '';
-  for (var parname in gets) {
-    if (gets[parname]) {
-      getstr = getstr + '&' + parname + '=' + encodeURIComponent(gets[parname]);
-    }
-  }
-  if (getstr) {
-    getstr = '?' + getstr.substr(1);
-  }
-  window.location = window.location.pathname + getstr;
-}
-
-
-/**
- * Returns associative array of named "GET" parameters and values
- */
-function getGets() {
-  var queryStr = window.location.search.substr(1);
-  return parseStr(queryStr);
-}
-
-/** A VERY light weight version of PHP parse_str - converts a simple
- * HTTP query string (key1=val1&key2=val2..) to a JS Obj 
- * @param string queryStr
- * @returns object
- */
-function parseStr(queryStr) {
-  var params = {};
-  if (!queryStr || (queryStr === ''))
-    return params;
-  var prmarr = queryStr.split("&");
-  for (var i = 0; i < prmarr.length; i++) {
-    var tmparr = prmarr[i].split("=");
-    params[tmparr[0]] = tmparr[1];
-  }
-  return params;
-}
-
-
-/**
- *Converts an array of key/values to a an '&' separated GET string of params
- *values. 
- * @param {type} getArr: Array of GET key/value pairs
- * @returns String: converted array of GET params to a query string
- */
-function getArrToStr(getArr) {
-  var retstr = '?';
-  for (var paramName in getArr) {
-    if (getArr.hasOwnProperty(paramName)) { // paramName is not inherited
-      retstr += (paramName + '=' + getArr[paramName] + '&');
-    }
-  }
-  retstr = retstr.substring(0, retstr.length - 1);
-  return retstr;
-}
-
-/** 
- * Takes an associative array of key/value pairs and returns a GET param str
- * TODO: URL encode? But what if existing param values are already URLencoded?
- * @param Array getArr: array of key/value pairs
- * @returns String query get parameter string
- */
-function setGets(getArr) {
-}
-
-
 
 /** Rounds a number to two decimal places. 
  * TODO: Make 2 the default, with additional optional parameter
@@ -799,6 +688,7 @@ function containsSubstr(theVar, subStr) {
   return false;
 }
 
+/***************   Starts of useful functions - not robust yet ********/
 /** Generates an almost certainly unique id for local purposes
  * 
  * @returns {String}
@@ -843,3 +733,188 @@ function htmlDecode(value) {
   }
 }
 
+
+
+/**
+ * Refresh current page with new GET parameter value
+ * Adds the parameter if it doesn't exist, or replaces the current value
+ *
+ * @param parmName: the name of the GET parameter
+ * @param parmValue: the value of the GET parameter
+ */
+function refreshNewGet(parmName, parmValue) {
+  var gets = getGets();
+  //Kludge -- if changing perpage, reset page to 1
+  if (parmName == 'perpage') {
+    gets['page'] = '1';
+  }
+  gets[parmName] = parmValue;
+  //Rebuild GET query string
+  var getstr = '';
+  for (var parname in gets) {
+    if (gets[parname]) {
+      getstr = getstr + '&' + parname + '=' + encodeURIComponent(gets[parname]);
+    }
+  }
+  if (getstr) {
+    getstr = '?' + getstr.substr(1);
+  }
+  window.location = window.location.pathname + getstr;
+}
+
+
+/**
+ * Takes an array of GET key/value pairs, adds (or replaces) them, and redirects
+ * @param {type} getArr
+ */
+function addGetsAndGo(getArr) {
+  var gets = getGets(); //Array of existing GET params
+  var outGets = $.extend({}, gets, getArr);
+  setGetsAndGo(outGets);
+}
+
+/** Takes an array of GET key/value pairs and sets them as the GET
+ * parameters to the current path, totally removing any current GET
+ * params not in this array.
+ * @param {type} getArr
+ */
+function setGetsAndGo(getArr) {
+  var queryStr = getArrToStr(getArr);
+  var basePath = getBasePath();
+  window.location = basePath + queryStr;
+}
+
+function getBasePath() {
+  var basePath = window.location.protocol + '//' + window.location.hostname
+          + window.location.pathname;
+  return basePath;
+}
+
+
+/**
+ * Returns associative array of named "GET" parameters and values
+ */
+function getGets() {
+  var queryStr = window.location.search.substr(1);
+  return parseStr(queryStr);
+}
+
+/** A VERY light weight version of PHP parse_str - converts a simple
+ * HTTP query string (key1=val1&key2=val2..) to a JS Obj 
+ * @param string queryStr
+ * @returns object
+ */
+function parseStr(queryStr) {
+  var params = {};
+  if (!queryStr || (queryStr === ''))
+    return params;
+  var prmarr = queryStr.split("&");
+  for (var i = 0; i < prmarr.length; i++) {
+    var tmparr = prmarr[i].split("=");
+    params[tmparr[0]] = tmparr[1];
+  }
+  return params;
+}
+
+
+/**
+ *Converts an array of key/values to a an '&' separated GET string of params
+ *values. 
+ * @param {type} getArr: Array of GET key/value pairs
+ * @returns String: converted array of GET params to a query string
+ */
+function getArrToStr(getArr) {
+  var retstr = '?';
+  for (var paramName in getArr) {
+    if (getArr.hasOwnProperty(paramName)) { // paramName is not inherited
+      retstr += (paramName + '=' + getArr[paramName] + '&');
+    }
+  }
+  retstr = retstr.substring(0, retstr.length - 1);
+  return retstr;
+}
+
+	 
+  /** This section intended to highlight a searchterm and scroll down to it
+   * if GET param 'search_term=search term' exists in URL.
+   * Not sure if this is the best way/place to do it?
+   */	
+  var gets = getGets();
+  if (gets.search_term && (typeof gets.search_term === 'string') && gets.search_term.length) {
+    //We have a search term - do we have a dom '.entry-wrapper' element?
+    var search_in = $('.entry-wrapper');
+    var search_term = decodeURIComponent(gets.search_term);
+    if (search_term && (typeof search_term === 'string') && search_in.length) {
+      var spanClass = 'highlight-matched-searchterm';
+      var spanSelector = '.'+spanClass;
+      //console.log('SI Exists & Search Term: ', search_term, 'SI:', search_in);
+      var starr = safeSplitString(search_term);
+      //console.log('Search Term Array: ', starr);
+      var bodyHtml = search_in.html();
+      for (var ix = 0 ; ix < starr.length ; ix++) {
+        var cmpstr = starr[ix];
+        cmpRE = new RegExp(cmpstr,'ig');
+        bodyHtml = bodyHtml.replace(cmpRE,'<span class="'+spanClass+'">$&</span>');
+      }
+      search_in.html(bodyHtml);
+      if ($(spanSelector).length) {
+        var topOffset =  $(spanSelector).offset().top - 120; 
+        console.log("TopOffset:", topOffset);
+        window.scrollTo(0, topOffset);
+      }
+    }
+  }	
+
+//////// Supporting Functions to be made more robust ///////
+
+
+/**
+ * Split a string into an array of SAFE string components
+ * @param string thestring
+ * @param string splitchar - default ' '
+ * @returns Array - of hopefully safe string components
+ */
+function safeSplitString(thestring,splitchar) {
+// Is this really safe? At least a sinlge place to fix... 
+  if (!thestring || !(typeof thestring === 'string') || !thestring.length) {
+    return [];
+  }
+  splitchar = splitchar || ' ';
+  var rawSplitArr = thestring.split(splitchar);
+  var retArr = [];
+  for (var i = 0 ; i < rawSplitArr.length ; i ++) {
+    retArr[i] = encodeURIComponent(rawSplitArr[i]);
+  }
+  return retArr;
+}
+
+
+/** If a form is modified, makes user confirm to leave, unless action is
+ * to submit
+ * @returns {undefined}
+ */
+$(function () {
+  $('body').on('change', 'form', function (event) {
+    $(window).on('beforeunload', function (event) { 
+      var confirmationMessage = "Unsaved Changes";
+      event.preventDefault();
+      event.returnValue = confirmationMessage; 
+      return confirmationMessage;
+    });
+  });
+  $('form').submit (function (event) {
+    console.log("Got in onload - trying 'off' ...");
+    $(window).off('beforeunload');
+  });
+});
+
+
+
+/** 
+ * Takes an associative array of key/value pairs and returns a GET param str
+ * TODO: URL encode? But what if existing param values are already URLencoded?
+ * @param Array getArr: array of key/value pairs
+ * @returns String query get parameter string
+ */
+function setGets(getArr) {
+}
