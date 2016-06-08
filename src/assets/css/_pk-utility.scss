@@ -315,24 +315,19 @@ eel to labels (descriptons), vs user input/repli8es */
 }
 */
 
-/*You have to attach these three classes to the object you want to center */
+
+/* The CONTAINING element must be RELATIVE*/
 @mixin make-horizontal-center {
   margin-left: 0;
   margin-right: 0;
   position: absolute;
   left: 50%;
-  /*
-  transform:translate(0,-50%);
-  */
   transform:translate(-50%,0);
 }
 
 @mixin make-vertical-center {
   margin-top: 0;
   margin-bottom: 0;
-  /** Think it works w. relative? But need to play with it more first.
-  position: relative;
-  */
   position: absolute;
   top: 50%;
   transform:translate(0,-50%);
@@ -340,20 +335,13 @@ eel to labels (descriptons), vs user input/repli8es */
 
 
 .horizontal-center { @include make-horizontal-center }
+.h-center { @include make-horizontal-center }
 .vertical-center { @include make-vertical-center }
+.v-center { @include make-vertical-center }
 
 
 /*The block to center in the containing block should have this class. The
 containing block needs to be positioned relatively*/
-/*
-.center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-right: -50%;
-  transform: translate(-50%, -50%);
-}
-*/
 .center {
   margin: 0;
   position: absolute;
