@@ -1135,12 +1135,12 @@ class $createclassname extends Migration {
   }
 
   /** First get all the methods of this class that start with
-   * 'getTableFiedDefsExtra' then execute them and return all
+   * 'getTableFieldDefsExtra' then execute them and return all
    * the extra defined table field defs - for example, the BuildQueryTrait
    * would define getTableFieldsDefsExtraBuildQueryTrait();
    */
   public static function getExtraTableFieldDefs() {
-    $fnpre = 'getTableFiedDefsExtra';
+    $fnpre = 'getTableFieldDefsExtra';
     $methods = get_class_methods(static::class);
     $tfmethods = [];
     $tfdefsets = [];

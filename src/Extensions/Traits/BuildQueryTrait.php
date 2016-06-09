@@ -1,4 +1,5 @@
 <?php
+
 namespace PkExtensions\Traits;
 
 use PkExtensions\Models\PkModel;
@@ -18,13 +19,13 @@ use \Request;
  * the set of values as JSON, using accessors/mutators like:
  * <pre>
   public function setTypeoffinancingIdValAttribute($value) { #$value is an array of possible values
-    if (!is_array($value)) $value = [$value];
-    $this->attributes['typeoffinancing_id_val'] = json_encode(array_values($value));
+  if (!is_array($value)) $value = [$value];
+  $this->attributes['typeoffinancing_id_val'] = json_encode(array_values($value));
   }
 
   public function getTypeoffinancingIdValAttribute($value) {
-    if (!$value) return [];
-    return json_decode($value,true);
+  if (!$value) return [];
+  return json_decode($value,true);
   }
  * </pre>
  * This trait supports "out of the box" direct field queries. 
@@ -33,7 +34,7 @@ use \Request;
 
 /** Note: When using the " IN " set criteria, we use accessors/mutators to 
  * convert in-memory arrays to JSON strings stored in the DB
- */ 
+ */
 trait BuildQueryTrait {
 
   /** In Implemented Classes, will be set to the class/model to be searched.
@@ -78,7 +79,6 @@ trait BuildQueryTrait {
     return true;
   }
 
-
   public static $numericQueryCrit = [
       '0' => "Don't Care",
       '>' => 'More Than',
@@ -107,10 +107,9 @@ trait BuildQueryTrait {
       '50' => 'Within 50 miles',
   ];
   public static $betweenQueryCrit = [
-    '0' => "Don't Care",
-    'BETWEEN' => 'Between',
+      '0' => "Don't Care",
+      'BETWEEN' => 'Between',
   ];
-
 
   /** Uses the above static $withinQueryCrit for now, until phased out
    * 
@@ -120,106 +119,139 @@ trait BuildQueryTrait {
     static $queryCrit = null;
     if (!$queryCrit) {
       $queryCrit = [
-          'group'=>static::$groupQueryCrit,
-          'within'=>static::$withinQueryCrit,
-          'string'=>static::$stringQueryCrit,
-          'numeric'=>static::$numericQueryCrit,
-          'between'=>static::$betweenQueryCrit,
+          'group' => static::$groupQueryCrit,
+          'within' => static::$withinQueryCrit,
+          'string' => static::$stringQueryCrit,
+          'numeric' => static::$numericQueryCrit,
+          'between' => static::$betweenQueryCrit,
       ];
       if (!$type) return $queryCrit;
       if (in_array($type, array_keys($queryCrit))) return $queryCrit[$type];
       return false;
     }
-
   }
-/**
- * 
- * IMPLEMENTOR TO PROVIDE:
-  public static $search_field_defs = [
+
+  /**
+   * 
+   * IMPLEMENTOR TO PROVIDE:
+    public static $search_field_defs = [
     $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between',
-     'extra'=>['suffix'=>$type],
+    'extra'=>['suffix'=>$type],
     $basename2 =>  'integer', #Assumes comparison is numeric
     $basename3, #Assumes type is integer & comparison is numeric
-   ];
- * 
- * Where $basename is the field name in the target table to search - 
- * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
- * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
- * 
- * This Trait can then build both the table field definitions AND maybe the
- * search controls for the search forms
- */ 
-
+    ];
+   * 
+   * Where $basename is the field name in the target table to search - 
+   * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
+   * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
+   * 
+   * This Trait can then build both the table field definitions AND maybe the
+   * search controls for the search forms
+   */
 
   /** Converts the simple $search_field_defs into canonical - 
    * @return array of assoc arrays of min: [$basename => ['fieldtype' => $fieldtype]
    */
   public static function getSearchFieldDefs() {
-    return normalizeMixedArray(static::$search_field_defs,'fieldtype');
+    $configStruct = ['fieldtype',
+        'fieldtype' => 'integer',
+        'comparison' => 'numeric',
+    ];
+    return normalizeConfigArray(static::$search_field_defs, $configStruct);
   }
 
   public static function getSearchFields() {
     return array_keys(static::getSearchFieldDefs());
   }
 
-  public static function getTableFiedDefsExtraBuildQuery () {
+  public static function buildSearchControl($baseName) {
+    
+  }
+
+  public static $queryFieldDefCacheKey = 'baseKeyedQueryTableFieldDefs';
+  /** Gets the flattened array to use for building migration code */
+  public static function getTableFieldDefsExtraBuildQuery() {
+    $idxArr = array_values(static::getBasenameTableFieldDefsExtraBuildQuery());
+    return call_user_func_array('array_merge', $idxArr);
+  }
+    
+  /** This returns an array keyed by basename=>array of all defs for that basename
+   *  query. It needs to be flattened and indexed to be used in building actual
+   *  migration table building code, which is what the above
+   *   getTableFieldDefsExtraBuildQuery does.
+   * @return type
+   */
+  public static function getBasenameTableFieldDefsExtraBuildQuery() {
+    if ($r = static::getCached(static::$queryFieldDefCacheKey)) return $r;
     $searchFields = static::getSearchFieldDefs();
     $fieldDefsCollection = [];
     foreach ($searchFields as $baseName => $def) {
-      $comparison = keyVal('comparison', $def,'numeric');
+      $comparison = keyVal('comparison', $def, 'numeric');
       $extra = keyVal('extra', $def);
-      $fieldBuildMethod = 'buildQueryFields'.$comparison;
-      $fieldDefsCollection[] = static::$fieldBuildMethod($baseName,$def);
+      $fieldBuildMethod = 'buildQueryFields' . $comparison;
+      /** This allows implementing classes to add additional comparison types
+       * and methods, and still get called from here.
+       */
+      $fieldDefs = static::$fieldBuildMethod($baseName, $def);
       if ($extra) {
-        $fieldDefsCollection[] = static::buildExtraFields($baseName, $extra);
+        $extraDefs = static::buildExtraFields($baseName, $extra);
+        if (is_array($extraDefs)) $fieldDefs = array_merge($fieldDefs, $extraDefs);
       }
-
+      $fieldDefsCollection[$baseName] = $fieldDefs;
     }
-    $fieldDefs = call_user_func_array('array_merge', $fieldDefsCollection);
-    return $fieldDefs;
+    return static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
   }
 
   public static function buildQueryFieldsNumeric($baseName, $def = null) {
-    $valType = keyVal('fieldtype',$def,'integer');
+    $valType = keyVal('fieldtype', $def, 'integer');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
     return [
-        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
-      ];
-    }
+        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
+    ];
+  }
 
   public static function buildQueryFieldsString($baseName, $def = null) {
-    $valType = keyVal('fieldtype',$def,'string');
+    $valType = keyVal('fieldtype', $def, 'string');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
     return [
-        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
-      ];
-    }
+        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
+    ];
+  }
+
   public static function buildQueryFieldsBetween($baseName, $def = null) {
-    $valType = keyVal('fieldtype',$def,'integer');
+    $valType = keyVal('fieldtype', $def, 'integer');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
     return [
-        $baseName.'_maxval'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_minval'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
-      ];
-    }
+        $baseName . '_maxval' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_minval' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
+    ];
+  }
+
   public static function buildQueryFieldsGroup($baseName, $def = null) {
-    $valType = keyVal('fieldtype',$def,'string');
+    $valType = keyVal('fieldtype', $def, 'string');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
     return [
-        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
-      ];
-    }
+        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
+    ];
+  }
+
   public static function buildQueryFieldsWithin($baseName, $def = null) {
-    $valType = keyVal('fieldtype',$def,'integer');
+    $valType = keyVal('fieldtype', $def, 'integer');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
     $paramType = keyVal('paramtype', $def, 'integer');
     return [
-        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
-        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
-        $baseName.'_param'=>['type'=>$paramType, 'methods' => 'nullable'],
-      ];
-    }
+        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
+        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
+        $baseName . '_param' => ['type' => $paramType, 'methods' => 'nullable'],
+    ];
+  }
 
   #Try building the query on the model first - it's prettier
+
   public function buildQueryOnTable() {
     $table = $this->getTargetTable();
     if (empty($table)) return false;
@@ -285,10 +317,10 @@ trait BuildQueryTrait {
             $query = $query->whereNotIn($root, array_values($critset['val']));
             continue;
           } else if ($critset['crit'] === 'BETWEEN') {
-          //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
-          //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
-            $min = to_int(keyVal('min',$critset['val']), -PHP_INT_MAX);
-            $max = to_int(keyVal('max',$critset['val']), PHP_INT_MAX);
+            //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
+            //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
+            $min = to_int(keyVal('min', $critset['val']), -PHP_INT_MAX);
+            $max = to_int(keyVal('max', $critset['val']), PHP_INT_MAX);
             pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
@@ -309,9 +341,9 @@ trait BuildQueryTrait {
 
   /** Takes an associative array, possibly from a Search Model, possibly from a post,
    * and only selects matching keys in the form:
-       "xxxx_crit"
-       "xxxx_val"
-       "xxxx_param" (optional parameters for custom querys)
+    "xxxx_crit"
+    "xxxx_val"
+    "xxxx_param" (optional parameters for custom querys)
    * ... and
    * only if the content of those keys is valid. Then builds an array in the 
    * form of: ['xxxx']=>['crit'=> $crit, 'val'=>$val, 'param' => $param] and returns it.
@@ -349,15 +381,17 @@ trait BuildQueryTrait {
       if ($root === false) continue;#Not a crit
       if ($val === null) continue;
       if (!$this->isValidCriterion($key)) continue;
-      $maxvalfield = $root.'_maxval'; #For 'BETWEEN'comparison
-      $minvalfield = $root.'_minval'; #For 'BETWEEN'comparison
+      $maxvalfield = $root . '_maxval'; #For 'BETWEEN'comparison
+      $minvalfield = $root . '_minval'; #For 'BETWEEN'comparison
       $valfield = $root . '_val';
       $valval = null;
       #Getting Complicated. $valval can be a scalar for ordinary comparison
       #If doing an " IN " comparison, $valval is a JSON encoded array.
       #if doing a "BETWEEN" comparison, $valval is an actual array, ['max'=>$max,'min'=>$min]
-      if (array_key_exists($maxvalfield, $arr)) $valval['max'] = $arr[$maxvalfield];
-      if (array_key_exists($minvalfield, $arr)) $valval['min'] = $arr[$minvalfield];
+      if (array_key_exists($maxvalfield, $arr))
+          $valval['max'] = $arr[$maxvalfield];
+      if (array_key_exists($minvalfield, $arr))
+          $valval['min'] = $arr[$minvalfield];
       if (is_array($valval)) { #At least one of min or max was set for BETWEEN
         $valval['max'] = to_int(keyVal('max', $valval), PHP_INT_MAX);
         $valval['min'] = to_int(keyVal('min', $valval), -PHP_INT_MAX);
@@ -367,7 +401,7 @@ trait BuildQueryTrait {
       //if (!array_key_exists($valfield, $arr)) continue;
       $paramfield = $root . '_param';
       $arr[$paramfield] = keyVal($paramfield, $arr);
-      
+
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
       $sets[$root] = ['crit' => $arr[$key], 'val' => $valval, 'param' => $arr[$paramfield]];
@@ -399,6 +433,17 @@ trait BuildQueryTrait {
       //pkdebug("MergeArr:", $mergearr);
       Request::merge($mergearr);
     }
+  }
+
+  /** For use in Query Forms - makes a full query control
+   * from the field name and comparison type, with $opts
+   * @return string HTML to make the control
+   */
+   
+  public static function htmlQueryControl($basename, $opts=[]) {
+
+
+
   }
 
 }

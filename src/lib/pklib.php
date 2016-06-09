@@ -2892,36 +2892,74 @@ function isPost() {
   return $_SERVER['REQUEST_METHOD'] === 'POST' ;
 }
 
-/** I use lots of arrays for configuration, but want make them as simple as
+/**I use lots of arrays for configuration, where I expect the form to be an
+ * associative array of keys, each with a value array, like:
+ * [$key1=>['p1'=>$scalar1, 'p2'=>$scalar2,..], $key2=>['p1'=>$vv1,...]]
+ * 
+ * But I don't want to write all that if not all params are set. I write the array
+ * like: $config =[$key1,$key2=>$scalar2, $key3=['p1'=>$scalar3,'p2'=>$scalar4,..]
+ * 
+ * But in the above, $key1 is a value, not a key, and the value for $key2 is a
+ * scalar, not an array. So this converts $config as written into a normalized form.
+ * 
+ * If $struct===null, return array will just switch indexed values to keys and
+ * return [$key1=>null, $key2=>$val2, etc. 
+ * 
+ * if $struct is string, returns
+ * [$key1=>[$struct=>null], $key2=>[$struct=>$scalar2], $key3=>[$struct=>null, 'p1'=>$scalar3...
+ * 
+ * if $struct is an array, if $struct[0] is string, is used as above, but
+ * the associative part of the array is used as defaults for the returned value arrays
+ * and merged with the returned value arrays
+ * 
+ * if $struct is assoc array with no int keys, for array values is merged as 
+ * above to provide defaults; but if val is scalar, stays the val
+ * 
+ * but want make them as simple as
  * possible - like, if I have array of function names and arguments, I might
  * use the funcname as key and args as val - but if the function doesn't take 
  * args, don't want to bother with [$funcname => null, ...], so just use funcname
  * as a $val and let it have a numeric index. And if there may be a single val
  * with a default name, or ...
- * @param array $arr - the array to normalize
- * @param array $struct - if present, has details on how to structure the return array 
+ * @param array $arr - the array to normalize to assoc array [$keyva1=>$val1,
+ * @param array|string|null $struct - if present, has defaults for the return array 
+ *   $struct might be: ['fieldtype','fieldtype'=>'integer','comparison'=>'numeric',...]
+ *   
  *   foreach key of $arr, if the key is int & $val is string, make $val new $key
+ *     and set the new val to $struct
  *     if $key is string, keep as index - if no $struct, keep val as val
  *     if $struct is scalar & $val is scalar, make val array: [$struct=>$val]
- *     if $struct is array - contains
+ *     if $struct is array - $struct[0] contains the keyname if $val is scalar 
  *   if scalar - AND $val is scalar
+ * 
+ * @return array of form: [$keyName => ['valkey1' => $valOrDefault, 'valkey2
  */
-function normalizeMixedArray(array $arr = [], $struct = null ) {
-
+function normalizeConfigArray(array $arr = [], $struct = null ) {
   if (!$arr || !is_array($arr) || !count($arr)) return [];
+  $defkey = $defarr = null;
+  if (is_string($struct)) $defkey = $struct;
+  if (is_array($struct)) {
+    $defkey = keyVal(0,$struct);
+    unset($struct[0]);
+    $defarr = $struct;
+  }
   $retarr = [];
-  foreach ($arr as $key => $val) {
-    if (is_string($key)) {
-      if ($struct && is_scalar($struct) && !is_array($val)) {
-        $val = [$struct => $val];
-      } 
-      $retarr[$key] = $val;
-    } else if (is_int($key) && is_string($val)) {
-      $retarr[$val] = null;
+  foreach ($arr as $origkey => $origval) {
+    if (is_int($origkey) && is_string($origval)) {
+      $retarr[$origval] = $defarr;
+    } else if (is_string($origkey)) {
+      if (is_scalar($origval) && $defkey) {
+        $newval =  [$defkey => $origval];
+      } else {
+        $newval = $origval;
+      }
+      if (is_array($newval) && is_array($defarr)) {
+        $newval = array_merge($defarr,$newval);
+      }
+      $retarr[$origkey] = $newval;
     } else { #What to do?
-      $retarr[$key] = $val;
+      $retarr[$origkey] = $origval;
     }
-
   }
   return $retarr;
 

@@ -62,9 +62,7 @@ Trait PolymorphicBaseTrait {
    public static function getTypeField() {
      return static::getTypeName().'_type'; 
    }
-   public static function getPolyBaseFieldDefs() {
-     //$class = static::class;
-     $typeName=static::getTypeName();
+   public static function getTableFieldDefsExtraMorphBase() {
      return [
        static::getTypeId()=> ['type'=>'integer','methods'=>'index'],
        static::getTypeField()=> 'string',
@@ -117,12 +115,15 @@ Trait PolymorphicBaseTrait {
     return $this->$typeField;
   }
 
+  /*
    public static function getTableFieldDefs() {
      $_fieldDefs = static::_getTableFieldDefs();
      $_polyBaseFieldDefs = static::getPolyBaseFieldDefs();
      $joinedFieldDefs = array_merge($_fieldDefs, $_polyBaseFieldDefs);
      return $joinedFieldDefs;
    }
+   * 
+   */
 
    /** Called by the implementing / using model - from the method definition
     * public function [$typeName] () { return $this
