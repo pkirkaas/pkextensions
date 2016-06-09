@@ -16,7 +16,7 @@ use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\BaseTransformer;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
-use App\User;
+use App\Models\User;
 use \Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
@@ -49,7 +49,14 @@ abstract class PkModel extends Model {
    * correspond to table field names, and values that represent their definition.
    * @var array - keys are table field names, values are table field defs
    */
-  public static $table_field_defs = null;
+  public static $table_field_defs = [ 'id' => 'increments',];
+
+  /** Since $table_field_defs are inhereted, if a subclass wants to eliminate
+   * some of the ancestor keys - like, use a different name for 'id' key, list
+   * those key names here.
+   * @var array 
+   */
+  public static $unset_table_field_keys =[];
 
   public static function getFieldNames() {
     static $fieldNameArr = [];
@@ -68,32 +75,20 @@ abstract class PkModel extends Model {
    * @return array
    */
   public static function _getTableFieldDefs() {
-    //if (static::$onlyLocal) return static::$table_field_defs;
-    $class = static::class;
-    $method = __METHOD__;
-    pkdebug("CLASS: [$class]; METHOD: [$method]; static_modelFD", static::$_modelFieldDefs);
-    if (array_key_exists($class, static::$_modelFieldDefs)) {
-      return static::$_modelFieldDefs[$class];
-    }
-    $defs = static::getAncestorArraysMerged('table_field_defs');
-    static::$_modelFieldDefs[$class] = $defs;
-    pkdebug("DEFS:", $defs);
-    return $defs;
-    /*
-    $staticFieldDefs = static::$table_field_defs;
-    if (!is_array($staticFieldDefs)) $staticFieldDefs = [];
-    if (($par = get_parent_class($class)) && method_exists($par, __METHOD__)) {
-      $ancestorDefs = $par::$method();
-      $staticFieldDefs = array_merge($ancestorDefs, $staticFieldDefs);
-    }
-    static::$_modelFieldDefs[$class] = $staticFieldDefs;
-    return $staticFieldDefs;
-     * 
-     */
+    $cacheKey = 'tableFieldDefs';
+    if (static::$onlyLocal) return static::$table_field_defs;
+    if (static::getCached($cacheKey) !== null) return static::getCached($cacheKey);
+    return static::setCached($cacheKey, static::getAncestorArraysMerged('table_field_defs'));
   }
 
+  public static function _unsetTableFieldDefs($defs = []) {
+    foreach (static::$unset_table_field_keys as $unset_key) {
+      unset($defs[$unset_key]);
+    }
+    return $defs;
+  }
   public static function getTableFieldDefs() {
-    return static::_getTableFieldDefs();
+    return  static::_unsetTableFieldDefs(static::_getTableFieldDefs());
   }
 
   public static function get_field_type($fieldname) {
@@ -161,6 +156,9 @@ abstract class PkModel extends Model {
     return $out;
   }
 
+  public static function getOnetimeMigrationFunctions() {
+    return static::getAncestorArraysMerged('onetimeMigrationFuncs');
+  }
   /** So not close to ready - finish in spare time .... */
   //public static function buildCreateMigrationDefinition() {
 
@@ -222,7 +220,7 @@ class $createclassname extends Migration {
     Schema::{$tableaction[$create]}('$tablename', function (Blueprint \$table) {
 ";
     $migrationFunctions = '';
-    foreach (static::$onetimeMigrationFuncs as $key => $func) {
+    foreach (static::getOnetimeMigrationFunctions() as $key => $func) {
       if (!in_array($key, $currenttablefields))
           $migrationFunctions .= "$spaces\$table->$func;\n";
     }

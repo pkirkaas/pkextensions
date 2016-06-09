@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 abstract class PolymorphicUser extends PkModel {
   /** Subclasses can override the base user Model */
-  public static $userModel = 'App\User';
+  public static $userModel = 'App\Models\User';
     function user() {
       return $this->morphOne(static::$userModel,'type');
     }

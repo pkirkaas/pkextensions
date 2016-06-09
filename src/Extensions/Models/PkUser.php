@@ -25,6 +25,9 @@ class PkUser extends PkModel
     implements AuthenticatableContract, AuthorizableContract,
         CanResetPasswordContract {
     use Authenticatable, Authorizable, CanResetPassword;
+    public static $onetimeMigrationFuncs = [
+      'remember_token' => 'rememberToken()',
+      ];
     protected $fillable = [
         'name', 'email', 'password',
     ];
@@ -37,16 +40,10 @@ class PkUser extends PkModel
     protected $hidden = [
         'password', 'remember_token',
     ];
-  public static $onetimeMigrationFuncs = [
-      'updated_at' => 'timestamps()',
-      'remember_token' => 'rememberToken()',
-      ];
   public static $table_field_defs = [
-      'id' => 'increments',
       'name' => ['type'=>'string', 'methods'=>'nullable'],
       'email' => ['type' => 'string', 'methods' => 'unique'],
       'password' => 'string',
-      'user_type' =>  ['type'=>'integer', 'methods'=>'nullable'],
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
     ];
 

@@ -5,7 +5,27 @@ namespace PkExtensions\Traits;
  * June 2016 Paul Kirkaas
  */
 trait UtilityMethodsTrait {
+
+  /** For caching results of methods that don't change. Keyed by 'key' & class
+   *
+   * @var array 
+   */
+  public static $_cache = []; 
   
+  public function getCached($key) {
+    $class = static::class;
+    if (array_key_exists($class,static::$_cache)) {
+      return keyVal($key, static::$_cache[$class]);
+    }
+    return null;
+  }
+
+  public static function setCached($key,$value=null) {
+    $class = static::class;
+    static::$_cache[$class][$key] = $value;
+    return $value;
+  }
+
   /** If any method wants to stop static::getAncestorMethodResultsMerged() from
    * continuing up the ancestor chain, it sets this flag TRUE. 
    * static::getAncestorMethodResultsMerged() will stop accending ancestors, 
