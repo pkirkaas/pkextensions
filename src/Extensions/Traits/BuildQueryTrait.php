@@ -78,6 +78,7 @@ trait BuildQueryTrait {
     return true;
   }
 
+
   public static $numericQueryCrit = [
       '0' => "Don't Care",
       '>' => 'More Than',
@@ -110,8 +111,115 @@ trait BuildQueryTrait {
     'BETWEEN' => 'Between',
   ];
 
-  #Try building the query on the model first - it's prettier
 
+  /** Uses the above static $withinQueryCrit for now, until phased out
+   * 
+   * @param string|null $type - query type - 'within', 'string', etc. If null, all 
+   */
+  public function getQueryCrit($type = null) {
+    static $queryCrit = null;
+    if (!$queryCrit) {
+      $queryCrit = [
+          'group'=>static::$groupQueryCrit,
+          'within'=>static::$withinQueryCrit,
+          'string'=>static::$stringQueryCrit,
+          'numeric'=>static::$numericQueryCrit,
+          'between'=>static::$betweenQueryCrit,
+      ];
+      if (!$type) return $queryCrit;
+      if (in_array($type, array_keys($queryCrit))) return $queryCrit[$type];
+      return false;
+    }
+
+  }
+/**
+ * 
+ * IMPLEMENTOR TO PROVIDE:
+  public static $search_field_defs = [
+    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between',
+     'extra'=>['suffix'=>$type],
+    $basename2 =>  'integer', #Assumes comparison is numeric
+    $basename3, #Assumes type is integer & comparison is numeric
+   ];
+ * 
+ * Where $basename is the field name in the target table to search - 
+ * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
+ * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
+ * 
+ * This Trait can then build both the table field definitions AND maybe the
+ * search controls for the search forms
+ */ 
+
+
+  /** Converts the simple $search_field_defs into canonical - 
+   * @return array of assoc arrays of min: [$basename => ['fieldtype' => $fieldtype]
+   */
+  public static function getSearchFieldDefs() {
+    return normalizeMixedArray(static::$search_field_defs,'fieldtype');
+  }
+
+  public static function getSearchFields() {
+    return array_keys(static::getSearchFieldDefs());
+  }
+
+  public static function getTableFiedDefsExtraBuildQuery () {
+    $searchFields = static::getSearchFieldDefs();
+    $fieldDefsCollection = [];
+    foreach ($searchFields as $baseName => $def) {
+      $comparison = keyVal('comparison', $def,'numeric');
+      $extra = keyVal('extra', $def);
+      $fieldBuildMethod = 'buildQueryFields'.$comparison;
+      $fieldDefsCollection[] = static::$fieldBuildMethod($baseName,$def);
+      if ($extra) {
+        $fieldDefsCollection[] = static::buildExtraFields($baseName, $extra);
+      }
+
+    }
+    $fieldDefs = call_user_func_array('array_merge', $fieldDefsCollection);
+    return $fieldDefs;
+  }
+
+  public static function buildQueryFieldsNumeric($baseName, $def = null) {
+    $valType = keyVal('fieldtype',$def,'integer');
+    return [
+        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
+      ];
+    }
+
+  public static function buildQueryFieldsString($baseName, $def = null) {
+    $valType = keyVal('fieldtype',$def,'string');
+    return [
+        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
+      ];
+    }
+  public static function buildQueryFieldsBetween($baseName, $def = null) {
+    $valType = keyVal('fieldtype',$def,'integer');
+    return [
+        $baseName.'_maxval'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_minval'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
+      ];
+    }
+  public static function buildQueryFieldsGroup($baseName, $def = null) {
+    $valType = keyVal('fieldtype',$def,'string');
+    return [
+        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
+      ];
+    }
+  public static function buildQueryFieldsWithin($baseName, $def = null) {
+    $valType = keyVal('fieldtype',$def,'integer');
+    $paramType = keyVal('paramtype', $def, 'integer');
+    return [
+        $baseName.'_val'=>['type'=>$valType, 'methods' => 'nullable'],
+        $baseName.'_crit'=>['type'=>'string', 'methods' => 'nullable'],
+        $baseName.'_param'=>['type'=>$paramType, 'methods' => 'nullable'],
+      ];
+    }
+
+  #Try building the query on the model first - it's prettier
   public function buildQueryOnTable() {
     $table = $this->getTargetTable();
     if (empty($table)) return false;

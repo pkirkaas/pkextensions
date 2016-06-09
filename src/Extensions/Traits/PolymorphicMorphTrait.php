@@ -8,6 +8,10 @@
 /** Supports the Morphing extensions that share a common base model. By definition,
  * there will be more than one, so there is an intermediate Abstract Morph model
  * which implements/uses this trait, and is extended by the various extensions/morphs.
+ * 
+ * Could implement/directly in Borrower & Lender Models, but still better to 
+ * use in an abstract MorphSbbUser class, extended by Borrower & Lender, because then
+ * both Borrower and Lender are instances of MorphSbbUser, which might be convenient
  *
  * Example: The shared extended base is "User" - the 'Morphing' models are
  * 'App\Models\Borrower' & 'App\Models\Lender'. Both will extend their common
@@ -19,9 +23,61 @@
  * will use this trait and be called XXXPolymorphicBase 
  *
  * The classes that extend/diverge/polymorph will implement a PolymorphExtendTrait.
+ * 
+ * Provided to Implementers/Users
+ * 
+ * Required and Optional attributes/methods of PolyExtensions using this trait:
+ * REQUIRED:
+ * public static $morphFrom = 'App\Models\User' or whatever
+ * 
+ * OPTIONAL:
+ * public $morphName = 'user'; or whatever. If not provided, the basename of
+ *  $morphFrom will be used ('user'). This provides the $this->user() to return
+ * the relation, and $this->user to return the value of the relation.
  */
 namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
 
 Trait PolymorphicMorphTrait {
+  public static function getMorphName() {
+    $class = static::class;
+    if (property_exists('morphName', $class)) return static::$morphName;
+    return strtolower(baseName(static::getMorphFrom()));
+  }
+
+  public function __call($method, $args=[]) {
+    if (strtolower($method) === strtolower(static::getMorphName())) {
+      return call_user_func_array([$this,'traitTypeMorphOne'], $args);
+    }
+    return parent::__call($method, $args);
+  }
+
+  public function __get($key) {
+    if (strtolower($key) === strtolower(static::getMorphName())) {
+       return $this->getRelationValue('traitTypeMorphOne');
+    }
+     return parent::__get($key);
+  }
+
+   /** Called by the implementing / using model - from the method definition
+    * public function [$typeName] () { return $this
+    * @param type $name
+    * @param type $type
+    * @param type $id
+    */
+   public function traitTypeMorphOne($morphFrom=null, $type = null, $id = null) {
+     $morphFrom = $morphFrom ? $morphFrom : static::getMorphFrom();
+     $type = $type ? $type : static::getMorphBaseKeyForMe().'_type';
+     $id = $id ? $id : static::MorphBaseKeyForMe().'_id';
+     return $this->morphTo($name, $type, $id);
+   }
+
+   public static function getMorphFrom() {
+     return static::$morphFrom;
+   }
+   public static function getMorphBaseKeyForMe() {
+     $morphFrom = static::getMorphFrom();
+     return $morphFrom::getTypeName();
+   }
+
 }

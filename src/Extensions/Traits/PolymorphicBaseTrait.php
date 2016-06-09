@@ -26,58 +26,96 @@ Trait PolymorphicBaseTrait {
 
    * Using the Trait: Implementing PolyBaseModel
    REQUIRED:
-   public static $polytypes = ['App\Models\Borrower', 'App\Models\Lender'];
    //public function [$typeName]() { return $this->traitTypeMorphTo() }
 
    * The Type name will be built from the Base class name of the Poly Extended class,
 
    * OPTIONAL:
-   static::$typeName='imageable'; #Makes 'imageable_type' & 'imageable_id'
+   #if you want to automate isBorrower(), isLender(), etc in the PolymorphBase
+   public static $polytypes = ['App\Models\Borrower', 'App\Models\Lender'];
+
+   static::$typeName='imageable';
+    #Makes table fields 'imageable_type' & 'imageable_id', and implements the 
+     method $this->imageable() to return the morphTo() relation.
         #Otherwise default field names: 'type_type' & 'type_id'
     protected $table = 'users'; #If you want to specify the table name
    */
 
-   public static $bases = [];
-
    /** Returns the implementing class's statically decared '$polytypes'
     * fully namespaced extension array - 
     *  example: ['App\\Models\\Borrower', 'App\\Models\\Lender']
-    * @return array of namespaced Morph/Extension Model names
+    * @return array of namespaced Morph/Extension Model, keyed by lc base names,
+    * like: ['borrower'=>'App\Models\Borrower', 
     */
    public static function getPolyTypes() {
-     return static::$polytypes;
-   }
-
-   /** Returns array of convenient 'base' names of the extension/morph types -
-    * Example: ['Borrower', 'Lender']
-    * @return array
-    */
-   public static function getPolyBases() {
-     $class = static::class;
-     if (array_key_exists($class, static::$bases)) return static::$bases[$class];
-     $polyTypes = static::getPolyTypes();
-     static::$bases[$class] = [];
-     foreach ($polyTypes as $polyType) {
-       static::$bases[$class][] = getBaseName($polyType);
+     if ($r = static::getCached('polyTypes')) return $r; 
+     $polyTypes = [];
+     foreach (static::$polytypes as $polytype) {
+       $polyTypes[strtolower(getBaseName($polytype))] = $polytype;
      }
-     return static::$bases[$class];
+     return static::setCached('polyTypes',$polyTypes);
    }
 
+   public static function getTypeId() {
+     return static::getTypeName().'_id'; 
+   }
+   public static function getTypeField() {
+     return static::getTypeName().'_type'; 
+   }
    public static function getPolyBaseFieldDefs() {
      //$class = static::class;
-     $typeName=static::typeName();
+     $typeName=static::getTypeName();
      return [
-       $typeName.'_id' => ['type'=>'integer','methods'=>'index'],
-       $typeName.'_type' => 'string',
+       static::getTypeId()=> ['type'=>'integer','methods'=>'index'],
+       static::getTypeField()=> 'string',
        ];
    }
 
+   /** Automates the 'morphTo()' method, and is[$type] - like, isBorrower()
+    * 
+    * @param type $method
+    * @param type $args
+    * @return type
+    */
    public function __call($method, $args=[]) {
-     if ($method === $this->getTypeName()) {
+     if (strtolower($method) === strtolower($this->getTypeName())) {
        return call_user_func_array([$this,'traitTypeMorphTo'],$args);
+     }
+     $tstType = removeStartStr($method, 'is');
+     if ($tstType && is_string($tstType)) {
+       $tstType = strtolower($tstType);
+       $polyTypes = static::getPolytypes();
+       if (in_array($tstType, array_keys($polyTypes))) {
+         return $polyTypes[$tstType] === $this->getMorphType();
+       }
      }
      return parent::__call($method, $args);
    }
+
+   public function __get($key) {
+     if ($key === static::getTypeName()) {
+       return $this->getRelationValue('traitTypeMorphTo');
+     }
+     return parent::__get($key);
+   }
+
+   /** Is the argument an instance of this class AND the same morph type?
+    * 
+    * @param object $other
+    * @return boolean
+    */
+  public function sameType( $other) {
+    if (!is_object($other) || (get_class() !== get_class($other))) return false;
+    return $this->getMorphType() === $other->getMorphType();
+  }
+
+  /**Returns the value of the morph type for this instance ('App\Models\Borrower')
+   * 
+   */
+  public function getMorphType() {
+    $typeField = static::getTypeField();
+    return $this->$typeField;
+  }
 
    public static function getTableFieldDefs() {
      $_fieldDefs = static::_getTableFieldDefs();
@@ -99,7 +137,7 @@ Trait PolymorphicBaseTrait {
      return $this->morphTo($name, $type, $id);
    }
 
-  public static function typeName() {
+  public static function getTypeName() {
      $class = static::class;
      if (property_exists($class,'typeName')) return static::$typeName;
      return 'type';

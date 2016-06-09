@@ -12,7 +12,7 @@ trait UtilityMethodsTrait {
    */
   public static $_cache = []; 
   
-  public function getCached($key) {
+  public static function getCached($key) {
     $class = static::class;
     if (array_key_exists($class,static::$_cache)) {
       return keyVal($key, static::$_cache[$class]);

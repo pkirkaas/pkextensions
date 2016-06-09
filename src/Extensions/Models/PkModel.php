@@ -88,7 +88,8 @@ abstract class PkModel extends Model {
     return $defs;
   }
   public static function getTableFieldDefs() {
-    return  static::_unsetTableFieldDefs(static::_getTableFieldDefs());
+    $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
+    return  static::_unsetTableFieldDefs($defs);
   }
 
   public static function get_field_type($fieldname) {
@@ -1131,6 +1132,28 @@ class $createclassname extends Migration {
 
   public function processPost($opts = null) {
     return false;
+  }
+
+  /** First get all the methods of this class that start with
+   * 'getTableFiedDefsExtra' then execute them and return all
+   * the extra defined table field defs - for example, the BuildQueryTrait
+   * would define getTableFieldsDefsExtraBuildQueryTrait();
+   */
+  public static function getExtraTableFieldDefs() {
+    $fnpre = 'getTableFiedDefsExtra';
+    $methods = get_class_methods(static::class);
+    $tfmethods = [];
+    $tfdefsets = [];
+    foreach ($methods as $method) {
+      if (startsWith($method,$fnpre, false)) {
+        $tfmethods[] = $method;
+      }
+    }
+    foreach ($tfmethods as $tfmethod) {
+      $tfdefsets[] = static::$tfmethod();
+    }
+    return call_user_func_array('array_merge', $tfdefsets);
+
   }
 
   /** Mutators for integer attributes - to change '' to NULL */

@@ -2126,7 +2126,7 @@ function keyValOrDefault($key = '', $container = [], $default = null) {
   } else {
     return $default;
   }
-  if (!is_scalar($key)) {
+  if (!is_scalar($key) && ($key !== null)) {
     return $default;
   }
   if (array_key_exists($key, $array)) {
@@ -2892,6 +2892,40 @@ function isPost() {
   return $_SERVER['REQUEST_METHOD'] === 'POST' ;
 }
 
+/** I use lots of arrays for configuration, but want make them as simple as
+ * possible - like, if I have array of function names and arguments, I might
+ * use the funcname as key and args as val - but if the function doesn't take 
+ * args, don't want to bother with [$funcname => null, ...], so just use funcname
+ * as a $val and let it have a numeric index. And if there may be a single val
+ * with a default name, or ...
+ * @param array $arr - the array to normalize
+ * @param array $struct - if present, has details on how to structure the return array 
+ *   foreach key of $arr, if the key is int & $val is string, make $val new $key
+ *     if $key is string, keep as index - if no $struct, keep val as val
+ *     if $struct is scalar & $val is scalar, make val array: [$struct=>$val]
+ *     if $struct is array - contains
+ *   if scalar - AND $val is scalar
+ */
+function normalizeMixedArray(array $arr = [], $struct = null ) {
+
+  if (!$arr || !is_array($arr) || !count($arr)) return [];
+  $retarr = [];
+  foreach ($arr as $key => $val) {
+    if (is_string($key)) {
+      if ($struct && is_scalar($struct) && !is_array($val)) {
+        $val = [$struct => $val];
+      } 
+      $retarr[$key] = $val;
+    } else if (is_int($key) && is_string($val)) {
+      $retarr[$val] = null;
+    } else { #What to do?
+      $retarr[$key] = $val;
+    }
+
+  }
+  return $retarr;
+
+}
 
 
 
