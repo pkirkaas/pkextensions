@@ -130,7 +130,7 @@ abstract class PkModel extends Model {
       if (is_string($def))
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
-        $type = $def['type'];
+        $type = keyVal('type',$def,'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
@@ -1149,11 +1149,16 @@ class $createclassname extends Migration {
         $tfmethods[] = $method;
       }
     }
+    if (!$tfmethods || !is_array($tfmethods) || !count($tfmethods)) return [];
     foreach ($tfmethods as $tfmethod) {
-      $tfdefsets[] = static::$tfmethod();
+      $res =  static::$tfmethod();
+      if ($res && is_array($res) && count($res)) {
+        $tfdefsets[] = $res;
+      }
     }
+    if (!$tfdefsets || !is_array($tfdefsets) || !count($tfdefsets)) return [];
+    if (count($tfdefsets) === 1) return $tfdefsets[0];
     return call_user_func_array('array_merge', $tfdefsets);
-
   }
 
   /** Mutators for integer attributes - to change '' to NULL */

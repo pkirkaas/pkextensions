@@ -65,11 +65,15 @@ Trait PolymorphicMorphTrait {
     * @param type $type
     * @param type $id
     */
-   public function traitTypeMorphOne($morphFrom=null, $type = null, $id = null) {
+   public function traitTypeMorphOne($morphFrom=null, $name=null, $type = null, $id = null) {
      $morphFrom = $morphFrom ? $morphFrom : static::getMorphFrom();
-     $type = $type ? $type : static::getMorphBaseKeyForMe().'_type';
-     $id = $id ? $id : static::MorphBaseKeyForMe().'_id';
-     return $this->morphTo($name, $type, $id);
+     $name = $name ? $name : static::getMorphBaseKeyForMe();
+     //$name = $name ? $name : static::getMorphName();
+     //$type = $type ? $type : static::getMorphBaseKeyForMe().'_type';
+     //$id = $id ? $id : static::getMorphBaseKeyForMe().'_id';
+     //var_dump(['morphFrom',$morphFrom,'name', $name,'id',$id,'type',$type]);
+     return $this->morphOne($morphFrom, $name);
+     //return $this->morphOne($morphFrom, $name,$type, $id);
    }
 
    public static function getMorphFrom() {
