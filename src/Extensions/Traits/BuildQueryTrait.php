@@ -32,7 +32,25 @@ use \Request;
  * @author Paul Kirkaas
  */
 
-/** Note: When using the " IN " set criteria, we use accessors/mutators to 
+  /**
+   * 
+   * IMPLEMENTOR TO PROVIDE:
+    public static $search_field_defs = [
+    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between',
+    'extra'=>['suffix'=>$type],
+    $basename2 =>  'integer', #Assumes comparison is numeric
+    $basename3, #Assumes type is integer & comparison is numeric
+    ];
+   * 
+   * Where $basename is the field name in the target table to search - 
+   * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
+   * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
+   * 
+   * This Trait can then build both the table field definitions AND maybe the
+   * search controls for the search forms
+   */
+
+/** Note: When using the " IN " set criteria ("group" type query), we use accessors/mutators to 
  * convert in-memory arrays to JSON strings stored in the DB
  */
 trait BuildQueryTrait {
@@ -131,23 +149,6 @@ trait BuildQueryTrait {
     }
   }
 
-  /**
-   * 
-   * IMPLEMENTOR TO PROVIDE:
-    public static $search_field_defs = [
-    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between',
-    'extra'=>['suffix'=>$type],
-    $basename2 =>  'integer', #Assumes comparison is numeric
-    $basename3, #Assumes type is integer & comparison is numeric
-    ];
-   * 
-   * Where $basename is the field name in the target table to search - 
-   * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
-   * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
-   * 
-   * This Trait can then build both the table field definitions AND maybe the
-   * search controls for the search forms
-   */
 
   /** Converts the simple $search_field_defs into canonical - 
    * @return array of assoc arrays of min: [$basename => ['fieldtype' => $fieldtype]
@@ -164,9 +165,14 @@ trait BuildQueryTrait {
     return array_keys(static::getSearchFieldDefs());
   }
 
-  public static function buildSearchControl($baseName) {
-    
-  }
+  /** Builds a set of HTML inputs for a particular search item/term, based on the
+   * comparison type - ex, if 
+   * @param type $baseName - 
+   */
+  /* No, don't think I'll do this - already have good generators */
+  /*
+  public static function buildSearchControl($baseName) { }
+   */
 
   public static $queryFieldDefCacheKey = 'baseKeyedQueryTableFieldDefs';
   /** Gets the flattened array to use for building migration code */

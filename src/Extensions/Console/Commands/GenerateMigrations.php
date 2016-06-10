@@ -19,9 +19,26 @@ class GenerateMigrations extends Command {
        $modelRoot = $this->argument("modelRoot");
        $this->info ("Generating Migration Create/Update class");
        $class = $this->argument("class");
+       if (!$class) {
+          $classes=\Config::get('app.buildmodels');
+          if ($classes && is_array($classes) && count($classes)) {
+            foreach ($classes as $class) {
+               $this->info ("Starting migration build for: [$class]");
+               $class::buildMigrationDefinition();
+               $this->info ("Migration building for [$class] done");
+            }
+           $this->info ("All Migration Builds Completed");
 
-       $migratontobuild =$modelRoot.'\\'.$class; 
-       $migratontobuild::buildMigrationDefinition();
-       $this->info ("Migration building for [$migratontobuild] done");
+          } else {
+            $this->info ("No Models to build Migrations for!");
+            die();
+          }
+
+       } else {
+         $migratontobuild =$modelRoot.'\\'.$class; 
+         $this->info ("Starting migration build for: [$migratontobuild]");
+         $migratontobuild::buildMigrationDefinition();
+         $this->info ("Migration building for [$migratontobuild] done");
+       }
     }
 }
