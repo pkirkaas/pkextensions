@@ -1,16 +1,20 @@
 /*
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
-*/
-/* 
+  Generic utility SCSS partial for PK Extensions
     Created on : Oct 11, 2015, 4:57:29 AM
     Author     : Paul Kirkaas
 */
+@import 'pk-variables';
 $grid-breakpoints:(xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
 $grid-columns:               12 !default;
 $grid-gutter-width:          1.875rem !default; // 30px
+$inner-border-color: #888 !default;
+$inner-border-spread: 1px !default;
 
+
+//Makes a border INSIDE the block - so takes no space
+.inner-border {
+  box-shadow: inset 0px 0px 0px $inner-border-spread $inner-border-color;
+}
 
 body {
   
