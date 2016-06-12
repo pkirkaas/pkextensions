@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 use \Request;
 use \Exception;
+use PkExtensions\PkTestGenerator;
 
 abstract class PkModel extends Model {
 
@@ -1161,6 +1162,24 @@ class $createclassname extends Migration {
     return call_user_func_array('array_merge', $tfdefsets);
   }
 
+  /** 
+   * Return a random instance, or array (collection) of random instances
+   * @param integer $num: If -1 (default), return single instance. 
+   *   if ($num >= 0) return array/collection of $num instances
+   * @param array $params - Can be used by subclasses to filter
+   * @return instance|array instances - 
+   */
+  public static function getRandomInstances($num = -1, $params = []) {
+    if ($num === 0) return [];
+    $instances = static::all();
+    $numinst = count($instances);
+    if (!$numinst) {
+      if ($num === -1) return null;
+      return [];
+    }
+    return PkTestGenerator::getRandomData($instances, $num);
+  }
+
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
    * Inserting '' into an integer field in MySQL is converted to 0 - so if you want
@@ -1173,4 +1192,6 @@ class $createclassname extends Migration {
     $this->attributes['loanamt'] = intOrNull($value);
     }
    */
+
+
 }

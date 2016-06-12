@@ -61,6 +61,17 @@ abstract class PkRefManager {
     return $lcbase.'_ref';
   }
 
+  /** 
+   * Return a random instance, or array (collection) of random instances
+   * @param integer $num: If -1 (default), return single instance. 
+   *   if ($num >= 0) return array/collection of $num instances
+   * @param array $params - Can be used by subclasses to filter
+   * @return instance|array instances - 
+   */
+  public static function getRandomRefs($items = -1, $params = []) {
+    return PkTestGenerator::getRandomData(static::getRefArr(), $num);
+  }
+
   /** Generates a key/value array for select box, with range of numbers
    * If $max_label is string, uses the string for the max label, and max-int for value
    * If $min_label is string, uses the string for the max label, and min-int for value
