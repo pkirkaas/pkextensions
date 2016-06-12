@@ -69,7 +69,9 @@ abstract class PkRefManager {
    * @return instance|array instances - 
    */
   public static function getRandomRefs($items = -1, $params = []) {
-    return PkTestGenerator::getRandomData(static::getRefArr(), $num);
+    $refArr = static::getRefArr();
+    pkdebug("RefArr:", $refArr);
+    return PkTestGenerator::getRandomData(static::getRefArr(), $items);
   }
 
   /** Generates a key/value array for select box, with range of numbers
