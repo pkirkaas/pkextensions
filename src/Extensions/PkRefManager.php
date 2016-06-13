@@ -115,6 +115,10 @@ abstract class PkRefManager {
   public static function getRandomValues($items = -1, $params = []) {
     return PkTestGenerator::getRandomData(static::getRefArr(), $items);
   }
+  public static function getRandomKeys($items = -1, $params = []) {
+    return PkTestGenerator::getRandomData(static::keys(), $items);
+  }
+
 
   public function __toString() {
     return $this->value();
