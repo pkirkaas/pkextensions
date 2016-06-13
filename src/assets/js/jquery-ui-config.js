@@ -4,12 +4,33 @@
  */
 
 
+/** Initialize Date Picker */
 $(function () {
-  console.log("In jqui config init");
   $('input.datepicker.auto-attach').datepicker( { 
     dateFormat: 'yy-mm-dd'
   });
 });
 
+
+/** Persist current tab and return to it - but clear if doesn't exist in this
+ * page
+ */
+$(function () {
+  var navsel = 'li.nav-item a.nav-link'; //The tab link cicked on
+  $('body').on('click', navsel, function (event) {
+    localStorage.setItem('lastTab', $(event.target).attr('href'));
+  });
+  //Retrieve localStorage lastTab - if it exists on page, go to it, else reset
+  var lastTab = localStorage.getItem('lastTab');
+  if (lastTab) {
+    var setActiveSel = navsel+'[href="'+lastTab+'"]';
+    var setActive = $(setActiveSel);
+    if (!setActive.length) {
+      localStorage.removeItem('lastTab');
+    } else {
+      setActive.tab('show');
+    }
+  }
+});
 
 
