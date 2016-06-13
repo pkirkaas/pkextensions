@@ -165,9 +165,11 @@ h3 {
 .height-auto, .heightauto { height: auto ! important; }
 .minwidth-50, .minwidth50 { min-width: 50px ! important; }
 
-.tal, .text-align-left { text-align: left ! important; }
-.tar, .text-align-right { text-align: right ! important; }
-.tac, .text-align-center { text-align: center ! important; }
+.max-width-100 {max-width: 100% !important;}
+
+.tal, .text-align-left, .align-left, .left-align { text-align: left ! important; }
+.tar, .text-align-right, .align-right, .right-align { text-align: right ! important; }
+.tac, .text-align-center, .align-center, .center-align { text-align: center ! important; }
 .italic { font-style: italic; }
 .bold { font-weight: bold ! important; }
 
@@ -227,7 +229,9 @@ h3 {
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
 
-.most-width, .mostwidth { width: 90%; }
+.width-90, .width90, .most-width, .mostwidth { width: 90% !important; }
+
+.width-80, .width80 { width: 80% !important; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
 
