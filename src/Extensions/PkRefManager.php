@@ -61,6 +61,42 @@ abstract class PkRefManager {
     return $lcbase.'_ref';
   }
 
+  public $datarow;
+  public function __construct($datarow = []) {
+    $this->datarow = $datarow;
+  }
+  public function key() {
+    $local = $this->datarow;
+    return key($local);
+  }
+  public function value() {
+    $local = $this->datarow;
+    return current($local);
+  }
+
+  public static $refcache = [];
+
+  /** If !$key, returns array of all ref objs of this type, 
+   * else if $key, returns the instance for $key
+   */
+  public static function getRefObjs($key = null) {
+    $class = static::class;
+    if (!array_key_exists($class, static::$refcache)) {
+      $refs = [];
+      $refArr = static::getRefArr();
+      foreach ($refArr as $refKey => $refValue) {
+        $refs[$refKey] = new static ([$refKey=>$refValue]);
+      }
+      static::$refcache[$class] = $refs;
+    }
+    $refInstances = static::$refcache[$class];
+    if (!is_arrayish($refInstances)) throw new Exception ("No valid ref instance array");
+    if ($key) {
+      return keyVal($key, $refInstances);
+    }
+    return static::$refcache[$class];
+  }
+
   /** 
    * Return a random instance, or array (collection) of random instances
    * @param integer $num: If -1 (default), return single instance. 
@@ -69,9 +105,15 @@ abstract class PkRefManager {
    * @return instance|array instances - 
    */
   public static function getRandomRefs($items = -1, $params = []) {
-    $refArr = static::getRefArr();
-    pkdebug("RefArr:", $refArr);
-    return PkTestGenerator::getRandomData(static::getRefArr(), $items);
+    //$refObjs = static::getRefObjs();
+    //pkdebug("Items: [$items], RefObjs:", $refObjs);
+    //$refItem =  PkTestGenerator::getRandomData(static::getRefObjs(), $items);
+    //pkdebug("RefItem:", $refItem);
+    return PkTestGenerator::getRandomData(static::getRefObjs(), $items);
+  }
+
+  public function __toString() {
+    return $this->value();
   }
 
   /** Generates a key/value array for select box, with range of numbers
