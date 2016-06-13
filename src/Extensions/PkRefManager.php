@@ -105,11 +105,15 @@ abstract class PkRefManager {
    * @return instance|array instances - 
    */
   public static function getRandomRefs($items = -1, $params = []) {
-    //$refObjs = static::getRefObjs();
-    //pkdebug("Items: [$items], RefObjs:", $refObjs);
-    //$refItem =  PkTestGenerator::getRandomData(static::getRefObjs(), $items);
-    //pkdebug("RefItem:", $refItem);
     return PkTestGenerator::getRandomData(static::getRefObjs(), $items);
+  }
+
+  /*
+   * @param array $params - Can be used by subclasses to filter
+   * 
+   */
+  public static function getRandomValues($items = -1, $params = []) {
+    return PkTestGenerator::getRandomData(static::getRefArr(), $items);
   }
 
   public function __toString() {

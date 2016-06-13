@@ -4,4 +4,12 @@
  */
 
 
+$(function () {
+  console.log("In jqui config init");
+  $('input.datepicker.auto-attach').datepicker( { 
+    dateFormat: 'yy-mm-dd'
+  });
+});
+
+
 

@@ -416,3 +416,8 @@ input[disabled].disabled {
     content: none;
   } 
 }
+
+/** So far, for automatic delete row buttons */
+.pk-compact {
+  margin: 0;
+}
