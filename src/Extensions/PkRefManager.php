@@ -1,17 +1,24 @@
 <?php
+
 namespace PkExtensions;
+
 /**
  * Abstract class mapping keys to descriptions
  * Subclasses generally just need to create a static $refArray of integers to descriptions
+ * Adding support for indexed key/value/details
  * @author Paul Kirkaas
  */
 abstract class PkRefManager {
+
+  public static $multival = false; #Default is simple key/value pairs
+  #But if true, ref array of form: [['key'=>$key,'value'=>$value, 'details'=>$details], ['key'=>....
   /**
    * Initialize in implementing classes
    * @var array key=>value; key to store in DB, value to display
    */
+  public static $cache = [];
   public static $refArr = [];
-  public static $labels = ['','',''];
+  public static $labels = ['', '', ''];
 
   /** Obviously, so implementing classes can get / generate their refArray other
    * than relying on static $refArray
@@ -20,58 +27,99 @@ abstract class PkRefManager {
   public static function getLabels() {
     return static::$labels;
   }
+
+  /** Used to return a simple array - still does for pre-existing ref classes-
+   * but for complex ref classes, returns the complex array. To guarantee
+   * always getting a simple array of key=>value, use static::getKeyValArr()
+   * instead
+   * @return array of key=>value
+   */
   public static function getRefArr() {
     return static::$refArr;
   }
-  public static function displayLabel($idx = null) {
-    return keyval($idx,static::getLabels());
-  }
-  public static function displayValue($key = null) {
+
+  public static function getKeyValArr() {
+    if (!static::$multival) return static::getRefArr();
+    $kvk = 'key-val-cache-key';
+    $class = static::class;
+    if (array_key_exists($class, static::$cache)) {
+      if (array_key_exists($kvk, static::$cache[$class])) {
+        return static::$cache[$class][$kvk];
+      }
+    } else {
+      static::$cache[$class] = [];
+    }
     $refArr = static::getRefArr();
-    return keyValOrDefault($key,$refArr,'');
+    foreach ($refArr as $refRow) {
+      static::$cache[$class][$kvk][$refRow['key']] = $refRow['value'];
+    }
+    return static::$cache[$class][$kvk];
   }
-  public static function giveLabelAndValue($key,$idx) {
-    return ['lablel'=> static::displayLabe($idx),
+
+  public static function displayLabel($idx = null) {
+    return keyval($idx, static::getLabels());
+  }
+
+  public static function displayValue($key = null) {
+    $refArr = static::getKeyValArr();
+    return keyValOrDefault($key, $refArr, '');
+  }
+
+  public static function giveLabelAndValue($key, $idx) {
+    return ['lablel' => static::displayLabe($idx),
         'value' => static::displayValue($key)
-        ];
+    ];
   }
+
   public static function notEmpty() {
     $refArr = static::getRefArr();
     if (!key($refArr)) unset($refArr[key($refArr)]);
     //reset($refArr);
     return $refArr;
   }
+
   public static function keys() {
-    $refArr = static::getRefArr();
+    $refArr = static::getKeyValArr();
     return array_keys($refArr);
+  }
+  public static function values($key=null) {
+    $refArr = static::getKeyValArr();
+    if ($key !== null) return keyVal($key,$refArr);
+    return array_values($refArr);
   }
 
   public static function baseToFieldname($base) {
-    return strtolower($base).'_ref';
+    return strtolower($base) . '_ref';
   }
+
   public static function baseToModelname($base) {
-    return "Ref".ucfirst($base);
+    return "Ref" . ucfirst($base);
   }
 
   public static function tableFieldName() {
     $baseModel = getBaseName(static::class);
-    $base = removeStartStr($baseModel,'Ref');
+    $base = removeStartStr($baseModel, 'Ref');
     if (!$base) return false;
     $lcbase = strtolower($base);
-    return $lcbase.'_ref';
+    return $lcbase . '_ref';
   }
 
   public $datarow;
+
   public function __construct($datarow = []) {
     $this->datarow = $datarow;
   }
+
   public function key() {
     $local = $this->datarow;
-    return key($local);
+    if (!static::$multival) return key($local);
+    return keyVal('key', $local);
   }
+
   public function value() {
     $local = $this->datarow;
-    return current($local);
+    if (!static::$multival) return current($local);
+    return keyVal('value', $local);
   }
 
   public static $refcache = [];
@@ -85,19 +133,20 @@ abstract class PkRefManager {
       $refs = [];
       $refArr = static::getRefArr();
       foreach ($refArr as $refKey => $refValue) {
-        $refs[$refKey] = new static ([$refKey=>$refValue]);
+        $refs[$refKey] = new static([$refKey => $refValue]);
       }
       static::$refcache[$class] = $refs;
     }
     $refInstances = static::$refcache[$class];
-    if (!is_arrayish($refInstances)) throw new Exception ("No valid ref instance array");
+    if (!is_arrayish($refInstances))
+        throw new Exception("No valid ref instance array");
     if ($key) {
       return keyVal($key, $refInstances);
     }
     return static::$refcache[$class];
   }
 
-  /** 
+  /**
    * Return a random instance, or array (collection) of random instances
    * @param integer $num: If -1 (default), return single instance. 
    *   if ($num >= 0) return array/collection of $num instances
@@ -112,13 +161,14 @@ abstract class PkRefManager {
    * @param array $params - Can be used by subclasses to filter
    * 
    */
+
   public static function getRandomValues($items = -1, $params = []) {
-    return PkTestGenerator::getRandomData(static::getRefArr(), $items);
+    return PkTestGenerator::getRandomData(static::getKeyValArr(), $items);
   }
+
   public static function getRandomKeys($items = -1, $params = []) {
     return PkTestGenerator::getRandomData(static::keys(), $items);
   }
-
 
   public function __toString() {
     return $this->value();
@@ -133,7 +183,7 @@ abstract class PkRefManager {
    * @param string $max_label
    * @param integer $step - the incremental step
    */
-  public static function numberRange($start = 0, $end = 100, $min_label = null, $max_label = null, $step =1) {
+  public static function numberRange($start = 0, $end = 100, $min_label = null, $max_label = null, $step = 1) {
     $result = [];
     if ($min_label && is_string($min_label)) $result[-PHP_INT_MAX] = $min_label;
     if (!$step) $step = 1;
@@ -146,5 +196,4 @@ abstract class PkRefManager {
     return $result;
   }
 
-  
 }

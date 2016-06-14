@@ -182,8 +182,8 @@ h3 {
 .invisible { visibility: hidden; }
 
 .nopadding, .no-padding, .padding-0, .padding0 { padding: 0px ! important; }
-.padding-left-0 { padding-left: 0; }
-.padding-right-0 { padding-right: 0; }
+.pad-left-0, .padding-left-0 { padding-left: 0; }
+.pad-right-0, .padding-right-0 { padding-right: 0; }
 .padding5, .padding-5 { padding: 5px ! important; }
 .padding10, .padding-10 { padding: 10px ! important; }
 .padding20, .padding-20 { padding: 20px ! important; }

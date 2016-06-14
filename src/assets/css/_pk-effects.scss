@@ -421,3 +421,25 @@ input[disabled].disabled {
 .pk-compact {
   margin: 0;
 }
+
+/** Try Vertical/Horizontal styling for Radio/YesNo set */
+
+.rs-horizontal .rs-layout {
+  display: inline-block;
+  /*
+  margin-left: .5rem;
+  margin-right: .5rem;
+  */
+}
+
+.rs-yn .radio.rs-layout {
+  width: 4rem
+}
+.rs-horizontal .rs-layout.rs-yn label {
+  /*
+  margin-left: 1rem;
+  margin-right: 1rem;
+  min-width: 4rem;
+  */
+
+}
