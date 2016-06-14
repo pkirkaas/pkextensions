@@ -34,3 +34,12 @@ $(function () {
 });
 
 
+/** Enable all tooltips */
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip( {
+      html:true
+    });
+    $('[data-toggle="tooltip"]').tooltip('show');
+});
+
+

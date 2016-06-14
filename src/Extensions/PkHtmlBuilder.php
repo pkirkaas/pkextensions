@@ -6,15 +6,21 @@ namespace PkExtensions;
 use Collective\Html\HtmlBuilder;
 
 class PkHtmlBuilder extends HtmlBuilder {
-
   public $name_prefix = null;
-
   public function attributes($attributes) {
     if ($this->name_prefix && array_key_exists('name', $attributes)) {
       $attributes['name'] = $this->name_prefix . '[' . $attributes['name'] . ']';
     }
+
+    /** Automate using BS4 tether Tooltips */
+    if (is_array($attributes) && array_key_exists('tooltip', $attributes)) {
+      $attributes['data-toggle'] = 'tooltip';
+      $attributes['title'] = html_encode($attributes['tooltip']);
+      unset ($attributes['tooltip']);
+    }
     return parent::attributes($attributes);
   }
+
 
   protected function toHtmlString($html) {
     return $html;
