@@ -196,6 +196,7 @@ trait BuildQueryTrait {
   /** Gets the flattened array to use for building migration code */
   public static function getTableFieldDefsExtraBuildQuery() {
     $fqd = static::getFullQueryDef();
+    var_dump($fqd);
     $fieldDefSet = [];
     foreach ($fqd as $f) {
       $fieldDefSet[]=$f['field_defs'];
@@ -214,7 +215,7 @@ trait BuildQueryTrait {
    *   and defs - if string, returns the def for that basename, or null
    * @return type
    */
-  public static function getFullQueryDef($baseName=null) {
+  public static function getFullQueryDef($fieldName=null) {
     /*
     if($r = static::getCached(static::$queryFieldDefCacheKey)) {
       if ($baseName) return keyVal($baseName,$r);
@@ -252,6 +253,7 @@ trait BuildQueryTrait {
       $def['field_defs'] = $fieldDefs;
       //$fieldDefsCollection[$baseName] = $fieldDefs;
     }
+    if ($fieldName) return $searchFields[$fieldName];
     return $searchFields;
     //$r = static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
     //if ($baseName) return keyVal($baseName, $r);
@@ -284,9 +286,9 @@ trait BuildQueryTrait {
   public static function fetchQueryDefSet($params=[]) {
 
     $queryDefs=static::getFullQueryDef();
-    pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
+    //pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
     if (!$params) return $queryDefs;
-    pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
+    //pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
     $ret = [];
     $model = keyVal('model',$params);
     $query = keyVal('query',$params);
@@ -451,11 +453,17 @@ trait BuildQueryTrait {
     $query = $targetModel::query();
     if (empty($querySets)) return $query;
     //pkdebug("NOT empty SETS!");
+    //pkdebug("QuerySets:", $querySets);
     foreach ($querySets as $root => $critset) {
+      $toq = typeOf($query);
+      //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
       if ($root == '0') continue;
+      //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
+      //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
       if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val']))
           continue;
+      //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         if (is_array($critset['val'])) {
@@ -467,6 +475,7 @@ trait BuildQueryTrait {
             continue;
           } else if ($critset['crit'] === 'BETWEEN') {
             //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
+     // pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
             //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
             $min = to_int(keyVal('min', $critset['val']), -PHP_INT_MAX);
             $max = to_int(keyVal('max', $critset['val']), PHP_INT_MAX);
@@ -477,6 +486,7 @@ trait BuildQueryTrait {
             continue;
           }
         }
+        //pkdebug("QT: ".typeOf($query)."..");
         $query = $query->where($root, $critset['crit'], $critset['val']);
       } else if (method_exists($this, 'customQuery' . $root)) {
         $customQueryMethod = 'customQuery' . $root;
@@ -564,7 +574,7 @@ trait BuildQueryTrait {
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
        
       $sets[$root] = ['crit' => $arr[$key], 'val' => $valval,
-          'param' => $arr[$paramfield], 'def'=>static::getBasenameQueryDef($root),];
+          'param' => $arr[$paramfield], 'def'=>static::getFullQueryDef($root),];
     }
     $this->querySets = $sets;
     return $sets;
