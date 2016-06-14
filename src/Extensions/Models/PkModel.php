@@ -596,7 +596,7 @@ class $createclassname extends Migration {
       $this->transformer = new BaseTransformer($this);
     }
     $this->transformer->setItem($this);
-    pkdebug('info', $info);
+    //pkdebug('info', $info);
     $this->transformer->addTransforms($info);
   }
 
@@ -611,7 +611,7 @@ class $createclassname extends Migration {
       #Could be an array of transformer instances, or actionsets for a new transformer
       reset($transinfo);
       $first = current($transinfo);
-      pkdebug('FIRST', $first);
+      //pkdebug('FIRST', $first);
       if (is_array($first)) { #Array of actionset methods
         if (is_string($name)) {
           $transformer = keyval($name, $this->transformers, new BaseTransformer($this));
@@ -722,10 +722,10 @@ class $createclassname extends Migration {
    * @param $modelDataArray array of new model data, probably from a POST
    */
   public static function updateModels($modelCollection, $modelDataArray) {
-    pkdebug("In UpdateMod, DA:", $modelDataArray);
+    //pkdebug("In UpdateMod, DA:", $modelDataArray);
     $tstInstance = new static();
     $keyName = $tstInstance->getKeyName();
-    pkdebug("In UpdateMod,kn: [$keyName] DA:", $modelDataArray);
+    //pkdebug("In UpdateMod,kn: [$keyName] DA:", $modelDataArray);
     $arrayKeys = [];
     foreach ($modelDataArray as $modelDataRow) {
       if (empty($modelDataRow[$keyName])) { #It's new, let's try to create it
@@ -738,10 +738,10 @@ class $createclassname extends Migration {
         $arrayKeys[$modelDataRow[$keyName]] = $modelDataRow;
       }
     }
-    pkdebug("arrayKeys", $arrayKeys);
+    //pkdebug("arrayKeys", $arrayKeys);
     foreach ($modelCollection as $model) {
 
-      pkdebug("Model Atts:", $model->get());
+      //pkdebug("Model Atts:", $model->get());
       if (!in_array($model->$keyName, array_keys($arrayKeys))) $model->delete();
       else $model->saveRelations($arrayKeys[$model->$keyName]);
     }
@@ -854,7 +854,7 @@ class $createclassname extends Migration {
    * names of $load_many_to_many the same as the relationship names
    */
   public function saveM2MRelations($data = []) {
-    pkdebug("Saving Here Data:", $data);
+    //pkdebug("Saving Here Data:", $data);
     if (empty(static::$load_many_to_many) ||
         !array_intersect(array_keys(static::$load_many_to_many), array_keys($data))) {
       return true; #Nothing to do
@@ -900,7 +900,7 @@ class $createclassname extends Migration {
         #submitted list of other obj keys - let's go!
         #But gotta clean up the keys in case some are 3 & some are '3'!
         #Just make them all strings?
-        pkdebug("Array is:", $arr);
+        //pkdebug("Array is:", $arr);
         $newarr = [];
         foreach ($arr as $el)
           $newarr[] = "$el";
@@ -917,7 +917,7 @@ class $createclassname extends Migration {
           $fresh [$mykey] = $thiskeyval;
           foreach ($addIds as $addId) {
             $fresh[$otherkey] = $addId;
-            pkdebug("Adding", $fresh);
+            //pkdebug("Adding", $fresh);
             $pivotmodel::create($fresh);
           }
         }

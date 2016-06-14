@@ -30,13 +30,19 @@ use \Request;
  * </pre>
  * This trait supports "out of the box" direct field queries. 
  * @author Paul Kirkaas
+ * 
+ * A trait that extends this trait can call static::buildQueryOnTable or 
+ * buildQueryOnModel several times with several tables or models, combine 
+ * them, then also call it's own custom methods to refine the results, based
+ * on the Query defs below.
+ * 
  */
 
   /**
    * 
    * IMPLEMENTOR TO PROVIDE:
     public static $search_field_defs = [
-    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between',
+    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between','parms'=>['integer','date',...]
     'extra'=>['suffix'=>$type],
     $basename2 =>  'integer', #Assumes comparison is numeric
     $basename3, #Assumes type is integer & comparison is numeric
@@ -48,6 +54,13 @@ use \Request;
    * 
    * This Trait can then build both the table field definitions AND maybe the
    * search controls for the search forms
+   * 
+   * IF THE QUERY FIELD IS ON A METHOD - IT MIGHT TAKE PARAMETERS - So the "parms" key points to a scalar (only 1 parm of that type),
+   * or an array of types. Parm fields will be called "$basename_parm1, "$basename_parm2, etc
+   * 
+   * The filed Def array can also have a key 'property' - default is 'attribute' of the target table/model. 
+   * But it can also be a method on THIS model -  ('attribute'=>'method') OR another model, if the 'model' key is
+   * set
    */
 
 /** Note: When using the " IN " set criteria ("group" type query), we use accessors/mutators to 
@@ -58,18 +71,19 @@ trait BuildQueryTrait {
   /** In Implemented Classes, will be set to the class/model to be searched.
    * @var ModelClass
    */
-  public $targetModel = null;
-  public $targetTable = null;
+  #An implementing trait can define targetModel or targetTable
+  #public static $targetModel = 'App\\Models\\Borrower';
+  #public $targetTable = 'borrowers';
 
-  public function getTargetTable() {
-    if ($this->targetTable) return $this->targetTable;
-    if ($this->targetModel) {
-      $targetModel = $this->targetModel;
-      $obj = new $targetModel();
-      $table = $obj->getTable();
-      $this->targetTable = $table;
-      return $table;
+  public static function getTargetTable() {
+    if (property_exists(static::class,'targetTable')) return static::$targetTable;
+    if (property_exists(static::class,'targetModel')) {
+      $model = new static::$targetModel();
+      return $model->getTable();
     }
+  }
+  public static function getTargetModel() {
+    if (property_exists(static::class,'targetModel')) return static::$targetModel;
   }
 
   /** Is $crit a valid DB criterion?
@@ -151,8 +165,12 @@ trait BuildQueryTrait {
 
 
   /** Converts the simple $search_field_defs into canonical - 
+   * THIS HAS THE NORMALIZED DEFINITION OF THE FIELDS FROM THE SEARCH CLASS
+   * It is used to build the table field defs, but information is stripped.
+   * We should merge the two - this w. getBasenameQueryDef
    * @return array of assoc arrays of min: [$basename => ['fieldtype' => $fieldtype]
    */
+
   public static function getSearchFieldDefs() {
     $configStruct = ['fieldtype',
         'fieldtype' => 'integer',
@@ -177,89 +195,193 @@ trait BuildQueryTrait {
   public static $queryFieldDefCacheKey = 'baseKeyedQueryTableFieldDefs';
   /** Gets the flattened array to use for building migration code */
   public static function getTableFieldDefsExtraBuildQuery() {
-    $idxArr = array_values(static::getBasenameTableFieldDefsExtraBuildQuery());
-    return call_user_func_array('array_merge', $idxArr);
+    $fqd = static::getFullQueryDef();
+    $fieldDefSet = [];
+    foreach ($fqd as $f) {
+      $fieldDefSet[]=$f['field_defs'];
+    }
+    //$idxArr = array_values(static::getBasenameQueryDef());
+    //return call_user_func_array('array_merge', $idxArr);
+    if (!is_array($fieldDefSet) || !count($fieldDefSet)) return [];
+    return call_user_func_array('array_merge', $fieldDefSet);
   }
     
   /** This returns an array keyed by basename=>array of all defs for that basename
    *  query. It needs to be flattened and indexed to be used in building actual
    *  migration table building code, which is what the above
    *   getTableFieldDefsExtraBuildQuery does.
+   * @param $baseName - null or string - if null returns all basenames
+   *   and defs - if string, returns the def for that basename, or null
    * @return type
    */
-  public static function getBasenameTableFieldDefsExtraBuildQuery() {
-    if ($r = static::getCached(static::$queryFieldDefCacheKey)) return $r;
+  public static function getFullQueryDef($baseName=null) {
+    /*
+    if($r = static::getCached(static::$queryFieldDefCacheKey)) {
+      if ($baseName) return keyVal($baseName,$r);
+      return $r;
+    }
+     * 
+     */
+    //$searchDefs = []; //Made of both the table field defs AND other params/settings
     $searchFields = static::getSearchFieldDefs();
-    $fieldDefsCollection = [];
-    foreach ($searchFields as $baseName => $def) {
-      $comparison = keyVal('comparison', $def, 'numeric');
-      $extra = keyVal('extra', $def);
+    //$fieldDefsCollection = [];
+    foreach ($searchFields as $baseName => &$def) {
+      //$searchFields[$baseName]['attribute'] = keyVal('attribute', $def,'property');
+      $attribute = keyVal('attribute', $def,'property');
+      $model = keyVal('model', $def);
+      $def['attribute'] = $attribute;
+      if (($model === 'target') || (!$model && ($attribute==='property'))) {
+        $def['model'] = static::getTargetModel();
+      } else if (empty($def['model'])) {
+        $def['model'] = static::class;
+      }
+      $comparison = $def['comparison'] = keyVal('comparison', $def, 'numeric');
       $fieldBuildMethod = 'buildQueryFields' . $comparison;
       /** This allows implementing classes to add additional comparison types
        * and methods, and still get called from here.
        */
       $fieldDefs = static::$fieldBuildMethod($baseName, $def);
+      /*
       if ($extra) {
         $extraDefs = static::buildExtraFields($baseName, $extra);
         if (is_array($extraDefs)) $fieldDefs = array_merge($fieldDefs, $extraDefs);
       }
-      $fieldDefsCollection[$baseName] = $fieldDefs;
+       * 
+       */
+      //$searchFields[$baseName]['field_defs']=$fieldDefs;
+      $def['field_defs'] = $fieldDefs;
+      //$fieldDefsCollection[$baseName] = $fieldDefs;
     }
-    return static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
+    return $searchFields;
+    //$r = static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
+    //if ($baseName) return keyVal($baseName, $r);
+    //return $r;
+  }
+
+  /** The query definitions can comprise several different Tables, Models,
+   * return QueryBuilder instances, or call methods on different models with
+   * different arguments. Have to separate them out. The instantiating
+   * QueryTrait can sequence them - just needs them broken down by model,
+   * table, if it's using SQL or methods...
+   */
+  public static function decomposeQueryDef() {
+    $queryDefs = static::getbaseNameQueryDef();
+    $models = [];
+    
+    foreach ($queryDefs as $baseName=>$queryDef) {
+
+    }
+
+  }
+  /** Allow the instantiating class to retrieve the query defs lots of ways
+   * The param keys specify what to get - 'model', 'method', 'table', 'query'.
+   * If the value of the key is 'true', all the defs for that type are returned
+   * that is, all if 'model'=>true, all model defs returned. But if model =>
+   * 'App\Models\Borrower', only those returned.
+   * @param type $params
+   * @return type
+   */
+  public static function fetchQueryDefSet($params=[]) {
+
+    $queryDefs=static::getFullQueryDef();
+    pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
+    if (!$params) return $queryDefs;
+    pkdebug("QueryDefs",$queryDefs);//, 'sfd',static::$search_field_defs);
+    $ret = [];
+    $model = keyVal('model',$params);
+    $query = keyVal('query',$params);
+    $methods = keyVal('methods',$params);
+    $attributes = keyVal('attributes',$params);
+    foreach ($queryDefs as $baseName=>$queryDef) {
+      
+    }
+
   }
 
   public static function buildQueryFieldsNumeric($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'integer');
     $fieldtype_args = keyVal('fieldtype_args', $def);
-    return [
-        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
-    ];
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = $parm; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
+
   }
 
   public static function buildQueryFieldsString($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'string');
     $fieldtype_args = keyVal('fieldtype_args', $def);
-    return [
-        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
-    ];
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = $parm; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
   }
 
   public static function buildQueryFieldsBetween($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'integer');
     $fieldtype_args = keyVal('fieldtype_args', $def);
-    return [
-        $baseName . '_maxval' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_minval' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
-    ];
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = $parm; 
+    }
+    $fields[$baseName . '_maxval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_minval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
   }
 
   public static function buildQueryFieldsGroup($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'string');
     $fieldtype_args = keyVal('fieldtype_args', $def);
-    return [
-        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
-    ];
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = $parm; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
   }
 
   public static function buildQueryFieldsWithin($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'integer');
     $fieldtype_args = keyVal('fieldtype_args', $def);
     $paramType = keyVal('paramtype', $def, 'integer');
-    return [
-        $baseName . '_val' => ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args],
-        $baseName . '_crit' => ['type' => 'string', 'methods' => 'nullable'],
-        $baseName . '_param' => ['type' => $paramType, 'methods' => 'nullable'],
-    ];
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = $parm; 
+    }
+    $fields[  $baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[ $baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    $fields[$baseName . '_param'] = ['type' => $paramType, 'methods' => 'nullable'];
+    return $fields;
   }
 
   #Try building the query on the model first - it's prettier
 
-  public function buildQueryOnTable() {
-    $table = $this->getTargetTable();
+  /** Can build queries on any table, but defaults to our targetTable if
+   * no table given. Can be combined several times
+   * @param string|null $table
+   * @return QueryBuilder instance or false
+   */
+  public function buildQueryOnTable($table = null) {
+    if (!$table) $table = $this->getTargetTable();
     if (empty($table)) return false;
     $sets = $this->buildQuerySets();
     if (empty($sets)) return false;
@@ -284,6 +406,13 @@ trait BuildQueryTrait {
    * which has to be defined in the implementing classes, presumably a trait
    * shared by the Controller/SearchModel. Looks first for field name, then
    * method name, defined as <tt>$this->customQuery{What}($crit,$val)</tt>
+   * 
+   * One advantage to searching on a model instance - you can also use
+   * and specify model methods as comparison criteria for stuff that's hard in 
+   * DB. Can also take parameters. The Query will first execute the query it
+   * can on the DB - then from the return, filter on the instances using
+   * the methods.
+   * 
    * (Ex: <tt>$this->customQueryAsset_debt_ratio($query,$crit, $val)</tt>:
    * <pre> 
    * [
@@ -297,18 +426,32 @@ trait BuildQueryTrait {
    * @param $targetModel - A PkModel CLASS, NOT instance.
    * @return Eloquent Builder
    * */
-  public function buildQueryOnModel($targetModel = null) {
-    if (!$targetModel) $targetModel = $this->targetModel;
+  public function buildQueryOnModel($targetModel = null, $querySets=null) {
+    if (!$targetModel) $targetModel = static::getTargetModel();
     if (empty($targetModel)) throw new \Exception("No model to build query on");
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     //pkdebug("TargetFieldNames:", $targetFieldNames);
-    if (!empty($this->querySets)) $sets = $this->querySets;
-    else $sets = $this->buildQuerySets();
+    if ($querySets === null) {
+      if (!empty($this->querySets)) $querySets = $this->querySets;
+      else $querySets = $this->buildQuerySets();
+    }
+    #Sets are keyed by 'root' or 'baseName', with a definition array. If the
+    #root key matches an attribute name on the model, that's what we search 
+    #against. If not, try to figure out what the query is on/for/to.
+    #
+    #The definition array might contain a sub-definition array - 
+    #$sets[$root]['def']['attribute'] - which could be : 'property',
+    #'target_method' (a method to call on the target Model), or 'self_method'
+    #(a method defined in this model/trait.) - with $baseName the method or property
+    #name. It could also contain other fields, like as parameters to methods
+    #
+    #In fact, it's totally appropriate for a persistent query to consist entirely
+    #of methods and NO model/table fields.
     //pkdebug("Query Sets:", $sets);
     $query = $targetModel::query();
-    if (empty($sets)) return $query;
+    if (empty($querySets)) return $query;
     //pkdebug("NOT empty SETS!");
-    foreach ($sets as $root => $critset) {
+    foreach ($querySets as $root => $critset) {
       if ($root == '0') continue;
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
       if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val']))
@@ -367,6 +510,14 @@ trait BuildQueryTrait {
    *  #...
    * ];
    */
+  /** Builds the query from the the key=> values either in the arg $arr
+   *  (if it was implemented from a controller action), or
+   * from it's own values (if it is implemented in a search model), or from
+   * a post array if it is implemented from a controller.
+   * @param array $arr
+   * @return array keyed by
+   *   'fieldname'=>['val'=>$val,'crit'=>$crit, {'param'=>$param}
+   */
   public function buildQuerySets(Array $arr = []) {
     $this->checkClearPost();
     if (empty($arr)) {
@@ -387,6 +538,7 @@ trait BuildQueryTrait {
       if ($root === false) continue;#Not a crit
       if ($val === null) continue;
       if (!$this->isValidCriterion($key)) continue;
+      #We COULD get static::getBasenameQueryDef($root) now, and see if we have supplimental info
       $maxvalfield = $root . '_maxval'; #For 'BETWEEN'comparison
       $minvalfield = $root . '_minval'; #For 'BETWEEN'comparison
       $valfield = $root . '_val';
@@ -410,7 +562,9 @@ trait BuildQueryTrait {
 
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
-      $sets[$root] = ['crit' => $arr[$key], 'val' => $valval, 'param' => $arr[$paramfield]];
+       
+      $sets[$root] = ['crit' => $arr[$key], 'val' => $valval,
+          'param' => $arr[$paramfield], 'def'=>static::getBasenameQueryDef($root),];
     }
     $this->querySets = $sets;
     return $sets;

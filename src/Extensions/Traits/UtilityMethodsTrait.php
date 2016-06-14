@@ -1,5 +1,6 @@
 <?php
 namespace PkExtensions\Traits;
+use Carbon\Carbon;
 /** Common methods that might be useful in many class hierarchies. Like a 
  * common base class for Laravel
  * June 2016 Paul Kirkaas
@@ -85,6 +86,32 @@ trait UtilityMethodsTrait {
     }
     $fullRetArr[$thisClass][$arrayName] = $mgArr;
     return $mgArr;
+  }
+
+  /** Gets the time difference between 2 dates, using defaults
+   * 
+   * @param scalar|array $args:
+   *   If scalar, just tries to figure how many years between now and then
+   *   If array:
+   * 'from': Required
+   * 'to' : Default: now()
+   * 'units': 'years',
+   * 
+   */
+  public static function timeDifference($args=[]) {
+    if (!$args) return null;
+    if (is_scalar($args)) {
+      $from = new Carbon($args);
+      $to = new Carbon();
+    } else if (is_array($args)) {
+      if (empty($args['from'])) return null;
+      $from = new Carbon($args['from']);
+      if (!empty($args['to'])) $to = new Carbon($args['to']);
+      else $to =  Carbon::now();
+    }
+    $units = keyVal('units', $args, 'years');
+    $diffMethod = "diffIn".$units;
+    return $from->$diffMethod($to);
   }
 
   /** Just like 'getAncestorArraysMerged' above, but uses methods to climb
