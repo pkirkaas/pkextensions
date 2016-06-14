@@ -73,3 +73,13 @@ function grid_layout($items, $params = []) {
    $html .= $row_closer;
    return $html;
 }
+
+/** Creates BS4/Tether tool-tip attributes. Escapes the string, and returns
+ * 'data-toggle="tooltip" title="$escapedString" '
+ * @param type $string
+ */
+function bs_tooltip($string) {
+  if (!$string || !is_string($string)) return '';
+  $string = html_encode($string);
+  return " data-toggle='tooltip' title='$string' ";
+}
