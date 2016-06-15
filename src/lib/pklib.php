@@ -163,6 +163,7 @@ function pkdebug() {
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out);
+  return false;
 }
 
 /** Take a stab to Try to get function/method/file this function was called from
@@ -2965,6 +2966,21 @@ function normalizeConfigArray(array $arr = [], $struct = null ) {
 
 }
 
+/** Takes a scaler as first arg, and unlimited other args (presumably
+ * arrays) and returns the first non-empty value for that key.
+ * @param type $key
+ * @param type $arg1
+ * @param type $argx
+ */
+function firstKeyVal($key,$arg1=null, $argx=null) {
+  $args = func_get_args();
+  $key = array_shift($args);
+  foreach ($args as $arg) {
+    $test = keyVal($key,$arg);
+    if ($test) return $test;
+  }
+  return null;
+}
 
 
 

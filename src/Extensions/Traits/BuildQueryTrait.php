@@ -1,8 +1,9 @@
 <?php
 
 namespace PkExtensions\Traits;
-
+use Illuminate\Database\Eloquent\Collection;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkMatch;
 use Illuminate\Database\Eloquent\Model;
 use \Request;
 
@@ -174,7 +175,7 @@ trait BuildQueryTrait {
   public static function getSearchFieldDefs() {
     $configStruct = ['fieldtype',
         'fieldtype' => 'integer',
-        'comparison' => 'numeric',
+        'comptype' => 'numeric',
     ];
     return normalizeConfigArray(static::$search_field_defs, $configStruct);
   }
@@ -196,7 +197,6 @@ trait BuildQueryTrait {
   /** Gets the flattened array to use for building migration code */
   public static function getTableFieldDefsExtraBuildQuery() {
     $fqd = static::getFullQueryDef();
-    var_dump($fqd);
     $fieldDefSet = [];
     foreach ($fqd as $f) {
       $fieldDefSet[]=$f['field_defs'];
@@ -236,8 +236,8 @@ trait BuildQueryTrait {
       } else if (empty($def['model'])) {
         $def['model'] = static::class;
       }
-      $comparison = $def['comparison'] = keyVal('comparison', $def, 'numeric');
-      $fieldBuildMethod = 'buildQueryFields' . $comparison;
+      $comptype = $def['comptype'] = keyVal('comptype', $def, 'numeric');
+      $fieldBuildMethod = 'buildQueryFields' . $comptype;
       /** This allows implementing classes to add additional comparison types
        * and methods, and still get called from here.
        */
@@ -297,6 +297,7 @@ trait BuildQueryTrait {
     foreach ($queryDefs as $baseName=>$queryDef) {
       
     }
+
 
   }
 
@@ -401,6 +402,19 @@ trait BuildQueryTrait {
     return false;
   }
 
+  /** Just combines the 'buildQueryOnModel' method, executes it, then
+   * runs the filters on the collection.
+   */
+  public function executeSearch() {
+    $collection = $this->buildQueryOnModel()->get();
+    $sz = count($collection);
+    pkdebug("Just ran query from BQT: SZ: $sz");
+    $newcol = $this->filterOnMethods($collection);
+    $sza = count($newcol);
+    pkdebug("SXA:  $sza");
+    return $newcol;
+  }
+
   /** Return an Eloquent Query Builder Instance
    * Builds a basic chained "AND WHERE..." query from the instance 'querySets" array.
    * The query set is an associative array of <tt>what=>[crit, val]</tt>, where
@@ -454,6 +468,8 @@ trait BuildQueryTrait {
     if (empty($querySets)) return $query;
     //pkdebug("NOT empty SETS!");
     //pkdebug("QuerySets:", $querySets);
+
+    //pkdebug("My PkMatchObjs:", $this->matchObjs);
     foreach ($querySets as $root => $critset) {
       $toq = typeOf($query);
       //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
@@ -477,9 +493,9 @@ trait BuildQueryTrait {
             //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
      // pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
             //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
-            $min = to_int(keyVal('min', $critset['val']), -PHP_INT_MAX);
-            $max = to_int(keyVal('max', $critset['val']), PHP_INT_MAX);
-            pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
+            $min = to_int(keyVal('minval', $critset['val']), -PHP_INT_MAX);
+            $max = to_int(keyVal('maxval', $critset['val']), PHP_INT_MAX);
+            //pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
           } else {
@@ -497,6 +513,7 @@ trait BuildQueryTrait {
   }
 
   public $querySets = [];
+  public $matchObjs;
 
   /** Takes an associative array, possibly from a Search Model, possibly from a post,
    * and only selects matching keys in the form:
@@ -529,6 +546,9 @@ trait BuildQueryTrait {
    *   'fieldname'=>['val'=>$val,'crit'=>$crit, {'param'=>$param}
    */
   public function buildQuerySets(Array $arr = []) {
+    if ($this->matchObjs === null) {
+      $this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
+    }
     $this->checkClearPost();
     if (empty($arr)) {
       if ($this instanceOf PkModel) {
@@ -556,13 +576,18 @@ trait BuildQueryTrait {
       #Getting Complicated. $valval can be a scalar for ordinary comparison
       #If doing an " IN " comparison, $valval is a JSON encoded array.
       #if doing a "BETWEEN" comparison, $valval is an actual array, ['max'=>$max,'min'=>$min]
-      if (array_key_exists($maxvalfield, $arr))
-          $valval['max'] = $arr[$maxvalfield];
-      if (array_key_exists($minvalfield, $arr))
-          $valval['min'] = $arr[$minvalfield];
+      $rootMatch = keyVal($root, $this->matchObjs, new PkMatch);
+      if (array_key_exists($maxvalfield, $arr)) {
+          $valval['maxval'] = $arr[$maxvalfield];
+          $rootMatch->maxval = $arr[$maxvalfield];
+      }
+      if (array_key_exists($minvalfield, $arr)) {
+          $valval['minval'] = $arr[$minvalfield];
+          $rootMatch->minval = $arr[$minvalfield];
+      }
       if (is_array($valval)) { #At least one of min or max was set for BETWEEN
-        $valval['max'] = to_int(keyVal('max', $valval), PHP_INT_MAX);
-        $valval['min'] = to_int(keyVal('min', $valval), -PHP_INT_MAX);
+        $rootMatch->maxval=$valval['maxval'] = to_int(keyVal('maxval', $valval), PHP_INT_MAX);
+        $rootMatch->minval=$valval['minval'] = to_int(keyVal('minval', $valval), -PHP_INT_MAX);
       }
       if (array_key_exists($valfield, $arr)) $valval = $arr[$valfield];
       if ($valval === null) continue;
@@ -573,8 +598,11 @@ trait BuildQueryTrait {
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
        
-      $sets[$root] = ['crit' => $arr[$key], 'val' => $valval,
-          'param' => $arr[$paramfield], 'def'=>static::getFullQueryDef($root),];
+      $sets[$root] = [];
+      $rootMatch->crit=$sets[$root]['crit'] = $arr[$key];
+      $rootMatch->val=$sets[$root]['val'] = $valval;
+      $rootMatch->param=$sets[$root]['param'] = $arr[$paramfield];
+      $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
     return $sets;
@@ -605,15 +633,47 @@ trait BuildQueryTrait {
     }
   }
 
+  public function getMatchObjs() {
+    if ($this->matchObjs && is_arrayish($this->matchObjs)) return $this->matchObjs;
+    $this->buildQuerySets();
+    if ($this->matchObjs && is_arrayish($this->matchObjs)) return $this->matchObjs;
+  }
+
+  /** After the Eloquent has run on the attributes and returned an eloquent collection,
+   * this method takes the collection and $querySets as above, 
+   * [$key=>['val'=>$val,'crit'=>$crit,'parm0'=>$parm0.....
+   * @param Eloquent Collection $collection
+   * @param array $querySets or null to take from local object
+   */
+  public function filterOnMethods(Collection $collection, $matchObjs=null) {
+    if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
+    if (!$matchObjs || !is_arrayish($matchObjs)) return $collection;
+    $modelName = $collection-> getQueueableClass();
+    $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
+        ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
+    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    if (!count($trimmedMatches)) return $collection;
+    $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
+      //pkdebug()
+      foreach($trimmedMatches as $match) {
+        $methodName = $match->method;
+        $res = $item->$methodName();
+        $ans = $match->satisfy($res);
+        if ($ans) pkdebug("This one failed:", $ans, " METHOD NAME: $methodName; $res: ",$res);
+        return !$ans;
+        //if (!$match->satisfy($res)) return false;
+      }
+      return true;
+    });
+    return $trimmedCollection;
+  }
+
   /** For use in Query Forms - makes a full query control
    * from the field name and comparison type, with $opts
    * @return string HTML to make the control
    */
    
   public static function htmlQueryControl($basename, $opts=[]) {
-
-
-
   }
 
 }
