@@ -84,7 +84,7 @@ class PkController extends Controller {
      */
     $data = Request::all();
     $tpkm = typeOf($pkmodel);
-    pkdebug("For type: [$tpkm] The POSTed data:", $data);
+    //pkdebug("For type: [$tpkm] The POSTed data:", $data);
 //if (!$pkmodel) return false;
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))
