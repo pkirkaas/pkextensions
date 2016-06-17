@@ -67,6 +67,27 @@ abstract class PkModel extends Model {
     return $fieldNameArr[$class];
   }
 
+  public static $methodsAsAttributeNames = [];
+
+  public static function getMethodsAsAttributeNames() {
+    return static::$methodsAsAttributeNames;
+  }
+
+  /** Executes the methods listed in static::getMethodsAsAttributesNames() and
+   * returns the results in an array of arrays
+   */
+  public function getMethodAttributes() {
+    $methodAttributes = static::getMethodsAsAttributeNames();
+    if (!$methodAttributes || !is_arrayish($methodAttributes) || !count($methodAttributes)) {
+      return [];
+    }
+    $resarr = [];
+    foreach ($methodAttributes as $methodAttribute) {
+      $resarr[$methodAttribute] = $this->$methodAttribute();
+    }
+    return $resarr;
+  }
+
    public static $_modelFieldDefs = [];
   /** ONLY CALLED BY static::getTableFieldDefs()
    * So implementing classes can modify defaults methods - adding and 
@@ -78,7 +99,8 @@ abstract class PkModel extends Model {
   public static function _getTableFieldDefs() {
     $cacheKey = 'tableFieldDefs';
     if (static::$onlyLocal) return static::$table_field_defs;
-    if (static::getCached($cacheKey) !== null) return static::getCached($cacheKey);
+    if (static::getCached($cacheKey) !== null)
+        return static::getCached($cacheKey);
     return static::setCached($cacheKey, static::getAncestorArraysMerged('table_field_defs'));
   }
 
@@ -1123,6 +1145,77 @@ class $createclassname extends Migration {
       }
     }
   }
+
+
+  /** Just so I can override in descendent classes - like get calculated 
+   * attributes, or one to many relationship objects, etc
+   * @return array of model attributes
+   */
+  public function getCustomAttributes() {
+    return $this->getAttributes();
+  }
+
+  /**
+   * Gets the attributes from the named relation. If $relationship is empty,
+   * tries to use $this->getLoadRelations() to get the names and types of
+   * all related models, and load them as an array 
+   * 
+   * @param string|array|null $relation - the name of the relation, and array of relation names
+   * (optionally keyed by name with ModelClass as value), or empty to get
+   * all the relations this model knows about.
+   */
+  public function getRelationshipAttributes($relations=null) {
+    $resarr = [];
+    $loadRelations = $this->getLoadRelations();
+    if (is_string ($relations)) {
+      $relations = [$relations];
+    }
+    if (!is_array($relations)) {
+      $relations = array_keys($loadRelations);
+    }
+    pkdebug("loadRels:", $loadRelations, 'relations', $relations);
+    if (!$relations) return [];
+    if (!is_array($relations)) {
+      throw new \Exception("Expected an array as an argument");
+      return [];
+    }
+    foreach ($relations as $relation) {
+      $atype = typeOf($this->$relation);
+      $sz = count($this->$relation);
+      $this->load($relation);
+      foreach($this->$relation as $athing) {
+        pkdebug("ATHING:", $athing->getCustomAttributes());
+      }
+    pkdebug("SZ::   $sz  relation:", $relation,"TYPEOF [$atype]");
+      if ($this->$relation instanceOf \PkExtensions\Models\PkModel) {
+        pkdebug("Processing [$relation] as instance of PkModel");
+         $resarr[$relation] = $this->$relation->getCustomAttributes();
+      } else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Model) {
+        pkdebug("Processing [$relation] as instance of Eloquent Model");
+         $resarr[$relation] = $this->$relation->getAttributes();
+        //} else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Collection) {
+      } else if (is_arrayish($this->$relation) && count($this->$relation)) {
+        pkdebug("Processing [$relation] as a collection/array");
+         $resarr[$relation]= [];
+         foreach($this->$relation as $instance) {
+          $toi = typeOf($instance);
+          pkdebug("Here we are..relname: [$relation], tof: [$toi].", $instance->getAttributes());
+          if ($instance instanceOf \PkExtensions\Models\PkModel) {
+            pkdebug("YES!!!! Processing as PkModel: [$relation], tof: [$toi].");
+            // PkExtensions\Models\PkModel
+             $resarr[$relation][] = $instance->getCustomAttributes();
+          } else if ($instance instanceOf \Illuminate\Database\Eloquent\Model) {
+             $resarr[$relation][] = $instance->getAttributes();
+          //} else if ($instance instanceOf \Illuminate\Database\Eloquent\Collection) {
+          } else {
+            pkdebug("For relation name: [$relation], instance type: [$toi]");
+           }
+         }
+       }
+    }
+    return $resarr;
+  }
+
 
   /** Probably useless method, but a subclass might want to do something with it.
    * More usefed in the controllers */
