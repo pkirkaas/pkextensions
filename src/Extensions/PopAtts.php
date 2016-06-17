@@ -54,6 +54,14 @@ class PopAtts {
   public static function callerClass() {
     return ' '.static::$attDefaults['popCallerClass'].' ';
   }
+  public static function dataAttrName($attributeName=null) {
+    if (!$attributeName) return static::$attDefaults['popAttrNameDataAttr'];
+    if ($attributeName && is_string($attributeName) && strlen($attributeName)) {
+      return static::$attDefaults['popAttrNameDataAttr']."='$attributeName' ";
+    }
+    throw new Exception ("Invalid AttributeName");
+  }
+
   public static function dataAttrElement($attributeName=null) {
     if (!$attributeName) return static::$attDefaults['popAttrNameDataAttr'];
     if ($attributeName && is_string($attributeName) && strlen($attributeName)) {

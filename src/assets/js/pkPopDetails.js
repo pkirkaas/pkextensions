@@ -41,15 +41,20 @@ var decodedObjectCache = null;
 
 
 /* As defined in app.blade.php
-     var popDefObj = {
-       dataModelType:'data-model-type-name',
+   var popDefObj = {
+        dataModelType:'data-model-type-name',
         dataModelId:'data-model-id',
-        jsPopupTmpCallerDataAttr:'data-js_popup-template-calls',
+        jsPopupTmpCallerDataAttr:'data-js-popup-template-calls',
         jsPopupTmpCalledDataAttr:'data-js-popup-template-called',
         encodedDataHolderClass:'encoded-data-holder',
         encDatMdlDataAttr:'data-encoded-data-objtype',
         encDatIdDataAttr:'data-encoded-data-objid',
-        encDatDatDataAttr:'data-encoded-data-data'
+        encDatDatDataAttr:'data-encoded-data-data',
+        popTemplateClass:'pop-hidden-js-template',
+        popCallerClass:'pop-details-for-obj',
+        popAttrNameDataAttr:'data-enc-attr-name',
+        valueTemplateClass:'enc-attr-val-tpl',
+        valueHolderClass:'enc-attr-val-holder-tpl'
      };
 */
 
@@ -183,15 +188,39 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 
 /** Takes an encoding template and recursively iterates through it building
  * the custom data dialog
- * @param {type} dom
- * @param {type} element
- * @param {type} encdata
- * @returns {undefined}
+ * @param HTML String/jQuery domBit - the template or part of it
+ * @param plain object encdata - the data for the model instance
+ * @param boolean emptyhide - default: true ('false' option not implemented yet)
+ *   - if true, don't show elements for which there is no data
+ * @returns HTML string/DOM for the dialog from the template, with values inserted
  */
-function buildDetailsDialog(dom, element, encdata) {
-  dom = jQuerify(dom);
-  element = jQuerify(element);
- // element.each(function())
+function buildDetailsDialog(domBit, encdata, emptyhide) {
+  domBit = jQuerify(domBit).clone();
+  if (domBit.hasClass(popDefObj.valueTemplateClass)) {
+    //... it is a template row for SOME data element. Get the enc data key 
+    var enc_att_name = domBit.attr(popDefObj.popAttrNameDataAttr);
+    if ((enc_att_name === undefined) || !enc_att_name ||
+            (encdata[enc_att_name] === undefined)) {
+      //We don't have a value for this row; leave blank
+      return false;
+    }
+    var encval = encdata[enc_att_name]; //We have a value - insert it 
 
+  }
+
+}
+
+function descendAndSet(template, encdata) {
+  template = jQuerify(template).clone();
+  if (template.hasClass(popDefObj.valueTemplateClass)) {
+
+  }
+  var innershell = $(template[0].cloneNode());
+  var innercontent = template.contents();
+  innercontent.each(function() {
+    innershell.append(descendAndSet(this));
+
+  });
+  
 }
 

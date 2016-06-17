@@ -912,6 +912,23 @@ function isObject(obj) {
   return obj === Object(obj);
 }
 
+function isjQuery(avar) {
+  return isObject(avar) && (avar instanceof jQuery);
+}
+
+/**
+ * Is the argument an integer or string convertable to an int?
+ * @param {type} value
+ * @returns {Boolean}
+ */
+function isIntish(value) {
+  return !isNaN(value) &&
+          parseInt(Number(value)) == value &&
+          !isNaN(parseInt(value, 10));
+}
+
+
+
 /** 
  * Takes an associative array of key/value pairs and returns a GET param str
  * TODO: URL encode? But what if existing param values are already URLencoded?
