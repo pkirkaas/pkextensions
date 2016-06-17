@@ -32,14 +32,18 @@ class PopAtts {
 
          #data attribute holding the model ID
      'dataModelId'=>"data-model-id",
-     'jsPopupTmpCallerDataAttr' => 'data-js_popup-template-calls',
+     'jsPopupTmpCallerDataAttr' => 'data-js-popup-template-calls',
      'jsPopupTmpCalledDataAttr' => 'data-js-popup-template-called',
      'encodedDataHolderClass'=>'encoded-data-holder',
      'encDatMdlDataAttr'=>'data-encoded-data-objtype',
      'encDatIdDataAttr'=>'data-encoded-data-objid',
      'encDatDatDataAttr'=>'data-encoded-data-data',
+     'popTemplateClass'=>'pop-hidden-js-template',
+   ];
 
-    ];
+  public static function templateClass() {
+    return static::$attDefaults['popTemplateClass'];
+  }
 
   public static function jsInit() {
     $ps = new PartialSet();
@@ -52,6 +56,12 @@ class PopAtts {
     $defStr = implode(",\n", $defArr);
     $ps[]="$defStr\n";
     $ps[]="  };\n";
+    $ps[]="</script>\n";
+    $ps[]="\n<style>\n";
+    $ps[]="  .".static::templateClass()." {\n";
+    $ps[]="    display:none;\n";
+    $ps[]="  }\n";
+    $ps[]="</style>\n";
     return $ps;
   }
 
@@ -69,15 +79,22 @@ class PopAtts {
     return " $dataName $dataId ";
   }
 
+  public static function holderDefault(PkModel $obj) {
+    if (! $obj instanceOf PkModel) throw new Exception ("Has to be a PkModel");
+    $id = $obj->id;
+    $modelName = strtolower(getBaseName(get_class($obj)));
+    return static::modelIdHolder($modelName,$id);
+  }
+
   /** In the data element you want to call a detailed template. Just provide the
    * template name
    */
   public static function popCaller($templateName) {
-    return " ".static::$jsPopupTmpCallerDataAttr."='$templateName' ";
+    return " ".static::$attDefaults['jsPopupTmpCallerDataAttr']."='$templateName' ";
   }
 
   public static function templateDefiner($templateName) {
-    return " ".static::$jsPopupTmpCalledDataAttr."='$templateName' ";
+    return " ".static::$attDefaults['jsPopupTmpCalledDataAttr']."='$templateName' ";
   }
 
 
