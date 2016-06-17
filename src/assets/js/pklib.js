@@ -7,6 +7,19 @@ var repository = {};
  */
 
 $(function () {
+  console.log("Trying to get data atts");
+  var data_atts = $('div.data-atts-holder');
+  if (data_atts.length) {
+    var enc_data = data_atts.attr('data-atts');
+    console.log("The encoded data", enc_data);
+    var dec_obj = $.parseJSON(enc_data);
+    console.log("The Decoded Obj:", dec_obj);
+  }
+
+});
+
+
+$(function () {
 
   /** Two general kinds of editing/creating/deleting multiple similar items on 
    * the same page - where you might want to make multiple changes to multiple items

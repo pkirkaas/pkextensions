@@ -114,6 +114,17 @@ trait UtilityMethodsTrait {
     return $from->$diffMethod($to);
   }
 
+  /**
+   * json_encodes & html_encodes a data array for inclusion as an HTML 
+   * element attribute value in a web page
+   * @param mixed $arg - a JSON encodable value
+   */
+  public static function encodeData($arg) {
+    $jsenc = json_encode($arg, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    $htenc = html_encode($jsenc);
+    return $htenc;
+  }
+
   /** Just like 'getAncestorArraysMerged' above, but uses methods to climb
    * the hierarchy - gives more flexibility.
    * In particular, thinking of field definitions in PkModels - some might want 

@@ -618,7 +618,6 @@ class $createclassname extends Migration {
       $this->transformer = new BaseTransformer($this);
     }
     $this->transformer->setItem($this);
-    //pkdebug('info', $info);
     $this->transformer->addTransforms($info);
   }
 
@@ -633,7 +632,6 @@ class $createclassname extends Migration {
       #Could be an array of transformer instances, or actionsets for a new transformer
       reset($transinfo);
       $first = current($transinfo);
-      //pkdebug('FIRST', $first);
       if (is_array($first)) { #Array of actionset methods
         if (is_string($name)) {
           $transformer = keyval($name, $this->transformers, new BaseTransformer($this));
@@ -744,10 +742,8 @@ class $createclassname extends Migration {
    * @param $modelDataArray array of new model data, probably from a POST
    */
   public static function updateModels($modelCollection, $modelDataArray) {
-    //pkdebug("In UpdateMod, DA:", $modelDataArray);
     $tstInstance = new static();
     $keyName = $tstInstance->getKeyName();
-    //pkdebug("In UpdateMod,kn: [$keyName] DA:", $modelDataArray);
     $arrayKeys = [];
     foreach ($modelDataArray as $modelDataRow) {
       if (empty($modelDataRow[$keyName])) { #It's new, let's try to create it
@@ -760,10 +756,7 @@ class $createclassname extends Migration {
         $arrayKeys[$modelDataRow[$keyName]] = $modelDataRow;
       }
     }
-    //pkdebug("arrayKeys", $arrayKeys);
     foreach ($modelCollection as $model) {
-
-      //pkdebug("Model Atts:", $model->get());
       if (!in_array($model->$keyName, array_keys($arrayKeys))) $model->delete();
       else $model->saveRelations($arrayKeys[$model->$keyName]);
     }
@@ -1151,7 +1144,7 @@ class $createclassname extends Migration {
    * attributes, or one to many relationship objects, etc
    * @return array of model attributes
    */
-  public function getCustomAttributes() {
+  public function getCustomAttributes($arg=null) {
     return $this->getAttributes();
   }
 
@@ -1173,7 +1166,6 @@ class $createclassname extends Migration {
     if (!is_array($relations)) {
       $relations = array_keys($loadRelations);
     }
-    pkdebug("loadRels:", $loadRelations, 'relations', $relations);
     if (!$relations) return [];
     if (!is_array($relations)) {
       throw new \Exception("Expected an array as an argument");
@@ -1183,31 +1175,21 @@ class $createclassname extends Migration {
       $atype = typeOf($this->$relation);
       $sz = count($this->$relation);
       $this->load($relation);
-      foreach($this->$relation as $athing) {
-        pkdebug("ATHING:", $athing->getCustomAttributes());
-      }
-    pkdebug("SZ::   $sz  relation:", $relation,"TYPEOF [$atype]");
       if ($this->$relation instanceOf \PkExtensions\Models\PkModel) {
-        pkdebug("Processing [$relation] as instance of PkModel");
          $resarr[$relation] = $this->$relation->getCustomAttributes();
       } else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Model) {
-        pkdebug("Processing [$relation] as instance of Eloquent Model");
          $resarr[$relation] = $this->$relation->getAttributes();
         //} else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Collection) {
       } else if (is_arrayish($this->$relation) && count($this->$relation)) {
-        pkdebug("Processing [$relation] as a collection/array");
          $resarr[$relation]= [];
          foreach($this->$relation as $instance) {
-          $toi = typeOf($instance);
-          pkdebug("Here we are..relname: [$relation], tof: [$toi].", $instance->getAttributes());
           if ($instance instanceOf \PkExtensions\Models\PkModel) {
-            pkdebug("YES!!!! Processing as PkModel: [$relation], tof: [$toi].");
-            // PkExtensions\Models\PkModel
              $resarr[$relation][] = $instance->getCustomAttributes();
           } else if ($instance instanceOf \Illuminate\Database\Eloquent\Model) {
              $resarr[$relation][] = $instance->getAttributes();
           //} else if ($instance instanceOf \Illuminate\Database\Eloquent\Collection) {
           } else {
+            $toi = typeOf($instance);
             pkdebug("For relation name: [$relation], instance type: [$toi]");
            }
          }
@@ -1216,6 +1198,13 @@ class $createclassname extends Migration {
     return $resarr;
   }
 
+  public function getEncodedCustomAttributes($args=null) {
+    $ca = $this->getCustomAttributes($args);
+    $jsenc = json_encode($ca, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    $htenc = html_encode($jsenc);
+    //$htenc = static::encodeData($ca);
+    return $htenc;
+  }
 
   /** Probably useless method, but a subclass might want to do something with it.
    * More usefed in the controllers */
