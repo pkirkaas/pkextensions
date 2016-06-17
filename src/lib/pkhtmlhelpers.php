@@ -1,6 +1,7 @@
 <?php
 use Collective\Html\HtmlBuilder;
 use Collective\Html\FormBuilder;
+use PkExtensions\PartialSet;
 
 
 /** Returns HTML of the items in a grid
@@ -83,3 +84,36 @@ function bs_tooltip($string) {
   $string = html_encode($string);
   return " data-toggle='tooltip' title='$string' ";
 }
+
+/** Creates an HTML element or array of elements holding encoded PkModel attribute
+ * data for use by JS on the page.
+ * @param PkModel|arrayish PkModels - $pkmodels - the model(s) to get attributes
+ * for. Can be mixed types - but then have to use the default model typename
+ * @param string|null $typename - what to call the type in the element.
+ *   Default is basename of the PkModel class.
+ * @return HTML String|Array HTML Strings - elements in the form:
+ *  <div class='encoded-data-holder' data-encoded-data-objtype="$typename"
+ *   data-encoded-data-objid="$id" data-encoded-data-data="$encoded_data"></div>"
+ */
+function jsObjDataGen($pkmodels, $typename = null) {
+  if ($pkmodels instanceOf \PkExtensions\Models\PkModel) {
+    $pkmodels = [$pkmodels];
+  }
+  $tstInstance = $pkmodels[0];
+  $typeof = typeOf($tstInstance);
+  if (!$tstInstance instanceOf \PkExtensions\Models\PkModel) {
+    throw new \Exception ("Wrong type: [$typeof]");
+  }
+  //if (!$typename) $typename = strtolower(getBaseName($typeof));
+  $ps = new PartialSet();
+  foreach ($pkmodels as $instance) {
+    if (!$typename) $thistypename = strtolower(getBaseName(get_class($instance)));
+    else $thistypename = $typename;
+    $encdata = $instance->getEncodedCustomAttributes();
+    $id = $instance->id;
+    $ps[] = "<div class='encoded-data-holder' data-encoded-data-objtype='$thistypename'
+       data-encoded-data-objid='$id' data-encoded-data-data='$encdata'></div>\n";
+  }
+  return $ps;
+
+} 
