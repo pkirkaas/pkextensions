@@ -163,6 +163,35 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
   if (dlg.length === 0) return;
   var dlgHtml = dlg.prop('outerHTML');
   console.log("DLGHTML: "+dlgHtml);
+  //Find the nearest parent with model & id set
+  var inst = $(this).closest('['+popDefObj.dataModelType+']');
+  var model = inst.attr(popDefObj.dataModelType);
+  var id = inst.attr(popDefObj.dataModelId);
+  if (!id || !model) {
+    console.log("Failed to get one of ["+model+']['+id+']');
+    return false;
+  }
+  var encdata=getDecodedData(model,id);
+  if (!encdata || !isObject(encdata)) {
+    console.log("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
+    return false;
+  }
+  console.log("Got ENCDATA!", encdata);
+  dom = buildDetailsDialog('<div></div>', dlgHtml, encdata);
 
 });
+
+/** Takes an encoding template and recursively iterates through it building
+ * the custom data dialog
+ * @param {type} dom
+ * @param {type} element
+ * @param {type} encdata
+ * @returns {undefined}
+ */
+function buildDetailsDialog(dom, element, encdata) {
+  dom = jQuerify(dom);
+  element = jQuerify(element);
+ // element.each(function())
+
+}
 

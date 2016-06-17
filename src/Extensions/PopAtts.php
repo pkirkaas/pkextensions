@@ -40,11 +40,30 @@ class PopAtts {
      'encDatDatDataAttr'=>'data-encoded-data-data',
      'popTemplateClass'=>'pop-hidden-js-template',
      'popCallerClass'=>'pop-details-for-obj',
+     'popAttrNameDataAttr'=>'data-enc-attr-name',
+     'valueTemplateClass' => 'enc-attr-val-tpl',
+     'valueHolderClass' => 'enc-attr-val-holder-tpl',
     ];
 
+  public static function valueHolderClass() {
+    return ' '.static::$attDefaults['valueHolderClass'].' ';
+  }
+  public static function valueTemplateClass() {
+    return ' '.static::$attDefaults['valueTemplateClass'].' ';
+  }
   public static function callerClass() {
     return ' '.static::$attDefaults['popCallerClass'].' ';
   }
+  public static function dataAttrElement($attributeName=null) {
+    if (!$attributeName) return static::$attDefaults['popAttrNameDataAttr'];
+    if ($attributeName && is_string($attributeName) && strlen($attributeName)) {
+      return  "class='".static::$attDefaults['valueHolderClass']."' ".
+          static::$attDefaults['popAttrNameDataAttr']."='$attributeName' ";
+    }
+    throw new Exception ("Invalid AttributeName");
+  }
+
+
   public static function templateClass() {
     return ' '.static::$attDefaults['popTemplateClass'].' ';
   }
@@ -97,8 +116,13 @@ class PopAtts {
     return " ".static::$attDefaults['jsPopupTmpCallerDataAttr']."='$templateName' ";
   }
 
-  public static function templateDefiner($templateName) {
-    return " ".static::$attDefaults['jsPopupTmpCalledDataAttr']."='$templateName' ";
+  public static function templateDefiner($templateName, $title=null) {
+    if ($title && is_string($title) && strlen($title)) {
+      $title = " data-title='$title' ";
+    } else {
+      $title='';
+    }
+    return " ".static::$attDefaults['jsPopupTmpCalledDataAttr']."='$templateName' $title";
   }
 
 
