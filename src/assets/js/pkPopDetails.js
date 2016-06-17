@@ -182,7 +182,26 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
     return false;
   }
   console.log("Got ENCDATA!", encdata);
-  dom = buildDetailsDialog('<div></div>', dlgHtml, encdata);
+  dlg = buildDetailDialog(dlgHtml, encdata);
+  var dlg_title = dlg.attr('data-title');
+  if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
+  console.log("Got dlg!", dlg.html());
+  var dialogOpts = {
+    modal: true,
+    autoOpen: true,
+    width: 600,
+    title: dlg_title,
+    buttons: [{
+        text: 'Close',
+        click: function () {
+          $(this).dialog('destroy');
+        }
+      }
+    ]
+  };
+  //var dialogOptions = dialogDefaults;
+  //dlg.modal('show');
+  dlg.dialog(dialogOpts);
 
 });
 
@@ -190,11 +209,43 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
  * the custom data dialog
  * @param HTML String/jQuery domBit - the template or part of it
  * @param plain object encdata - the data for the model instance
- * @param boolean emptyhide - default: true ('false' option not implemented yet)
+ * @param boolean hideempty - default: true ('false' option not implemented yet)
  *   - if true, don't show elements for which there is no data
  * @returns HTML string/DOM for the dialog from the template, with values inserted
  */
-function buildDetailsDialog(domBit, encdata, emptyhide) {
+function buildDetailDialog(template,encdata,hideempty) {
+  hideempty = (hideempty === undefined)?true:hideempty;
+  if (isEmpty(encdata) && hideempty) return false;
+  template=jQuerify(template).clone();
+  if (!template.length) return false;
+  var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']');
+  dataFields.each(function() {
+    console.log("In each data-el - this: ", this);
+    var jqthis = $(this);
+    var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
+    if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
+      console.log("The template had a bad data-attribute name");
+      template.closest('.'+popDefObj.valueTemplateClass).remove();
+    }
+    if (encdata[encAttName] === undefined) {
+      if (hideempty) template.closest('.'+popDefObj.valueTemplateClass).remove();
+    } else { //We have a value - insert it!
+      jqthis.htmlFormatted(encdata[encAttName]);
+    }
+  });
+  return template;
+}
+
+/** Takes an encoding template and recursively iterates through it building
+ * the custom data dialog
+ * @param HTML String/jQuery domBit - the template or part of it
+ * @param plain object encdata - the data for the model instance
+ * @param boolean hideempty - default: true ('false' option not implemented yet)
+ *   - if true, don't show elements for which there is no data
+ * @returns HTML string/DOM for the dialog from the template, with values inserted
+ */
+/*
+function buildDetailsDialog(domBit, encdata, hideempty) {
   domBit = jQuerify(domBit).clone();
   if (domBit.hasClass(popDefObj.valueTemplateClass)) {
     //... it is a template row for SOME data element. Get the enc data key 
@@ -223,4 +274,5 @@ function descendAndSet(template, encdata) {
   });
   
 }
+*/
 

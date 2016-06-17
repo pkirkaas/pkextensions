@@ -216,6 +216,30 @@ $(function () {
   });
 });
 
+
+jQuery.fn.extend({
+  htmlFormatted: function (content) {
+    console.log("Formatters:", this.formatters);
+    for (var formatter in this.formatters) {
+      if (this.formatters[formatter](this,content)) return true;
+    }
+    this.html(content);
+    },
+  formatters: {
+    currency: function(jqobj,content) {
+      if (jqobj.hasClass('jq-format-currency')) {
+        var currency ='$'+content.toLocaleString("en"); 
+        jqobj.html(currency);
+        return true;
+      }
+      return false;
+    }
+  },
+  addFormatter: function(name, formatter) {
+    jQuery.formatters[name] = formatter;
+  }
+});
+
 function demoResponseTarget(target, data, arg) {
   console.log("DemoResponseTarget ARGS: ", data, arg, 'target: ', target);
 }
@@ -331,6 +355,10 @@ function addClassAndClear(classToAdd, classesToRemove, obj) {
     obj.removeClass(classesToRemove[idx]);
   }
   obj.addClass(classToAdd);
+}
+
+function FormattedHtml(element, content) {
+  element = jQuerify(element);
 }
 
 /**
@@ -910,6 +938,15 @@ $(function () {
 
 function isObject(obj) {
   return obj === Object(obj);
+}
+
+/** Returns true for false/undefined/null/0/''/{}/[]
+ * 
+ * @param mixed avar
+ * @returns boolean - true if 'empty', else false
+ */
+function isEmpty(avar) {
+  return (avar === undefined) || !avar || (isObject(avar) && !Object.keys(avar).length);
 }
 
 function isjQuery(avar) {
