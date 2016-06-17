@@ -43,8 +43,12 @@ class PopAtts {
      'popAttrNameDataAttr'=>'data-enc-attr-name',
      'valueTemplateClass' => 'enc-attr-val-tpl',
      'valueHolderClass' => 'enc-attr-val-holder-tpl',
+     'titleHolderClass' => 'dialog-title-value-holder',
     ];
 
+  public static function titleHolderClass() {
+    return ' '.static::$attDefaults['titleHolderClass'].' ';
+  }
   public static function valueHolderClass() {
     return ' '.static::$attDefaults['valueHolderClass'].' ';
   }

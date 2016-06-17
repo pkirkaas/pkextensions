@@ -228,7 +228,17 @@ jQuery.fn.extend({
   formatters: {
     currency: function(jqobj,content) {
       if (jqobj.hasClass('jq-format-currency')) {
-        var currency ='$'+content.toLocaleString("en"); 
+        var num = toNumber(content);
+        if (isNaN(num)) {
+          console.error('Invalid Number: ',content);
+          jqobj.html('');
+        }
+        var sign = '';
+        if (num < 0) {
+          num = -num;
+          sign = '-';
+        }
+        var currency =sign+'$'+num.toLocaleString("en"); 
         jqobj.html(currency);
         return true;
       }
@@ -955,15 +965,45 @@ function isjQuery(avar) {
 
 /**
  * Is the argument an integer or string convertable to an int?
- * @param {type} value
- * @returns {Boolean}
+ * isIntish('7') true
+ * isIntish('7 8') false
+ * isIntish([7]) true - not what I want
+ * @param mixed value
+ * @returns boolean
  */
 function isIntish(value) {
   return !isNaN(value) &&
-          parseInt(Number(value)) == value &&
+          parseInt(Number(value)) == value && //if use ===  isIntish('7') false!
           !isNaN(parseInt(value, 10));
 }
 
+/** Returns a number if that's reasonable, else NaN. */
+function toNumber(aval) {
+  if (!isNumeric(aval)) return NaN;
+  return Number(aval);
+}
+
+/**
+ * For values:
+   '7' => true
+   7.9 => true
+   false => false
+   true => false
+   null => false
+   [6] => false
+   ['7'] => false
+   '7 8 9' => false
+   {0:17} => false 
+ * @param mixed aval
+ * @returns boolean - true if reasonably numeric, else false (as above)
+ */
+function isNumeric(aval) {
+  return (! (aval instanceof Array)) && (Number(aval)===parseFloat(aval)); 
+}
+
+function isArray(aval) {
+  return aval instanceof Array;
+}
 
 
 /** 

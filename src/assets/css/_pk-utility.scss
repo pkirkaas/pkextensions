@@ -630,3 +630,6 @@ $i: 1;
     .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}
   }
 }
+.currency, .number, .numeric, .int, .integer, .jq-format-currency {
+  text-align: right;
+}
