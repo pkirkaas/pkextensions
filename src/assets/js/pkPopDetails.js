@@ -152,9 +152,17 @@ $(function () {
  * @returns {Boolean}
  */
 //$('body').on('hover', '.'+popDefObj.popTemplateClass, function (event) {
-$('body').on('hover', '['+popDefObj.jsPopupTmpCallerDataAttr+']', function (event) {
+//$('body').on('hover', '['+popDefObj.jsPopupTmpCallerDataAttr+']', function (event) {
+//$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
+$('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
+  console.log("Hovering...");
+
   var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
   if (!src) return;
+  var dlg = $('.'+popDefObj.popTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
+  if (dlg.length === 0) return;
+  var dlgHtml = dlg.prop('outerHTML');
+  console.log("DLGHTML: "+dlgHtml);
 
 });
 

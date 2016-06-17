@@ -39,10 +39,14 @@ class PopAtts {
      'encDatIdDataAttr'=>'data-encoded-data-objid',
      'encDatDatDataAttr'=>'data-encoded-data-data',
      'popTemplateClass'=>'pop-hidden-js-template',
-   ];
+     'popCallerClass'=>'pop-details-for-obj',
+    ];
 
+  public static function callerClass() {
+    return ' '.static::$attDefaults['popCallerClass'].' ';
+  }
   public static function templateClass() {
-    return static::$attDefaults['popTemplateClass'];
+    return ' '.static::$attDefaults['popTemplateClass'].' ';
   }
 
   public static function jsInit() {
@@ -53,7 +57,7 @@ class PopAtts {
     foreach (static::$attDefaults as $defName => $defValue) {
       $defArr[] = "    $defName:'$defValue'";
     }
-    $defStr = implode(",\n", $defArr);
+    $defStr = implode(",\n    ", $defArr);
     $ps[]="$defStr\n";
     $ps[]="  };\n";
     $ps[]="</script>\n";
