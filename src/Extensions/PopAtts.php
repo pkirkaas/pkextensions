@@ -73,10 +73,11 @@ class PopAtts {
    * template name
    */
   public static function popCaller($templateName) {
-    return " ".static::$jsPopupTmpDataAttr."='$templateName' ";
+    return " ".static::$jsPopupTmpCallerDataAttr."='$templateName' ";
   }
 
   public static function templateDefiner($templateName) {
+    return " ".static::$jsPopupTmpCalledDataAttr."='$templateName' ";
   }
 
 
