@@ -210,7 +210,9 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 /** Like above, but instead of clickable dialog, hoverable details.. */
 //$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
 $('body').on( {
-    mouseenter: function () {
+    mouseenter: function (event) {
+      console.log("THE TARGET", event.target);
+      var jqtarget = $(event.target);
       var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
       if (!src) return;
       var dlg = $('.'+popDefObj.hoverTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
@@ -229,31 +231,14 @@ $('body').on( {
         console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
         return false;
       }
-      for (var prop in encdata) {
-        var typep = typeof encdata[prop];
-        if (isArray(encdata[prop])) typep = 'ARRAY';
-        //console.log('PROP: '+prop + '; TYPEOF: '+ typep);
-      }
-      /*
-      console.log("Got ENCDATA!", encdata);
-      */
       dlg = buildHoverDetailDialog(dlgHtml, encdata);
       dlg.addClass('block');
-      //console.trace();
-      //console.log("dlg:", dlg);
       var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
-
-      //dlg.find('.'+popDefObj.arrayParentClass).remove();
-
-
-
-
-
       if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
       var aframe = $(popDefObj.hoverHtmlTemplate);
-      //aframe.html(dlg);
       aframe.append(dlg);
-      $('body').append(aframe);
+      jqtarget.append(aframe);
+      //$('body').append(aframe);
     },
     mouseleave: function () {
       $('.hover-detail-frame').remove();
