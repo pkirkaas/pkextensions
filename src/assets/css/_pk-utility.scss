@@ -672,3 +672,40 @@ $i: 1;
   margin-bottom: .5rem;
   
 }
+
+
+
+.faded {
+  background-color: rgba(200,200,200,.5);
+  
+}
+
+@mixin pkfs($int: 0)  {
+  $fsz: 1rem + $int * .1rem;
+  font-size: $fsz;
+}
+
+@mixin pkfw($int:0) {
+  $fw: 500 + $int * 100;
+  font-weight: $fw;
+}
+.pkfs1 { @include pkfs(1); }
+.pkfs2 { @include pkfs(2); }
+.pkfs3 { @include pkfs(3); }
+.pkfs4 { @include pkfs(4); }
+.pkfs5 { @include pkfs(5); }
+.pkfs6 { @include pkfs(6); }
+.pkfs10 { @include pkfs(10); }
+
+.pkfw1 { @include pkfw(1); }
+.pkfw2 { @include pkfw(2); }
+.pkfw3 { @include pkfw(3); }
+.pkfw4 { @include pkfw(4); }
+.pkfw5 { @include pkfw(5); }
+
+.pkl1 { @include pkfs(1); @include pkfw(1); }
+.pkl2 { @include pkfs(2); @include pkfw(1); }
+.pkl3 { @include pkfs(3); @include pkfw(2); }
+.pkl4 { @include pkfs(4); @include pkfw(2); }
+.pkl5 { @include pkfs(5); @include pkfw(3); }
+.pkl6 { @include pkfs(6); @include pkfw(3); }

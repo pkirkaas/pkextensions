@@ -50,7 +50,7 @@ function numberItems($items,$word) {
 
 ##View Helpers
 function pk_showcheck($val = null, $checked = "&#9745;", $unchecked ="&#9744;", $styles = []) {
-  $defaultstyles = ['font-size'=>'xx-large','margin'=>'auto','color'=>'black', 'text-align'=>'center'];
+  $defaultstyles = ['font-size'=>'large','line-height'=>'1rem', 'margin'=>'auto','color'=>'black', 'text-align'=>'center'];
   $stylestr = '';
   foreach ($defaultstyles as $key => $value) {
     $stylestr.="$key:$value; ";
