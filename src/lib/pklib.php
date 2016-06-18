@@ -457,7 +457,9 @@ function pkcatchecho($runnable) {
   //Var_Dump($arg);
   //print_r($arg);
   $vardump = ob_get_contents();
-  ob_end_clean();
+  //Experimenting 6/16 - replacing with ob_end_flush...
+  //ob_end_clean();
+  ob_end_flush();
   ini_set('xdebug.overload_var_dump', 1);
   return "<pre>$vardump</pre>";
 }
@@ -477,7 +479,9 @@ function pkvardump($arg, $disableXdebug = true) {
     ob_start();
     Var_Dump($arg);
     $vardump = ob_get_contents();
-    ob_end_clean();
+  //Experimenting 6/16 - replacing with ob_end_flush...
+   // ob_end_clean();
+  ob_end_flush();
   } else {
     $vardump = print_r($arg, true);
   }
