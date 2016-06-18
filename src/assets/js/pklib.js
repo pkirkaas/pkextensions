@@ -219,7 +219,7 @@ $(function () {
 
 jQuery.fn.extend({
   htmlFormatted: function (content) {
-    console.log("Formatters:", this.formatters);
+    //console.log("Formatters:", this.formatters);
     for (var formatter in this.formatters) {
       if (this.formatters[formatter](this,content)) return true;
     }

@@ -160,7 +160,6 @@ $(function () {
 //$('body').on('hover', '['+popDefObj.jsPopupTmpCallerDataAttr+']', function (event) {
 //$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
 $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
-  console.log("Hovering...");
 
   var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
   if (!src) return;
@@ -183,9 +182,11 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
   }
   console.log("Got ENCDATA!", encdata);
   dlg = buildDetailDialog(dlgHtml, encdata);
-  var dlg_title = dlg.attr('data-title');
+
+  var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
+
   if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
-  console.log("Got dlg!", dlg.html());
+  console.log("Got dlg!", dlg.html(), 'title:', dlg_title);
   var dialogOpts = {
     modal: true,
     autoOpen: true,
@@ -205,6 +206,114 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 
 });
 
+
+/** Testing Hover/MouseEnter/MouseLeave */
+/*
+$('body').on( {
+    mouseenter: function () {
+        console.log('Mouse Entered2');
+    },
+    mouseleave: function () {
+        console.log('Mouse Left2');
+    }
+},'.test-mouse-selector2' );
+
+$('body').on('.test-mouse-selector2', {
+    mouseenter: function () {
+        console.log('Mouse Entered2');
+    },
+    mouseleave: function () {
+        console.log('Mouse Left2');
+    }
+});
+
+$(".test-mouse-selector").on({
+    mouseenter: function () {
+        console.log('Mouse Entered');
+    },
+    mouseleave: function () {
+        console.log('Mouse Left');
+    }
+});
+*/
+
+/** Like above, but instead of clickable dialog, hoverable details.. */
+//$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
+$('body').on( {
+    mouseenter: function () {
+      var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
+      if (!src) return;
+      console.log("Hover SRC:",src);
+      var dlg = $('.'+popDefObj.hoverTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
+      if (dlg.length === 0) return;
+      var dlgHtml = dlg.prop('outerHTML');
+      console.log("HOVER DLGHTML: "+dlgHtml);
+      //Find the nearest parent with model & id set
+      var inst = $(this).closest('['+popDefObj.dataModelType+']');
+      var model = inst.attr(popDefObj.dataModelType);
+      var id = inst.attr(popDefObj.dataModelId);
+      if (!id || !model) {
+        console.error("Failed to get one of ["+model+']['+id+']');
+        return false;
+      }
+      var encdata=getDecodedData(model,id);
+      if (!encdata || !isObject(encdata)) {
+        console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
+        return false;
+      }
+      console.log("Got ENCDATA!", encdata);
+      dlg = buildHoverDetailDialog(dlgHtml, encdata);
+      console.trace();
+      console.log("dlg:", dlg);
+      var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
+      if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
+      var aframe = $(popDefObj.hoverHtmlTemplate);
+      //aframe.html(dlg);
+      aframe.append(dlg);
+      $('body').append(aframe);
+      console.log('Mouse Entered 4');
+    },
+    mouseleave: function () {
+      $('.hover-detail-frame').remove();
+        console.log('Mouse Left 4');
+    }
+}, '.'+popDefObj.popCallerClass);
+
+        
+        /*
+        
+        
+        
+        'hover', '.'+popDefObj.popCallerClass, function (event) {
+  console.log("Really Hovering...");
+  var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
+  if (!src) return;
+  var dlg = $('.'+popDefObj.popTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
+  if (dlg.length === 0) return;
+  var dlgHtml = dlg.prop('outerHTML');
+  //console.log("DLGHTML: "+dlgHtml);
+  //Find the nearest parent with model & id set
+  var inst = $(this).closest('['+popDefObj.dataModelType+']');
+  var model = inst.attr(popDefObj.dataModelType);
+  var id = inst.attr(popDefObj.dataModelId);
+  if (!id || !model) {
+    console.error("Failed to get one of ["+model+']['+id+']');
+    return false;
+  }
+  var encdata=getDecodedData(model,id);
+  if (!encdata || !isObject(encdata)) {
+    console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
+    return false;
+  }
+  //console.log("Got ENCDATA!", encdata);
+  dlg = buildDetailDialog(dlgHtml, encdata);
+  var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
+  if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
+});
+*/
+
+
+
 /** Takes an encoding template and recursively iterates through it building
  * the custom data dialog
  * @param HTML String/jQuery domBit - the template or part of it
@@ -217,7 +326,36 @@ function buildDetailDialog(template,encdata,hideempty) {
   hideempty = (hideempty === undefined)?true:hideempty;
   if (isEmpty(encdata) && hideempty) return false;
   template=jQuerify(template).clone();
-  if (!template.length) return false;
+  if (!template.length) {
+    console.error("Couldn't get the template!");
+    return false;
+  }
+  var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']');
+  dataFields.each(function() {
+    console.log("In each data-el - this: ", this);
+    var jqthis = $(this);
+    var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
+    if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
+      console.error("The template had a bad data-attribute name");
+      template.closest('.'+popDefObj.valueTemplateClass).remove();
+    }
+    if (encdata[encAttName] === undefined) {
+      if (hideempty) template.closest('.'+popDefObj.valueTemplateClass).remove();
+    } else { //We have a value - insert it!
+      jqthis.htmlFormatted(encdata[encAttName]);
+    }
+  });
+  return template;
+}
+
+function buildHoverDetailDialog(template,encdata,hideempty) {
+  hideempty = (hideempty === undefined)?true:hideempty;
+  if (isEmpty(encdata) && hideempty) return false;
+  template=jQuerify(template).clone();
+  if (!template.length) {
+    console.error("Couldn't get the template!");
+    return false;
+  }
   var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']');
   dataFields.each(function() {
     console.log("In each data-el - this: ", this);

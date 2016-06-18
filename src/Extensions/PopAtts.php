@@ -39,24 +39,27 @@ class PopAtts {
      'encDatIdDataAttr'=>'data-encoded-data-objid',
      'encDatDatDataAttr'=>'data-encoded-data-data',
      'popTemplateClass'=>'pop-hidden-js-template',
+     'hoverTemplateClass'=>'hover-hidden-js-template',
      'popCallerClass'=>'pop-details-for-obj',
      'popAttrNameDataAttr'=>'data-enc-attr-name',
      'valueTemplateClass' => 'enc-attr-val-tpl',
      'valueHolderClass' => 'enc-attr-val-holder-tpl',
      'titleHolderClass' => 'dialog-title-value-holder',
+     'hoverHtmlTemplate' => '<div class="hover-detail-frame"></div>',
+
     ];
 
   public static function titleHolderClass() {
-    return ' '.static::$attDefaults['titleHolderClass'].' ';
+    return static::$attDefaults['titleHolderClass'].' ';
   }
   public static function valueHolderClass() {
-    return ' '.static::$attDefaults['valueHolderClass'].' ';
+    return static::$attDefaults['valueHolderClass'].' ';
   }
   public static function valueTemplateClass() {
-    return ' '.static::$attDefaults['valueTemplateClass'].' ';
+    return static::$attDefaults['valueTemplateClass'].' ';
   }
   public static function callerClass() {
-    return ' '.static::$attDefaults['popCallerClass'].' ';
+    return static::$attDefaults['popCallerClass'].' ';
   }
   public static function dataAttrName($attributeName=null) {
     if (!$attributeName) return static::$attDefaults['popAttrNameDataAttr'];
@@ -76,8 +79,13 @@ class PopAtts {
   }
 
 
+  public static function hoverTemplateClass() {
+    return static::$attDefaults['hoverTemplateClass'].' ';
+  }
+
+
   public static function templateClass() {
-    return ' '.static::$attDefaults['popTemplateClass'].' ';
+    return static::$attDefaults['popTemplateClass'].' ';
   }
 
   public static function jsInit() {
@@ -93,7 +101,8 @@ class PopAtts {
     $ps[]="  };\n";
     $ps[]="</script>\n";
     $ps[]="\n<style>\n";
-    $ps[]="  .".static::templateClass()." {\n";
+    $ps[]="  .".static::templateClass().", .".static::titleHolderClass();
+    $ps[]=  "\n .".static::hoverTemplateClass(). " {\n";
     $ps[]="    display:none;\n";
     $ps[]="  }\n";
     $ps[]="</style>\n";
