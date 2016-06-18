@@ -26,6 +26,7 @@ use PkExtensions\PartialSet;
  * @return false || $HTML string of layout grid
  * 
  */
+/* Moved & improved somewhere ...
 function grid_layout($items, $params = []) {
   if (!is_arrayish($items) || !($sz = count($items))) return false;
    $num_columns = keyVal('num_columns', $params, 12);
@@ -74,6 +75,8 @@ function grid_layout($items, $params = []) {
    $html .= $row_closer;
    return $html;
 }
+ * 
+ */
 
 /** Creates BS4/Tether tool-tip attributes. Escapes the string, and returns
  * 'data-toggle="tooltip" title="$escapedString" '

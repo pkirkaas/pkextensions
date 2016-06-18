@@ -53,11 +53,15 @@ Trait PolymorphicMorphTrait {
   }
 
   public function __get($key) {
+    //pkdebug("KEY", $key);
     if (strtolower($key) === strtolower(static::getMorphName())) {
        return $this->getRelationValue('traitTypeMorphOne');
     }
      return parent::__get($key);
   }
+  /*
+   * 
+   */
 
    /** Called by the implementing / using model - from the method definition
     * public function [$typeName] () { return $this

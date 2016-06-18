@@ -45,9 +45,19 @@ class PopAtts {
      'valueTemplateClass' => 'enc-attr-val-tpl',
      'valueHolderClass' => 'enc-attr-val-holder-tpl',
      'titleHolderClass' => 'dialog-title-value-holder',
+     'arrayParentClass' => 'enc-array-parent-row',
+     'arrayChildClass' => 'enc-array-child-row',
      'hoverHtmlTemplate' => '<div class="hover-detail-frame"></div>',
 
     ];
+
+  public static function arrayParentClass() {
+    return static::$attDefaults['arrayParentClass'].' ';
+  }
+
+  public static function arrayChildClass() {
+    return static::$attDefaults['arrayChildClass'].' ';
+  }
 
   public static function titleHolderClass() {
     return static::$attDefaults['titleHolderClass'].' ';
@@ -106,6 +116,7 @@ class PopAtts {
     $ps[]="    display:none;\n";
     $ps[]="  }\n";
     $ps[]="</style>\n";
+    //pkdebug("PS:", $ps);
     return $ps;
   }
 

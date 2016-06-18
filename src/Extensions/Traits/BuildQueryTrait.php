@@ -408,10 +408,10 @@ trait BuildQueryTrait {
   public function executeSearch() {
     $collection = $this->buildQueryOnModel()->get();
     $sz = count($collection);
-    pkdebug("Just ran query from BQT: SZ: $sz");
+    //pkdebug("Just ran query from BQT: SZ: $sz");
     $newcol = $this->filterOnMethods($collection);
     $sza = count($newcol);
-    pkdebug("SXA:  $sza");
+    //pkdebug("SXA:  $sza");
     return $newcol;
   }
 
@@ -651,7 +651,7 @@ trait BuildQueryTrait {
     $modelName = $collection-> getQueueableClass();
     $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
         ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
-    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    //pkdebug("The Trimmed Match Collection:", $trimmedMatches);
     if (!count($trimmedMatches)) return $collection;
     $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
       //pkdebug()

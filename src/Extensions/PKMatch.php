@@ -122,20 +122,20 @@ class PkMatch {
     $emptyCrit = keyVal('emptyCrit', $params, true);
     foreach ($matchArr as $base => $match) {
       if (!is_a($match->model, $modelName, true)) {
-        pkdebug("Failed for [$modelName] && ", $match);
+        //pkdebug("Failed for [$modelName] && ", $match);
         continue;
       }
       if (!$match->method || !in_array($match->method,$modelMethods,1)) {
-        pkdebug("Failed for [match ] && methods", $match);
+        //pkdebug("Failed for [match ] && methods", $match);
         continue;
       }
       if ($emptyCrit && !$match->crit) {
-        pkdebug("Failed for [match ] && crit", $match);
+        //pkdebug("Failed for [match ] && crit", $match);
         continue;
       }
       $trimArr[$base] = $match;
     }
-    pkdebug("The Trimmed Arr", $trimArr);
+    //pkdebug("The Trimmed Arr", $trimArr);
     return $trimArr;
   }
 
@@ -247,7 +247,7 @@ class PkMatch {
    * @param type $arg
    */
   public function satisfy($arg=null) {
-    pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
+    //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
     if ($this->comptype === 'numeric') return $this->numericComp($arg);
@@ -315,7 +315,7 @@ class PkMatch {
 
 
     public function numericComp($arg = null) {
-      pkdebug("ArG",$arg,'this', $this);
+      //pkdebug("ArG",$arg,'this', $this);
       if (!is_numeric($this->val) || !is_numeric($arg)) {
         //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
         return pkdebug ("[{$this->val}] or [$arg] is not numeric");

@@ -83,7 +83,7 @@ function getDecodedData(objtype,objid) {
   }
   if (decodedObjectCache[objtype] === undefined) {
     decodedObjectCache[objtype] = {};
-    console.log("The cache attribute ["+objtype+"] was undefined");
+    console.error("The cache attribute ["+objtype+"] was undefined");
   }
   if (objid === undefined) {
     return decodedObjectCache[objtype];
@@ -121,19 +121,19 @@ function objDataDecode(objtype, objid) {
           objtype+'"][data-encoded-data-objid="'+
           objid + '"]');
   var encoded = datael.attr('data-encoded-data-data');
-  console.log ('encoded:', encoded);
+  //console.log ('encoded:', encoded);
   var decoded =  $.parseJSON(encoded);
-  console.log ('decoded:', decoded);
+  //console.log ('decoded:', decoded);
   return decoded;
 }
 
 
 
 $(function () {
-  console.log("Trying to get data atts");
+  //console.log("Trying to get data atts");
   //var res = getDecodedData('borrower','1');
   var res = getDecodedData();
-  console.log("RES:", res);
+  //console.log("RES:", res);
   /*
   var data_atts = $('div.data-atts-holder');
   if (data_atts.length) {
@@ -166,27 +166,27 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
   var dlg = $('.'+popDefObj.popTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
   if (dlg.length === 0) return;
   var dlgHtml = dlg.prop('outerHTML');
-  console.log("DLGHTML: "+dlgHtml);
+  //console.log("DLGHTML: "+dlgHtml);
   //Find the nearest parent with model & id set
   var inst = $(this).closest('['+popDefObj.dataModelType+']');
   var model = inst.attr(popDefObj.dataModelType);
   var id = inst.attr(popDefObj.dataModelId);
   if (!id || !model) {
-    console.log("Failed to get one of ["+model+']['+id+']');
+    console.error("Failed to get one of ["+model+']['+id+']');
     return false;
   }
   var encdata=getDecodedData(model,id);
   if (!encdata || !isObject(encdata)) {
-    console.log("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
+    console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
     return false;
   }
-  console.log("Got ENCDATA!", encdata);
+  //console.log("Got ENCDATA!", encdata);
   dlg = buildDetailDialog(dlgHtml, encdata);
 
   var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
 
   if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
-  console.log("Got dlg!", dlg.html(), 'title:', dlg_title);
+  //console.log("Got dlg!", dlg.html(), 'title:', dlg_title);
   var dialogOpts = {
     modal: true,
     autoOpen: true,
@@ -207,47 +207,15 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 });
 
 
-/** Testing Hover/MouseEnter/MouseLeave */
-/*
-$('body').on( {
-    mouseenter: function () {
-        console.log('Mouse Entered2');
-    },
-    mouseleave: function () {
-        console.log('Mouse Left2');
-    }
-},'.test-mouse-selector2' );
-
-$('body').on('.test-mouse-selector2', {
-    mouseenter: function () {
-        console.log('Mouse Entered2');
-    },
-    mouseleave: function () {
-        console.log('Mouse Left2');
-    }
-});
-
-$(".test-mouse-selector").on({
-    mouseenter: function () {
-        console.log('Mouse Entered');
-    },
-    mouseleave: function () {
-        console.log('Mouse Left');
-    }
-});
-*/
-
 /** Like above, but instead of clickable dialog, hoverable details.. */
 //$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
 $('body').on( {
     mouseenter: function () {
       var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
       if (!src) return;
-      console.log("Hover SRC:",src);
       var dlg = $('.'+popDefObj.hoverTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
       if (dlg.length === 0) return;
       var dlgHtml = dlg.prop('outerHTML');
-      console.log("HOVER DLGHTML: "+dlgHtml);
       //Find the nearest parent with model & id set
       var inst = $(this).closest('['+popDefObj.dataModelType+']');
       var model = inst.attr(popDefObj.dataModelType);
@@ -261,21 +229,26 @@ $('body').on( {
         console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
         return false;
       }
+      for (var prop in encdata) {
+        var typep = typeof encdata[prop];
+        if (isArray(encdata[prop])) typep = 'ARRAY';
+        console.log('PROP: '+prop + '; TYPEOF: '+ typep);
+      }
+      /*
       console.log("Got ENCDATA!", encdata);
+      */
       dlg = buildHoverDetailDialog(dlgHtml, encdata);
-      console.trace();
-      console.log("dlg:", dlg);
+      //console.trace();
+      //console.log("dlg:", dlg);
       var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
       if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
       var aframe = $(popDefObj.hoverHtmlTemplate);
       //aframe.html(dlg);
       aframe.append(dlg);
       $('body').append(aframe);
-      console.log('Mouse Entered 4');
     },
     mouseleave: function () {
       $('.hover-detail-frame').remove();
-        console.log('Mouse Left 4');
     }
 }, '.'+popDefObj.popCallerClass);
 

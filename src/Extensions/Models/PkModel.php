@@ -52,12 +52,60 @@ abstract class PkModel extends Model {
    */
   public static $table_field_defs = [ 'id' => 'increments',];
 
+
+
+//Display Value Fields
+  public static $displayValueSuffix = "_DV"; // Let's try that...
+
+
+  /* Fields of this model that can display more meaningful info with
+   * $this->displayValue($field_name);
+   * The individual models must implement this, but then can access the
+   * reference value NOT ONLY with $model->displayValue($field_name);, but 
+   * also $this->$field_name.'displayValue'
+   * 
+   * The dispvalfield can be a value of the array, or a key of the array
+   * with the value the refModel that can display it. That's easiest because
+   * it's handled automatically. But to get the actual display_value_fields,
+   * you have call static::getDisplayValueFields();
+   */
+
+  public static $display_value_fields = [ /*
+    'financetype_id',
+    'buscredit_id'=>'App\References\BusinessCreditRef',
+   */];
+
+  /** Does two entirely different things - by default, 
+   * Just returns an indexed array of field names
+   * But if $onlyrefs = true, ONLY RETURNS display value fields mapped to 
+   * PkRef classes
+   */
+  public static function getDisplayValueFields($onlyrefs = false) {
+    if ($onlyrefs) {
+      $refarr = [];
+      foreach (static::$display_value_fields as $key => $value) {
+        if (is_string ($key) && is_string($value)) {
+          $refarr[$key] = $value;
+        }
+      }
+      return $refarr;
+    }
+    if (!static::$display_value_fields ||
+        !count(static::$display_value_fields)) {
+      return [];
+    }
+    $normalized = normalizeConfigArray(static::$display_value_fields);
+    if (is_array($normalized)) return array_keys($normalized);
+    return [];
+  }
+
+
   /** Since $table_field_defs are inhereted, if a subclass wants to eliminate
    * some of the ancestor keys - like, use a different name for 'id' key, list
    * those key names here.
    * @var array 
    */
-  public static $unset_table_field_keys =[];
+  public static $unset_table_field_keys = [];
 
   public static function getFieldNames() {
     static $fieldNameArr = [];
@@ -88,7 +136,8 @@ abstract class PkModel extends Model {
     return $resarr;
   }
 
-   public static $_modelFieldDefs = [];
+  public static $_modelFieldDefs = [];
+
   /** ONLY CALLED BY static::getTableFieldDefs()
    * So implementing classes can modify defaults methods - adding and 
    * subtracting fields
@@ -110,9 +159,10 @@ abstract class PkModel extends Model {
     }
     return $defs;
   }
+
   public static function getTableFieldDefs() {
     $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
-    return  static::_unsetTableFieldDefs($defs);
+    return static::_unsetTableFieldDefs($defs);
   }
 
   public static function get_field_type($fieldname) {
@@ -153,7 +203,7 @@ abstract class PkModel extends Model {
       if (is_string($def))
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
-        $type = keyVal('type',$def,'integer');
+        $type = keyVal('type', $def, 'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
@@ -183,6 +233,7 @@ abstract class PkModel extends Model {
   public static function getOnetimeMigrationFunctions() {
     return static::getAncestorArraysMerged('onetimeMigrationFuncs');
   }
+
   /** So not close to ready - finish in spare time .... */
   //public static function buildCreateMigrationDefinition() {
 
@@ -597,10 +648,31 @@ class $createclassname extends Migration {
   public $transformers = [];
 
   public function __get($key) {
+    //pkdebug("KEY", $key);
+    # This seems pretty obvious - why don't Eloquent do it?
+    if (!$key) return null;
     $name = removeEndStr($key, 'Tfrm');
     if ($name) return $this->transformer->$key;
+
+    $name = removeEndStr($key, static::$displayValueSuffix);
+    if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
+    if ($name && in_array($name,static::getDisplayValueFields(),1)) {
+      return $this->displayValue($name);
+    }
+    /*
+     * 
+     */
     return parent::__get($key);
   }
+    public function getAttribute($key) {
+      if (!$key) return null;
+      return parent::getAttribute($key);
+
+    }
+    public function getAttributeValue($key) {
+      if (!$key) return null;
+      return parent::getAttributeValue($key);
+    }
 
   public function __call($method, $args = []) {
     $name = removeEndStr($method, 'Tfrm');
@@ -1070,7 +1142,23 @@ class $createclassname extends Migration {
    * @return string - the user-friendly text to display
    */
   public function displayValue($fieldName, $value = null) {
-    if (!$this->authRead()) return "Can't view this info";
+    if (!$fieldName || !is_string($fieldName) || !strlen($fieldName)) {
+      return null;
+    }
+    //$class=get_class($this);
+    $refmaps = static::getDisplayValueFields(true);
+    foreach ($refmaps as $fn => $rc) {
+    if (!$fn || !is_string($fn) || !strlen($fn) ||
+       !$rc || !is_string($rc) || !strlen($rc)
+        || !class_exists($rc)) {
+      continue;
+    }
+      if ($fn === $fieldName) {
+        //$fldVal = $this->$fieldName;
+        //pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
+        return $rc::displayValue($this->$fieldName);
+      }
+    }
     if ($value === null) return $this->$fieldName;
     return $value;
   }
@@ -1139,13 +1227,23 @@ class $createclassname extends Migration {
     }
   }
 
-
   /** Just so I can override in descendent classes - like get calculated 
    * attributes, or one to many relationship objects, etc
    * @return array of model attributes
    */
   public function getCustomAttributes($arg=null) {
     return $this->getAttributes();
+  }
+
+  public function getDisplayValueAttributes($arg = null) {
+    $dva = [];
+    //pkdebug("The Fields:", static::getDisplayValueFields());
+    foreach (static::getDisplayValueFields() as $dvf) {
+     // $theval = $this->$dvf;
+      //pkdebug("DVF", $dvf,"THE VAL:", $theval);
+      $dva[$dvf.static::$displayValueSuffix] = $this->displayValue($dvf);
+    }
+    return $dva;
   }
 
   /**
@@ -1157,10 +1255,10 @@ class $createclassname extends Migration {
    * (optionally keyed by name with ModelClass as value), or empty to get
    * all the relations this model knows about.
    */
-  public function getRelationshipAttributes($relations=null) {
+  public function getRelationshipAttributes($relations = null) {
     $resarr = [];
     $loadRelations = $this->getLoadRelations();
-    if (is_string ($relations)) {
+    if (is_string($relations)) {
       $relations = [$relations];
     }
     if (!is_array($relations)) {
@@ -1176,24 +1274,24 @@ class $createclassname extends Migration {
       $sz = count($this->$relation);
       $this->load($relation);
       if ($this->$relation instanceOf \PkExtensions\Models\PkModel) {
-         $resarr[$relation] = $this->$relation->getCustomAttributes();
+        $resarr[$relation] = $this->$relation->getCustomAttributes();
       } else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Model) {
-         $resarr[$relation] = $this->$relation->getAttributes();
+        $resarr[$relation] = $this->$relation->getAttributes();
         //} else if ($this->$relation instanceOf \Illuminate\Database\Eloquent\Collection) {
       } else if (is_arrayish($this->$relation) && count($this->$relation)) {
-         $resarr[$relation]= [];
-         foreach($this->$relation as $instance) {
+        $resarr[$relation] = [];
+        foreach ($this->$relation as $instance) {
           if ($instance instanceOf \PkExtensions\Models\PkModel) {
-             $resarr[$relation][] = $instance->getCustomAttributes();
+            $resarr[$relation][] = $instance->getCustomAttributes();
           } else if ($instance instanceOf \Illuminate\Database\Eloquent\Model) {
-             $resarr[$relation][] = $instance->getAttributes();
+            $resarr[$relation][] = $instance->getAttributes();
           //} else if ($instance instanceOf \Illuminate\Database\Eloquent\Collection) {
           } else {
             $toi = typeOf($instance);
             pkdebug("For relation name: [$relation], instance type: [$toi]");
-           }
-         }
-       }
+          }
+        }
+      }
     }
     return $resarr;
   }
@@ -1228,13 +1326,13 @@ class $createclassname extends Migration {
     $tfmethods = [];
     $tfdefsets = [];
     foreach ($methods as $method) {
-      if (startsWith($method,$fnpre, false)) {
+      if (startsWith($method, $fnpre, false)) {
         $tfmethods[] = $method;
       }
     }
     if (!$tfmethods || !is_array($tfmethods) || !count($tfmethods)) return [];
     foreach ($tfmethods as $tfmethod) {
-      $res =  static::$tfmethod();
+      $res = static::$tfmethod();
       if ($res && is_array($res) && count($res)) {
         $tfdefsets[] = $res;
       }
@@ -1244,7 +1342,7 @@ class $createclassname extends Migration {
     return call_user_func_array('array_merge', $tfdefsets);
   }
 
-  /** 
+  /**
    * Return a random instance, or array (collection) of random instances
    * @param integer $num: If -1 (default), return single instance. 
    *   if ($num >= 0) return array/collection of $num instances
@@ -1274,6 +1372,4 @@ class $createclassname extends Migration {
     $this->attributes['loanamt'] = intOrNull($value);
     }
    */
-
-
 }
