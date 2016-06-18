@@ -651,8 +651,11 @@ class $createclassname extends Migration {
     //pkdebug("KEY", $key);
     # This seems pretty obvious - why don't Eloquent do it?
     if (!$key) return null;
+    /*
     $name = removeEndStr($key, 'Tfrm');
     if ($name) return $this->transformer->$key;
+     * 
+     */
 
     $name = removeEndStr($key, static::$displayValueSuffix);
     if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
@@ -674,12 +677,16 @@ class $createclassname extends Migration {
       return parent::getAttributeValue($key);
     }
 
+    /*
   public function __call($method, $args = []) {
     $name = removeEndStr($method, 'Tfrm');
     if (!$name) return parent::__call($method, $args);
     return $this->transformer->__call($method, $args);
   }
+     * 
+     */
 
+  /*
   public function getTransformer($name = null) {
     if (!is_string($name)) return $this->transformer;
     else return keyval($name, $this->transformers);
@@ -722,6 +729,8 @@ class $createclassname extends Migration {
       }
     }
   }
+   * 
+   */
 
   /**
    *

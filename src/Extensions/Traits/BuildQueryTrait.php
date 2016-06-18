@@ -227,15 +227,36 @@ trait BuildQueryTrait {
     $searchFields = static::getSearchFieldDefs();
     //$fieldDefsCollection = [];
     foreach ($searchFields as $baseName => &$def) {
+      /** Initially defaulted to the Query Model if the field type was method - but
+       * that was wrong, since I built my match filters. NOW - always default to target
+       * model unless it doesn't exist OR the target is explictly specified to something
+       * esle.
+       */
       //$searchFields[$baseName]['attribute'] = keyVal('attribute', $def,'property');
       $attribute = keyVal('attribute', $def,'property');
       $model = keyVal('model', $def);
+
+
+      $def['attribute'] = $attribute;
+      if (($model === 'target') || !$model) {
+        $def['model'] = static::getTargetModel();
+      } else {
+        $def['model'] = static::class;
+      }
+
+
+      /* ORIG
       $def['attribute'] = $attribute;
       if (($model === 'target') || (!$model && ($attribute==='property'))) {
         $def['model'] = static::getTargetModel();
       } else if (empty($def['model'])) {
         $def['model'] = static::class;
       }
+
+
+*/
+
+
       $comptype = $def['comptype'] = keyVal('comptype', $def, 'numeric');
       $fieldBuildMethod = 'buildQueryFields' . $comptype;
       /** This allows implementing classes to add additional comparison types
@@ -408,10 +429,10 @@ trait BuildQueryTrait {
   public function executeSearch() {
     $collection = $this->buildQueryOnModel()->get();
     $sz = count($collection);
-    //pkdebug("Just ran query from BQT: SZ: $sz");
+    pkdebug("Just ran query from BQT: SZ: $sz");
     $newcol = $this->filterOnMethods($collection);
     $sza = count($newcol);
-    //pkdebug("SXA:  $sza");
+    pkdebug("SXA:  $sza");
     return $newcol;
   }
 
@@ -549,6 +570,7 @@ trait BuildQueryTrait {
     if ($this->matchObjs === null) {
       $this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
     }
+    //pkdebug("The generated 'matches' are", $this->matchObjs);
     $this->checkClearPost();
     if (empty($arr)) {
       if ($this instanceOf PkModel) {
@@ -605,6 +627,10 @@ trait BuildQueryTrait {
       $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
+    foreach ($this->matchObjs as $ma) {
+      if ($ma->compfield == 'assetdebtratio')
+      pkdebug("After buildQS, The MA is: ", $ma);
+    }
     return $sets;
   }
 
@@ -646,12 +672,22 @@ trait BuildQueryTrait {
    * @param array $querySets or null to take from local object
    */
   public function filterOnMethods(Collection $collection, $matchObjs=null) {
+    pkdebug("Yes, trying to filter.");
     if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
     if (!$matchObjs || !is_arrayish($matchObjs)) return $collection;
+    $numpre = count($matchObjs);
     $modelName = $collection-> getQueueableClass();
+    pkdebug("The num of match objs before: The QC is: [ $modelName ], the num $numpre -- is mine here?");
+    foreach ($matchObjs as $ma) {
+      if ($ma->compfield == 'assetdebtratio')
+      pkdebug("After buildQS, The MA is: ", $ma);
+    }
+
+
+
     $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
         ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
-    //pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
     if (!count($trimmedMatches)) return $collection;
     $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
       //pkdebug()

@@ -1,5 +1,4 @@
 <?php
-
 namespace PkExtensions;
 use \Exception;
 
@@ -248,6 +247,9 @@ class PkMatch {
    * @param type $arg
    */
   public function satisfy($arg=null) {
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("YES: ASSETDEBTRAT: THIS:", $this);
+    }
     //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
@@ -316,6 +318,9 @@ class PkMatch {
 
 
     public function numericComp($arg = null) {
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg);
+    }
       //pkdebug("ArG",$arg,'this', $this);
       if (!is_numeric($this->val) || !is_numeric($arg)) {
         //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
