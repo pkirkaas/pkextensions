@@ -10,7 +10,8 @@
   "require": {
     "php": ">=5.5.9",
     "laravelcollective/html": "5.*",
-    "jenssegers/agent": "^2.3"
+    "jenssegers/agent": "^2.3",
+     "ezyang/htmlpurifier": "^4.7"
   },
   "autoload": {
     "psr-4": {
