@@ -58,6 +58,11 @@ class PopAtts {
   public static function arrayChildClass() {
     return static::$attDefaults['arrayChildClass'].' ';
   }
+  public static function encodedDataHolderClass() {
+
+    return static::$attDefaults['encodedDataHolderClass'].' ';
+  }
+
 
   public static function titleHolderClass() {
     return static::$attDefaults['titleHolderClass'].' ';
@@ -99,6 +104,12 @@ class PopAtts {
   }
 
   public static function jsInit() {
+    $noDisplayClasses = [
+        static::encodedDataHolderClass(),
+        static::templateClass(),
+        static::titleHolderClass(),
+        static::hoverTemplateClass(),
+      ];
     $ps = new PartialSet();
     $ps[]="<script>\n";
     $ps[]="  var popDefObj = {\n";
@@ -111,10 +122,13 @@ class PopAtts {
     $ps[]="  };\n";
     $ps[]="</script>\n";
     $ps[]="\n<style>\n";
-    $ps[]="  .".static::templateClass().", .".static::titleHolderClass();
-    $ps[]=  "\n .".static::hoverTemplateClass(). " {\n";
-    $ps[]="    display:none;\n";
-    $ps[]="  }\n";
+    foreach ($noDisplayClasses as $ndc) {
+      $ps[] = '.'.$ndc . " {\n    display:none;\n  }\n";
+    }
+    //$ps[]="  .".", .".;
+    //$ps[]=  ",\n .".. " {\n";
+    //$ps[]="    display:none;\n";
+    //$ps[]="  }\n";
     $ps[]="</style>\n";
     //pkdebug("PS:", $ps);
     return $ps;

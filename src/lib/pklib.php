@@ -2982,6 +2982,16 @@ function firstKeyVal($key,$arg1=null, $argx=null) {
   return null;
 }
 
+/** Checks these exist and are not empty */
+function ne_string($var) {
+  return $var && is_string($var) && strlen($var);
+}
+function ne_array($var) {
+  return $var && is_array($var) && count($var);
+}
+function ne_arrayish($var) {
+  return $var && is_arrayish($var) && count($var);
+}
 
 
 

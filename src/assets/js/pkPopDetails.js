@@ -232,15 +232,23 @@ $('body').on( {
       for (var prop in encdata) {
         var typep = typeof encdata[prop];
         if (isArray(encdata[prop])) typep = 'ARRAY';
-        console.log('PROP: '+prop + '; TYPEOF: '+ typep);
+        //console.log('PROP: '+prop + '; TYPEOF: '+ typep);
       }
       /*
       console.log("Got ENCDATA!", encdata);
       */
       dlg = buildHoverDetailDialog(dlgHtml, encdata);
+      dlg.addClass('block');
       //console.trace();
       //console.log("dlg:", dlg);
       var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
+
+      //dlg.find('.'+popDefObj.arrayParentClass).remove();
+
+
+
+
+
       if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
       var aframe = $(popDefObj.hoverHtmlTemplate);
       //aframe.html(dlg);
@@ -253,38 +261,6 @@ $('body').on( {
 }, '.'+popDefObj.popCallerClass);
 
         
-        /*
-        
-        
-        
-        'hover', '.'+popDefObj.popCallerClass, function (event) {
-  console.log("Really Hovering...");
-  var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
-  if (!src) return;
-  var dlg = $('.'+popDefObj.popTemplateClass+'['+popDefObj.jsPopupTmpCalledDataAttr+'="' + src + '"]');
-  if (dlg.length === 0) return;
-  var dlgHtml = dlg.prop('outerHTML');
-  //console.log("DLGHTML: "+dlgHtml);
-  //Find the nearest parent with model & id set
-  var inst = $(this).closest('['+popDefObj.dataModelType+']');
-  var model = inst.attr(popDefObj.dataModelType);
-  var id = inst.attr(popDefObj.dataModelId);
-  if (!id || !model) {
-    console.error("Failed to get one of ["+model+']['+id+']');
-    return false;
-  }
-  var encdata=getDecodedData(model,id);
-  if (!encdata || !isObject(encdata)) {
-    console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
-    return false;
-  }
-  //console.log("Got ENCDATA!", encdata);
-  dlg = buildDetailDialog(dlgHtml, encdata);
-  var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
-  if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
-});
-*/
-
 
 
 /** Takes an encoding template and recursively iterates through it building
@@ -329,13 +305,101 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
     console.error("Couldn't get the template!");
     return false;
   }
-  var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']');
+
+
+/*
+      //Manage arrays here ...
+      var parentArrs  = dlg.find('.'+popDefObj.arrayParentClass);
+      parentArrs.each(function (idx) {
+        $(this).child_arr = $(this).find('.'+popDefObj.arrayChildClass).clone();
+        $(this).find('.'+popDefObj.arrayChildClass).remove();
+      });
+      console.log("Parent Arrs stripped:",parentArrs.html());
+      parentArrs.each(function (idx) {
+        console.log("Trying to see the child array...",$(this).child_arr.html());
+      });
+  */
+
+    var arrParCl = '.'+popDefObj.arrayParentClass;
+    var arrChldCl = '.'+popDefObj.arrayChildClass;
+    var attrDataSel = '['+popDefObj.popAttrNameDataAttr+']';
+
+console.log("The var sels:", arrParCl,arrChldCl, attrDataSel);
+var tstDF1 = template.find(attrDataSel);
+
+//The below filters out the parent arrays as well
+//var tstDF2 = template.find(attrDataSel).not(arrParCl +', '+arrParCl +' *');
+//
+//This keeps the parent arrays, but filters out the children arrays
+var dataFields = template.find(attrDataSel).not(arrParCl +' *');
+
+//console.log("LN1: ",tstDF1.length, "LN2: ", tstDF2.length);
+//console.log("tst2: ", tstDF2);
+
+
+  //var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']').not(arrParCl + ' '+arrParCl +' *');
+  //var topDataFields = dataFields.filter()
+//  console.log("DataFields:", dataFields);
+  //tstDF2.each (function() {
+   // console.log("tstDF2  DATAFIELD", this);
+
+  //});
+  //dataFields.each (function() {
+   // console.log("THIS DATAFIELD", this);
+
+  //});
+
+
+
   dataFields.each(function() {
-    console.log("In each data-el - this: ", this);
+    //console.log("In each data-el - this: ", this);
     var jqthis = $(this);
     var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
     if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
-      console.log("The template had a bad data-attribute name");
+      console.error("The template had a bad data-attribute name");
+      template.closest('.'+popDefObj.valueTemplateClass).remove();
+    }
+    if (encdata[encAttName] === undefined) {
+      if (hideempty) template.closest('.'+popDefObj.valueTemplateClass).remove();
+    } else if (isArray(encdata[encAttName])) { //We have an array - what do we do?
+      //Not elegant, but - length either 0 (delete child), 1 (populate child)
+      // > 1 - copy child
+      var len = encdata[encAttName].length;
+      console.log("ENCATTNAME: "+encAttName+' len '+ len + ' encattdata ',encdata[encAttName] );
+      //if (!len) jqthis.find(arrChldCl).remove();
+      var childClone =  jqthis.find(arrChldCl).clone();
+      for (var i = 0 ; i < len ; i++ ) {
+        var datarow = encdata[encAttName][i];
+        var childArrCopy =  childClone.clone();
+        console.log("ChildArrayCopy: ",childArrCopy );
+        childArrCopy.removeClass('hidden');
+        var dataEls = childArrCopy.find(attrDataSel);
+        dataEls.each(function () {
+          var jqcdat = $(this);
+          var cencAttName = jqcdat.attr(popDefObj.popAttrNameDataAttr);
+          jqcdat.htmlFormatted(datarow[cencAttName]);
+        });
+        jqthis.append(childArrCopy);
+      }
+    } else { //We have a value - insert it!
+      jqthis.htmlFormatted(encdata[encAttName]);
+    }
+  });
+
+
+
+
+
+
+//This kind of works, but not for arrays. Fiddle with it for arrays, but keep the
+// original...
+/*
+  dataFields.each(function() {
+    //console.log("In each data-el - this: ", this);
+    var jqthis = $(this);
+    var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
+    if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
+      console.error("The template had a bad data-attribute name");
       template.closest('.'+popDefObj.valueTemplateClass).remove();
     }
     if (encdata[encAttName] === undefined) {
@@ -344,6 +408,11 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
       jqthis.htmlFormatted(encdata[encAttName]);
     }
   });
+  */
+
+
+
+
   return template;
 }
 
