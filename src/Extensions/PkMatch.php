@@ -248,7 +248,7 @@ class PkMatch {
    */
   public function satisfy($arg=null) {
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("YES: ASSETDEBTRAT: THIS:", $this);
+      pkdebug("YES: ASSETDEBTRAT: THIS:", $this, 'ARG', $arg);
     }
     //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
@@ -257,7 +257,7 @@ class PkMatch {
     if ($this->comptype === 'group') return $this->groupComp($arg);
     if ($this->comptype === 'within') return $this->withinComp($arg);
     if ($this->comptype === 'between') return $this->betweenComp($arg);
-    if ($this->comptype === 'exists') return $this->numericComp($arg);
+    if ($this->comptype === 'exists') return $this->existsComp($arg);
     throw new \Exception ("Unknown comparison type: ".$this->comptype);
   }
 
@@ -324,8 +324,9 @@ class PkMatch {
       //pkdebug("ArG",$arg,'this', $this);
       if (!is_numeric($this->val) || !is_numeric($arg)) {
         //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
-        return pkdebug ("[{$this->val}] or [$arg] is not numeric");
+        return pkdebug ("A PROBLEM: [{$this->val}] or [$arg] is not numeric");
       }
+      /** Restore to this clean state when debugged...
       if ($this->crit === '<' ) return $arg <  $this->val;
 
       if ($this->crit === '<=') return $arg <=  $this->val;
@@ -335,6 +336,53 @@ class PkMatch {
       if ($this->crit === '>')   return $arg >  $this->val;
       if ($this->crit === '=' ) return $arg == $this->val;
       if ($this->crit === '!=' ) return $arg != $this->val;
+       * 
+       */
+      if ($this->crit === '<' ) {
+        $res = ($arg <  $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+      }
+
+      if ($this->crit === '<=') {
+        $res = ( $arg <=  $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+    }
+
+      if ($this->crit === '>=') {
+        $res = ($arg >=  $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+      }
+
+      if ($this->crit === '>')   {
+        $res = ($arg >  $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+      }
+      if ($this->crit === '=' ) {
+        $res = ( $arg == $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+      }
+      if ($this->crit === '!=' ) {
+        $res = ($arg != $this->val);
+    if ($this->compfield == 'assetdebtratio') {
+      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    }
+        return $res;
+      }
       throw new Exception ("Unknown [{$this->crit}] for comptype: {$this->comptype}");
 
     }
