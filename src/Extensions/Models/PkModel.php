@@ -1159,7 +1159,8 @@ class $createclassname extends Migration {
     foreach ($refmaps as $fn => $rc) {
     if (!$fn || !is_string($fn) || !strlen($fn) ||
        !$rc || !is_string($rc) || !strlen($rc)
-        || !class_exists($rc)) {
+        || !class_exists($rc) || 
+        !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
       continue;
     }
       if ($fn === $fieldName) {

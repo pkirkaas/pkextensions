@@ -1,14 +1,12 @@
 <?php
-
 namespace PkExtensions;
-
 /**
  * Abstract class mapping keys to descriptions
  * Subclasses generally just need to create a static $refArray of integers to descriptions
  * Adding support for indexed key/value/details
  * @author Paul Kirkaas
  */
-abstract class PkRefManager {
+abstract class PkRefManager  implements PkDisplayValueInterface{
 
   public static $multival = false; #Default is simple key/value pairs
   #But if true, ref array of form: [['key'=>$key,'value'=>$value, 'details'=>$details], ['key'=>....
