@@ -1,5 +1,7 @@
 <?php
+
 namespace PkExtensions;
+
 use \Exception;
 
 /** Way too simple to call it a query - just does a simple match on simple criteria
@@ -50,14 +52,14 @@ class PkMatch {
       ],
   ];
   /*
-  public $active; #Should this match be run?
-  public $comptype; #Like, 'numeric', 'string', 'between', etc
-  public $criterion; # Like 0 (Don't care), >, <, 'LIKE%', etc
-  public $compvalue; # Should it be > 7? Or an array, like for 'group' or 'between'
-  public $comptarget; #ModelName, TableName, or none
-  public $targettype; #'table', 'model', etc
-  public $compfield; #Field/Attribute name like 'user_id', or a method name
-  public $callable; #Is it a simple filed/attribute name, or a callable method/function/etc
+    public $active; #Should this match be run?
+    public $comptype; #Like, 'numeric', 'string', 'between', etc
+    public $criterion; # Like 0 (Don't care), >, <, 'LIKE%', etc
+    public $compvalue; # Should it be > 7? Or an array, like for 'group' or 'between'
+    public $comptarget; #ModelName, TableName, or none
+    public $targettype; #'table', 'model', etc
+    public $compfield; #Field/Attribute name like 'user_id', or a method name
+    public $callable; #Is it a simple filed/attribute name, or a callable method/function/etc
    * 
    */
 #If 0/False, simple attribute, else 'method', 'function', etc
@@ -70,22 +72,23 @@ class PkMatch {
    *   of criteria to omit/remove from the results
    * @return type
    */
+
   public static function getCriteriaSets($key = null, $omit = null) {
     if (!$key) return static::$criteriaSets;
     $rawCritSet = keyVal($key, static::$criteriaSets, []);
     if (is_arrayish($omit) && count($omit)) {
       foreach ($omit as $oc) {
-        unset ($rawCritSet[$oc]);
+        unset($rawCritSet[$oc]);
       }
       //pkdebug("GETSETS: For Key: [ $key ]; OMIT: ", $omit, 'rawCritSet:', $rawCritSet);
     }
     return $rawCritSet;
   }
 
-
   public static function getCriteriaTypes() {
     return array_keys(static::getCriteriaSets());
   }
+
   public static function isValidCompType($comptype = null) {
     if (in_array($comptype, static::getCriteriaTypes(), 1)) return $comptype;
     return false;
@@ -115,7 +118,6 @@ class PkMatch {
       'model',
       'table',
       'fieldtype',
-
   ];
 
   /** Takes an array of PkMatch objects and filters them according to 
@@ -131,8 +133,8 @@ class PkMatch {
     if (!is_arrayish($matchArr)) return [];
     if (!$params) return $matchArr;
     $trimArr = [];
-    $modelName = keyVal('modelName',$params);
-    $modelMethodsFilter = keyVal('modelMethods', $params,'true');
+    $modelName = keyVal('modelName', $params);
+    $modelMethodsFilter = keyVal('modelMethods', $params, 'true');
     if ($modelMethodsFilter) $modelMethods = get_class_methods($modelName);
     $emptyCrit = keyVal('emptyCrit', $params, true);
     foreach ($matchArr as $base => $match) {
@@ -140,7 +142,7 @@ class PkMatch {
         //pkdebug("Failed for [$modelName] && ", $match);
         continue;
       }
-      if (!$match->method || !in_array($match->method,$modelMethods,1)) {
+      if (!$match->method || !in_array($match->method, $modelMethods, 1)) {
         //pkdebug("Failed for [match ] && methods", $match);
         continue;
       }
@@ -158,7 +160,7 @@ class PkMatch {
   public static function matchFactory($arrSets = [], $params = []) {
     //pkdebug("Enter MatchFact, arrstes:", $arrSets);
     foreach (array_keys($arrSets) as $key) {
-      if (removeEndStr($key,'_crit') || removeEndStr($key,'_val')) {
+      if (removeEndStr($key, '_crit') || removeEndStr($key, '_val')) {
         $arrSets = static::flatToStructured($arrSets, $params);
         break;
       }
@@ -166,7 +168,7 @@ class PkMatch {
     //pkdebug("REFACTOR MatchFact, arrstes:", $arrSets);
     $matchArr = [];
     foreach ($arrSets as $baseName => $arrSet) {
-     // pkdebug("BASENEAME: [$baseName] ARRSET: ",$arrSet);
+      // pkdebug("BASENEAME: [$baseName] ARRSET: ",$arrSet);
       $marr = [];
       //if ($baseName === 'yrsest') pkdebug("BNAME:  $baseName, arrSetPre", $arrSet);
       if (!$fs = keyVal('field_set', $arrSet)) {
@@ -180,17 +182,18 @@ class PkMatch {
       if (array_key_exists('maxval', $fs)) $marr['maxval'] = $fs['maxval'];
       $meta = keyVal('meta', $arrSet);
       $comptype = firstKeyVal('comptype', $fs, $arrSet, $meta);
-      if (!$comptype)  $comptype = static::getTypeFromCrit(keyVal('crit',$marr));
+      if (!$comptype) $comptype = static::getTypeFromCrit(keyVal('crit', $marr));
       if (!$comptype) {
-        if (array_key_exists('minval',$fs ) || array_key_exists('maxval',$fs)) $comptype = 'between';
+        if (array_key_exists('minval', $fs) || array_key_exists('maxval', $fs))
+            $comptype = 'between';
       }
       if (!$comptype && is_array(keyVal('val', $marr))) $comptype = 'group';
       if (!static::isValidCompType($comptype)) continue;
       $marr['comptype'] = $comptype;
       $marr['compfield'] = $baseName;
       foreach (static::$attributeNames as $attName) {
-      //if ($baseName === 'yrsest') pkdebug("Looking for attName: $attName");
-        if ($tst = firstKeyVal($attName,$meta, $arrSet, $fs)) {
+        //if ($baseName === 'yrsest') pkdebug("Looking for attName: $attName");
+        if ($tst = firstKeyVal($attName, $meta, $arrSet, $fs)) {
           $marr[$attName] = $tst;
         }
       }
@@ -199,14 +202,16 @@ class PkMatch {
     return $matchArr;
   }
 
- static   $fieldendings = ['crit', 'val', 'parm0', 'parm1', 'parm2', 'maxval', 'minval',];
- static   $metaendings = ['comptype','fieldtype','runnable', 'callable', 'targettype','comptarget', ];
+  static $fieldendings = ['crit', 'val', 'parm0', 'parm1', 'parm2', 'maxval', 'minval',];
+  static $metaendings = ['comptype', 'fieldtype', 'runnable', 'callable', 'targettype', 'comptarget',];
+
   /* Creates and returns a structured array from flat, to build a match set
    * of Matches based on the data args and params
    * Could be a flat array like from a DB table -
    *  ['fieldname_crit'=>$crit, 'fieldname_val'=>$val, etc
    */
-  public static function flatToStructured($arrSets = [], $params =[]) {
+
+  public static function flatToStructured($arrSets = [], $params = []) {
     $basekeyed = [];
     foreach ($arrSets as $key => $val) {
       foreach (static::$fieldendings as $end) {
@@ -252,7 +257,8 @@ class PkMatch {
     return false;
   }
 
-  public $attributes=[];
+  public $attributes = [];
+
   public function __construct($argarr = []) {
     $this->attributes = $argarr;
   }
@@ -261,7 +267,7 @@ class PkMatch {
    * false
    * @param type $arg
    */
-  public function satisfy($arg=null) {
+  public function satisfy($arg = null) {
     if ($this->compfield == 'assetdebtratio') {
       //pkdebug("YES: ASSETDEBTRAT: THIS:", $this, 'ARG', $arg);
     }
@@ -273,78 +279,72 @@ class PkMatch {
     if ($this->comptype === 'within') return $this->withinComp($arg);
     if ($this->comptype === 'between') return $this->betweenComp($arg);
     if ($this->comptype === 'exists') return $this->existsComp($arg);
-    throw new \Exception ("Unknown comparison type: ".$this->comptype);
+    throw new \Exception("Unknown comparison type: " . $this->comptype);
   }
 
-    public function stringComp($arg = null) {
-      if ($this->crit === 'LIKE') {
-        return $this->val === $arg;
-      }
-      if ($this->crit === '%LIKE') {
-        return removeEndStr($arg, $this->val);
-      }
-      if ($this->crit === 'LIKE%') {
-        return removeStartStr($arg, $this->val);
-      }
-      if ($this->crit === '%LIKE%') {
-        return strpos($arg, $this->val) !== false;
-      }
-      throw new \Exception ("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  public function stringComp($arg = null) {
+    if ($this->crit === 'LIKE') {
+      return $this->val === $arg;
     }
-
-    public function groupComp($arg = null) {
-      if ($this->crit === 'IN') {
-        if (!$this->val) return false;
-        if (!is_array($this->val)) throw new Exception ("Invalid val:".print_r($this->val,1));
-        return (in_array($arg, $this->val));
-      }
-        if ($this->crit === 'NOTIN') {
-        if (!$this->val) return true;
-        if (!is_array($this->val)) throw new Exception ("Invalid val:".print_r($this->val,1));
-        return (!in_array($arg, $this->val));
-      }
-      throw new Exception ("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+    if ($this->crit === '%LIKE') {
+      return removeEndStr($arg, $this->val);
     }
-
-
-    public function withinComp($arg = null) {
-      throw new Exception ("'WITHIN' not supported yet");
+    if ($this->crit === 'LIKE%') {
+      return removeStartStr($arg, $this->val);
     }
-    public function betweenComp($arg = null) {
-      if (!is_numeric($arg)) { #Can we turn it into a date? 
-         $arg = strtotime($arg);
-      }
-      if ($arg === false) return $this->crit !== 'BETWEEN';
-      $minval = $this->min;
-      $maxval = $this->maxval;
-      if (!is_numeric($minval)) $minval = strtotime($min);
-      if (!is_numeric($maxval)) $maxval = strtotime($maxval);
-      $between = ($maxval !== false)
-          && ($minval !== false)
-          && ($arg <= $maxval) && ($arg >=$minval);
-      if ($this->crit === 'BETWEEN') return $between;
-      if ($this->crit === 'NOT BETWEEN') return !$between;
-      throw new Exception ("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+    if ($this->crit === '%LIKE%') {
+      return strpos($arg, $this->val) !== false;
     }
+    throw new \Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  }
 
-    public function existsComp($arg = null) {
-      return ($this->crit==='EXISTS') && $arg;
+  public function groupComp($arg = null) {
+    if ($this->crit === 'IN') {
+      if (!$this->val) return false;
+      if (!is_array($this->val))
+          throw new Exception("Invalid val:" . print_r($this->val, 1));
+      return (in_array($arg, $this->val));
     }
-
-
-    public function numericComp($arg = null) {
-      /*
-    if ($this->compfield == 'assetdebtratio') {
-      pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg);
+    if ($this->crit === 'NOTIN') {
+      if (!$this->val) return true;
+      if (!is_array($this->val))
+          throw new Exception("Invalid val:" . print_r($this->val, 1));
+      return (!in_array($arg, $this->val));
     }
-       * 
-       */
-      //pkdebug("ArG",$arg,'this', $this);
-      if (!is_numeric($this->val) || !is_numeric($arg)) {
-        //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
-        return pkdebug ("A PROBLEM: [{$this->val}] or [$arg] is not numeric");
-      }
-      /** Restore to this clean state when debugged...
+    throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  }
+
+  public function withinComp($arg = null) {
+    throw new Exception("'WITHIN' not supported yet");
+  }
+
+  public function betweenComp($arg = null) {
+    if (!is_numeric($arg)) { #Can we turn it into a date? 
+      $arg = strtotime($arg);
+    }
+    if ($arg === false) return $this->crit !== 'BETWEEN';
+    $minval = $this->min;
+    $maxval = $this->maxval;
+    if (!is_numeric($minval)) $minval = strtotime($min);
+    if (!is_numeric($maxval)) $maxval = strtotime($maxval);
+    $between = ($maxval !== false) && ($minval !== false) && ($arg <= $maxval) && ($arg >= $minval);
+    if ($this->crit === 'BETWEEN') return $between;
+    if ($this->crit === 'NOT BETWEEN') return !$between;
+    throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  }
+
+  public function existsComp($arg = null) {
+    return ($this->crit === 'EXISTS') && $arg;
+  }
+
+  public function numericComp($arg = null) {
+      if ($this->compfield == 'assetdebtratio')  pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg,$this);
+    //pkdebug("ArG",$arg,'this', $this);
+    if (!is_numeric($this->val) || !is_numeric($arg)) {
+      //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
+      return pkdebug("A PROBLEM: For thisMathc;", $this, 'this->val', $this->val, " or [arg] ", $arg, " is not numeric");
+    }
+    /** Restore to this clean state when debugged...
       if ($this->crit === '<' ) return $arg <  $this->val;
 
       if ($this->crit === '<=') return $arg <=  $this->val;
@@ -354,65 +354,51 @@ class PkMatch {
       if ($this->crit === '>')   return $arg >  $this->val;
       if ($this->crit === '=' ) return $arg == $this->val;
       if ($this->crit === '!=' ) return $arg != $this->val;
-       * 
-       */
-      if ($this->crit === '<' ) {
-        $res = ($arg <  $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-      //pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
-    }
-        return $res;
-      }
-
-      if ($this->crit === '<=') {
-        $res = ( $arg <=  $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
-    }
-        return $res;
+     * 
+     */
+    if ($this->crit === '<') {
+      $res = ($arg < $this->val);
+      if ($this->compfield == 'assetdebtratio')  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
     }
 
-      if ($this->crit === '>=') {
-        $res = ($arg >=  $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-     // pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    if ($this->crit === '<=') {
+      $res = ( $arg <= $this->val);
+      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
     }
-        return $res;
-      }
 
-      if ($this->crit === '>')   {
-        $res = ($arg >  $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    if ($this->crit === '>=') {
+      $res = ($arg >= $this->val);
+      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
     }
-        return $res;
-      }
-      if ($this->crit === '=' ) {
-        $res = ( $arg == $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-     // pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
-    }
-        return $res;
-      }
-      if ($this->crit === '!=' ) {
-        $res = ($arg != $this->val);
-    if ($this->compfield == 'assetdebtratio') {
-    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
-    }
-        return $res;
-      }
-      throw new Exception ("Unknown [{$this->crit}] for comptype: {$this->comptype}");
 
+    if ($this->crit === '>') {
+      $res = ($arg > $this->val);
+      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
     }
+    if ($this->crit === '=') {
+      $res = ( $arg == $this->val);
+      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
+    }
+    if ($this->crit === '!=') {
+      $res = ($arg != $this->val);
+      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      return $res;
+    }
+    throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  }
 
   public function __get($key) {
-    return keyVal($key,$this->attributes);
+    return keyVal($key, $this->attributes);
   }
 
-  public function __set($key,$val) {
+  public function __set($key, $val) {
     $this->attributes[$key] = $val;
   }
-
 
   /** Should take a wide variety of formats & convert. Examples:
    * ['attr1_val=>$val1,'attr1_crit'=>$crit1,'parms'=>[], 

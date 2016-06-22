@@ -392,6 +392,7 @@ class $createclassname extends Migration {
    */
   public function getTableFieldAttributes($key = null) {
     $attributeNames = $this->getAttributeNames();
+    if ($this instanceof \App\Models\Borrower) pkdebug("AttributeNames:", $attributeNames);
     if ($key) {
       if (in_array($key, $attributeNames)) return $this->$key;
       else return null;
@@ -1272,11 +1273,13 @@ class $createclassname extends Migration {
     //pkdebug("The Fields:", static::getDisplayValueFields());
     foreach (static::getDisplayValueFields() as $dvf) {
      // $theval = $this->$dvf;
-      //pkdebug("DVF", $dvf,"THE VAL:", $theval);
-      if ($this->hasTableField($dvf)) {
-        $dva[$dvf.static::$displayValueSuffix] = $this->displayValue($dvf);
-      } else if (method_exists($this, $dvf)) {
+     pkdebug("DVF", $dvf);
+      if (method_exists($this, $dvf)) {
+        pkdebug("And trying call method on DVF", $dvf);
         $dva[$dvf.static::$displayValueSuffix] = $this->displayValueMethod($dvf);
+      } else if ($this->hasTableField($dvf)) {
+        pkdebug("Thinks is table field DVF", $dvf);
+        $dva[$dvf.static::$displayValueSuffix] = $this->displayValue($dvf);
       }
     }
     return $dva;

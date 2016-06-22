@@ -639,6 +639,7 @@ trait BuildQueryTrait {
       $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
+    //pkdebug("After QA, mathcObjs are:", $this->matchObjs);
     //foreach ($this->matchObjs as $ma) {
       //if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma);
     //}
@@ -695,18 +696,17 @@ trait BuildQueryTrait {
 
     $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
         ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
-    //pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
     if (!count($trimmedMatches)) return $collection;
     $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
       foreach($trimmedMatches as $match) {
         $methodName = $match->method;
-        $res = $item->$methodName();
-        $ans = $match->satisfy($res);
-      //  if ($ans) pkdebug("This one failed:", $ans, " METHOD NAME: $methodName; $res: ",$res);
-        return !$ans;
-        //if (!$match->satisfy($res)) return false;
-      }
-      return true;
+        $methodResult = $item->$methodName();
+        $passed = $match->satisfy($methodResult);
+        $reject = !$passed;
+        if ($reject) return $reject;
+      } ## Passed all the criteria; don't reject
+      return false;
     });
     return $trimmedCollection;
   }
@@ -774,7 +774,7 @@ trait BuildQueryTrait {
      * 
      */
     $tmpCtl =  PkHtmlRenderer::buildQuerySet($params);
-    pkdebug("TMPCTL: ", $tmpCtl);
+    pkdebug("TMPCTL: \n$tmpCtl\n");
 
     return PkHtmlRenderer::buildQuerySet($params);
     //pkdebug("The QueryDef for [ $basename ]:", $fieldDef);
