@@ -2987,6 +2987,26 @@ function firstKeyVal($key,$arg1=null, $argx=null) {
 }
 
 /** Checks these exist and are not empty */
+/**
+ * 
+ * @param mixed $value - To test for intishness
+ * @param boolean $nullorfalse - Should null/false/'' be considered intish?
+ * @return boolean
+ */
+//function intish($value, $nullorfalse = false) {
+//  return is_intish($value, $nullorfalse);
+//}
+
+function is_intish($value, $nullorfalse = false) {
+  #Objects and arrays never
+  if (!is_scalar($value) || !($value===null)) return false;
+  if($nullorfalse && !$value) return true;
+  if (!is_numeric($value) && !is_boolean($value)) return false;
+  $intval = (int) $value;
+  $diff = abs($value - $intval);
+  return ! $diff;
+}
+
 function ne_string($var) {
   return $var && is_string($var) && strlen($var);
 }
@@ -2995,6 +3015,10 @@ function ne_array($var) {
 }
 function ne_arrayish($var) {
   return $var && is_arrayish($var) && count($var);
+}
+
+function ne_intish($var) {
+  return is_intish($var) && $var;
 }
 
 

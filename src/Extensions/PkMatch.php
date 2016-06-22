@@ -63,10 +63,25 @@ class PkMatch {
 #If 0/False, simple attribute, else 'method', 'function', etc
   public $parameters; #Opt Arr - not only methods take args, 'within' & 'between' as well
 
-  public static function getCriteriaSets($key = null) {
+  /**
+   * 
+   * @param string $key
+   * @param null|array $omit - if $key && is_array($omit), $omit is the array
+   *   of criteria to omit/remove from the results
+   * @return type
+   */
+  public static function getCriteriaSets($key = null, $omit = null) {
     if (!$key) return static::$criteriaSets;
-    return keVal($key, static::$criteriaSets);
+    $rawCritSet = keyVal($key, static::$criteriaSets, []);
+    if (is_arrayish($omit) && count($omit)) {
+      foreach ($omit as $oc) {
+        unset ($rawCritSet[$oc]);
+      }
+      //pkdebug("GETSETS: For Key: [ $key ]; OMIT: ", $omit, 'rawCritSet:', $rawCritSet);
+    }
+    return $rawCritSet;
   }
+
 
   public static function getCriteriaTypes() {
     return array_keys(static::getCriteriaSets());
@@ -248,7 +263,7 @@ class PkMatch {
    */
   public function satisfy($arg=null) {
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("YES: ASSETDEBTRAT: THIS:", $this, 'ARG', $arg);
+      //pkdebug("YES: ASSETDEBTRAT: THIS:", $this, 'ARG', $arg);
     }
     //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
@@ -318,9 +333,12 @@ class PkMatch {
 
 
     public function numericComp($arg = null) {
+      /*
     if ($this->compfield == 'assetdebtratio') {
       pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg);
     }
+       * 
+       */
       //pkdebug("ArG",$arg,'this', $this);
       if (!is_numeric($this->val) || !is_numeric($arg)) {
         //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
@@ -341,7 +359,7 @@ class PkMatch {
       if ($this->crit === '<' ) {
         $res = ($arg <  $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
       }
@@ -349,7 +367,7 @@ class PkMatch {
       if ($this->crit === '<=') {
         $res = ( $arg <=  $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
     }
@@ -357,7 +375,7 @@ class PkMatch {
       if ($this->crit === '>=') {
         $res = ($arg >=  $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+     // pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
       }
@@ -365,21 +383,21 @@ class PkMatch {
       if ($this->crit === '>')   {
         $res = ($arg >  $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
       }
       if ($this->crit === '=' ) {
         $res = ( $arg == $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+     // pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
       }
       if ($this->crit === '!=' ) {
         $res = ($arg != $this->val);
     if ($this->compfield == 'assetdebtratio') {
-      pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+    //  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
     }
         return $res;
       }

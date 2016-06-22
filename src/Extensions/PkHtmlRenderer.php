@@ -130,6 +130,96 @@ class PkHtmlRenderer extends PartialSet {
      return $this;
   }
 
+  /** Builds a pair of controls:
+   *  - a criteria chooser - (like, a select box with '>', '<', etc)
+   *  - and a value holder - (typically text box)
+   *  - with a label
+   * 
+   * @param array $params: There are default values for several settings - 
+   *    if the input $param value is an array, it is added to the default value;
+   *    if it is a string, it replaces the default value. 
+   *    Example: defaultWrapClass = ' query-set-class ': 
+   *     if $param['wrapClass'] === ' custom-set-class ', $setClass = ' custom-set-class'
+   *     if $param['wrapClass'] === ['custom-set-class'], $setClass = 'query-set-class custom-set-class'
+   * 
+   *   @paramParam string 'label' - The label for the set
+   *   @paramParam string 'wrapTag' - The wrapper type: default: 'fieldset'
+   *   @paramParam string 'critVal' - Criteria value - default null
+   *   @paramParam string 'valVal' - (comparison) Value value - default null
+   *   @paramParam string|array 'wrapClass' - The css class for the set wrapper
+   *   @paramParam string|array 'labelClass'  - The css class for the set label
+   *   @paramParam string|array 'critClass'  - The css class for the critBox
+   *   @paramParam string|array 'valClass'  - The css class for the valBox
+   *   @paramParam assoc array 'critAtts'  - optional criteria control atts
+   *   @paramParam assoc array 'valAtts'  - optional value control atts
+   *   @paramParam string 'critType'  - Default: 'select'
+   *   @paramParam string 'valType'  - Default: 'text'
+   *   @paramParam string 'enabled'  - 'enabled', 'disabled', null : Default: null
+   * 
+   * #Field Names: - EITHER 'basename' is set, or 'critname' & 'valname' are set.
+   *   @paramParam string 'basename': If set, creates
+   *      the criteria field "$basename_crit'  
+   *      the value field "$basename_val'  
+   * OTHERWISE:
+   *   @paramParam string 'critname': The name of the crit field
+   *   @paramParam string 'valname': The name of the crit field
+   * 
+   *   @paramParam assoc array 'criteriaSet' : crit values => labels
+   * 
+   * @return \PkExtensions\PkHtmlRenderer - Representing the HTML for the Query Control
+   */
+  public function querySet($params = []) {
+    $defaults = [
+    'wrapTag' => 'fieldset', 
+    'wrapClass' => ' form-group block search-crit-val-pair ',
+    'labelClass' => '',
+    'critClass' => ' form-control search-crit ',
+    'valClass' => ' form-control search-val ',
+    'valAtts' => [],
+    'critAtts' => [],
+    'valType' => 'text',
+    'critType' => 'select',
+    'label' => '',
+    'valVal' => null,
+    'critVal' => null,
+    'enabled' => null,
+
+    ];
+
+    $appendableOpts = ['wrapClass', 'labelClass', 'critClass', 'valClass'];
+    $tmpOpts = [];
+    foreach ($appendableOpts as $apOpt) {
+      $tmpOpts[$apOpt] = keyVal($apOpt, $params);
+      if (ne_array($tmpOpts[$apOpt])) {
+        $params[$apOpt] = $defaults[$apOpt] . ' '. explode(' ', $tmpOpts[$apOpt]);
+      }
+    }
+
+    $params = array_merge($defaults, $params);
+    $basename = keyVal('basename', $params);
+    $params['critname'] = keyVal('critname', $params, $basename.'_crit');
+    $params['valname'] = keyVal('valname', $params, $basename.'_val');
+    $params['critAtts']['class'] = $params['critClass'];
+    unset( $params['critClass']);
+    $params['valAtts']['class'] = $params['valClass'];
+    unset( $params['valClass']);
+
+    $wrapTag = $params['wrapTag'];
+    $critType = $params['critType'];
+    $valType = $params['valType'];
+
+    #Start building!
+    $this->$wrapTag(RENDEROPEN, $params['wrapClass']);
+      $this->label(RENDEROPEN, $params['wrapClass']);
+        $this->div($params['label'], $params['labelClass']);
+        $this->rawcontent(PkForm::select($params['critname'],$params['criteriaSet'], $params['critVal'], $params['critAtts']));
+        $this->rawcontent(PkForm::text($params['valname'], $params['valVal'], $params['valAtts']));
+      $this->RENDERCLOSE();
+    $this->RENDERCLOSE();
+
+    return $this;
+
+  }
   public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = []) {
     $this[] = PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
     return $this;
@@ -281,6 +371,13 @@ class PkHtmlRenderer extends PartialSet {
     if (is_string($attributes)) $attributes = ['class' => $attributes];
     return $attributes;
   }
+
+  public static function buildQuerySet($params = []) {
+    $out=new static();
+    $out->querySet($params);
+    return $out;
+  }
+
   /**
    * Takes a label and an input and wraps them
    * @param array $args - can't think of all the params I need now

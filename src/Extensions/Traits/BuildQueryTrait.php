@@ -4,6 +4,8 @@ namespace PkExtensions\Traits;
 use Illuminate\Database\Eloquent\Collection;
 use PkExtensions\Models\PkModel;
 use PkExtensions\PkMatch;
+use PkExtensions\PkHtmlRenderer;
+
 use Illuminate\Database\Eloquent\Model;
 use \Request;
 
@@ -43,8 +45,15 @@ use \Request;
    * 
    * IMPLEMENTOR TO PROVIDE:
     public static $search_field_defs = [
-    $basename1 => ['fieldtype' => 'integer', 'comparison'=>'between','parms'=>['integer','date',...]
-    'extra'=>['suffix'=>$type],
+      $basename1 => ['fieldtype' => 'integer',
+     'comptype'=>'between', //Comparison Type: DEFAULT: numeric
+     'parms'=>['integer','date',...]
+     'extra'=>['suffix'=>$type],
+     'criteria'=>[ #If not the full default set of criteria for the comptype
+       'criteriaSet' =>['='=>'The Same As', '!='=>'Different From',... 
+           #EG: An explicit set of criteria values/labels
+       {OR} 'omit'=>['=', '!=', ...} #Omit these from the default
+       {OR} 'include'=>['0', '='], #include ONLY these from the default
     $basename2 =>  'integer', #Assumes comparison is numeric
     $basename3, #Assumes type is integer & comparison is numeric
     ];
@@ -243,25 +252,19 @@ trait BuildQueryTrait {
       } else {
         $def['model'] = static::class;
       }
-
-
-      /* ORIG
-      $def['attribute'] = $attribute;
-      if (($model === 'target') || (!$model && ($attribute==='property'))) {
-        $def['model'] = static::getTargetModel();
-      } else if (empty($def['model'])) {
-        $def['model'] = static::class;
-      }
-
-
-*/
-
-
       $comptype = $def['comptype'] = keyVal('comptype', $def, 'numeric');
       $fieldBuildMethod = 'buildQueryFields' . $comptype;
       /** This allows implementing classes to add additional comparison types
        * and methods, and still get called from here.
        */
+      if (!is_arrayish($def)) $def = [];
+      $criteria = keyVal('criteria', $def);
+      $criteriaSet = keyVal('criteriaSet', $criteria);
+      if (!$criteriaSet) {
+        $omit = keyVal('omit', $criteria);
+        $criteriaSet = PkMatch::getCriteriaSets($comptype, $omit);
+      }
+      $def['criteria']['criteriaSet'] = $criteriaSet;
       $fieldDefs = static::$fieldBuildMethod($baseName, $def);
       /*
       if ($extra) {
@@ -274,6 +277,7 @@ trait BuildQueryTrait {
       $def['field_defs'] = $fieldDefs;
       //$fieldDefsCollection[$baseName] = $fieldDefs;
     }
+    //pkdebug("FIELDDEFS:", $fieldDefs);
     if ($fieldName) return $searchFields[$fieldName];
     return $searchFields;
     //$r = static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
@@ -322,10 +326,18 @@ trait BuildQueryTrait {
 
   }
 
+
   public static function buildQueryFieldsNumeric($baseName, $def = null) {
+    //if ($baseName == 'netprofitmargin') {
+     // pkdebug("BASENAME: [ $baseName ] ; def: ", $def);
+    //}
     $valType = keyVal('fieldtype', $def, 'integer');
     $fieldtype_args = keyVal('fieldtype_args', $def);
     $fields = [];
+    //$criteria = keyVal('criteria',$def,[]);
+    //$omit = keyVal('omit',$criteria);
+    //$fields['criteriaSet'] = PkMatch::getCriteriaSets('numeric', $omit);
+    //$def['criteria']['criteriaSet'] = $fields['criteriaSet'];
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
@@ -429,10 +441,10 @@ trait BuildQueryTrait {
   public function executeSearch() {
     $collection = $this->buildQueryOnModel()->get();
     $sz = count($collection);
-    pkdebug("Just ran query from BQT: SZ: $sz");
+    //pkdebug("Just ran query from BQT: SZ: $sz");
     $newcol = $this->filterOnMethods($collection);
     $sza = count($newcol);
-    pkdebug("SXA:  $sza");
+    //pkdebug("SXA:  $sza");
     return $newcol;
   }
 
@@ -627,10 +639,9 @@ trait BuildQueryTrait {
       $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
-    foreach ($this->matchObjs as $ma) {
-      if ($ma->compfield == 'assetdebtratio')
-      pkdebug("After buildQS, The MA is: ", $ma);
-    }
+    //foreach ($this->matchObjs as $ma) {
+      //if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma);
+    //}
     return $sets;
   }
 
@@ -672,30 +683,26 @@ trait BuildQueryTrait {
    * @param array $querySets or null to take from local object
    */
   public function filterOnMethods(Collection $collection, $matchObjs=null) {
-    pkdebug("Yes, trying to filter.");
+    //pkdebug("Yes, trying to filter.");
     if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
     if (!$matchObjs || !is_arrayish($matchObjs)) return $collection;
     $numpre = count($matchObjs);
     $modelName = $collection-> getQueueableClass();
-    pkdebug("The num of match objs before: The QC is: [ $modelName ], the num $numpre -- is mine here?");
-    foreach ($matchObjs as $ma) {
-      if ($ma->compfield == 'assetdebtratio')
-      pkdebug("After buildQS, The MA is: ", $ma);
-    }
+    //pkdebug("The num of match objs before: The QC is: [ $modelName ], the num $numpre -- is mine here?");
+    //foreach ($matchObjs as $ma) { if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma); }
 
 
 
     $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
         ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
-    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    //pkdebug("The Trimmed Match Collection:", $trimmedMatches);
     if (!count($trimmedMatches)) return $collection;
     $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
-      //pkdebug()
       foreach($trimmedMatches as $match) {
         $methodName = $match->method;
         $res = $item->$methodName();
         $ans = $match->satisfy($res);
-        if ($ans) pkdebug("This one failed:", $ans, " METHOD NAME: $methodName; $res: ",$res);
+      //  if ($ans) pkdebug("This one failed:", $ans, " METHOD NAME: $methodName; $res: ",$res);
         return !$ans;
         //if (!$match->satisfy($res)) return false;
       }
@@ -705,11 +712,67 @@ trait BuildQueryTrait {
   }
 
   /** For use in Query Forms - makes a full query control
-   * from the field name and comparison type, with $opts
+   * from the field name and comparison type, with $params
+   * 
+   * For now, only handle simple _crit, _val comparisons
+   * with $params['basename']
+   * 
+   * @param assoc array $params:
+   *   @paramParam: string 'basename' (required): The basename of the field to search - like,
+   *   'annual_income' - will build a criteria select box called "annual_income_crit'
+   *      ("<", ">", etc)
+   *    and a value input box named 'annual_income_val'
+   * 
+   * @paramParam string 'label' (optional, suggested) - the label for the control
+   * 
+   * 
    * @return string HTML to make the control
    */
    
-  public static function htmlQueryControl($basename, $opts=[]) {
+  public static function htmlQueryControl($params=[]) {
+    $basename = $params['basename'];
+    $queryDef = static::getFullQueryDef($basename);
+    $criteriaSet = keyVal('criteriaSet', $params);
+    if (!$criteriaSet) {
+      $criteriaSet = keyVal('criteriaSet', $queryDef);
+      if (!$criteriaSet) {
+        $criteria = keyVal('criteria', $queryDef);
+        if (ne_arrayish($criteria)) {
+          $criteriaSet = keyVal('criteriaSet');
+        }
+      }
+      if (!$criteriaSet) { #No custom criteriaSet, so default
+        $comptype = keyVal('comptype', $queryDef, 'numeric');
+        $criteriaSet = PkMatch::getCriteriaSets($comptype);
+      }
+    }
+    $params['criteriaSet'] = $criteriaSet;
+    /*
+    $fieldDefArr = keyVal('field_defs', $queryDef);
+    if (ne_array($fieldDefArr)) {
+      $fieldNames = array_keys($fieldDefArr);
+    } else {
+      $fieldNames = [$basename.'_crit', $basename.'_val'];
+    }
+    $critName  = null;
+    $valName  = null;
+    foreach ($fieldNames as $i => $fieldName) {
+      if (removeEndStr($fieldName, '_crit')) {
+        $critName = $fieldName;
+        unset ($fieldNames[$i]);
+      }
+      if (removeEndStr($fieldName, '_val')) {
+        $valName = $fieldName;
+        unset ($fieldNames[$i]);
+      }
+    }
+     * 
+     */
+    $tmpCtl =  PkHtmlRenderer::buildQuerySet($params);
+    pkdebug("TMPCTL: ", $tmpCtl);
+
+    return PkHtmlRenderer::buildQuerySet($params);
+    //pkdebug("The QueryDef for [ $basename ]:", $fieldDef);
   }
 
 }
