@@ -403,6 +403,10 @@ class $createclassname extends Migration {
     return $retarr;
   }
 
+  public function hasTableField($fieldName) {
+    return $this->getTableFieldAttributes($fieldName);
+  }
+
   /** Get all the defined table field names (attributes) from the static
    * class, without needing an instance.
    * @return array of table field names.
@@ -658,7 +662,7 @@ class $createclassname extends Migration {
      */
 
     $name = removeEndStr($key, static::$displayValueSuffix);
-    if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
+    //if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
     if ($name && in_array($name,static::getDisplayValueFields(),1)) {
       return $this->displayValue($name);
     }
@@ -677,14 +681,18 @@ class $createclassname extends Migration {
       return parent::getAttributeValue($key);
     }
 
-    /*
   public function __call($method, $args = []) {
+    $name = removeEndStr($method,  static::$displayValueSuffix);
+    if (ne_string($name) &&  in_array($name,static::getDisplayValueFields(),1)) {
+      return $this->displayValueMethod($name, $args);
+    }
+    return parent::__call($method, $args);
+    /*
     $name = removeEndStr($method, 'Tfrm');
     if (!$name) return parent::__call($method, $args);
     return $this->transformer->__call($method, $args);
-  }
-     * 
      */
+  }
 
   /*
   public function getTransformer($name = null) {
@@ -1143,26 +1151,23 @@ class $createclassname extends Migration {
   /**
    * Returns the friendly value to display for the field.
    * <p>
-   * Should be overwritten in 
-   * sublcasses. The default is to just display the value for the field, but
-   * in subclasses, examine the field name, and if it represents a reference
+   * Check if a translation/format class is defined for the field, as in:
+   * public static $display_value_fields = [
+      'typeoffinancing_id' => 'App\References\TypeOfFinancingRef',
+   * ];
+   * that implements PkDisplayValueInterface;
    * (like, status_id), return the mapped status display text.
    * @param string $fieldName - the name of the DB field to examine
    * @return string - the user-friendly text to display
    */
   public function displayValue($fieldName, $value = null) {
-    if (!$fieldName || !is_string($fieldName) || !strlen($fieldName)) {
-      return null;
-    }
-    //$class=get_class($this);
+    if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
     foreach ($refmaps as $fn => $rc) {
-    if (!$fn || !is_string($fn) || !strlen($fn) ||
-       !$rc || !is_string($rc) || !strlen($rc)
-        || !class_exists($rc) || 
-        !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
-      continue;
-    }
+      if (!ne_string($fn) || !ne_string($rc) || !class_exists($rc) || 
+          !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
+        continue;
+      }
       if ($fn === $fieldName) {
         //$fldVal = $this->$fieldName;
         //pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
@@ -1171,6 +1176,23 @@ class $createclassname extends Migration {
     }
     if ($value === null) return $this->$fieldName;
     return $value;
+  }
+
+  public function displayValueMethod($methodName, $args=[]) {
+    if (!ne_string($methodName)) return null;
+    //$class=get_class($this);
+    $refmaps = static::getDisplayValueFields(true);
+    foreach ($refmaps as $fn => $rc) {
+      if (!ne_string($fn) || !ne_string($rc) || !class_exists($rc) || 
+          !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
+        continue;
+      }
+      if ($fn === $methodName) {
+        $value = call_user_func_array([$this,$methodName], $args);
+        return $rc::displayValue($value);
+      }
+    }
+
   }
 
   /** Should we convert all int attributes with value of '' to null? Let's try
@@ -1251,7 +1273,11 @@ class $createclassname extends Migration {
     foreach (static::getDisplayValueFields() as $dvf) {
      // $theval = $this->$dvf;
       //pkdebug("DVF", $dvf,"THE VAL:", $theval);
-      $dva[$dvf.static::$displayValueSuffix] = $this->displayValue($dvf);
+      if ($this->hasTableField($dvf)) {
+        $dva[$dvf.static::$displayValueSuffix] = $this->displayValue($dvf);
+      } else if (method_exists($this, $dvf)) {
+        $dva[$dvf.static::$displayValueSuffix] = $this->displayValueMethod($dvf);
+      }
     }
     return $dva;
   }

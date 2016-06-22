@@ -2999,11 +2999,12 @@ function firstKeyVal($key,$arg1=null, $argx=null) {
 
 function is_intish($value, $nullorfalse = false) {
   #Objects and arrays never
-  if (!is_scalar($value) || !($value===null)) return false;
-  if($nullorfalse && !$value) return true;
+  if (!is_scalar($value) && !($value===null)) return false;
+  if($nullorfalse && !$value) return true; #Zeroish
   if (!is_numeric($value) && !is_boolean($value)) return false;
   $intval = (int) $value;
   $diff = abs($value - $intval);
+  //pkdebug("Value:", $value, "DIFF", $diff, 'INTVAL', $intval);
   return ! $diff;
 }
 

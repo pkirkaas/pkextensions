@@ -732,20 +732,25 @@ trait BuildQueryTrait {
   public static function htmlQueryControl($params=[]) {
     $basename = $params['basename'];
     $queryDef = static::getFullQueryDef($basename);
+    pkdebug("queryDef:", $queryDef);
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
       $criteriaSet = keyVal('criteriaSet', $queryDef);
+    pkdebug("criteriaSet:", $criteriaSet);
       if (!$criteriaSet) {
         $criteria = keyVal('criteria', $queryDef);
         if (ne_arrayish($criteria)) {
-          $criteriaSet = keyVal('criteriaSet');
+          $criteriaSet = keyVal('criteriaSet',$criteria);
+    pkdebug("criteriaSet:", $criteriaSet);
         }
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
         $comptype = keyVal('comptype', $queryDef, 'numeric');
         $criteriaSet = PkMatch::getCriteriaSets($comptype);
+    pkdebug("criteriaSet:", $criteriaSet);
       }
     }
+    pkdebug("criteriaSet:", $criteriaSet);
     $params['criteriaSet'] = $criteriaSet;
     /*
     $fieldDefArr = keyVal('field_defs', $queryDef);

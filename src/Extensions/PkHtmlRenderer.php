@@ -210,8 +210,9 @@ class PkHtmlRenderer extends PartialSet {
 
     #Start building!
     $this->$wrapTag(RENDEROPEN, $params['wrapClass']);
-      $this->label(RENDEROPEN, $params['wrapClass']);
-        $this->div($params['label'], $params['labelClass']);
+      $this->label(RENDEROPEN, $params['labelClass']);
+        //$this->div($params['label'], $params['labelClass']);
+        $this->rawcontent($params['label']);
         $this->rawcontent(PkForm::select($params['critname'],$params['criteriaSet'], $params['critVal'], $params['critAtts']));
         $this->rawcontent(PkForm::text($params['valname'], $params['valVal'], $params['valAtts']));
       $this->RENDERCLOSE();
