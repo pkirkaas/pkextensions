@@ -225,6 +225,8 @@ function getCallingFrame($baseFile = null) {
 /**
  * Returns the (unlimited) args as a string, arg strings as strings,
  * array and obj args as var_dumps.
+ * TODO: Keep static var of log files written to in current request;
+ * only initialize w. date on first call PER FILE
  * @return string
  */
 function pkdebug_base() {
