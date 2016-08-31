@@ -19,9 +19,7 @@
 date_default_timezone_set("America/Los_Angeles");
 
 class PkLibConfig {
-
   static $suppressPkDebug = true;
-
   public static function getSuppressPkDebug() {
     return static::$suppressPkDebug;
   }
@@ -29,7 +27,6 @@ class PkLibConfig {
   public static function setSuppressPkDebug($suppress = true) {
     static::$suppressPkDebug = $suppress;
   }
-
 }
 
 Class Undefined {
@@ -150,11 +147,18 @@ function tmpdbg() {
 }
 
 /** Like PkDebug, except first arg is the name of a logfile - 
+ * To create a specific named Log function, do:
+  function mLog( ) {
+    $args = func_get_args();
+    array_unshift($args, LOGFILE);
+    return call_user_func_array('pkdebugNamedLog',$args);
+  } 
  */
 function pkdebugNamedLog() {
   $args = func_get_args();
-  $logName = array_shift($args);
-  $logPath = getAppLogDir() . '/' . $logName;
+  //$logName = array_shift($args);
+  //$logPath = getAppLogDir() . '/' . $logName;
+  $logPath =  array_shift($args);
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out, $logPath);
 }
@@ -196,7 +200,6 @@ function getCallingFrame($baseFile = null) {
   $retinfo = ['file' => '', 'function' => '', 'line' => '', 'class' => '', 'type' => ''];
   $stack = debug_backtrace();
   if (!$baseFile) $baseFile = __FILE__;
-//  return $stack;
   $stacksize = sizeof($stack);
 
   for ($i = 0; $i < $stacksize; $i++) {
@@ -205,86 +208,18 @@ function getCallingFrame($baseFile = null) {
   }
   $baseIdx = $i + 1;
   if (!array_key_exists($baseIdx, $stack)) return $retinfo;
-  //$file = keyValOrDefault('file', $stack[$baseIdx],'');
-  //if (!$file) $file =  keyValOrDefault('file', $stack[$baseIdx + 2],'');
-  //$retinfo['file'] = keyValOrDefault('file', $stack[$baseIdx],'');
   $file = $func($stacksize, $stack, $baseIdx, 'file', [], 5);
   $retinfo['file'] = $file;
-  //$line = keyValOrDefault('line', $stack[$baseIdx],'');
   $line = $func($stacksize, $stack, $baseIdx, 'line', [], 5);
-  //if (!$line) $line =  keyValOrDefault('line', $stack[$baseIdx + 2],'');
   $retinfo['line'] = $line;
-  //$retinfo['line'] = keyValOrDefault('line', $stack[$baseIdx],'');
   $baseIdx ++;
   if (!array_key_exists($baseIdx, $stack)) return $retinfo;
   $retinfo['class'] = keyValOrDefault('class', $stack[$baseIdx], '');
-  //$retinfo['function'] = keyValOrDefault('function', $stack[$baseIdx+2],'');
   $retinfo['function'] = $func($stacksize, $stack, $baseIdx, 'function', ['call_user_func_array', 'siteLog'], 5);
   $retinfo['type'] = keyValOrDefault('type', $stack[$baseIdx], '');
   $retinfo['idx'] = $baseIdx;
   return $retinfo;
 
-  /** Fix the rest of the code for general use some day
-
-
-
-
-
-
-
-    //$fields =['file', 'line']
-    $idx = 0;
-    while ((empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__))) {
-    $idx++;
-    if ($idx = $stacksize) break;
-    }
-    //$frame = $stack[$idx];
-    if (array_key_exists($idx+$level,$stack)) {
-    $retinfo['file'] = keyValOrDefault('file', $stack[$idx + $level],'');
-    $retinfo['line'] = keyValOrDefault('line', $stack[$idx + $level],'');
-    } else {
-    $retinfo['file'] = '';
-    $retinfo['line'] = '';
-    }
-
-
-    $idx = 0;
-    while ((empty($stack[$idx]['function']) || ($stack[$idx]['function'] === __FUNCTION__))) {
-    $idx++;
-    if ($idx = $stacksize) break;
-    }
-    if (array_key_exists($idx+$level,$stack)) {
-    $retinfo['function'] = keyValOrDefault('function', $stack[$idx + $level],'');
-    } else {
-    $retinfo['function'] = '';
-    }
-
-    $idx = 0;
-    while ((empty($stack[$idx]['class']))) {
-    $idx++;
-    if ($idx = $stacksize) break;
-    }
-
-    if (array_key_exists($idx+$classlevel,$stack)) {
-    $retinfo['class'] = keyValOrDefault('class', $stack[$idx + $classlevel],'');
-    $retinfo['method'] = keyValOrDefault('method', $stack[$idx + $classlevel],'');
-    } else {
-    $retinfo['class'] = '';
-    $retinfo['method'] = '';
-    }
-   * 
-   */
-  /*
-
-
-    $retinfo['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
-    if (isset($stack[1])) {
-    $retinfo['file'] = keyValOrDefault('file', $frame);
-    $retinfo['function'] = keyValOrDefault('function',$frame);
-    $retinfo['line']  = keyValOrDefault('line',$frame);
-    }
-   * 
-   */
 }
 
 /**
@@ -293,39 +228,30 @@ function getCallingFrame($baseFile = null) {
  * @return string
  */
 function pkdebug_base() {
+  static $callno = 0;
   if (PkLibConfig::getSuppressPkDebug()) return null;
   $stack = debug_backtrace();
   $stacksize = sizeof($stack);
-  //$frame = $stack[0];
-  //$frame = $stack[1];
-  //$out = "\n".date('j-M-y; H:i:s').': '.$frame['file'].": ".$frame['function'].': '.$frame['line'].": \n  ";
-  $out = "\nPKDEBUG OUT: STACKSIZE: $stacksize";
-  /*
-    if (!isset($frame['file']) || !isset($frame['line'])) {
-    $out.="\n\nStack Frame; no 'file': ";
-    foreach ($frame as $key=>$val) {
-    if (is_array($val)) $val = '(array)';
-    $out .="[$key]=>[$val] - ";
-    }
-    $out .= "\n\n";
-    // var_dump($stack);
-    }// else {
-   * 
-   */
+  $out = '';
+  //$out = "\nLOG OUT: STACKSIZE: $stacksize";
+  if (!$callno) {
+    $out .= "\nLOG: ". date('j-M-y; H:i:s') ;
+  } else {
+//    $out .= "\n\n";
+
+  }
+  $callno ++;
   $idx = 0;
-  while ((empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__))) {
+  while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx+1]['function'],-3)==='Log')) {
     $idx++;
   }
   $frame = $stack[$idx];
-
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
-  //$out .= pkstack() . "\n\n";
   if (isset($stack[1])) {
-    $out .= "\nFrame $idx: " . date('j-M-y; H:i:s') . ': ' . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
+    $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
   } else {
-    $out .= "\n" . date('j-M-y; H:i:s') . ': ' . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
+    $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
   }
-  //}
   $lastarg = func_get_arg(func_num_args() - 1);
   $dumpobjs = true;
   if (is_bool($lastarg) && ($lastarg === false)) $dumpobjs = false;
@@ -336,21 +262,15 @@ function pkdebug_base() {
     if (is_bool($msg)) {
       $msg = $msg ? 'TRUE' : 'FALSE';
     }
-    if ($msg instanceOf sfOutputEscaperArrayDecorator) {
-      $printMsg = false;
-      //if ($msg instanceOf Doctrine_Locator_Injectable) {
-    } else if (is_object($msg)) {
+    if (is_object($msg)) {
       $printMsg = $dumpobjs;
-//        $msg=$msg->toArray(); 
     }
     if ($msg instanceOf Doctrine_Pager) $printMsg = false;
-    //if ($printMsg && (is_object($msg) || is_array($msg))) $msg = json_encode($msg);
-    if ($printMsg && (is_object($msg) || is_array($msg)))
-    //$msg = pkvardump($msg);
-      $msg = displayData($msg);
-    $out .= ('Type: ' . $type . ($printMsg ? ': Payload: ' . $msg : '') . "\n  ");
+    if ($printMsg && (is_object($msg) || is_array($msg))) $msg = displayData($msg);
+    //$out .= ('Type: ' . $type . ($printMsg ? ': Payload: ' . $msg : '') . "\n  ");
+    $out .= ($type . ($printMsg ? ': ' . $msg : '') . "\n  ");
   }
-  $out.="END DEBUG OUT\n\n";
+  //$out.="END DEBUG OUT\n\n";
   return $out;
 }
 
@@ -1669,24 +1589,6 @@ function getDomainHard($url = null) {
   return $domain;
 }
 
-/*
-  function getRealPostArray() {
-  if (!$_SERVER['REQUEST_METHOD'] === 'POST') {#Nothing to do
-  return null;
-  }
-  $postdata = file_get_contents("php://input");
-  $post = [];
-  $postraws = explode('&', $postdata);
-  foreach ($postraws as $postraw) { #Each is a string like: 'xxxx=yyyy'
-  $keyvalpair = explode('=',$postraw);
-  if (empty($keyvalpair[1])) {
-  $keyvalpair[1] = null;
-  }
-  $post[urldecode($keyvalpair[0])] = urldecode($keyvalpair[1]);
-  }
-  return $post;
-  }
- */
 
 /**
  * Returns a POST array without dots in keys converted to '_' BUT NOTE!
@@ -1697,14 +1599,8 @@ function getRealPostArray() {
   if ($_SERVER['REQUEST_METHOD'] !== 'POST') {#Nothing to do
     return null;
   }
-  // global $HTTP_RAW_POST_DATA;
-  //static $postdata = '';
-  //$postdata = $HTTP_RAW_POST_DATA;
   $neverANamePart = '~#~';
-  //if (!$postdata) {
   $postdata = file_get_contents("php://input");
-  //}
-  pkdebug("POST DATA:", $postdata);
   $post = [];
   $rebuiltpairs = [];
   $postraws = explode('&', $postdata);
@@ -1769,9 +1665,6 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
   //$output = $totalindent."[\n";
   $depth++;
   foreach ($var as $key => $value) {
-    //$output .=($indent.$totalindent."'$key' =>".var_export_square($value, $depth, $indent).",\n");
-    //$output .=("'$key' =>".var_export_square($value, $depth, $indent).",\n");
-    //$output .=("'$key' => " . var_export_square($value, $depth, $indent) . " ");
     if (is_string($key)) {
       $key = "'$key'";
     } else if (is_null($key)) {
@@ -1783,8 +1676,6 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
     }
     $output .=("$key => " . var_export_square($value, $depth, $indent) . " ");
   }
-  //$output .= $totalindent."]";
-  //$output .= "]";
   if ($depth > 1) {
     $output .= "],\n";
   } else {
@@ -1802,32 +1693,22 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
  */
 function displayData($data, $level = 0, $indent = 2) {
   $offset = str_repeat(' ', $level * $indent);
-  //if (is_null($data)) return $offset."NULL\n";
-  //if (is_null($data)) return "NULL, ";
   if (is_null($data)) return "NULL";
   $type = typeOf($data);
-  //if (is_bool($data)) if ($data) $data = 'TRUE'; else $data='FALSE';
-  //if (is_bool($data)) if ($data) return 'TRUE, '; else return 'FALSE, ';
   if (is_bool($data)) if ($data) return 'TRUE';
     else return 'FALSE';
-  //if (is_scalar($data)) return "$offset$type:[$data]\n";
   if (is_scalar($data)) return "$type:{{$data}}";
   if (is_array($data)) {
-    //if (!$data) return $offset."[]";
-    //if (!$data) return $offset."[] ";
     if (!$data) return "[]";
     $retStr = "[\n";
     $level ++;
     $newoffset = str_repeat(' ', $level * $indent);
     foreach ($data as $key => $val) {
-      //$retStr .= "{$offset}$key=>".displayData($val, $level, $indent)."\n";
       $retStr .= "{$newoffset}$key=>" . displayData($val, $level, $indent) . "\n";
     }
-    //return "$retStr\n$offset]";
     return "$retStr$offset]";
   }
   #Something else - obj, probably
-  //return $offset.$type.':'.print_r($data,1);
   return $offset . $type . ':' . pkvardump($data);
 }
 
