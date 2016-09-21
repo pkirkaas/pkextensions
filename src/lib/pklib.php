@@ -148,7 +148,7 @@ function tmpdbg() {
 
 /** Like PkDebug, except first arg is the name of a logfile - 
  * To create a specific named Log function, do:
-  function mLog( ) {
+  function myLog( ) {
     $args = func_get_args();
     array_unshift($args, LOGFILE);
     return call_user_func_array('pkdebugNamedLog',$args);
@@ -233,7 +233,7 @@ function pkdebug_base() {
   static $callno = 0;
   if (PkLibConfig::getSuppressPkDebug()) return null;
   $stack = debug_backtrace();
-  $stacksize = sizeof($stack);
+  //$stacksize = sizeof($stack);
   $out = '';
   //$out = "\nLOG OUT: STACKSIZE: $stacksize";
   if (!$callno) {
@@ -540,24 +540,27 @@ function html_clean(&$arr, $usehtmlspecchars = false) {
 /**
  * Takes a file name or path, and returns the lower-cased extension (ex, 'jpg')
  * @param string $filePath: The string file path
+ * @param boolean $tolower: if true, lower case
  * @return string: the LOWER CASED file extension, if any, with no ".'
  */
-function getFileExtension($filePath) {
-  $ext = strtolower(substr($filePath, strrpos($filePath, '.') + 1));
+function getFileExtension($filePath, $tolower = true) {
+  $ext = substr($filePath, strrpos($filePath, '.') + 1);
+  if ($tolower) $ext = strtolower($ext);
   return $ext;
 }
-
 /**
  * Removes the protocol, domain, and parameters, just returns
  * indexed array of route segments. ex, for URL:
  * http://www.example.com/some/lengthy/path?with=get1&another=get2
  * ... returns: array('some', 'lengthy', 'path');
  * @param Boolean|String $default: If the first two segments are missing, should
+   *   return ['index','index'] as default?
  * @param int $depth default = 2: How many segments to set to the default 'index' the base URL
  * we return the default value for them? Default false, otherwise probably 'index'
  * @return Array: Route Segments
  */
 function getRouteSegments($default = false, $depth = 2) {
+  if ($default === true) $default = 'index';
   $aseg = $_SERVER['REQUEST_URI'];
   $breakGets = explode('?', $aseg);
   $noGet = $breakGets[0];
@@ -2871,7 +2874,8 @@ function firstKeyVal($key,$arg1=null, $argx=null) {
 
 /** Checks these exist and are not empty */
 /**
- * 
+ * Checks if a value (including string) is "intish". PHP is_numeric returns
+ * true for '12', but is_int returns false. <tt>is_intish('12')</tt> returns true
  * @param mixed $value - To test for intishness
  * @param boolean $nullorfalse - Should null/false/'' be considered intish?
  * @return boolean
@@ -2884,7 +2888,7 @@ function is_intish($value, $nullorfalse = false) {
   #Objects and arrays never
   if (!is_scalar($value) && !($value===null)) return false;
   if($nullorfalse && !$value) return true; #Zeroish
-  if (!is_numeric($value) && !is_boolean($value)) return false;
+  if (!is_numeric($value) && !is_bool($value)) return false;
   $intval = (int) $value;
   $diff = abs($value - $intval);
   //pkdebug("Value:", $value, "DIFF", $diff, 'INTVAL', $intval);
