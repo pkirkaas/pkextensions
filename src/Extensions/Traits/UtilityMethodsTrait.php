@@ -181,4 +181,14 @@ trait UtilityMethodsTrait {
   }
    * 
    */
+
+
+  /** Sets the properties of the object to the array key/values of $$propertiesName
+   * Typical Use: In <tt>__construct($properties=[])</tt>: Use key/value pairs of
+   * "$properties" array to set the properties of the object.
+   * @param string $propertiesName: The name of the variable array of property values
+   */
+   public function setProperties($propertiesName = 'properties',$properties=null){
+     //TODO: Implement. 
+   }
 }
