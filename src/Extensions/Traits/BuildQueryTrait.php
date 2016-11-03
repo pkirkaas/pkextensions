@@ -341,7 +341,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = $parm; 
+      //$fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -356,7 +357,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = $parm; 
+      //$fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -370,7 +372,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = $parm; 
+      //$fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
     }
     $fields[$baseName . '_maxval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_minval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
@@ -385,7 +388,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = $parm; 
+      //$fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -401,7 +405,7 @@ trait BuildQueryTrait {
     if ($parms && is_scalar($parms)) $parms = [$parms];
 
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
     }
     $fields[  $baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[ $baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
