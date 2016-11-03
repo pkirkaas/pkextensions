@@ -214,9 +214,9 @@ function getCallingFrame($baseFile = null) {
   $retinfo['line'] = $line;
   $baseIdx ++;
   if (!array_key_exists($baseIdx, $stack)) return $retinfo;
-  $retinfo['class'] = keyValOrDefault('class', $stack[$baseIdx], '');
+  $retinfo['class'] = keyVal('class', $stack[$baseIdx], '');
   $retinfo['function'] = $func($stacksize, $stack, $baseIdx, 'function', ['call_user_func_array', 'siteLog'], 5);
-  $retinfo['type'] = keyValOrDefault('type', $stack[$baseIdx], '');
+  $retinfo['type'] = keyVal('type', $stack[$baseIdx], '');
   $retinfo['idx'] = $baseIdx;
   return $retinfo;
 
