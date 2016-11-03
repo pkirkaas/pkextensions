@@ -456,10 +456,14 @@ class $createclassname extends Migration {
   /**
    * Checks to see if the $arg is instantiated and the same instance of this obj.
    * Ridiculous this is not built in...
+   *** NOTE! As of Laravel 5.3, it finally is - but we want to return the model instance
    * @param any $var
    * $return boolean|static - false if not instantiated or not the same object, else the object
    */
-  public function is($var) {
+  public function is(Model $var) {
+    if (method_exists(get_parent_class(),'is')) {
+      if (!parent::is($var)) return false;
+    }
     if (!static::instantiated($var) || !static::instantiated($this))
         return false;
     if (get_class($this) !== get_class($var)) return false;
