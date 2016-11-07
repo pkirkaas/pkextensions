@@ -173,6 +173,23 @@ class PkTestGenerator {
     return static::getRandomSqlDateFromRange($n, $m, $days);
   }
 
+  public static function getRandomLorem($len = 0) {
+    static $texts = [
+
+        'Earum placerat lorem est nunc id a congue ornare suspendisse lectus elementum',
+        'Id qui nulla justo ante phasellus</h4><p>Lectus viverra egestas pellentesque pede metus. Habitant et urna. Amet magna libero. Non sed cras. Placerat magna qui. Mauris euismod quo. Amet id purus. Amet eros in lacus libero vitae. Sed quis consectetuer. Aliquam leo donec sagittis in non wisi praesent pharetra nascetur ut torquent. Tortor amet molestie. Sed a at diam integer arcu. In fringilla odio velit auctor amet',
+        'feugiat tellus id nec luctus et pede luctus nibh',
+        'egestas consectetuer in Purus wisi massa. Integer gravida dui sed elementum neque. Quisque aut ipsum urna pede in et adipiscing aptent. Urna mi qui leo proin ut. Mi mauris elementum libero hendrerit in officiis lobortis ante. Sed mauris amet. Neque nunc eros at quis pellentesque aliquam ipsum libero. Morbi faucibus rhoncus. Est amet viverra. Eget nulla ridiculus. Amet aliquam at. Nec mi cras.',
+        'Molestiae quisque odio mattis volutpat ante. Ut dui amet. Donec in nunc risus etiam hendrerit arcu tellus felis massa id soluta est imperdiet metus. Neque sed malesuada. Arcu viverra elementum odio suspendisse diam dui pellentesque metus',
+        'hymenaeos auctor tellus. Varius sit odio. Amet morbi tempus mauris gravida libero pede urna ut. Dolores nulla id mauris lorem morbi. Porttitor nam mattis potenti non velit. Fringilla sapien ipsum tortor pede nec sem sem ea. Pulvinar sed vitae sunt libero pellentesque mi in nec. Elit auctor eros dignissim tristique nunc. In lorem eu.',
+        'Vestibulum consequat ut cras luctus eu at pede mauris. Nullam a est vitae turpis a commodo sit sit sagittis adipiscing lacinia. Lorem nulla eu. Condimentum cras senectus turpis justo mi facilisi sodales pellentesque. Libero ullamcorper lectus. Mattis lorem elementum. Est mauris id morbi omnis tellus dolor mi enim. Dolor lacinia wisi metus ac rutrum. Integer vitae consequat. Dolor etiam eget.',
+    ];
+
+    $str = static::getRandomData($texts);
+    if ($len) $str = substr($str, 0, to_int($len));
+    return $str;
+  }
+
 
 
   /**
@@ -224,6 +241,34 @@ class PkTestGenerator {
    return date( 'Y-m-d H:i:s', $rnd );
   }
 
+  public static function getRandomFullName() {
+    return static::getRandomFirstName() . ' ' . static::getRandomLastName();
+  }
+
+  public static function getRandomFirstName() {
+    $fnames = array('Joe', 'Sally', 'Mary', 'Jose', 'Abdul', 'Katarina', 'Joachim',
+        'Xhu', 'Toby', 'Saskia', 'Misha', 'Vaseem', 'Kalleen', 'Kenzie', 'Elizabeth',
+        'Justin', 'Taylor', 'Giovanna', 'Stephanie', 'Olivia', 'Scott', 'Tina',
+        'Amber', 'Bryan', 'Porche', 'Eric', 'Michelle', 'Ashley', 'Robert',
+        'William', 'Emily', 'Caitlin', 'Justin', 'Morgan', 'Gabrielle', 'Deanna',
+        'Brian', 'Maxwell', 'Amanda', 'Jessica', 'Sarah', 'Shirby', 'Allison',
+        'Heather', 'Sydney', 'Alex',);
+    return static::getRandomData($fnames);
+  }
+
+  public static function getRandomLastName() {
+    $lnames = array('Smith', 'Lee', "O'Brien", "M'Beko", 'Semaphore', 'Crankshaft',
+        'Kahn', 'Zaheer', 'Clymatis', 'Wagner-Spiel', 'Van Hoffen Schmidt',
+        'Sidhartha', 'Evans', 'Bradbury', 'Loyack', 'Yost', 'Moulton', 'Thompson',
+        'Ciurleo', 'Ibarra', 'Reyes', 'Negron', 'Bevis', 'Beard', 'Moyer', 'Davis',
+        'Thomas', 'Jadush', 'Stewart', 'Boren', 'Holst', 'Hassler', 'Alvey',
+        'Hamilton', 'Suskin', 'Howell', 'Blomquist', 'Cassel', 'Bourjac',
+        'Anderson', 'Foye', 'Stenlake', 'Crookham', 'May', 'McLaughlin', 'Peterson',
+        'Rivers',);
+    return static::getRandomData($lnames);
+  }
+
+
 
 ######################  THIS DOESN'T WORK YET W. LARAVEL - BUT GET IT GOING.....
   /** 'Uploads' a random file from the directory, of 'type'
@@ -261,9 +306,6 @@ class PkTestGenerator {
      // $validentries[]=$entry;
 
 
-
-
-
 //      $valid = BaseFileHandler::validateFiletype($newpath, $type);
  //     if ($valid === false) continue;
       $paths[] = $newpath;
@@ -299,6 +341,46 @@ class PkTestGenerator {
   }
 
 
+/** Depends on having a "Sundries" Dir, with uploadable files */
+  public static function makeUploadedSpfFiles() {
+    $sampleDir = realpath(__DIR__ . "/../../../Sundries");
+    $filenames = scandir($sampleDir);
+    $symfups = [];
+    foreach ($filenames as $filename) {
+      $fpath = $sampleDir . "/$filename";
+      if (is_file($fpath)) {
+        $newfpath = __DIR__ . "/cache/$filename";
+        copy($fpath, $newfpath);
+        $mime = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $newfpath);
+        $size = filesize($newfpath);
+        $symfups[] = new SymfonyUploadedFile($newfpath, $fpath, $mime, $size, 0, true);
+      }
+    }
+    return $symfups;
+  }
+
+
+
+  /** REMOVES & returns a random item from the indexed array. 
+   * ARRAY PASSED BY REFERENCE, SO SHOULD BE CALLED WITH A COPY!
+   * the item from the array passed by reference, so as not to return the same
+   * value twice
+   * @param arrayish &$dataArr
+   * @return type
+   */
+  public static function removeRandomItem(&$dataArr = []) {
+    if (is_array($dataArr)) { #Only on arrays so far
+      $dataArr = array_values($dataArr); #Make sure sequentiallly indexed
+    }
+    if (!sizeOf($dataArr)) return null;
+    $randkey = mt_rand(0, sizeof($dataArr) - 1);
+    $retval = $dataArr[$randkey];
+    if (is_array($dataArr)) {
+      unset($dataArr[$randkey]);
+      $dataArr = array_values($dataArr);
+    }
+    return $retval;
+  }
 
 
 
