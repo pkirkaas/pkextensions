@@ -660,20 +660,12 @@ class $createclassname extends Migration {
     //pkdebug("KEY", $key);
     # This seems pretty obvious - why don't Eloquent do it?
     if (!$key) return null;
-    /*
-    $name = removeEndStr($key, 'Tfrm');
-    if ($name) return $this->transformer->$key;
-     * 
-     */
 
     $name = removeEndStr($key, static::$displayValueSuffix);
     //if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
     if ($name && in_array($name,static::getDisplayValueFields(),1)) {
       return $this->displayValue($name);
     }
-    /*
-     * 
-     */
     return parent::__get($key);
   }
     public function getAttribute($key) {
@@ -692,58 +684,8 @@ class $createclassname extends Migration {
       return $this->displayValueMethod($name, $args);
     }
     return parent::__call($method, $args);
-    /*
-    $name = removeEndStr($method, 'Tfrm');
-    if (!$name) return parent::__call($method, $args);
-    return $this->transformer->__call($method, $args);
-     */
   }
 
-  /*
-  public function getTransformer($name = null) {
-    if (!is_string($name)) return $this->transformer;
-    else return keyval($name, $this->transformers);
-  }
-
-  public function setTransformerFromArray($info) {
-    if (!$this->transformer instanceOf BaseTransformer) {
-      $this->transformer = new BaseTransformer($this);
-    }
-    $this->transformer->setItem($this);
-    $this->transformer->addTransforms($info);
-  }
-
-  public function setTransformer($transinfo, $name = null) {
-    if ($transinfo instanceOf BaseTransformer) {
-      $transformer = $transinfo;
-      $transformer->setItem($this);
-
-      if (is_string($name)) $this->transformers[$name] = $transformer;
-      else $this->transformer = $transformer;
-    } else if (is_array($transinfo)) {
-      #Could be an array of transformer instances, or actionsets for a new transformer
-      reset($transinfo);
-      $first = current($transinfo);
-      if (is_array($first)) { #Array of actionset methods
-        if (is_string($name)) {
-          $transformer = keyval($name, $this->transformers, new BaseTransformer($this));
-          $this->transformers[$name] = $transformer;
-        } else {
-          $transformer = $this->getTransformer();
-        }
-        $transformer->addTransforms($transinfo);
-        if (!is_string($name)) $this->transformer = $transformer;
-        else $this->transformers[$name] = $transformer;
-      } else if ($first instanceOf BaseTransformer) { #assume an array of transformers
-        foreach ($transinfo as $key => $value) {
-          $value->setItem($this);
-          if (is_string($key)) $this->transformers[$key] = $value;
-        }
-      }
-    }
-  }
-   * 
-   */
 
   /**
    *
@@ -757,8 +699,6 @@ class $createclassname extends Migration {
   public static $load_relations = [ /* 'items' => 'App\Models\Item' */];
 
   /** Default, just returns the static setting.
-   * 
-   * @return type
    */
   public function getLoadRelations() {
     return static::$load_relations;
@@ -1183,6 +1123,12 @@ class $createclassname extends Migration {
     return $value;
   }
 
+/** 
+  If the key of displayvalues is a method, the class it points to must implement
+  the PkDisplayValueInterface - then the method is called, with the optional args,
+  and the result of the method is processed by the DisplayValueInterface class
+  and THAT result is returned. Dollar or Percent Formatting, for example.
+ */
   public function displayValueMethod($methodName, $args=[]) {
     if (!ne_string($methodName)) return null;
     //$class=get_class($this);
@@ -1271,7 +1217,17 @@ class $createclassname extends Migration {
   public function getCustomAttributes($arg=null) {
     return $this->getAttributes();
   }
+#If want to return array of ALL real & virtual attributes
+#  public function getCustomAttributes($arg = null) {
+#    $myAtts = $this->getAttributes();
+#    $relationAtts = $this->getRelationshipAttributes();
+#    $methodAtts = $this->getMethodAttributes();
+#    $dvAtts = $this->getDisplayValueAttributes();
+#    return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts);
+#  }
 
+
+/** Gets the Display Value attributes of Methods & IDs */
   public function getDisplayValueAttributes($arg = null) {
     $dva = [];
     //pkdebug("The Fields:", static::getDisplayValueFields());
