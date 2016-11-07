@@ -165,6 +165,21 @@ abstract class PkModel extends Model {
     return static::_unsetTableFieldDefs($defs);
   }
 
+  /** Tries to return a description of the attribute for a label
+   * If there is a 'desc' property for the attribute, return it.
+   * Else, if there is a 'comment' property for the attribute, return it
+   * Else, return ucfirst $attname
+  */
+  public static function attdesc($attname) {
+    $defs = static::getTableFieldDefs();
+    if (!in_array($attname,array_keys($defs),1)) {
+      return ucfirst($attname);
+    }
+    $attprops = $defs[$attname];
+    $desc = keyVal('desc',$attprops,keyVal('comment',$attprops,ucfirst($attname)));
+    return $desc;
+  }
+
   public static function get_field_type($fieldname) {
     $fielddef = KeyVal($fieldname, static::getTableFieldDefs());
     if (!$fielddef) return false;
@@ -205,6 +220,7 @@ abstract class PkModel extends Model {
       else if (is_array($def)) {
         $type = keyVal('type', $def, 'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
+        $comment = keyval('comment', $def);
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
         if (is_string($methods)) {
@@ -224,6 +240,7 @@ abstract class PkModel extends Model {
                 $methodChain .= "->$method($args)";
           }
         }
+        if ($comment) $methodChain .= "->comment($comment)";
         $out .= $fielddef . $methodChain . "$changestr;\n";
       }
     }
