@@ -382,6 +382,26 @@ class PkTestGenerator {
     return $retval;
   }
 
+  /** Returns a STRING of random digits, 
+   */
+  public static function getRandomDigitString($length=1)
+    $ret = '';
+    for ($i=0 ; $i<$length; $i++) {
+      $digit = mt_rand(0,9);
+      $ret .= "$digit";
+    }
+    return $ret;
+  }
+
+  /** Generates a random SSN, 
+   * @param string $separator = '' - what separates the components
+   * @return string - SSN
+   */
+  public static function randomSSN($separator = '') {
+    return static::getRandomDigitString(3).
+      $separator.static::getRandomDigitString(2).
+      $separator.static::getRandomDigitString(3);
+  }
 
 
 

@@ -1,0 +1,22 @@
+  public static function registerReferences($reference, $methodName, $rules = null) {
+  public static function __callStatic($method, $args) {
+  public static function getSeasonFromDate($date, $wyr = 1, $sql = true) {
+  public static function getRandomComment() {
+  public static function getRandomData( $dataArr, $items=-1) {
+  public static function getRandomJobTitle() {
+  public static function getRandomUnixDateFromRange($from, $to=0, $multiplier = 365) {
+  public static function getRandomDateOffset($n, $days = 30) {
+  public static function getRandomLorem($len = 0) {
+  public static function getRandomSqlDateFromRange($from, $to=0, $multiplier = 365) {
+  public static function getRandomSqlRecentDate($multiplier = 365) {
+  public static function getRandomSqlBirthdate($multiplier = 365) {
+  public static function sqlDateFromUnix($unixDate) {
+  public static function getRandomDateBetween($date1, $date2) {
+  public static function getRandomFullName() {
+  public static function getRandomFirstName() {
+  public static function getRandomLastName() {
+  public static function getRandomFilePathFromDir($dir, $type = 'image') {
+  public static function makeUploadedSpfFiles() {
+  public static function removeRandomItem(&$dataArr = []) {
+  public static function getRandomDigitString($length=1)
+  public static function randomSSN($separator = '') {
