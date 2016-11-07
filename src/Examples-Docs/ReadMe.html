@@ -18,8 +18,13 @@
 
 <li>laravel/app: Copy 'References' here
 
+<li>If using PkUser & Building Migration, delete the Laravel default <tt>database/migrations/...create_users...php</tt> class.
+
 <li><tt><b>laravel/app/Console/Kernel.php</b></tt>: Add custom Artisan commands here. Example:
 <pre>
+use PkExtensions\Console\Commands\ClearAll;
+use PkExtensions\Console\Commands\GenerateMigrations;
+//...
     protected $commands = [
        GenerateMigrations::class,
       ClearAll::class,
@@ -52,6 +57,8 @@ return [
       ],
 </pre>
 
+
+
 <h3>Additional Service Providers</h3>
 <pre>
   /** Add-Ons */
@@ -81,6 +88,12 @@ return [
       ....
 </pre>
 
+<h2>session.php</h2>
+<p>Change to use DB:
+<pre>
+  'driver' => env('SESSION_DRIVER', 'database'),
+</pre>
+<p>... and run: <tt> php artisan session:table </tt>
 <h2>auth.php</h2>
 <p>Set the path to th euser model:
 <pre>
@@ -100,6 +113,23 @@ return [
         realpath(base_path('app/resources/views')),
         realpath(base_path('vendor/pkirkaas/PkExtensions/src/Extensions/resources/views')),
     ],
+</pre>
+
+<h1>laravel/public/index.php</h1>
+<p>Modify to display errors (not in prod), & use pkdebug logging:
+<pre>
+ini_set("display_errors", 1);
+error_reporting (E_ALL );
+
+//....
+
+require_once(__DIR__.'/../app/References/AppReferenceCollection.php');
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+setAppLog();
+appLogReset(false);
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
 </pre>
 </body>
 </html>

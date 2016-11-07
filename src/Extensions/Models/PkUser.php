@@ -50,6 +50,13 @@ class PkUser extends PkModel
     ];
 
 
+  /** Can be overridden - but basic try here */
+  public function getName() {
+    if ($this->name) return $this->name;
+    return $this->email;
+  }
+
+
   public function authDelete() {
     return $this->authUpdate();
   }
