@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <link type='text/css' rel='stylesheet' href='MyStyleSheet.css'/>
+  <title>Suggested Mods</title>
+</head>
+<body>
+<div class='title'>Suggested mods to standard Laravel Installation</div>
+
+<h1>laravel/app</h1>
+<ul>
+<li>laravel/app: add 'resources' directory, 'assets' & 'views' subdirs.
+<li>laravel/app/resources/assets: img, js & sass dirs.
+<li>laravel/app/resources/views: app.blade.php , & controller subdirs for views
+
+<li>laravel/app: create "models" dir here, put models (including user)
+
+<li>laravel/app: Copy 'References' here
+
+<li><tt><b>laravel/app/Console/Kernel.php</b></tt>: Add custom Artisan commands here. Example:
+<pre>
+    protected $commands = [
+       GenerateMigrations::class,
+      ClearAll::class,
+    ];
+</pre>
+
+<h1>laravel/routes</h1>
+<p>web.php: 
+<pre>
+
+Auth::routes();
+
+Route::group(['middleware' => ['web']], function () {
+  Route::any('/', ['as'=>'home', 'uses'=>'IndexController@index']);
+});
+
+
+</pre>
+
+<h1>laravel/config</h1>
+<h2>app.php</h2>
+<h3>Add the models you want to automatically build migrations</h3>
+<p>If you want to use the PkExtensions artisan make migrations command, add the models:
+<pre>
+return [
+
+  'buildmodels' => [
+      '\\App\\Models\\User',
+      '\\App\\Models\\Contact',
+      ],
+</pre>
+
+<h3>Additional Service Providers</h3>
+<pre>
+  /** Add-Ons */
+  Collective\Html\HtmlServiceProvider::class,
+  Laravel\Socialite\SocialiteServiceProvider::class,
+  /*
+   * PkExtension Application Service Providers...
+   */
+  PkExtensions\PkHtmlServiceProvider::class,
+  PkExtensions\PkValidatorServiceProvider::class,
+</pre>
+
+<h3>Additional Aliases</h3>
+<pre>
+  #Extensions...
+  'Form' => Collective\Html\FormFacade::class,
+  'Html' => Collective\Html\HtmlFacade::class,
+  'PkForm'    => PkExtensions\PkFormFacade::class,
+  'PkHtml'    => PkExtensions\PkHtmlFacade::class,
+  'PkValidator' => PkExtensions\PkValidatorFacade::class,
+</pre>
+<h3>Etc</h3>
+<pre>
+   'name' => 'Cool Site Name',
+   ....
+      'timezone' => 'America/Los_Angeles',
+      ....
+</pre>
+
+<h2>auth.php</h2>
+<p>Set the path to th euser model:
+<pre>
+
+    'providers' => [
+        'users' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\User::class,
+        ],
+</pre>
+
+<h2>View.php</h2>
+<p>Add the additional view resource directories:
+<pre>
+    'paths' => [
+        realpath(base_path('resources/views')),
+        realpath(base_path('app/resources/views')),
+        realpath(base_path('vendor/pkirkaas/PkExtensions/src/Extensions/resources/views')),
+    ],
+</pre>
+</body>
+</html>
+

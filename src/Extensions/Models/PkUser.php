@@ -45,6 +45,8 @@ class PkUser extends PkModel
       'email' => ['type' => 'string', 'methods' => 'unique'],
       'password' => 'string',
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
+       'admin'=>['type'=>'boolean', 'methods'=>['default'=>'false']],
+
     ];
 
 
@@ -68,9 +70,11 @@ class PkUser extends PkModel
      * Subclasses should implement this
      * @return boolean
      */
-    public function isAdmin() {
-      return false;
-    }
+
+  public function isAdmin() {
+    if ($this->admin) return true;
+    return false;
+  }
 
     /** Special handling to reset passwords in a form, then calls parent method
      */
