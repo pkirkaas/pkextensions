@@ -151,8 +151,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @param array $params - Can be used by subclasses to filter
    * @return instance|array instances - 
    */
-  public static function getRandomRefs($items = -1, $params = []) {
-    return PkTestGenerator::getRandomData(static::getRefObjs(), $items);
+  public static function randRefs($items = -1, $params = []) {
+    return PkTestGenerator::randData(static::getRefObjs(), $items);
   }
 
   /*
@@ -160,12 +160,12 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * 
    */
 
-  public static function getRandomValues($items = -1, $params = []) {
-    return PkTestGenerator::getRandomData(static::getKeyValArr(), $items);
+  public static function randValues($items = -1, $params = []) {
+    return PkTestGenerator::randData(static::getKeyValArr(), $items);
   }
 
-  public static function getRandomKeys($items = -1, $params = []) {
-    return PkTestGenerator::getRandomData(static::keys(), $items);
+  public static function randKeys($items = -1, $params = []) {
+    return PkTestGenerator::randData(static::keys(), $items);
   }
 
   public function __toString() {

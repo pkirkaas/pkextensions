@@ -36,8 +36,30 @@ class ZipRef extends PkRefManager {
       }
     }
     return $retarr;
-    
   }
+
+  /** Returns an ASSOCIATIVE array of locations
+   * 
+   * @param type $withinmiles
+   * @param type $ofzip
+   */
+  public static function getCaliforniaZipsAssoc($withinmiles = null, $ofzip = null) {
+    $locations = static::getCaliforniaZips($withinmiles, $ofzip);
+    $assoclocs = [];
+    foreach ($locations as $location) {
+      $assoclocs[] = static::locationAssoc($location);
+    }
+    return $assoclocs;
+  }
+
+  /**Takes a single index location (ca_cities) row & returns as a meaningful
+   * associative array of zip, city, state, latitude, longitude
+   */
+  public static function locationAssoc($location) {
+      return ['zip'=>$location[0], 'state'=>$location[1], 'city'=>$location[2],
+          'latitude'=>$location[3], 'longitude'=>$location[4]];
+  }
+
   public static $ca_cities = [
       [90001, "CA", "Los Angeles", 33.973093, -118.247896],
       [90002, "CA", "Los Angeles", 33.94969, -118.246213],

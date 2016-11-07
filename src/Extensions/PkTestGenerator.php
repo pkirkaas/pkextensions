@@ -3,6 +3,7 @@
   */
 
 namespace PkExtensions;
+use PkExtensions\References\ZipRef;
 
 
 class PkTestGenerator {
@@ -58,8 +59,8 @@ class PkTestGenerator {
       $row['cache'] = include($row['file']);
     }
     switch (count($args)) {
-      case 0 : return static::getRandomData($row['cache']);
-      case 1 : return static::getRandomData($row['cache'], $args[0]);
+      case 0 : return static::randData($row['cache']);
+      case 1 : return static::randData($row['cache'], $args[0]);
     }
 
   }
@@ -81,8 +82,8 @@ class PkTestGenerator {
 
 
 
-  public static function getRandomComment() {
-    return static::getRandomData(static::$comments);
+  public static function randComment() {
+    return static::randData(static::$comments);
   }
   /**
    * Returns random data item (possibly with invalid data item) from an array 
@@ -91,7 +92,7 @@ class PkTestGenerator {
    *   means return an array, empty for $items = 0...
    * @return single instance or array, depending on num items
    */
-  public static function getRandomData( $dataArr, $items=-1) {
+  public static function randData( $dataArr, $items=-1) {
     try {
       //if (!$items) throw new \Exception("Invalid value or type for items");
       if (!$items) return [];
@@ -135,11 +136,11 @@ class PkTestGenerator {
 
   public static $jobTitles = null;
 
-  public static function getRandomJobTitle() {
+  public static function randJobTitle() {
     if (static::$jobTitles === null) {
       static::$jobTitles = require(__DIR__.'/References/JobTitles.php');
     }
-    return static::getRandomData(static::$jobTitles);
+    return static::randData(static::$jobTitles);
   }
 
 
@@ -151,7 +152,7 @@ class PkTestGenerator {
    * @param integer $multiplier - num days - default, 365, 1 yr
    * @return string: Pretty Date within the range
    */
-  public static function getRandomUnixDateFromRange($from, $to=0, $multiplier = 365) {
+  public static function randUnixDateFromRange($from, $to=0, $multiplier = 365) {
     $from = $from * $multiplier;
     $to = $to * $multiplier;
     if ($from < $to) {
@@ -166,14 +167,14 @@ class PkTestGenerator {
   }
 
   /** Get a date about n months in the future or past */
-  public static function getRandomDateOffset($n, $days = 30) {
+  public static function randDateOffset($n, $days = 30) {
     if ($n < 0 ) $m = $n - 1;
     else $m = $n + 1;
     $m = (int) (1.5 * $m);
-    return static::getRandomSqlDateFromRange($n, $m, $days);
+    return static::randSqlDateFromRange($n, $m, $days);
   }
 
-  public static function getRandomLorem($len = 0) {
+  public static function randLorem($len = 0) {
     static $texts = [
 
         'Earum placerat lorem est nunc id a congue ornare suspendisse lectus elementum',
@@ -185,7 +186,7 @@ class PkTestGenerator {
         'Vestibulum consequat ut cras luctus eu at pede mauris. Nullam a est vitae turpis a commodo sit sit sagittis adipiscing lacinia. Lorem nulla eu. Condimentum cras senectus turpis justo mi facilisi sodales pellentesque. Libero ullamcorper lectus. Mattis lorem elementum. Est mauris id morbi omnis tellus dolor mi enim. Dolor lacinia wisi metus ac rutrum. Integer vitae consequat. Dolor etiam eget.',
     ];
 
-    $str = static::getRandomData($texts);
+    $str = static::randData($texts);
     if ($len) $str = substr($str, 0, to_int($len));
     return $str;
   }
@@ -199,16 +200,16 @@ class PkTestGenerator {
    * @param int $multiplier - multiply from/to days - default, 365, so from/to are years
    * @return type
    */
-  public static function getRandomSqlDateFromRange($from, $to=0, $multiplier = 365) {
-    return static::sqlDateFromUnix(static::getRandomUnixDateFromRange($from, $to, $multiplier));
+  public static function randSqlDateFromRange($from, $to=0, $multiplier = 365) {
+    return static::sqlDateFromUnix(static::randUnixDateFromRange($from, $to, $multiplier));
   }
 
-  public static function getRandomSqlRecentDate($multiplier = 365) {
-    return static::sqlDateFromUnix(static::getRandomUnixDateFromRange(0, -1, $multiplier));
+  public static function randSqlRecentDate($multiplier = 365) {
+    return static::sqlDateFromUnix(static::randUnixDateFromRange(0, -1, $multiplier));
   }
 
-  public static function getRandomSqlBirthdate($multiplier = 365) {
-    return static::sqlDateFromUnix(static::getRandomUnixDateFromRange(-20, -70, $multiplier));
+  public static function randSqlBirthdate($multiplier = 365) {
+    return static::sqlDateFromUnix(static::randUnixDateFromRange(-20, -70, $multiplier));
   }
 
   public static function sqlDateFromUnix($unixDate) {
@@ -220,7 +221,7 @@ class PkTestGenerator {
   /* Takes actual dates and returens something in between. Takes Unix or SQL,
    * and returns the date in the same format 
    */
-  public static function getRandomDateBetween($date1, $date2) {
+  public static function randDateBetween($date1, $date2) {
     if (to_int($date1) && $to_int($date2)) {
       $sql = false;
     } else if (is_string($date1) && is_string($date2)) {
@@ -241,11 +242,11 @@ class PkTestGenerator {
    return date( 'Y-m-d H:i:s', $rnd );
   }
 
-  public static function getRandomFullName() {
-    return static::getRandomFirstName() . ' ' . static::getRandomLastName();
+  public static function randFullName() {
+    return static::randFirstName() . ' ' . static::randLastName();
   }
 
-  public static function getRandomFirstName() {
+  public static function randFirstName() {
     $fnames = array('Joe', 'Sally', 'Mary', 'Jose', 'Abdul', 'Katarina', 'Joachim',
         'Xhu', 'Toby', 'Saskia', 'Misha', 'Vaseem', 'Kalleen', 'Kenzie', 'Elizabeth',
         'Justin', 'Taylor', 'Giovanna', 'Stephanie', 'Olivia', 'Scott', 'Tina',
@@ -253,10 +254,10 @@ class PkTestGenerator {
         'William', 'Emily', 'Caitlin', 'Justin', 'Morgan', 'Gabrielle', 'Deanna',
         'Brian', 'Maxwell', 'Amanda', 'Jessica', 'Sarah', 'Shirby', 'Allison',
         'Heather', 'Sydney', 'Alex',);
-    return static::getRandomData($fnames);
+    return static::randData($fnames);
   }
 
-  public static function getRandomLastName() {
+  public static function randLastName() {
     $lnames = array('Smith', 'Lee', "O'Brien", "M'Beko", 'Semaphore', 'Crankshaft',
         'Kahn', 'Zaheer', 'Clymatis', 'Wagner-Spiel', 'Van Hoffen Schmidt',
         'Sidhartha', 'Evans', 'Bradbury', 'Loyack', 'Yost', 'Moulton', 'Thompson',
@@ -265,7 +266,7 @@ class PkTestGenerator {
         'Hamilton', 'Suskin', 'Howell', 'Blomquist', 'Cassel', 'Bourjac',
         'Anderson', 'Foye', 'Stenlake', 'Crookham', 'May', 'McLaughlin', 'Peterson',
         'Rivers',);
-    return static::getRandomData($lnames);
+    return static::randData($lnames);
   }
 
 
@@ -280,7 +281,7 @@ class PkTestGenerator {
    */
   //public static function importRandomFileFromDir($dir, $type = 'image') {
   public static $tmpdir = __DIR__.'/tmp';
-  public static function getRandomFilePathFromDir($dir, $type = 'image') {
+  public static function randFilePathFromDir($dir, $type = 'image') {
     pkdebug("DIR:  [$dir] ");
     if (!is_dir($dir)) {
       pkdebug("Couldn't resolve [$dir] to a directory");
@@ -312,7 +313,7 @@ class PkTestGenerator {
     }
     pkdebug("For [$dir], got valid paths:", $paths);
     #We have a set of valid file paths of the required type. Pick one:
-    $path = static::getRandomData($paths);
+    $path = static::randData($paths);
     $base = basename($path);
     $copypath = pkuntrailingslashit(static::$tmpdir)."/$base";
     copy($path,$copypath);
@@ -383,11 +384,13 @@ class PkTestGenerator {
   }
 
   /** Returns a STRING of random digits, 
+   * @param $from - minimal initial digit - default 0
    */
-  public static function getRandomDigitString($length=1)
+  public static function randDigitString($length=1,$from=0) {
     $ret = '';
     for ($i=0 ; $i<$length; $i++) {
-      $digit = mt_rand(0,9);
+      ($i===0) ? $min = $from : $min = 0;
+      $digit = mt_rand($min,9);
       $ret .= "$digit";
     }
     return $ret;
@@ -397,12 +400,23 @@ class PkTestGenerator {
    * @param string $separator = '' - what separates the components
    * @return string - SSN
    */
-  public static function randomSSN($separator = '') {
-    return static::getRandomDigitString(3).
-      $separator.static::getRandomDigitString(2).
-      $separator.static::getRandomDigitString(3);
+  public static function randSSN($separator = '') {
+    return static::randDigitString(3).
+      $separator.static::randDigitString(2).
+      $separator.static::randDigitString(3);
   }
 
+  public static function randPhone($separator = '-') {
+    return static::randDigitString(3,2).
+      $separator.static::randDigitString(3,2).
+      $separator.static::randDigitString(4);
+  }
+
+
+
+  public static function randFullAddress($separator=',') {
+    $faker = Faker\Factory::create();
+    $locations = ZipRef::
 
 
 
