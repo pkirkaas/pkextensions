@@ -223,6 +223,7 @@ abstract class PkModel extends Model {
         $comment = keyval('comment', $def);
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
+        if ($comment) $fielddef .= "->comment(\"$comment\")";
         if (is_string($methods)) {
           if ($change && (in_array($methods, $indices)))
               $fielddef .= $changestr . ";\n";
@@ -240,7 +241,6 @@ abstract class PkModel extends Model {
                 $methodChain .= "->$method($args)";
           }
         }
-        if ($comment) $methodChain .= "->comment(\"$comment\")";
         $out .= $fielddef . $methodChain . "$changestr;\n";
       }
     }
