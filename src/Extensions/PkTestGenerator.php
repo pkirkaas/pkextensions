@@ -415,7 +415,7 @@ class PkTestGenerator {
 
 
   public static function randFullAddress($separator=',') {
-    $faker = Faker\Factory::create();
+    $faker = \Faker\Factory::create();
     $location = ZipRef::randLocation();
     return $faker->streetAddress."$separator ".
         $location['city']."$separator ".

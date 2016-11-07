@@ -3,6 +3,7 @@
 namespace PkExtensions\References;
 
 use PkExtensions\PkRefManager;
+use PkExtensions\PkTestGenerator;
 
 class ZipRef extends PkRefManager {
   public static $milesperlat = 69;
