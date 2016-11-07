@@ -1,0 +1,12 @@
+/** Initialize/override any Bootstrap default variables, then import Bootstrap */
+//Experiment with enabling these features
+
+$enable-shadows:     true;
+$enable-gradients:  true;
+$enable-transitions: true;
+//$enable-flex: true;
+
+
+$gray-dark: #222;
+@import 'sbc-bs-variables';
+@import "bootstrap";

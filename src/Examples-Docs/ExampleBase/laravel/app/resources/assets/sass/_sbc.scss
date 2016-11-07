@@ -1,0 +1,108 @@
+/* 
+Custom scss for sbc
+Mar 4, 2016
+Author: Paul Kirkaas
+*/
+
+@import 'sbc-variables'; // Custom SBC SCSS Variables
+@import 'pk-variables'; // Generic PK Extension SCSS Variables
+@import 'variables'; //BS Variables
+@import 'mixins';
+@import 'pk-mixins';
+@import 'pk-utility';
+@import "pk-effects";
+
+$inner-border-color: #888 !default;
+$inp-row-vpad: .5rem;
+.inp-row {
+  padding-top: $inp-row-vpad;
+  padding-bottom: $inp-row-vpad;
+}
+
+.pkh5 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.pkh6 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #444;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: .8rem;
+  margin-bottom: .8rem;
+
+}
+
+.lqp-label {
+  margin: 25px;
+  padding: 35px;
+  border: solid black 1px;
+  background-color: #aa8;
+}
+
+.site-home-anchor {
+  font-size: large;
+  color: #400;
+  text-align: center;
+  display: block;
+}
+
+ul.nav.navbar-nav.li {
+  text-align: center;
+}
+
+.new-msg-cnt {
+  color: #f44;
+}
+
+.head-img-wrapper {
+  max-width: 10em;
+  //height: 2em;
+}
+
+.row.resp-head {
+  margin-bottom: 1em;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  background-color: #422;
+  border-radius: .25em;
+  //margin-top: .1em;
+}
+.head-slug-content {
+  text-align: center;
+  margin-top: 1.25em;
+  font-size: large;
+  //color: #33a;
+  color: #aaf;
+  font-style: italic;
+  @include below-bp('md') {
+    margin-top: .25em;
+  }
+}
+
+div img.img-fluid-vertical {
+  width: auto;
+  max-height: 100%;
+  max-width: none;
+}
+.head-slug.head-col {
+  vertical-align: text-bottom;
+  //height: 2em;
+}
+.tooltip {
+  padding: 1em;
+  font-size: medium;
+}
+
+.tooltip-inner {
+  border: solid #999 1px;
+  border-radius: .5rem;
+}
