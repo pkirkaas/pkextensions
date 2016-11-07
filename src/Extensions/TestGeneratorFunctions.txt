@@ -15,7 +15,6 @@
   public static function randFullName() {
   public static function randFirstName() {
   public static function randLastName() {
-  //public static function importRandomFileFromDir($dir, $type = 'image') {
   public static function randFilePathFromDir($dir, $type = 'image') {
   public static function makeUploadedSpfFiles() {
   public static function removeRandomItem(&$dataArr = []) {

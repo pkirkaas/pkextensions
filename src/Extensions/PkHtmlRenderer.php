@@ -5,6 +5,7 @@
 namespace PkExtensions;
 use PkHtml;
 use PkForm;
+use PkExtensions\Models\PkModel;
 
 if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 
@@ -57,7 +58,7 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
-  /** Takes to values, puts them each in their own div, then wraps them both in another
+  /** Takes two values, puts them each in their own div, then wraps them both in another
    * 
    * @param type $value
    * @param type $label
@@ -77,6 +78,57 @@ class PkHtmlRenderer extends PartialSet {
     $this->RENDERCLOSE();
     return $this;
   }
+
+
+  /**
+   * Takes a PkModel instance & string attribute name and displays as per $opts
+   * Really messes up separation of model & display, but so convenient.
+   * @param PkModel $model - REQUIRED
+   * @param string $attname - REQUIRED
+   * @param assoc array $opts:
+   *   'wrapperAttributes' : string | array - if string, class name, else key/val
+   *   'labelAttributes': string | array - if string, class name, else key/val
+   *   'valueAttributes': string | array - if string, class name, else key/val
+       'wrapperTag'=>'div',
+       'labelTag' => 'div',
+       'valueTag' => 'div',
+   *   'raw': boolean: default: false - 
+   *   'label':true | false | 'a string' : If true - use PkModel->attdesc() for
+   *       label. If false, no label, if string, use as label
+   */
+  public function wrapattr(PkModel $model,$attname,$opts=[]) {
+    $defaultOpts = [
+        //'wrapperClass' => 'pk-wrapper',
+        //'labelClass' => 'pk-label',
+        //'valueClass' => 'pk-value',
+        'label' => true,
+        'raw' => false,
+        'wrapperTag'=>'div',
+        'labelTag' => 'div',
+        'valueTag' => 'div',
+        'valueAttributes' => 'pk-value',
+        'labelAttributes' => 'pk-label',
+        'wrapperAttributes' => 'pk-wrapper',
+    ];
+    $opts = array_merge($defaultOpts, $opts);
+    extract($opts);
+    if ($raw) {
+      $valueTag = 'raw'.$valueTag;
+      $labelTag = 'raw'.$labelTag;
+    }
+    if ($label === true) $label = $model->attdesc($attname);
+    $value = $model->$attname;
+    $this->$wrapperTag(RENDEROPEN,$wrapperAttributes);
+      if ($label !== false) $this->$labelTag($label, $labelAttributes);
+      $this->$valueTag($value, $valueAttributes);
+    $this->RENDERCLOSE();
+    return $this;
+
+  }
+
+
+
+
   public function rawwrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='') {
     return $this->wrap($value, $label,$valueClass, $labelClass, $wrapperClass, true);
   }
@@ -250,6 +302,12 @@ class PkHtmlRenderer extends PartialSet {
      return $this;
   }
 
+  /** To render regular Blade templates within a PkHtmlRenderer context
+   * 
+   * @param string $view - standarad blade view name
+   * @param array $data - standard blade view data
+   * @return string|\PkExtensions\PkHtmlRenderer
+   */
   public function render($view,$data=[]) {
     if (!$view || !is_string($view)) return '';
     $relview = str_replace('.','/', $view);
