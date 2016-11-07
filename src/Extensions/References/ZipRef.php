@@ -60,6 +60,16 @@ class ZipRef extends PkRefManager {
           'latitude'=>$location[3], 'longitude'=>$location[4]];
   }
 
+  public static function randLocation($items = -1) {
+    $rawLocations = PkTestGenerator::randData(static::$ca_cities, $items);
+    if ($items === -1) return static::locationAssoc($rawLocations);
+    $assocLocs = [];
+    foreach ($rawLocations as $rawLocation) {
+      $assocLocs[] = static::locationAssoc($rawLocation);
+    }
+    return $assocLocs;
+  }
+
   public static $ca_cities = [
       [90001, "CA", "Los Angeles", 33.973093, -118.247896],
       [90002, "CA", "Los Angeles", 33.94969, -118.246213],
