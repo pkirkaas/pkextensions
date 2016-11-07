@@ -240,7 +240,7 @@ abstract class PkModel extends Model {
                 $methodChain .= "->$method($args)";
           }
         }
-        if ($comment) $methodChain .= "->comment('"'.$comment.'"')";
+        if ($comment) $methodChain .= "->comment(\"$comment\")";
         $out .= $fielddef . $methodChain . "$changestr;\n";
       }
     }
