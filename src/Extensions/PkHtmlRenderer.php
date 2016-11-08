@@ -59,7 +59,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   /** Takes two values, puts them each in their own div, then wraps them both in another
-   * 
+   * TWO FORMS! $value can be an associative array! (Like wrapattr below)!
    * @param type $value
    * @param type $label
    * @param type $valueClass
@@ -67,6 +67,31 @@ class PkHtmlRenderer extends PartialSet {
    * @param type $wrapperClass
    */
   public function wrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='', $raw=null) {
+    if (is_arrayish($value)) {
+      $opts = $value;
+      $defaultOpts = [
+        'value' => '',
+        'label' => '',
+        'raw' => false,
+        'wrapperTag'=>'div',
+        'labelTag' => 'div',
+        'valueTag' => 'div',
+        'valueAttributes' => 'pk-value',
+        'labelAttributes' => 'pk-label',
+        'wrapperAttributes' => 'pk-wrapper',
+      ];
+      $opts = array_merge($defaultOpts, $opts);
+      extract($opts);
+      if ($raw) {
+        $valueTag = 'raw'.$valueTag;
+        $labelTag = 'raw'.$labelTag;
+      }
+      $this->$wrapperTag(RENDEROPEN,$wrapperAttributes);
+        if ($label) $this->$labelTag($label, $labelAttributes);
+        $this->$valueTag($value, $valueAttributes);
+      $this->RENDERCLOSE();
+      return $this;
+    }
     $this->div(RENDEROPEN,$wrapperClass);
     if ($raw === true) {
       $this->rawdiv($label, $labelClass);
