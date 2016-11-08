@@ -122,3 +122,8 @@ function jsObjDataGen($pkmodels, $typename = null) {
   return $ps;
 
 } 
+
+function checkBox($value) {
+  if ($value) return '&#9745;';
+  return  '&#9744;';
+}
