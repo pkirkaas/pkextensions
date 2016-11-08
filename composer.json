@@ -18,6 +18,7 @@
       "PkExtensions\\": "src/Extensions/"
     },
     "files": [
+      "src/lib/PkExtensions.php",
       "src/lib/pklib.php",
       "src/lib/pkhtmlhelpers.php",
       "src/lib/pkhelpers.php"
