@@ -12,14 +12,13 @@ class PkTestGenerator {
       'She is doing better than I expected',
       'Very good progress since our previous session',
       "I'm concerned - she seems to be on a downward slope",
-      "It's so harde for her to go through this alone, but she's much better off without him",
+      "It's so hard for her to go through this alone, but she's much better off without him",
       "His substance abuse seems to be getting worse",
       "Excellent progress since last time",
       "The family is so poor they can't focus on other important issues",
       "The medication seems to be helping",
       "Her spirit is very good, under the circumstances",
       "We have to keep an eye on her progress and check which way she's going next time",
-
   ];
 
   /** Used to hold registered method names, data sources, and rules for using

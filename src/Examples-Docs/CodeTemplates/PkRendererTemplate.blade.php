@@ -16,6 +16,10 @@ $out->div(RENDEROPEN,'row inner-border');
       $out->wrap(pk_showcheck($user->profitable),'Profitable:','tac', 'pkl1','col-md-4' );
       $out->wrap(dollar_format($user->cc),'Credit Card:','tac', 'pkl1','col-md-4' );
       $out->wrap($user->type2_id_DV,'Type 2:','tac', 'pkl1','col-md-4' );
+      $out->wrapattr($user,'full_name'); #Gets the attribute of the model, & the desc.
+  }
+
+
     $out->RENDERCLOSE();
   $out->RENDERCLOSE();
 $out->RENDERCLOSE();
