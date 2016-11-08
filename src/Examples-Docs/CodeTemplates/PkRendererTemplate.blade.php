@@ -1,6 +1,7 @@
 <?php
 use PkExtensions\PkHtmlRenderer;
 $out = new PkHtmlRenderer();
+$statout = new PkHtmlRenderer();
 ?>
 <div class="pkh5">Details</div>
 
@@ -19,7 +20,14 @@ $out->div(RENDEROPEN,'row inner-border');
       $out->wrapattr($user,'full_name'); #Gets the attribute of the model, & the desc.
   }
 
-
+    $statout->wrap([
+        'value' => $client->relationship_status_id_DV,
+        'label' => 'Relationship',
+        'labelAttributes' => 'block tpm-label',
+        'valueAttributes' => 'block tpm-value',
+        'wrapperAttributes' => 'col-xs-3 tpm-wrapper',
+    ]);
+    $out[]=$statout;
     $out->RENDERCLOSE();
   $out->RENDERCLOSE();
 $out->RENDERCLOSE();
