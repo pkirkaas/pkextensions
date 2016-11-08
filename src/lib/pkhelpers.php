@@ -147,3 +147,15 @@ function makeDropMenu($route, $paramName = null, $valArr = [], $labelClosure = n
   }
   return $out;
 }
+
+
+/**
+ * Returns "Yes" if $arg, "No" if $arg explicitly 0 || false; else ''
+ * @param mixed $arg
+ * @return string : "Yes", "No", or ""
+ */
+function yesnonull($arg) {
+  if ($arg) return 'Yes';
+  if (($arg===false) || ($arg === 0)) return "No";
+  return '';
+}
