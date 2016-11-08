@@ -30,10 +30,12 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * but for complex ref classes, returns the complex array. To guarantee
    * always getting a simple array of key=>value, use static::getKeyValArr()
    * instead
+   * @param boolean $null - if true, adds key null=>'None' to start of array
    * @return array of key=>value
    */
-  public static function getRefArr() {
-    return static::$refArr;
+  public static function getRefArr($null=false) {
+    if (!$null) return static::$refArr;
+    return [null=>'None'] + static::$refArr;
   }
 
   public static function getKeyValArr() {

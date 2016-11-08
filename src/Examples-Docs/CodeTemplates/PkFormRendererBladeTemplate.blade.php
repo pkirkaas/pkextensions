@@ -14,6 +14,16 @@ $infoout->wrap([
     'valueAttributes' => 'block tpm-value',
     'wrapperAttributes' => 'col-xs-4 tpm-wrapper',
 ]);
+
+ #Note arguement 'true' to ::getRefArr(true) - prepends null=>'None' to array
+ $infoout->wrap([
+      'value' => PkForm::select('insurance_status_id',App\References\InsuranceStatusRef::getRefArr(true),null),
+      'raw'=>true,
+      'label' => 'Insurance Status',
+      'labelAttributes' => 'block tpm-label',
+      'valueAttributes' => 'block tpm-value',
+      'wrapperAttributes' => 'col-xs-4 tpm-wrapper',
+    ]);
 $out[] = $infoout;
 
 $out[] =   PkForm::button('Submit', ['type'=>'submit', 'name'=>'submit','value'=>'submit',
