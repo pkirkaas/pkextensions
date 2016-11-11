@@ -17,13 +17,9 @@ use PkExtensions\Models\PkModel;
  * $subform = new PkMultiSubformRenderer;
  * $subform->basename = $tablename;
  * //Make the base subform
- * //$subform->hidden('id');
+ * $subform->hidden('id');
  * $subform->text('name',$attributes);
  * $subform->text('ssn');
- * //$subform->$tpl_fields = ['id','name','ssn'];
- * //$subform->hidden('tblname[__CNT_TPL__][id]','__FLD_TPL__id');
- * //$subform->text('tblname[__CNT_TPL__][name]','__FLD_TPL__name');
- * //$subform->text('tblname[__CNT_TPL__][ssn]','__FLD_TPL__ssn');
  * //$subform->$tpl_fields = ['id','name','ssn'];
  * $subform->subform_data = [
  *   ['id'=>7, 'name'=>'Joe', 'ssn'=>'555-33-4444',],
@@ -31,6 +27,11 @@ use PkExtensions\Models\PkModel;
  *  ];
  * // (Generally, build $subform_data in a foreach )
  * echo $subform;
+ * // If you want to keep the default classes/atts for pklib.js, but ADD css
+ * // classes, use appent_atts():
+//$subform->append_atts('create_button','tst-create-btn-class');
+//$subform->append_atts('deletable_dataset','tst-dds-class');
+//$subform->append_atts('js_template',['class'=>'tst-add-class-arr']);
  */
 class PkMultiSubformRenderer  extends PkHtmlRenderer {
   /**

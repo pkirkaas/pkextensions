@@ -19,16 +19,17 @@ function setAppLog() {
 }
 
 /**
- * Returns a user friendly string date format for a Carbon date object, with default
+ * Returns a user friendly string date format for date string or Carbon date object, with default
  * format or given - BUT also returns "Never" if Carbon date is max/min - or null.
- * @param Carbon $date
+ * @param mixed $date - a date parsable by Carbon, including a Carbon Date object
  * @param string $format
  */
-function friendlyCarbonDate(Carbon $date = null, $format =  'M j, Y') {
-  if (!$date) return "Never";
+function friendlyCarbonDate($date = null, $format =  'M j, Y') {
+  if (!$date) return "Never/None";
+  $date = new Carbon($date);
   $min = Carbon::minValue();
   $max = Carbon::maxValue();
-  if ($max->eq($date) || $min->eq($date)) return "Never";
+  if ($max->eq($date) || $min->eq($date)) return "Never/None";
   return $date->format($format);
 }
 /**
