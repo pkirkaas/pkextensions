@@ -13,6 +13,21 @@ class ClientController extends PkController {
     if ($client->user->is($user)) return view('client.viewprofile',['client'=>$client]);
     return $this->error("Not your client!");
   }
+
+
+#If creating a new instance...
+#Can't believe it works this well - verify
+  public function newprofile() {
+    $user = Auth::user();
+    $client = new Client();
+    $client->user_id = $user->id;
+    $this->processSubmit(['pkmodel'=>$client]);
+    if ($client->id) { #We created the client - redirect to edit
+      return redirect()->route('client_editprofile', [$client]);
+    }
+    return view('client.editprofile',['client'=>$client]);
+  }
+
   public function editprofile(Client $client) {
     $user = Auth::user();
     if (!$client->user->is($user)) return $this->error("Not your client!");

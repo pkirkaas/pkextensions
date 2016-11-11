@@ -52,6 +52,13 @@ $infoout->wrap([
 $out[] = $infoout;
 $out[]=$diagsf;
 
+
+#Can put sections/containers together in a row
+$out->div(RENDEROPEN,'row');
+  $out->rawdiv($diagwrapper,'col-sm-6');
+  $out->rawdiv($payout,'col-sm-6');
+$out->RENDERCLOSE();
+
 $out[] =   PkForm::button('Submit', ['type'=>'submit', 'name'=>'submit','value'=>'submit',
       'class'=>'pkmvc-button block fullwidth','title'=>"Save Changes"]);
  $out[] = PkForm::close();

@@ -338,6 +338,9 @@ class $createclassname extends Migration {
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
   public static $mySqlNumericTypes = ['tinyint', 'smallint', 'mediumint', 'int',
       'bigint', 'decimal', 'float', 'double', 'real', 'bit', 'boolean', 'serial'];
+  public static $mySqlDateTimeTypes = [
+      'date', 'datetime', 'timestamp', 'time', 'year',
+      ];
 
   /** POSTs submit an empty string for "no value". For integer table fields, 
    * should we convert the empty string to null? Default for MySQL is to insert
@@ -1220,11 +1223,17 @@ class $createclassname extends Migration {
     
   }
 
-  public function convertEmptyStringToNullForNumerics() {
+  /** When POSTING empty values, can't POST nulls, get converted to ''
+   * No good for int & date types, even if they allow NULL, so convert to NULL
+   * @param boolean $anddates: true - and dates?
+   */
+  public function convertEmptyStringToNullForNumerics($anddates=true) {
     $attributeDefs = $this->getAttributeDefs();
     foreach ($attributeDefs as $name => $type) {
-      if (($this->$name === '') && in_array(strtolower($type), static::$mySqlNumericTypes)) {
-        $this->$name = null;
+      if ( ($this->$name === '') &&
+          (in_array(strtolower($type), static::$mySqlNumericTypes) ||
+          ($anddates && in_array(strtolower($type), static::$mySqlDateTimeTypes)))) { 
+          $this->$name = null;
       }
     }
   }
