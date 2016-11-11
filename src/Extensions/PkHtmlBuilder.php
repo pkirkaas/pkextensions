@@ -11,11 +11,10 @@ class PkHtmlBuilder extends HtmlBuilder {
   # just as an attribute for this single item
   public function attributes($attributes) {
     $name_prefix = keyVal('name_prefix',$attributes, $this->name_prefix);
-    if ($name_prefix && array_key_exists('name', $attributes)) {
+    if ($name_prefix && is_array($attributes) && array_key_exists('name', $attributes)) {
       $attributes['name'] = $name_prefix . '[' . $attributes['name'] . ']';
     }
-    unset($attributes['name_prefix']);
-    if (array_key_exists('name_prefix',$attributes) || $name_prefix) pkdebug("NamePrefix: $name_prefix\nAtts:",$attributes);
+    if (is_array($attributes)) unset($attributes['name_prefix']);
 
     /** Automate using BS4 tether Tooltips */
     if (is_array($attributes) && array_key_exists('tooltip', $attributes)) {
@@ -27,9 +26,13 @@ class PkHtmlBuilder extends HtmlBuilder {
   }
 
 
+  /*
+   * //Remove 11 Nov 16 -- maybe not necessary?
   protected function toHtmlString($html) {
     return $html;
   }
+   * 
+   */
 
   /** Generates Bootstrap Dropdown menus - BUT - on click/tourch ONLY IF UA
    * isMobile() - otherwise, on hover. So if onHover, the menu label can be a

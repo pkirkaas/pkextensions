@@ -77,7 +77,7 @@ class PkHtmlRenderer extends PartialSet {
    * @param type $wrapperClass
    */
   public function wrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='', $raw=null) {
-    if (is_arrayish($value)) {
+    if (!is_stringish($value) && is_arrayish($value)) {
       $opts = $value;
       $defaultOpts = [
         'value' => '',
@@ -192,7 +192,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return html string
    */
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
-    if (is_arrayish($content)) {
+    if (!is_stringish($content) && is_arrayish($content)) {
       $content = keyVal('content', $content);
       $attributes = keyVal('attributes', $content,$attributes);
       $raw = keyVal('raw', $content,false,$raw);
@@ -222,7 +222,7 @@ class PkHtmlRenderer extends PartialSet {
 
   //Inputs 
   public function select($name, $list = [], $selected = null, $options = []) {
-    if (is_arrayish($name)) {
+    if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
       $list = keyVal('list', $name,$list);
       $selected = keyVal('selected', $name,$selected);
@@ -238,7 +238,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
-    if (is_arrayish($name)) {
+    if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
       $list = keyVal('list', $name,$list);
       $values = keyVal('values', $name,$values);
@@ -304,7 +304,7 @@ class PkHtmlRenderer extends PartialSet {
    * 
    */
 	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
-    if (is_arrayish($name)) {
+    if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
       $checked = keyVal('checked', $name,$checked);
       $options = keyVal('options', $name,$options);
@@ -321,7 +321,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public function input($type, $name, $value = null, $options = []) {
-    if (is_arrayish($name)) {
+    if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
       $value = keyVal('value', $name,$value);
       $options = keyVal('options', $name,$options);
@@ -342,7 +342,7 @@ class PkHtmlRenderer extends PartialSet {
    * @param type $options
    */
   public function textarea($name, $value = null, $options = []) {
-    if (is_arrayish($name)) {
+    if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
       $value = keyVal('value', $name,$value);
       $options = keyVal('options', $name,$options);
