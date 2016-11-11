@@ -6,6 +6,19 @@ var repository = {};
  * @license   http://opensource.org/licenses/BSD-3-Clause  
  */
 
+/** If need to do something on element create */
+/*
+$('body').on('DOMNodeInserted',  function (e) {
+  if ($(e.target).is(selector)) {
+    //Do Something
+  }
+  var dpel = $(e.target).find(selector);
+  if (dpel.length) {
+    //Do Something
+  }
+});
+*/
+
 
 $(function () {
 

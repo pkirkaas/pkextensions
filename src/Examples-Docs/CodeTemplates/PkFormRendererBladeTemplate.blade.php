@@ -20,7 +20,8 @@ $diagsf = new PkMultiSubformRenderer([
   ]);
 //Test adding attributes
 $diagsf->append_atts('create_button','tst-create-btn-class');
-$diagsf->append_atts('deletable_dataset','tst-dds-class');
+$diagsf->append_atts('deletable_dataset','row'); #To put the Delete button in a row
+$diagsf->append_atts('delete_button_wrap','col-xs-3'); #To put the Delete button in a row
 $diagsf->append_atts('js_template',['class'=>'tst-add-class-arr']);
 
 $diagsf->subform_data = $diagrows;

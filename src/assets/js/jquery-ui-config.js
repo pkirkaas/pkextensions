@@ -5,13 +5,20 @@
 
 
 /** Initialize Date Picker */
+/*
 $(function () {
   $('input.datepicker.auto-attach').datepicker( { 
     dateFormat: 'yy-mm-dd'
   });
 });
+*/
 
-
+/** Better Initialize Date Picker */
+$('body').on('focus', 'input.datepicker.auto-attach', function (e) {
+    $(this).datepicker({
+      dateFormat: 'yy-mm-dd'
+  });
+});
 /** Persist current tab and return to it - but clear if doesn't exist in this
  * page
  */

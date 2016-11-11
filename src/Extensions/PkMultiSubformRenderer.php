@@ -53,6 +53,10 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
   public $create_button_attributes = ['class'=>'js btn mf-btn pkmvc-button create-new-data-set'];
   public $create_button_tag = 'div';
   public $delete_button_label = 'Delete';
+  public $create_button_wrap_tag = 'div';
+  public $create_button_wrap_attributes = ['class'=>''];
+  public $delete_button_wrap_tag = 'div';
+  public $delete_button_wrap_attributes = ['class'=>''];
   public $delete_button_tag = 'div';
   public $delete_button_attributes = ['class'=>'js btn mf-btn pkmvc-button data-set-delete'];
   public $js_template_tag = 'fieldset';
@@ -90,7 +94,6 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
 
   public function __toString() {
     $baseSubForm = parent::__toString();
-    pkdebug("The baseSubForm:\n\n$baseSubForm\n\nThe Values:", $this->subform_data);
     $out = new PkHtmlRenderer();
     $out[] = "\n";
     $cnt = 0;
@@ -101,9 +104,12 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
       }
       $create_button_attributes = $this->create_button_attributes;
       $create_button_tag = $this->create_button_tag;
+      $create_button_wrap_tag = $this->create_button_wrap_tag;
       $create_button_attributes['data-itemcount'] = $cnt;
       //$createbutton = $this->div($this->create_button_label, $this->create_button_attributes);
-      $out ->$create_button_tag($this->create_button_label, $create_button_attributes);
+      $out->$create_button_wrap_tag(RENDEROPEN, $this->create_button_wrap_attributes);
+        $out ->$create_button_tag($this->create_button_label, $create_button_attributes);
+      $out->RENDERCLOSE();
       //$out[] = $this->div($this->create_button_label, $create_button_attributes);
     /*
       $out[] = $this->$create_button_tag($this->create_button_label, $this->create_button_attributes);
@@ -147,7 +153,10 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
       }
       $tpl[] = $baseSubForm."\n";
       $delete_button_tag = $this->delete_button_tag;
-      $tpl->$delete_button_tag($this->delete_button_label, $this->delete_button_attributes);
+      $delete_button_wrap_tag = $this->delete_button_wrap_tag;
+      $tpl->$delete_button_wrap_tag(RENDEROPEN,  $this->delete_button_wrap_attributes);
+        $tpl->$delete_button_tag($this->delete_button_label, $this->delete_button_attributes);
+      $tpl->RENDERCLOSE();
     $tpl->RENDERCLOSE();
     if ($values === null) { //Invisible template part
       $tpl->RENDERCLOSE();
