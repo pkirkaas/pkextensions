@@ -159,22 +159,31 @@ class PkHtmlRenderer extends PartialSet {
     return $this->wrap($value, $label,$valueClass, $labelClass, $wrapperClass, true);
   }
 
-  /**Change to allow $content to be assoc array
+  /** Just return $this->tagged with $raw default to true rather than false
    * 
+   * @param string $tag - the HTML tag - required
+   * @param scalar|array|null $content
+   * @param string|array|null $attributes
+   * @param boolean $raw - default true
+   * @return html string
    */
   public function rawtagged($tag, $content = null, $attributes=null, $raw = true) {
-    if (is_arrayish($content)) {
-      $content = keyVal('content', $content);
-      $attributes = keyVal('attributes', $content);
-      $raw = keyVal('raw', $content,true);
-    }
     return $this->tagged($tag, $content, $attributes, $raw);
   }
+  /**
+   * Generate HTML element of type $tag
+   * Change to allow $content to be assoc array with same params as arg
+   * @param string $tag - the HTML tag - required
+   * @param scalar|array|null $content
+   * @param string|array|null $attributes
+   * @param boolean $raw - default true
+   * @return html string
+   */
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     if (is_arrayish($content)) {
       $content = keyVal('content', $content);
-      $attributes = keyVal('attributes', $content);
-      $raw = keyVal('raw', $content,false);
+      $attributes = keyVal('attributes', $content,$attributes);
+      $raw = keyVal('raw', $content,false,$raw);
     }
     $attributes = $this->cleanAttributes($attributes);
     if (!$content) $content = ' ';
