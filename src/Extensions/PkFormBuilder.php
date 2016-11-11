@@ -11,19 +11,20 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkHtmlBuilder;
 
 class PkFormBuilder extends FormBuilder {
 
   /**
    * Create a new form builder instance.
-   *
+   * if config/app.php set right, will use PkHtmlBuilder to build $html
    * @param  \Illuminate\Routing\UrlGenerator  $url
    * @param  \Illuminate\Html\HtmlBuilder  $html
    * @param  string  $csrfToken
    * @return void
    */
-  public function __construct(HtmlBuilder $html, UrlGenerator $url, Factory $view, $csrfToken) {
-    parent::__construct($html, $url, $view, $csrfToken);
+  public function __construct(PkHtmlBuilder $pkhtml, UrlGenerator $url, Factory $view, $csrfToken) {
+    parent::__construct($pkhtml, $url, $view, $csrfToken);
   }
 
   /*

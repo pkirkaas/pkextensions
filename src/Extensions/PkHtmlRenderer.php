@@ -159,10 +159,23 @@ class PkHtmlRenderer extends PartialSet {
     return $this->wrap($value, $label,$valueClass, $labelClass, $wrapperClass, true);
   }
 
+  /**Change to allow $content to be assoc array
+   * 
+   */
   public function rawtagged($tag, $content = null, $attributes=null, $raw = true) {
+    if (is_arrayish($content)) {
+      $content = keyVal('content', $content);
+      $attributes = keyVal('attributes', $content);
+      $raw = keyVal('raw', $content,true);
+    }
     return $this->tagged($tag, $content, $attributes, $raw);
   }
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
+    if (is_arrayish($content)) {
+      $content = keyVal('content', $content);
+      $attributes = keyVal('attributes', $content);
+      $raw = keyVal('raw', $content,false);
+    }
     $attributes = $this->cleanAttributes($attributes);
     if (!$content) $content = ' ';
     if ($content === true) {
