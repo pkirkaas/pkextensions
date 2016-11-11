@@ -15,11 +15,16 @@ if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 /**
  * Usage: 
  * $subform = new PkMultiSubformRenderer;
+ * $subform->basename = $tablename;
  * //Make the base subform
- * $subform->hidden('tblname[__CNT_TPL__][id]','__FLD_TPL__id');
- * $subform->text('tblname[__CNT_TPL__][name]','__FLD_TPL__name');
- * $subform->text('tblname[__CNT_TPL__][ssn]','__FLD_TPL__ssn');
- * $subform->$subform_string_templates = ['id','name','ssn'];
+ * //$subform->hidden('id');
+ * $subform->text('name',$attributes);
+ * $subform->text('ssn');
+ * //$subform->$tpl_fields = ['id','name','ssn'];
+ * //$subform->hidden('tblname[__CNT_TPL__][id]','__FLD_TPL__id');
+ * //$subform->text('tblname[__CNT_TPL__][name]','__FLD_TPL__name');
+ * //$subform->text('tblname[__CNT_TPL__][ssn]','__FLD_TPL__ssn');
+ * //$subform->$tpl_fields = ['id','name','ssn'];
  * $subform->subform_data = [
  *   ['id'=>7, 'name'=>'Joe', 'ssn'=>'555-33-4444',],
  *   ['id'=>9, 'name'=>'Jane', 'ssn'=>'666-22-8888',],
@@ -38,7 +43,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    * eg, ['id','name','ssn'];
    * @var null|array
    */
-  public $subform_string_templates=null;
+  public $tpl_fields=null;
   public $cnt_tpl = '__CNT_TPL__';
   public $fld_tpl_prefix = '__FLD_TPL__';
   public $templatables_attributes = ['class'=>'templatable-data-sets'];
@@ -58,6 +63,17 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    */
   public $owner_id = null;
 
+  /** Generally want to set at least basemodel & tpl_fields
+   * @param array $args - initialization array
+   */
+  public function __construct($args=[]) {
+    foreach ($args as $key => $val) {
+      if (property_exists($this,$key)) {
+        $this->$key = $val;
+      }
+    }
+    parent::__construct();
+  }
   /*
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     if (is_arrayis($content)) {
@@ -73,7 +89,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
 
   public function __toString() {
     $baseSubForm = parent::__toString();
-    //pkdebug("The Values:", $this->subform_data);
+    pkdebug("The baseSubForm:\n\n$baseSubForm\n\nThe Values:", $this->subform_data);
     $out = new PkHtmlRenderer();
     $out[] = "\n";
     $cnt = 0;
@@ -95,6 +111,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
       $out[] = $this->makeSubformPart($baseSubForm);
     $out->RENDERCLOSE();
     $out[] = "\n";
+    //PkForm::setNamePrefix($newNamePrefix);
     return $out->__toString();
   }
 
@@ -103,23 +120,28 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    * 
    */
   public function makeSubformPart($baseSubForm, $idx = null, $values=null) {
-    //pkdebug("baseSubform: \n$baseSubForm\nidx:", $idx,'Values',$values);
-    if ($idx !== null) $baseSubForm = str_replace($this->cnt_tpl,$idx,$baseSubForm);
-    if (!is_arrayish($this->subform_string_templates)) return $baseSubForm;
+    if (!is_arrayish($this->tpl_fields)) return $baseSubForm;
+
+    if ($idx !== null) { #Existing data, value to be replaced in __toString
+      $baseSubForm = str_replace($this->cnt_tpl,$idx,$baseSubForm);
+    } else { #Subform template - all values to be null
+      foreach ($this->tpl_fields as $inp_fld) {
+        $valkey = $this->fieldValueTemplate($inp_fld);
+        $baseSubForm = str_replace($valkey,'',$baseSubForm);
+      }
+    }
     $tpl = new PkHtmlRenderer();
     $tpl[]= "\n";
-    //return "<h3>In makeSubformPart</h3>";
     if ($values === null) { //Invisible template part
       $js_template_tag = $this->js_template_tag;
       $tpl->$js_template_tag(RENDEROPEN,$this->js_template_attributes);
     } 
     //$tpl->div(RENDEROPEN,$this->templatable_attributes);
     $tpl->div(RENDEROPEN,$this->deletable_dataset_attributes);
-      foreach ($this->subform_string_templates as $inp_fld) {
-        $valkey = $this->fld_tpl_prefix.$inp_fld;
+      foreach ($this->tpl_fields as $inp_fld) {
+        $valkey = $this->fieldValueTemplate($inp_fld);
         $val = keyVal($inp_fld,$values);
         if (is_string($val)) $val = "'".$val."'";
-        //pkdebug("INP_FLD: $inp_fld, valkey: $valkey; val: $val");
         $baseSubForm = str_replace($valkey,$val,$baseSubForm);
       }
       $tpl[] = $baseSubForm."\n";
@@ -132,4 +154,71 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
     $tpl[]="\n";
     return $tpl;
   }
+
+  public function fieldValueTemplate($name) {
+    return $this->fld_tpl_prefix.$name;
+  }
+
+  /**Customize attributes for subform inputs */
+  public function cleanAttributes($options) {
+    $options = parent::cleanAttributes($options);
+    if ($this->basename) {
+      $options['name_prefix']=$this->basename."[{$this->cnt_tpl}]";
+    }
+    return $options;
+  }
+
+  public function input($type, $name, $value = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $value = keyVal('value', $name,$value);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    $options['value'] = $this->fieldValueTemplate($name);
+    $options['name'] = keyVal('name',$options,$name);
+    $return = parent::input($type,$name,$value,$options);
+    pkdebug("Return: $return\nOptions:",$options);
+    return $return;
+    //return parent::input($type,$name,$value,$options);
+  }
+
+  public function textarea($name, $value = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $value = keyVal('value', $name,$value);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    $value = $options['value'] = $this->fieldValueTemplate($name);
+    $options['name'] = keyVal('name',$options,$name);
+    return parent::textarea($name,$value,$options);
+  }
+  
+  public function select($name, $list = [], $selected = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $list = keyVal('list', $name,$list);
+      $selected = keyVal('selected', $name,$selected);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    $options['selected'] = $this->fieldValueTemplate($name);
+    $options['name'] = keyVal('name',$options,$name);
+    return parent::select($name,$list,$selected,$options);
+  }
+
+
+  /** Don't worry for subforms */
+  /*
+  public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
+     if (is_string($options)) $options = ['class'=>$options];
+     if ($this instanceOf PkMultiSubformRenderer && $this->basename) {
+      $options['name_prefix']=$this->basename."{[$this->cnt_tpl]}";
+    }
+     $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
+     return $this;
+  }
+   */
+
 }

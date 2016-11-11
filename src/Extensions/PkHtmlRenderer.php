@@ -10,7 +10,9 @@ use PkExtensions\Models\PkModel;
 
 if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 
-/* Linked ? */
+/** We allow it to know about the possibility of the extended class
+ * PkMultiSubformRenderer
+ */
 class PkHtmlRenderer extends PartialSet {
   public static $selfclosing_tags = [
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
@@ -31,6 +33,13 @@ class PkHtmlRenderer extends PartialSet {
       'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title',
       'tr', 'tt', 'u', 'ul', 'var', 'video',
     ];
+
+  public static $input_types = [
+    'checkbox', 'color', 'date', 'datetime', 'datetime-local', 'email', 'file', 'hidden', 'image', 'month', 
+    'number', 'password', 'radio', 'range', 'min', 'max', 'value', 'step', 'reset', 'search', 'submit', 
+    'tel', 'text', 'time', 'url', 'week', 
+    ];
+
   public static function contentTag($tag) {
     if (!$tag || !is_string($tag)) return false;
     $tag = strtolower($tag);
@@ -122,6 +131,8 @@ class PkHtmlRenderer extends PartialSet {
    *   'label':true | false | 'a string' : If true - use PkModel->attdesc() for
    *       label. If false, no label, if string, use as label
    */
+  ## Don't want this for now
+  /*
   public function wrapattr(PkModel $model,$attname,$opts=[]) {
     $defaultOpts = [
         //'wrapperClass' => 'pk-wrapper',
@@ -149,8 +160,9 @@ class PkHtmlRenderer extends PartialSet {
       $this->$valueTag($value, $valueAttributes);
     $this->RENDERCLOSE();
     return $this;
-
   }
+   * 
+   */
 
 
 
@@ -172,7 +184,7 @@ class PkHtmlRenderer extends PartialSet {
   }
   /**
    * Generate HTML element of type $tag
-   * Change to allow $content to be assoc array with same params as arg
+   * Change to allow $content to be assoc array with same params as args
    * @param string $tag - the HTML tag - required
    * @param scalar|array|null $content
    * @param string|array|null $attributes
@@ -207,9 +219,111 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
-  public function RENDERCLOSE() {
-    return $this->close();
+
+  //Inputs 
+  public function select($name, $list = [], $selected = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $list = keyVal('list', $name,$list);
+      $selected = keyVal('selected', $name,$selected);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    #If selected exists in options, override arg
+    $selected=keyVal('selected',$options,$selected);
+    #Set name in options
+    $options['name']=keyVal('name',$options,$name);
+    $this[] = PkForm::select($name, $list, $selected, $options);
+    return $this;
   }
+
+  public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $list = keyVal('list', $name,$list);
+      $values = keyVal('values', $name,$values);
+      $options = keyVal('options', $name,$options);
+      $unset = keyVal('unset', $name,$unset);
+    }
+    $options = $this->cleanAttributes($options);
+    #If values exists in options, override arg
+    $values=keyVal('values',$options,$values);
+    #Set name in options
+    $options['name']=keyVal('name',$options,$name);
+    $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
+    return $this;
+  }
+
+  /*
+  public function hidden($name, $value = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $value = keyVal('value', $name,$value);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    $this[] = PkForm::hidden($name, $value, $options);
+    return $this;
+  }
+  public function text($name, $value = null, $options = []) {
+    return $this->input('text',$name,$value,$options);
+  }
+   * 
+   */
+	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $checked = keyVal('checked', $name,$checked);
+      $options = keyVal('options', $name,$options);
+      $unset = keyVal('unset', $name,$unset);
+      $value = keyVal('value', $name,$value);
+    }
+    $options = $this->cleanAttributes($options);
+    #If checked exists in options, override arg
+    $checked=keyVal('checked',$options,$checked);
+    #Set name in options
+    $options['name']=keyVal('name',$options,$name);
+    $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
+    return $this;
+  }
+
+  public function input($type, $name, $value = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $value = keyVal('value', $name,$value);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    #If value exists in options, override arg
+    $value=keyVal('value',$options,$value);
+    #Set name in options
+    $options['name']=keyVal('name',$options,$name);
+    $this[] = PkForm::input($type, $name, $value, $options);
+    return $this;
+  }
+
+  /** Don't just default to 'tagged', cuz it's input
+   * 
+   * @param type $name
+   * @param type $value
+   * @param type $options
+   */
+  public function textarea($name, $value = null, $options = []) {
+    if (is_arrayish($name)) {
+      $name = keyVal('name', $name);
+      $value = keyVal('value', $name,$value);
+      $options = keyVal('options', $name,$options);
+    }
+    $options = $this->cleanAttributes($options);
+    #If value exists in options, override arg
+    $value=keyVal('value',$options,$value);
+    #Set name in options
+    $options['name']=keyVal('name',$options,$name);
+    $this[] = PkForm::textarea($name, $value, $options);
+    return $this;
+  }
+
+
 
   /** Make it look cleaner by just using many of the PkForm shortcuts */
   public function submitButton($label = 'Submit', $options = []) {
@@ -219,15 +333,155 @@ class PkHtmlRenderer extends PartialSet {
   }
 
 
-  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[]) {
-    $this[] = PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+  /**
+   * Just makes attributes more flexible. If it's just a string, build an
+   * attribute array of ['class' => $attributes]
+   * if it's an indexed array, assume array of classes, implode, and do the same
+   * NOTE: Overridden in subclasses to customize attributes (like SubForm)
+   * @param array|string $attributes
+   */
+  public function cleanAttributes($attributes) {
+    if (is_array_indexed($attributes)) {
+      $attributes = implode (' ', $attributes);
+    }
+    if (is_string($attributes)) $attributes = ['class' => $attributes];
+    return $attributes;
+  }
+
+  /** To render regular Blade templates within a PkHtmlRenderer context
+   * 
+   * @param string $view - standarad blade view name
+   * @param array $data - standard blade view data
+   * @return string|\PkExtensions\PkHtmlRenderer
+   */
+  public function render($view,$data=[]) {
+    if (!$view || !is_string($view)) return '';
+    $relview = str_replace('.','/', $view);
+    $viewroots = \Config::get('view.paths');
+    $viewfile = null;
+    foreach ($viewroots as $viewroot ) {
+      $testpath = $viewroot.'/'.$relview.'.phtml';
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        continue;
+      }
+    }
+    if (!$viewfile) {
+      pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
+      return $this;
+    }
+
+    if (is_array($data)) {
+      ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
+      ###########  $out, for example, was a terrible choice!
+      extract($data);
+    }
+    ob_start();
+    include ($viewfile);
+    $___PKMVC_RENDERER_OUT = ob_get_contents();
+    ob_end_clean();
+    $this[] = $___PKMVC_RENDERER_OUT;
     return $this;
   }
 
+  /**Close with matched tag */
+  public function close() {
+    $tag = array_pop($this->tagStack);
+    $this[] = $this->spaceDepth()."</$tag>\n";
+    return $this;
+  }
 
-  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
-     $this[] = PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts);
-     return $this;
+  #Alias for ->close()
+  public function RENDERCLOSE() {
+    return $this->close();
+  }
+
+
+  /**
+   * For Bootstrap - when displaying a collection, make rows and cols
+   * @param arrayish $data
+   * @param string $template
+   * @param type $cols
+   * @param type $class
+   */
+  public function rows($data,$template,$cols=4, $rowclass='', $colclass = '', $itemclass='') {
+    if (!is_arrayish($data) ||!count($data)) return $this;
+    $colsize = (int) (12/$cols);
+    //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+    $this->div(RENDEROPEN, "row $rowclass");
+    $i = 0;
+    foreach ($data as $datum) {
+      $this->div(RENDEROPEN, "col-sm-$colsize  $colclass");
+        $this->render($template,['datum'=>$datum, 'class'=>$itemclass]);
+      $this->RENDERCLOSE();
+      $i++;
+      if (!($i % $cols)) {
+        $this->RENDERCLOSE();
+        //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
+        $this->div(RENDEROPEN, "row $rowclass");
+      }
+    }
+    $this->RENDERCLOSE();
+    return $this;
+  }
+
+  /** Totally misconceived
+  public function wrapToolTip($tooltip, $wrapperClasses =' ', $tooltipClasses = '') {
+    $arrayIterator = $this->getIterator();
+    $currentVal = $arrayIterator->current();
+    $currentKey = $arrayIterator->key();
+    $this->offsetUnset($currentKey);
+    $this->div(RENDEROPEN, "tooltip-wrapper $wrapperClasses");
+    $this->rawcontent($currentVal);
+    $this->tooltip($tooltip,$tooltipClasses);
+    $this->RENDERCLOSE();
+    return $this;
+  }
+   * 
+   */
+
+  public function tooltip($tooltip, $extraclasses = ' ') {
+    $this->rawdiv($tooltip, "pk-tooltip $extraclasses");
+    return $this;
+  }
+
+  public function spaceDepth() {
+    $size = count($this->tagStack);
+    $out = '';
+    for ($i = 0 ; $i < $size ; $i++) $out .= '  ';
+    return $out;
+  }
+
+  public function __call($method, $args) {
+    $raw = false;
+    if ($tag = removeStartStr($method,'raw')) {
+      $method = $tag;
+      $raw = true;
+    }
+    #TODO: Do something with $raw
+    pkdebug("In __CALL: Method: $method\nargs: ",$args);
+    array_unshift($args,$method);
+    if (in_array($method, static::$selfclosing_tags)) {
+      return call_user_func_array([$this,'nocontent'], $args);
+    } else if (!$raw && in_array($method, static::$content_tags)) {
+      return call_user_func_array([$this,'tagged'], $args);
+    } else if ( $raw  && in_array($method, static::$content_tags)) {
+      return call_user_func_array([$this,'rawtagged'], $args);
+    } else if (in_array($method, static::$input_types)) {
+      //$args = array_unshift($args,$method,$args);
+      return call_user_func_array([$this,'input'], $args);
+    }
+    throw new \Exception("Unknown Method: [$method]");
+  }
+
+
+
+
+  ## Build Query controls
+  public static function buildQuerySet($params = []) {
+    $out=new static();
+    $out->querySet($params);
+    return $out;
   }
 
   /** Builds a pair of controls:
@@ -321,181 +575,30 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
 
   }
+
+
+
+  /**Don't want to use these anymore - just wrap - but keep in case used in older apps*/
   public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = []) {
     $this[] = PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
     return $this;
   }
-  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
-     $this[] = PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) { $this[] = PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts);
      return $this;
   }
 
-  public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
-      if (is_string($options)) $options = ['class'=>$options];
-     $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
+  public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[]) {
+    $this[] = PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+    return $this;
+  }
+
+  public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+     $this[] = PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts);
      return $this;
   }
 
-  public function hidden($name, $value = null, $options = []) {
-      if (is_string($options)) $options = ['class'=>$options];
-      $this[] = PkForm::hidden($name, $value, $options);
-    }
-  public function text($name, $value = null, $options = []) {
-      if (is_string($options)) $options = ['class'=>$options];
-      $this[] = PkForm::text($name, $value, $options);
-    }
-	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
-      if (is_string($options)) $options = ['class'=>$options];
-	   $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
-     return $this;
-  }
 
-  /** To render regular Blade templates within a PkHtmlRenderer context
-   * 
-   * @param string $view - standarad blade view name
-   * @param array $data - standard blade view data
-   * @return string|\PkExtensions\PkHtmlRenderer
-   */
-  public function render($view,$data=[]) {
-    if (!$view || !is_string($view)) return '';
-    $relview = str_replace('.','/', $view);
-    $viewroots = \Config::get('view.paths');
-    $viewfile = null;
-    foreach ($viewroots as $viewroot ) {
-      $testpath = $viewroot.'/'.$relview.'.phtml';
-      if (file_exists($testpath)) {
-        $viewfile = $testpath;
-        continue;
-      }
-    }
-    if (!$viewfile) {
-      pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
-      return $this;
-    }
-
-    if (is_array($data)) {
-      ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
-      ###########  $out, for example, was a terrible choice!
-      extract($data);
-    }
-    ob_start();
-    include ($viewfile);
-    $___PKMVC_RENDERER_OUT = ob_get_contents();
-    ob_end_clean();
-    $this[] = $___PKMVC_RENDERER_OUT;
-    return $this;
-  }
-
-  public function close() {
-    $tag = array_pop($this->tagStack);
-    $this[] = $this->spaceDepth()."</$tag>\n";
-    return $this;
-  }
-
-  /**
-   * For Bootstrap - when displaying a collection, make rows and cols
-   * @param arrayish $data
-   * @param string $template
-   * @param type $cols
-   * @param type $class
-   */
-  public function rows($data,$template,$cols=4, $rowclass='', $colclass = '', $itemclass='') {
-    if (!is_arrayish($data) ||!count($data)) return $this;
-    $colsize = (int) (12/$cols);
-    //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
-    $this->div(RENDEROPEN, "row $rowclass");
-    $i = 0;
-    foreach ($data as $datum) {
-      $this->div(RENDEROPEN, "col-sm-$colsize  $colclass");
-        $this->render($template,['datum'=>$datum, 'class'=>$itemclass]);
-      $this->RENDERCLOSE();
-      $i++;
-      if (!($i % $cols)) {
-        $this->RENDERCLOSE();
-        //$this->div(RENDEROPEN, "row fsi-row-lg-level fsi-row-md-level $rowclass");
-        $this->div(RENDEROPEN, "row $rowclass");
-      }
-    }
-    $this->RENDERCLOSE();
-    return $this;
-  }
-
-  /** Totally misconceived
-  public function wrapToolTip($tooltip, $wrapperClasses =' ', $tooltipClasses = '') {
-    $arrayIterator = $this->getIterator();
-    $currentVal = $arrayIterator->current();
-    $currentKey = $arrayIterator->key();
-    $this->offsetUnset($currentKey);
-    $this->div(RENDEROPEN, "tooltip-wrapper $wrapperClasses");
-    $this->rawcontent($currentVal);
-    $this->tooltip($tooltip,$tooltipClasses);
-    $this->RENDERCLOSE();
-    return $this;
-  }
-   * 
-   */
-
-  public function tooltip($tooltip, $extraclasses = ' ') {
-    $this->rawdiv($tooltip, "pk-tooltip $extraclasses");
-    return $this;
-  }
-
-  public function spaceDepth() {
-    $size = count($this->tagStack);
-    $out = '';
-    for ($i = 0 ; $i < $size ; $i++) $out .= '  ';
-    return $out;
-  }
-
-  public function __call($method, $args) {
-    $raw = false;
-    if ($tag = removeStartStr($method,'raw')) {
-      $method = $tag;
-      $raw = true;
-    }
-    array_unshift($args,$method);
-    if (in_array($method, static::$selfclosing_tags)) {
-      return call_user_func_array([$this,'nocontent'], $args);
-    } else if (!$raw && in_array($method, static::$content_tags)) {
-      return call_user_func_array([$this,'tagged'], $args);
-    } else if ( $raw  && in_array($method, static::$content_tags)) {
-      return call_user_func_array([$this,'rawtagged'], $args);
-    }
-    throw new \Exception("Unknown Method: [$method]");
-  }
-
-
-  /**
-   * Just makes attributes more flexible. If it's just a string, build an
-   * attribute array of ['class' => $attributes]
-   * if it's an indexed array, assume array of classes, implode, and do the same
-   * @param array|string $attributes
-   */
-  public function cleanAttributes($attributes) {
-    if (is_array_indexed($attributes)) {
-      $attributes = implode (' ', $attributes);
-    }
-    if (is_string($attributes)) $attributes = ['class' => $attributes];
-    return $attributes;
-  }
-
-  public static function buildQuerySet($params = []) {
-    $out=new static();
-    $out->querySet($params);
-    return $out;
-  }
-
-  /**
-   * Takes a label and an input and wraps them
-   * @param array $args - can't think of all the params I need now
-   */
-  /*
-  public static function controlPair($control, $shorttext='', $longtext='', $args=[]) {
-    $label = div($shorttext);
-    
-
-  }
-
+  /*  Not used for now....
   public $parent; #The owning parent of this type
 
   public function __construct($args = []) {
@@ -517,18 +620,9 @@ class PkHtmlRenderer extends PartialSet {
     $this[] = $new;
     return $new;
   }
-
-  public function tag($tag, $content = '', $attributes = []){
-    $value = PkHtml::tag($tag, $content, $attributes);
-    $this[] = $value;
-    return $this;
-  }
-
-  public function div($content = '', $attributes = []) {
-    return $this->tag('div', $content, $attributes);
-  }
    * 
    */
   
+
 
 }

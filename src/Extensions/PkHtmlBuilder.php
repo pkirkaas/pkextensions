@@ -7,10 +7,15 @@ use Collective\Html\HtmlBuilder;
 
 class PkHtmlBuilder extends HtmlBuilder {
   public $name_prefix = null;
+  #Allow setting of attribute name prefix globally for builder, or
+  # just as an attribute for this single item
   public function attributes($attributes) {
-    if ($this->name_prefix && array_key_exists('name', $attributes)) {
-      $attributes['name'] = $this->name_prefix . '[' . $attributes['name'] . ']';
+    $name_prefix = keyVal('name_prefix',$attributes, $this->name_prefix);
+    if ($name_prefix && array_key_exists('name', $attributes)) {
+      $attributes['name'] = $name_prefix . '[' . $attributes['name'] . ']';
     }
+    unset($attributes['name_prefix']);
+    if (array_key_exists('name_prefix',$attributes) || $name_prefix) pkdebug("NamePrefix: $name_prefix\nAtts:",$attributes);
 
     /** Automate using BS4 tether Tooltips */
     if (is_array($attributes) && array_key_exists('tooltip', $attributes)) {
