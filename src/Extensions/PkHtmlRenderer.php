@@ -1,5 +1,6 @@
 <?php
-/** I Had great dreams for this once - but maybe later....
+/** Renders HTML - can be included in Blade templates, but also implements a
+ * custom templating/HTML rendering system.
  * 
  */
 namespace PkExtensions;
