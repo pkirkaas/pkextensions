@@ -38,6 +38,22 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return [null=>'None'] + static::$refArr;
   }
 
+  /**Defaults to getRefArr, but if $merged === true, combines the
+   * key & value in the select display
+   * 
+   */
+  public static function getSelectList($null=false,$merged = false) {
+    if (!$merged) return static::getRefArr($null);
+    $refArr = [];
+    foreach ( static::getRefArr() as $key => $val) {
+      $refArr[$key] = $key.' : '.$val;
+    }
+    if (!$null) return $refArr;
+    return [null=>'None'] + $refArr;
+
+  }
+
+
   public static function getKeyValArr() {
     if (!static::$multival) return static::getRefArr();
     $kvk = 'key-val-cache-key';

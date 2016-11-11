@@ -254,6 +254,39 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /** Appends / adds $att_val to the CLASS property </tt>{$att_name}_attributes</tt>
+   * Mostly used by subclasses.
+   * If {$att_name}_attributes exists & is string,
+   *    converted to ['class'=>$this->{$att_name}_attributes]
+   * If $att_val is string,
+   *    converted to ['class'=>$att_val]
+   * If the two arrays have the same keys ('class'), & is_string($val), they
+   * are combined with a ' ' separator.
+   * @param string $attr_name - the CLASS PROPERTY att name, gets '_attributes' appended
+   * @param array|scalar $att_val
+   */
+  public function append_atts($attr_name, $att_val) {
+    $property_name = $attr_name.'_attributes';
+    if (!property_exists($this,$property_name)) return false;
+    $property = $this->$property_name;
+    if (!is_arrayish($property)) {
+      $property = ['class' => $property];
+    }
+    if (!is_arrayish($property)) return false; #Something wrong...
+    if (!is_arrayish($att_val)) {
+      $att_val = ['class' => $att_val];
+    }
+    if (!is_arrayish($att_val)) return false; #Something wrong...
+    foreach ($property as $propkey => $propval) {
+      if (!array_key_exists($propkey,$att_val)) continue;
+      $att_val_val = $att_val[$propkey];
+      //if (is_scalarish($propval)) $propval = [$propval];
+      //if (is_scalarish($att_val_val)) $att_val_val = [$att_val_val];
+      $property[$propkey] = $propval.' '.$att_val_val;
+    }
+    $this->$property_name = $property;
+    return $this->$property_name;
+  }
   /*
   public function hidden($name, $value = null, $options = []) {
     if (is_arrayish($name)) {

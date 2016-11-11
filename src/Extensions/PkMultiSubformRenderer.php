@@ -10,7 +10,7 @@ use PkHtml;
 use PkForm;
 use PkExtensions\Models\PkModel;
 
-if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
+//if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 
 /**
  * Usage: 
@@ -49,11 +49,11 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
   public $templatables_attributes = ['class'=>'templatable-data-sets'];
   public $deletable_dataset_attributes = 'deletable-data-set';
   public $create_button_label = 'Create';
-  public $create_button_attributes = ['class'=>'js btn create-new-data-set'];
+  public $create_button_attributes = ['class'=>'js btn mf-btn pkmvc-button create-new-data-set'];
   public $create_button_tag = 'div';
   public $delete_button_label = 'Delete';
   public $delete_button_tag = 'div';
-  public $delete_button_attributes = ['class'=>'js btn data-set-delete'];
+  public $delete_button_attributes = ['class'=>'js btn mf-btn pkmvc-button data-set-delete'];
   public $js_template_tag = 'fieldset';
   public $js_template_attributes=['disabled'=>true,'style'=>'display: none;', 'class'=>'template-container'];
   /** Generally, the table name */
@@ -203,8 +203,9 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
       $options = keyVal('options', $name,$options);
     }
     $options = $this->cleanAttributes($options);
-    $options['selected'] = $this->fieldValueTemplate($name);
+    $selected = $options['selected'] = $this->fieldValueTemplate($name);
     $options['name'] = keyVal('name',$options,$name);
+    $options['data-selected']=$selected;
     return parent::select($name,$list,$selected,$options);
   }
 

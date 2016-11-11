@@ -88,6 +88,26 @@ $(function () {
   });
 });
 
+
+/** Set subform select inputs after templating */
+$(function () {
+  console.log("Compiled");
+});
+$(function () {
+    var tpl_sels = $('.templatable-data-sets select');
+    tpl_sels.each(function(idx, sel_el) {
+      var jqSelEl = $(sel_el);
+      var selected = jqSelEl.attr('selected');
+      var data_selected = jqSelEl.attr('data-selected');
+      //Using attr('selected') On Purpose, since built by templater that way
+      jqSelEl.val(data_selected);
+      console.log('Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
+    });
+
+
+});
+
+
 $(function () {
   $('.js-fade-out').fadeOut(8400, function () {
     $(this).css('display', 'none');

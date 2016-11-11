@@ -869,6 +869,10 @@ function is_stringish($value, $nullorfalse = true) {
   return is_scalar($value);
 }
 
+function is_scalarish($value, $nullorfalse = true) {
+  return is_stringish($value, $nullorfalse);
+}
+
 /**
  * Takes any number of arguments as scalars or arrays, or nested arrays, and
  * returns a 1 dimentional indexed array of the values 
