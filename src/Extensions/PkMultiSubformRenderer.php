@@ -42,7 +42,6 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
   public $cnt_tpl = '__CNT_TPL__';
   public $fld_tpl_prefix = '__FLD_TPL__';
   public $templatables_attributes = ['class'=>'templatable-data-sets'];
-  //public $templatable_attributes = ['class'=>'templatable-data-set'];
   public $deletable_dataset_attributes = 'deletable-data-set';
   public $create_button_label = 'Create';
   public $create_button_attributes = ['class'=>'js btn create-new-data-set'];
@@ -74,7 +73,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
 
   public function __toString() {
     $baseSubForm = parent::__toString();
-    pkdebug("The Values:", $this->subform_data);
+    //pkdebug("The Values:", $this->subform_data);
     $out = new PkHtmlRenderer();
     $out[] = "\n";
     $cnt = 0;
@@ -104,7 +103,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    * 
    */
   public function makeSubformPart($baseSubForm, $idx = null, $values=null) {
-    pkdebug("baseSubform: \n$baseSubForm\nidx:", $idx,'Values',$values);
+    //pkdebug("baseSubform: \n$baseSubForm\nidx:", $idx,'Values',$values);
     if ($idx !== null) $baseSubForm = str_replace($this->cnt_tpl,$idx,$baseSubForm);
     if (!is_arrayish($this->subform_string_templates)) return $baseSubForm;
     $tpl = new PkHtmlRenderer();
@@ -120,7 +119,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
         $valkey = $this->fld_tpl_prefix.$inp_fld;
         $val = keyVal($inp_fld,$values);
         if (is_string($val)) $val = "'".$val."'";
-        pkdebug("INP_FLD: $inp_fld, valkey: $valkey; val: $val");
+        //pkdebug("INP_FLD: $inp_fld, valkey: $valkey; val: $val");
         $baseSubForm = str_replace($valkey,$val,$baseSubForm);
       }
       $tpl[] = $baseSubForm."\n";

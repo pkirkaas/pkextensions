@@ -64,6 +64,7 @@ class PkController extends Controller {
 //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
   public function processSubmit($opts = null, $inits = null) {
     if (!$this->ShouldProcessSubmit($opts)) return null;
+    #In a POST && met 'shouldProcessSubmit' requirements
     if ($opts instanceOf PkModel) {
       $pkmodel = $opts;
     } else if (is_arrayish($opts)) {
@@ -84,7 +85,6 @@ class PkController extends Controller {
      */
     $data = Request::all();
     $tpkm = typeOf($pkmodel);
-    //pkdebug("For type: [$tpkm] The POSTed data:", $data);
 //if (!$pkmodel) return false;
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))

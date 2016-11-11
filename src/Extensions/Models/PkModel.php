@@ -890,6 +890,8 @@ class $createclassname extends Migration {
             if (!array_key_exists($foreignKey, $relrow)) {
               $relrow[$foreignKey] = $modelId;
             }
+            #Again, compensate for empty string POSTED instead of NULL
+            if (!$relrow[$keyName]) $relrow[$keyName]=null;
           }
           /** Either: */
           //$relInstance->fillFillables($relrow);
