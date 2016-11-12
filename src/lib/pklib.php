@@ -2535,12 +2535,32 @@ function manageStaticCache(&$cacheArr, $levels = []) {
  * If null, return current moment as SQL date/time
  * @return string The SQL date/time
  */
-function unixtimeToSql($unixtime = null) {
+function unixtimeToSql($unixtime = null,$just_date = false) {
   if (!$unixtime) {
     $unixtime = time();
   }
-  $mysqldate = date('Y-m-d H:i:s', $unixtime);
+  if ($just_date) $fmt = 'Y-m-d';
+  else $fmt='Y-m-d H:i:s';
+  $mysqldate = date($fmt, $unixtime);
   return $mysqldate;
+}
+
+/** Tests if $val is valid SQL Date/Time string
+ * Pulled it off the web, so who knows..?
+ * @param mixed $val
+ * @return boolean
+ */
+function validSqlDate($val) {
+  if (!$val ||!is_string($val)) return false;
+  if(preg_match ("/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/", $val)) return true;
+  // This seems to only work with DateTime
+  $matches = [];
+  if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $val, $matches)) { 
+    if (checkdate($matches[2], $matches[3], $matches[1])) { 
+        return true; 
+    } 
+  } 
+  return false; 
 }
 
 /**

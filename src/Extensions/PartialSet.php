@@ -23,6 +23,39 @@ namespace PkExtensions;
  */
 class PartialSet extends \ArrayObject {
   public $separator = '';
+  /** Settings that are not echoed but can be used to hold values, set opts, etc
+   *
+   * @var array 
+   */
+  public $custom_opts = [];
+  /*
+  public function opt_set($name,$value=null) {
+    $this->custom_opts[$name] = $value;
+    return $value;
+  }
+  public function opt_get($name) {
+    return keyVal($name,$this->custom_opts);
+  }
+   * 
+   */
+
+  #$something = $this->opt_something;
+  public function __get($name) {
+    $optName = removeStartStr($name,'opt_');
+    if (!$optName) return parent::__get($name);
+    return keyVal($optName,$this->custom_opts);
+  }
+
+  #$this->opt_something = $value;
+  public function __set($name,$value=null) {
+    $optName = removeStartStr($name,'opt_');
+    if (!$optName) return parent::__set($name, $value);
+    return $this->custom_opts[$optName] = $value;
+  }
+
+
+
+
   public function __construct($arg = []) {
     parent::__construct($arg);
     $this->separator = ' ';
