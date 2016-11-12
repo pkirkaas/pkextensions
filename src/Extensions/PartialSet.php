@@ -101,6 +101,7 @@ class PartialSet extends \ArrayObject {
     $str = $this->separator;
     if (count($this) && is_arrayish($this)) {
       foreach ($this as $key => $item) {
+        if ($key === 'custom_opts') continue;
         $str.= ' ' . $this->decomposeArray($item) . $this->separator;
       }
     }

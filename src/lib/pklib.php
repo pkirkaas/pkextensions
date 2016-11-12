@@ -17,6 +17,9 @@
  */
 //$defaultTimeZone = date_default_timezone_get ();
 date_default_timezone_set("America/Los_Angeles");
+ //The supported MySql date range is '1000-01-01' to '9999-12-31'.
+define('MYSQL_MAXDATE', '9999-12-31');
+define('MYSQL_MINDATE', '1000-01-01');
 
 class PkLibConfig {
   static $suppressPkDebug = true;

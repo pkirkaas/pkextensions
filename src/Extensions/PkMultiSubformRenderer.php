@@ -188,7 +188,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
     $options['value'] = $this->fieldValueTemplate($name);
     $options['name'] = keyVal('name',$options,$name);
     $return = parent::input($type,$name,$value,$options);
-    pkdebug("Return: $return\nOptions:",$options);
+    //pkdebug("Return: $return\nOptions:",$options);
     return $return;
     //return parent::input($type,$name,$value,$options);
   }
