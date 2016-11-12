@@ -148,6 +148,7 @@ trait BuildQueryTrait {
       '20' => 'Within 20 miles',
       '50' => 'Within 50 miles',
   ];
+  #TODO: Should allow for "at least" & 'at_most'
   public static $betweenQueryCrit = [
       '0' => "Don't Care",
       'BETWEEN' => 'Between',

@@ -392,20 +392,20 @@ class PkHtmlRenderer extends PartialSet {
     $relview = str_replace('.','/', $view);
     $viewroots = \Config::get('view.paths');
     $viewfile = null;
+    //pkdebug('viewroots', $viewroots);
     foreach ($viewroots as $viewroot ) {
       $testpath = $viewroot.'/'.$relview.'.phtml';
+     // pkdebug("testpath:  $testpath");
       if (file_exists($testpath)) {
         $viewfile = $testpath;
-        continue;
+        break;
       }
-      /**
+      #Will this work with Blade templates?
       $testpath = $viewroot.'/'.$relview.'.blade.php';
       if (file_exists($testpath)) {
         $viewfile = $testpath;
-        continue;
+        break;
       }
-       * 
-       */
     }
     if (!$viewfile) {
       pkdebug("ERROR: Couldn't find viewtemplate: [$view]");
@@ -421,6 +421,7 @@ class PkHtmlRenderer extends PartialSet {
     include ($viewfile);
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
+    //pkdebug("RENDEROUT\n\n$___PKMVC_RENDERER_OUT\n\n");
     $this[] = $___PKMVC_RENDERER_OUT;
     return $this;
   }
@@ -500,7 +501,6 @@ class PkHtmlRenderer extends PartialSet {
       $raw = true;
     }
     #TODO: Do something with $raw
-    pkdebug("In __CALL: Method: $method\nargs: ",$args);
     array_unshift($args,$method);
     if (in_array($method, static::$selfclosing_tags)) {
       return call_user_func_array([$this,'nocontent'], $args);
