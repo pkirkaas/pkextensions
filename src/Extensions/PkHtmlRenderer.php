@@ -382,7 +382,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   /** To render regular Blade templates within a PkHtmlRenderer context
-   * 
+   * ... uh, looks like it renders .phtml templates - which is fine
    * @param string $view - standarad blade view name
    * @param array $data - standard blade view data
    * @return string|\PkExtensions\PkHtmlRenderer
@@ -398,6 +398,14 @@ class PkHtmlRenderer extends PartialSet {
         $viewfile = $testpath;
         continue;
       }
+      /**
+      $testpath = $viewroot.'/'.$relview.'.blade.php';
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        continue;
+      }
+       * 
+       */
     }
     if (!$viewfile) {
       pkdebug("ERROR: Couldn't find viewtemplate: [$view]");

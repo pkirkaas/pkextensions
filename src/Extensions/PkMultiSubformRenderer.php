@@ -148,7 +148,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
       foreach ($this->tpl_fields as $inp_fld) {
         $valkey = $this->fieldValueTemplate($inp_fld);
         $val = keyVal($inp_fld,$values);
-        if (is_string($val)) $val = "'".$val."'";
+        //if (is_string($val)) $val = "'".$val."'";
         $baseSubForm = str_replace($valkey,$val,$baseSubForm);
       }
       $tpl[] = $baseSubForm."\n";
