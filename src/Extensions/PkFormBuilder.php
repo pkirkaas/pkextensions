@@ -172,6 +172,7 @@ class PkFormBuilder extends FormBuilder {
    * @return \Illuminate\Support\HtmlString
    */
   public function submitButton($label = 'Submit', $options = []) {
+    if (is_string($options)) $options = ['class'=>$options];
     if (!array_key_exists('type', $options)) $options['type'] = 'submit';
     if (!array_key_exists('name', $options)) $options['name'] = 'submit';
     if (!array_key_exists('value', $options)) $options['value'] = 'submit';
