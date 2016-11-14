@@ -31,6 +31,21 @@ $out->div(RENDEROPEN,'row inner-border');
     $out->RENDERCLOSE();
   $out->RENDERCLOSE();
 $out->RENDERCLOSE();
+
+#Can also use simple BS row rendering function:
+
+
+$data=['Item 1', "Item 2", "Item 3",];
+$colclasses=["col-xs-2","col-xs-4", "col-xs-6"];
+$rowclass = 'head-row';
+$colclass='inner-border';
+$out->row($data,$colclasses,$rowclass,$colclass);
+
+
+
+
+
+
 echo $out;
 ?>
 @include('system-partials.grid-part',

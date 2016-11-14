@@ -439,6 +439,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
 
+  #Not happy with this...
   /**
    * For Bootstrap - when displaying a collection, make rows and cols
    * @param arrayish $data
@@ -465,6 +466,25 @@ class PkHtmlRenderer extends PartialSet {
     }
     $this->RENDERCLOSE();
     return $this;
+  }
+
+  /**
+   * Very simple BS Row Renderer. Makes a <div class='row $rowclass'>
+   * Then iterates through $data array and wraps each datum in corresponding col class
+   * @param array $data - indexed array of stringish datums for the row
+   * @param array $colclasses - indexed array of same size as $data, with corresponding col classes
+   * @param string $rowclass - optional additional class for the row
+   * @param string $colclass - optional additional class for every column
+   * @return $this
+   */
+  public function row ($data, $colclasses, $rowclass='', $colclass='' ) {
+    $row = "row $rowclass";
+    $this->div(RENDEROPEN, $row);
+    foreach ($data as $i => $datum) {
+      $data_colclass = $colclasses[$i]." $colclass";
+      $this->div($datum,$data_colclass);
+    }
+    $this->RENDERCLOSE();
   }
 
   /** Totally misconceived
