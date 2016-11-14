@@ -94,9 +94,20 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return $refArr;
   }
 
-  public static function keys() {
-    $refArr = static::getKeyValArr();
-    return array_keys($refArr);
+  /**
+   * 
+   * @param int|null $first - return just the first N keys, if present
+   * @return array - the keys, or first $first keys
+   */
+  public static function keys($first = null) {
+    //$refArr = static::getKeyValArr();
+    //$keys = array_keys($refArr);
+    $keys = array_keys(static::getKeyValArr());
+    if ($first && ($first < count($keys))) {
+      $keys = array_slice($keys,0,$first);
+    }
+    return $keys;
+    //return array_keys($refArr);
   }
   public static function values($key=null) {
     $refArr = static::getKeyValArr();
@@ -182,8 +193,16 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return PkTestGenerator::randData(static::getKeyValArr(), $items);
   }
 
+  /**
+   * 
+   * @param integer $items - if -1, single scalar key, else array of keys
+   * @param array $params - ['first'=>null | int - select from the first N keys
+   * @return scalar|array - single scalar key if $items == -1, else array of $items keys
+   */
   public static function randKeys($items = -1, $params = []) {
-    return PkTestGenerator::randData(static::keys(), $items);
+    $first = keyVal('first',$params);
+    return PkTestGenerator::randData(static::keys($first), $items);
+    //return PkTestGenerator::randData(static::keys(), $items);
   }
 
   public function __toString() {
