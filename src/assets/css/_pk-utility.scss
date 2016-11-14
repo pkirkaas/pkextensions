@@ -728,3 +728,20 @@ $i: 1;
 .pkl4 { @include pkfs(4); @include pkfw(2); }
 .pkl5 { @include pkfs(5); @include pkfw(3); }
 .pkl6 { @include pkfs(6); @include pkfw(3); }
+
+
+@media print {
+  /*
+	body {
+		font-size: 80%;
+	}
+  */
+
+  .print-button {
+    display: none ! important;
+  }
+
+  .no-print {
+    display: none ! important;
+  }
+}

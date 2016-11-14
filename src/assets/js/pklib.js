@@ -66,8 +66,6 @@ $(function () {
    * Then, these two assignments work EVERYWHERE ON THE PAGE
    */
 
-
-
   $('body').on('click', '.js.btn.data-set-delete', function (event) {
     $(event.target).closest('div.deletable-data-set').remove();
   });
@@ -119,6 +117,19 @@ $(function () {
 
 
 });
+
+/**
+ * In CSS, do:
+ * 
+
+@media print {
+  .print-button { display: none; }
+  .no-print { display: none; }
+}
+ */
+  $('body').on('click', '.print-button', function (event) {
+    window.print();
+  });
 
 
 $(function () {
