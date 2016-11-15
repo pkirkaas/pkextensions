@@ -142,6 +142,25 @@ class PkTestGenerator {
     return static::randData(static::$jobTitles);
   }
 
+  /** Returns a random SQL Time of Day
+   * 
+   * @param array $opts:
+   *   'from' - hour from: default: 8AM
+   *   'to' - hour to: default: 17:00/5PM
+   *   'inc' - incremental minutes: default(max): 30. 0 means only whole hours
+   */
+  public static function randSqlTime($opts=[]){
+    $from = keyVal('from', $opts,8);
+    $to = keyVal('to', $opts,17);
+    $inc = min(keyVal('inc',$opts,15),30);
+    $hour = mt_rand($from,$to);
+    if (!$inc) return "$hour:00";
+    $inc = max($inc, 10);
+    $rg = 60/$inc;
+    $mins = mt_rand(0,$rg)*$inc%60;
+    return "$hour:$mins";
+
+  }
 
 
   /**
