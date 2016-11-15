@@ -473,16 +473,31 @@ class PkHtmlRenderer extends PartialSet {
    * Then iterates through $data array and wraps each datum in corresponding col class
    * @param array $data - indexed array of stringish datums for the row
    * @param array $colclasses - indexed array of same size as $data, with corresponding col classes
-   * @param string $rowclass - optional additional class for the row
-   * @param string $colclass - optional additional class for every column
+   * @param array $opts: (but can be $rowclass string, then $colclass is string)
+   *    @param string $rowclass - optional additional class for the row
+   *    @param string $colclass - optional additional class for every column
+   *    @param boolean $raw
    * @return $this
    */
-  public function row ($data, $colclasses, $rowclass='', $colclass='' ) {
+  public function row ($data, $colclasses, $opts=[], $colclass='') {
+    if (is_array($opts)) {
+      $rowclass= keyVal('rowclass', $opts);
+      $colclass=keyVal('colclass',$opts);
+      $raw = keyVal('raw', $opts);
+    } else {
+      $rowclass=$opts;
+      $raw=false;
+    }
+    if ($raw) {
+      $div = 'rawdiv';
+    } else {
+      $div = 'div';
+    }
     $row = "row $rowclass";
-    $this->div(RENDEROPEN, $row);
+    $this->$div(RENDEROPEN, $row);
     foreach ($data as $i => $datum) {
       $data_colclass = $colclasses[$i]." $colclass";
-      $this->div($datum,$data_colclass);
+      $this->$div($datum,$data_colclass);
     }
     $this->RENDERCLOSE();
   }

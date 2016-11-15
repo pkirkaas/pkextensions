@@ -730,6 +730,13 @@ $i: 1;
 .pkl6 { @include pkfs(6); @include pkfw(3); }
 
 
+.row-eq-height {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+}
+
 @media print {
   /*
 	body {

@@ -21,6 +21,7 @@ use \Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use \Request;
 use \Exception;
 use PkExtensions\PkTestGenerator;
