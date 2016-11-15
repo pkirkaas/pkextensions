@@ -432,6 +432,7 @@ function appLogPath($path = null) {
   }
   $defaultPath = $base . '/logs/app.log';
   static $logpath = null;
+  error_log("defaultPath: [$defaultPath]");
   if ($path === false) {
     $logpath = $defaultPath;
     $res = makePathToFile($logpath);

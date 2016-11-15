@@ -38,15 +38,20 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return [null=>'None'] + static::$refArr;
   }
 
-  /**Defaults to getRefArr, but if $merged === true, combines the
-   * key & value in the select display
+  /**Defaults to getRefArr, but if $merged, combines the
+   * key & value in the select display, with $merged as the separator
+   * @param boolean $null - include null value?
+   * @param boolean|string $merged - if 'true', combine w. ':' , if
+   * string, use that.
    * 
    */
   public static function getSelectList($null=false,$merged = false) {
     if (!$merged) return static::getRefArr($null);
+    if (!is_string($merged)) $merged = ':';
+
     $refArr = [];
     foreach ( static::getRefArr() as $key => $val) {
-      $refArr[$key] = $key.' : '.$val;
+      $refArr[$key] = $key." $merged ".$val;
     }
     if (!$null) return $refArr;
     return [null=>'None'] + $refArr;

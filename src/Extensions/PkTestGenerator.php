@@ -161,16 +161,20 @@ class PkTestGenerator {
     }
     $day = 24 * 60 * 60;
     $now = time();
-    $rndTime = $now + ($rndOffset * $day);
+    $rndDayPart = mt_rand(0,$day);
+    $rndTime = $now + ($rndOffset * $day) + $rndDayPart;
     return $rndTime;
   }
 
-  /** Get a date about n months in the future or past */
-  public static function randDateOffset($n, $days = 30) {
+  /** Get a date about n months in the future or past
+   * @param boolean $time = false - just the date. If true, DateTime
+   */
+
+  public static function randDateOffset($n, $days = 30, $time = false) {
     if ($n < 0 ) $m = $n - 1;
     else $m = $n + 1;
     $m = (int) (1.5 * $m);
-    return static::randSqlDateFromRange($n, $m, $days);
+    return static::randSqlDateFromRange($n, $m, $days, $time);
   }
 
   public static function randLorem($len = 0) {
@@ -197,23 +201,24 @@ class PkTestGenerator {
    * @param int $from - num of units from now
    * @param int $to - num of units from now
    * @param int $multiplier - multiply from/to days - default, 365, so from/to are years
+   * @param boolean $time - default false -- just an SQL Date, or DateTime?
    * @return type
    */
-  public static function randSqlDateFromRange($from, $to=0, $multiplier = 365) {
-    return static::sqlDateFromUnix(static::randUnixDateFromRange($from, $to, $multiplier));
+  public static function randSqlDateFromRange($from, $to=0, $multiplier = 365, $time = false) {
+    return static::sqlDateFromUnix(static::randUnixDateFromRange($from, $to, $multiplier), $time);
   }
 
-  public static function randSqlRecentDate($multiplier = 365) {
-    return static::sqlDateFromUnix(static::randUnixDateFromRange(0, -1, $multiplier));
+  public static function randSqlRecentDate($multiplier = 365, $time=false) {
+    return static::sqlDateFromUnix(static::randUnixDateFromRange(0, -1, $multiplier), $time);
   }
 
   public static function randSqlBirthdate($multiplier = 365) {
     return static::sqlDateFromUnix(static::randUnixDateFromRange(-20, -70, $multiplier));
   }
 
-  public static function sqlDateFromUnix($unixDate) {
-    //$mysqldate = date('Y-m-d H:i:s', $unixDate);
-    $mysqldate = date('Y-m-d', $unixDate);
+  public static function sqlDateFromUnix($unixDate, $time=false) {
+    if ($time) $mysqldate = date('Y-m-d H:i:s', $unixDate);
+    else $mysqldate = date('Y-m-d', $unixDate);
     return $mysqldate;
   }
 
