@@ -32,3 +32,18 @@ class DateFormat implements PkDisplayValueInterface {
     return friendlyCarbonDate($value, $fmt);
   }
 }
+
+/** Returns "Yes" for true value, "No" or "" otherwise */
+class YesNo implements PkDisplayValueInterface {
+  /**
+   * 
+   * @param mixed $value
+   * @param boolean $nullisno - if true, return empty string for null value
+   * @return string 'Yes','No', ''
+   */
+  public static function displayValue($value = null, $nullisno=null) {
+    if ($value) return "Yes";
+    if (!$nullisno && (is_null($value) || ($value === ''))) return '';
+    return "No";
+  }
+}

@@ -502,6 +502,32 @@ class PkHtmlRenderer extends PartialSet {
     $this->RENDERCLOSE();
   }
 
+  /**
+   * Outputs an html table row
+   * @param array|string $data - the array of columns to output (string if only one)
+   *   BUT if an element of $data is an array, is ['val'=>$value,'coltag'=>$tag,'colatts'=>$attributes]
+   * @param string|array $opts
+   *   if string, the th or (default) td tag to use for the columns
+   * @return html table row string
+   */
+  public function tablerow($data=[],$opts='td') {
+    if (!is_array($data)) $data = [$data];
+    if (is_string($opts)) $opts = ['coltag' => $opts];
+    if (is_array($opts)) { 
+      $coltag = keyVal('coltag',$opts,'td');
+    }
+    $this[]="<tr>\n";
+    foreach ($data as $idx =>$datum) {
+      if (!is_array($datum)) $datum = ['value'=>$datum];
+      $value = keyVal('value',$datum);
+      $lcoltag = keyVal('coltag',$datum,$coltag);
+      $latts =  keyVal('colatts',$datum);
+      $this[] = "  <$lcoltag $latts>$value</$lcoltag>\n";
+    }
+    $this[]="</tr>\n";
+    return $this;
+  }
+
   /** Totally misconceived
   public function wrapToolTip($tooltip, $wrapperClasses =' ', $tooltipClasses = '') {
     $arrayIterator = $this->getIterator();
