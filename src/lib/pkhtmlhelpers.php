@@ -127,3 +127,7 @@ function checkBox($value) {
   if ($value) return '&#9745;';
   return  '&#9744;';
 }
+
+function printButton($extraclasses = 'inline', $txt='Print') {
+  return "<div class='$extraclasses pkmvc-button print-button'>$txt</div>";
+}

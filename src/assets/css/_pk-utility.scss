@@ -752,3 +752,9 @@ $i: 1;
     display: none ! important;
   }
 }
+
+@media screen {
+  .print-only, .no-screen {
+    display: none;
+  }
+}

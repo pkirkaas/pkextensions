@@ -63,7 +63,7 @@ abstract class PkModel extends Model {
    * $this->displayValue($field_name);
    * The individual models must implement this, but then can access the
    * reference value NOT ONLY with $model->displayValue($field_name);, but 
-   * also $this->$field_name.'displayValue'
+   * also $this->$field_name.'_DV'
    * 
    * The dispvalfield can be a value of the array, or a key of the array
    * with the value the refModel that can display it. That's easiest because
@@ -74,6 +74,7 @@ abstract class PkModel extends Model {
   public static $display_value_fields = [ /*
     'financetype_id',
     'buscredit_id'=>'App\References\BusinessCreditRef',
+    'date'=>['PkExtensions\DisplayValue\DateFormat','Y-m-d'], #Argument to DateFormat
    */];
 
   /** Does two entirely different things - by default, 
@@ -85,7 +86,8 @@ abstract class PkModel extends Model {
     if ($onlyrefs) {
       $refarr = [];
       foreach (static::$display_value_fields as $key => $value) {
-        if (is_string ($key) && is_string($value)) {
+        //if (is_string ($key) && is_string($value)) {
+        if (is_string ($key) && $value) {
           $refarr[$key] = $value;
         }
       }
@@ -1132,6 +1134,13 @@ class $createclassname extends Migration {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
     foreach ($refmaps as $fn => $rc) {
+      #$rc can be a String classname that implements PkDisplayValueInterface, OR
+      #an array of [$className,$args] where $args= date format, or $ precision, whatever
+      $args = null;
+      if (is_array($rc)) {
+        $args = $rc[1];
+        $rc = $rc[0];
+      } 
       if (!ne_string($fn) || !ne_string($rc) || !class_exists($rc) || 
           !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
         continue;
@@ -1139,7 +1148,7 @@ class $createclassname extends Migration {
       if ($fn === $fieldName) {
         //$fldVal = $this->$fieldName;
         //pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
-        return $rc::displayValue($this->$fieldName);
+        return $rc::displayValue($this->$fieldName,$args);
       }
     }
     if ($value === null) return $this->$fieldName;

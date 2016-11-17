@@ -263,9 +263,9 @@ div.blocked:hover::after {
 
 /** Sope button styling, also for divs, and menus? */
 
-.pkmvc-button:focus,
-.pkmvc-button:visited,
-.pkmvc-button {
+body .pkmvc-button:focus,
+body .pkmvc-button:visited,
+body .pkmvc-button {
   white-space: nowrap;
   text-align: center;
   text-decoration: none;
@@ -282,15 +282,24 @@ div.blocked:hover::after {
   margin: .5rem;
   text-shadow: 0 -1px 1px #1a5ad9;
 }
+body .pkmvc-button:focus a,
+body .pkmvc-button:visited a,
+body .pkmvc-button a {
+  color: #fff;
+  text-decoration: none;
+}
 
-.pkmvc-button:hover {
+body .pkmvc-button:hover,
+body .pkmvc-button:hover a {
     text-decoration: none;
     color: #ffe;
+}
+body .pkmvc-button:hover {
     background-image: linear-gradient(to top, #557ac9, #174fc0);
     cursor: pointer; 
 }
 
-.pkmvc-button:active {
+body .pkmvc-button:active {
     border-top: 1px solid #1b4db3;
     border-right: 1px solid #174299;
     border-bottom: 1px solid #133780;

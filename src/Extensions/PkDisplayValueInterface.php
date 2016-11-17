@@ -3,8 +3,11 @@ namespace PkExtensions;
 /**
  * Just requires the Class to implement the static::displayValue($value) method,
  * for outputing values
+ * 
+ * Implementing classes can have additional args to displayValue, but the default
+ * should be null.
  *
- * @author KIRKP010
+ * @author Paul Kirkaas
  */
 interface PkDisplayValueInterface {
   public static function displayValue($value=null);
