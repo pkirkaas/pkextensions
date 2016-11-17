@@ -2567,6 +2567,45 @@ function validSqlDate($val) {
   return false; 
 }
 
+/** Returns seconds diff (+future or -past) between $sqlDt1 & $sqlDt2
+ * 
+ * @param string $sqlDt1 - an SQL date
+ * @param string|null $sqlDt2 - an SQL date, or NULL for now
+ * @param boolean $just_date - just use date, not date-time for now
+ * @return int|null - seconds diff, or null if invalid SQL date format
+ */
+function sqlDateCmp($sqlDt1,$sqlDt2=null, $just_date=false) {
+  if (!$sqlDt2) $sqlDt2 = unixtimeToSql(null,$just_date);
+  if (!validSqlDate($sqlDt1) || !validSqlDate($sqlDt2)) return null;
+  return strtotime($sqlDt1) - strtotime($sqlDt2);
+}
+
+/** Checks if the SQL date is in the future (from Now)
+ * @param string $sqlDt - SQL date formatted date to test
+ * @param boolean $just_date - just use date, not date-time for now
+ * @return int|boolean|null - #seconds in future if future, or 0 if NOW,
+ *    or FALSE if past, or NULL if invalid SQL date format
+ */
+function sqlDateFuture($sqlDt, $just_date=false) {
+  $diff = sqlDateCmp($sqlDt,null,$just_date);
+  if (!is_numeric($diff)) return $diff;
+  if ($diff < 0) return false;
+  return $diff;
+}
+
+/** Checks if the SQL date is in the past (from Now)
+ * @param string $sqlDt - SQL date formatted date to test
+ * @param boolean $just_date - just use date, not date-time for now
+ * @return int|boolean|null - #seconds in past if past, or 0 if NOW,
+ *    or FALSE if past, or NULL if invalid SQL date format
+ */
+function sqlDatePast($sqlDt, $just_date=false) {
+  $diff = sqlDateCmp($sqlDt,null,$just_date);
+  if (!is_numeric($diff)) return $diff;
+  if ($diff > 0) return false;
+  return -$diff;
+}
+
 /**
  * Converts an SQL formatted date/time string to unix integer timestamp
  * @param string $sqldate The SQL date/time string. If null, returns current unix time.

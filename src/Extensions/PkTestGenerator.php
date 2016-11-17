@@ -412,7 +412,7 @@ class PkTestGenerator {
   public static function randDigitString($length=1,$from=0) {
     $ret = '';
     for ($i=0 ; $i<$length; $i++) {
-      ($i===0) ? $min = $from : $min = 0;
+      $min = ($i===0) ? $from : 0;
       $digit = mt_rand($min,9);
       $ret .= "$digit";
     }
