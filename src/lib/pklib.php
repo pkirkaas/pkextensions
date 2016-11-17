@@ -1962,18 +1962,14 @@ function equivalent($a, $b) {
  * @param type $prec
  * @return type
  */
-function dollar_format($num, $prec = 0) {
-  if (($num === null) || ($num === '')) return '';
-  if (is_array($prec)) {
-    if (array_key_exists('prec', $prec)) {
-      $prec = $$prec['prec'];
-    } else {
-      $prec = 0;
-    }
-  }
+function dollar_format($num, $opts = 0, $hide0=false) {
+  if (!is_array ($opts )) $opts=['prec'=>$opts];
+  $prec = keyVal('prec', $opts, 0);
+  $hide0 = keyVal('hide0',$opts,$hide0);
   if (is_array($num)) {
     $num = array_sum($num);
   }
+  if (($num === null) || ($num === '') || ($hide0 && !$num)) return '';
   return '$' . number_format($num, $prec);
 }
 
@@ -2921,6 +2917,22 @@ function normalizeConfigArray(array $arr = [], $struct = null ) {
   }
   return $retarr;
 
+}
+/**
+ * For getting valid params or defaults. REMOVES $param key=>values if 
+ * $key not in $default - so safe to use with extract($result);
+ * Takes an associative array of parameters, and associative array of
+ * defaults and returns an associative array JUST WITH KEYS IN DEFAULTS,
+ * but with values of $params if the key exists
+ * @param type $params
+ * @param type $defaults
+ */
+function getParamsOrDefault($params = [],$defaults = []) {
+  $badkeys = array_diff(array_keys($params), array_keys($defaults));
+  foreach ($badkeys as $badkey) {
+    unset($params[$badkey]);
+  }
+  return array_merge($defaults, $params);
 }
 
 /** Takes a scaler as first arg, and unlimited other args (presumably
