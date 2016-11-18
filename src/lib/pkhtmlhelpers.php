@@ -16,6 +16,7 @@ function grid_layout($items, $opts=[]) {
     'num_columns' => 12,
     'items_per_row' => 3,
     'row_class' => '',
+    'col_class' => '',#Additional column class
   ];
   $params = getParamsOrDefault($opts, $defaults);
   extract($params);
@@ -26,7 +27,7 @@ function grid_layout($items, $opts=[]) {
   }
   $item_width = $num_columns/$items_per_row;
   $numcols = count($items);
-  $colclass = "col-xs-$item_width";
+  $colclass = "col-xs-$item_width $col_class";
   $grout = new PkHtmlRenderer();
   $grout->rawdiv(RENDEROPEN,"row $row_class");
     foreach ($items as $i=>$item) {

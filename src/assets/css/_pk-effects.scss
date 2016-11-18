@@ -368,8 +368,10 @@ img.avatar,
 img.big-picture-dialog {
   max-width: 70rem;
   max-height: 70rem;
+  /*
   border-radius: 2rem;
   border: solid blue 5px;
+  */
 
 } 
 img.avatar {
@@ -452,3 +454,15 @@ input[disabled].disabled {
   */
 
 }
+/** To center jQuery UI dialogs - pk-big-picture, but generalizable
+ * Need to add "data-dialogClass='pk-big-picture'" to the js-dialog-button 
+*/
+.ui-dialog.ui-widget.pk-big-picture {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform:translate(-50%,-50%);
+}
+/*
+*/
