@@ -14,9 +14,11 @@ if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
  * PkMultiSubformRenderer
  */
 class PkHtmlRenderer extends PartialSet {
+  #These are called with $this->nocontent($tagname, $attributes)
   public static $selfclosing_tags = [
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
     'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr', ];
+  #These are by default called with $this->tagged($tagname,$value/content, $attributes)
   public static $content_tags = [
       'a', 'abbr', 'acronym', 'address', 'applet', 'article', 'aside',
       'audio', 'b', 'basefont', 'bdi', 'bdo', 'big', 'blockquote', 'body',
@@ -168,6 +170,9 @@ class PkHtmlRenderer extends PartialSet {
 
 
   public function rawwrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='') {
+    if (is_array($value)) {
+      $value['raw'] = true;
+    }
     return $this->wrap($value, $label,$valueClass, $labelClass, $wrapperClass, true);
   }
 
@@ -472,14 +477,16 @@ class PkHtmlRenderer extends PartialSet {
    * Very simple BS Row Renderer. Makes a <div class='row $rowclass'>
    * Then iterates through $data array and wraps each datum in corresponding col class
    * @param array $data - indexed array of stringish datums for the row
-   * @param array $colclasses - indexed array of same size as $data, with corresponding col classes
+   * @param array|string $colclasses - indexed array of same size as $data,
+   *   with corresponding col classes, OR a single column class string to be used
+   *   on EACH column of the row - identical
    * @param array $opts: (but can be $rowclass string, then $colclass is string)
    *    @param string $rowclass - optional additional class for the row
    *    @param string $colclass - optional additional class for every column
    *    @param boolean $raw
    * @return $this
    */
-  public function row ($data, $colclasses, $opts=[], $colclass='') {
+  public function row ($data, $colclasses=null, $opts=[], $colclass='') {
     if (is_array($opts)) {
       $rowclass= keyVal('rowclass', $opts);
       $colclass=keyVal('colclass',$opts);
@@ -494,12 +501,32 @@ class PkHtmlRenderer extends PartialSet {
       $div = 'div';
     }
     $row = "row $rowclass";
+    $sz = count($data);
+    $colsz = 12/$sz;
     $this->$div(RENDEROPEN, $row);
     foreach ($data as $i => $datum) {
-      $data_colclass = $colclasses[$i]." $colclass";
+      if (!$colclasses) {
+        $colclasses = "col-xs-$colsz";
+      }
+      if (is_array($colclasses)) {
+        $itemclass = $colclasses[$i];
+      } else {
+        $itemclass = $colclasses;
+      }
+      $data_colclass = "$itemclass $colclass";
       $this->$div($datum,$data_colclass);
     }
     $this->RENDERCLOSE();
+  }
+
+
+  public function rawrow ($data, $colclasses=null, $opts=[], $colclass='') {
+    if (!is_arrayish($opts)) {
+      $opts = ['rowclass'=>$opts, 'colclass'=>$colclass];
+    }
+    $opts['raw']=true;
+    return $this->row($data, $colclasses,$opts, $colclass);
+
   }
 
   /**

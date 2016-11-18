@@ -2,8 +2,43 @@
 use Collective\Html\HtmlBuilder;
 use Collective\Html\FormBuilder;
 use PkExtensions\PartialSet;
+use PkExtensions\PkHtmlRenderer;
 
 
+/** Try to redo this rationally - but works as test in kirkaas.com gallery*/
+/**
+ * 
+ * @param type $items
+ * @param type $opts
+ */
+function grid_layout($items, $opts=[]) {
+  $defaults = [
+    'num_columns' => 12,
+    'items_per_row' => 3,
+    'row_class' => '',
+  ];
+  $params = getParamsOrDefault($opts, $defaults);
+  extract($params);
+  if ($items instanceOf PartialSet) {
+    $numitems = $items->sizeOf();
+  } else {
+    $numitems = count($items);
+  }
+  $item_width = $num_columns/$items_per_row;
+  $numcols = count($items);
+  $colclass = "col-xs-$item_width";
+  $grout = new PkHtmlRenderer();
+  $grout->rawdiv(RENDEROPEN,"row $row_class");
+    foreach ($items as $i=>$item) {
+      $grout->rawdiv($item,$colclass);
+      if (($i+1 <$numitems) && !(($i+1) % $items_per_row) ) {
+        $grout->RENDERCLOSE();
+        $grout->rawdiv(RENDEROPEN,"row $row_class");
+      }
+    }
+  $grout->RENDERCLOSE();
+  return $grout;
+}
 
 
 /** Returns HTML of the items in a grid
