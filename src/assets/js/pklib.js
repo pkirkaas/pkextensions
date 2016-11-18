@@ -99,11 +99,27 @@ $(function () {
   });
 });
 
+/** Toggle enabled/disabled other form components
+ * The 'toggling' class: enable-toggler
+ * The 'toggled' class: enable-toggled
+ * Goes up DOM until 'body' OR '.enable-toggle-set', then disables every control
+ * of class 'enable-toggled' below that.
+ */
+$('body').on('click', '.enable-toggler', function (event) {
+  //console.log("Trying to toggle - e target:", event.target);
+  var toggled = $(event.target).closest('.enable-toggle-set, body').find('.enable-toggled');
+  //var toggle_set = $(event.target).closest('.enable-toggle-set');
+  //console.log("Toggle Set:",toggle_set[0]);
+  //console.log("enable-toggled:",toggled[0]);
+  var disabled = toggled.prop('disabled');
+  toggled.prop('disabled', !disabled);
+  
+});
+
 
 /** Set subform select inputs after templating */
-$(function () {
-  console.log("Compiled");
-});
+
+
 $(function () {
     var tpl_sels = $('.templatable-data-sets select');
     tpl_sels.each(function(idx, sel_el) {
@@ -975,6 +991,8 @@ function safeSplitString(thestring,splitchar) {
  * to submit
  * @returns {undefined}
  */
+//Don't want to make this default for ALL forms!
+/**
 $(function () {
   $('body').on('change', 'form', function (event) {
     $(window).on('beforeunload', function (event) { 
@@ -985,6 +1003,22 @@ $(function () {
     });
   });
   $('form').submit (function (event) {
+    console.log("Got in onload - trying 'off' ...");
+    $(window).off('beforeunload');
+  });
+});
+*/
+//Just forms with class '.chck-frm'
+$(function () {
+  $('body').on('change', 'form.chck-frm', function (event) {
+    $(window).on('beforeunload', function (event) { 
+      var confirmationMessage = "Unsaved Changes";
+      event.preventDefault();
+      event.returnValue = confirmationMessage; 
+      return confirmationMessage;
+    });
+  });
+  $('form.chck-frm').submit (function (event) {
     console.log("Got in onload - trying 'off' ...");
     $(window).off('beforeunload');
   });
