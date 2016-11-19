@@ -21,7 +21,7 @@ Class PkMediaHelper {
   public $srcdir = 'ORIG_MEDIA';
   public $cmpdirs;#If empty, defaults to $this->srcdir-$maxwidth-$maxheight for each compression level
       #If you want to specify dirs, do as array, like ['web_compressed','thumbnails',..] etc.
-  public $maxwidtharr = [1000,256]; //Max width for compressed image & thumbnail image
+  public $maxwidtharr = [800,400]; //Max width for compressed image & thumbnail image. Can initialize to more levels
   public $maxheightarr; #If not given, defaults to maxwidtharr;
   public $type = 'image';
   public $maxlevels = 0;

@@ -99,6 +99,7 @@ $(function () {
   });
 });
 
+////// Some Togglers
 /** Toggle enabled/disabled other form components
  * The 'toggling' class: enable-toggler
  * The 'toggled' class: enable-toggled
@@ -106,14 +107,19 @@ $(function () {
  * of class 'enable-toggled' below that.
  */
 $('body').on('click', '.enable-toggler', function (event) {
-  //console.log("Trying to toggle - e target:", event.target);
   var toggled = $(event.target).closest('.enable-toggle-set, body').find('.enable-toggled');
-  //var toggle_set = $(event.target).closest('.enable-toggle-set');
-  //console.log("Toggle Set:",toggle_set[0]);
+  var disabled = toggled.prop('disabled');
+  toggled.prop('disabled', !disabled);
+});
+
+/* Toggle show/hide - Toggler class: 'hide-toggler', target class: 'hide-toggled', wrapper: 'hide-toggle-set'
+ * 
+ */
+$('body').on('click', '.hide-toggler', function (event) {
+  var toggled = $(event.target).closest('.hide-toggle-set, body').find('.hide-toggled');
   //console.log("enable-toggled:",toggled[0]);
   var disabled = toggled.prop('disabled');
   toggled.prop('disabled', !disabled);
-  
 });
 
 
