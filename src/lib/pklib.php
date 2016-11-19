@@ -3007,6 +3007,22 @@ function ne_intish($var) {
 }
 
 
+/** Sets the members of Object object to the corresponding key values of the
+ * associative $atts array
+ * @param Object $obj
+ * @param array $atts
+ * @return array - remaining $atts not used to set properties
+ */
+function setInstanceAtts($obj, array $atts = []) {
+  if (!is_object($obj)) return false;
+  foreach ($atts as $key => $value) {
+    if (property_exists($obj,$key)) {
+      $obj->$key = $value;
+      unset($atts[$key]);
+    } 
+  }
+  return $atts;
+}
 
 
 
