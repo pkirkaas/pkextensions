@@ -761,3 +761,15 @@ $i: 1;
 .js-dialog-content {
   display: none;
 }
+
+/** For labels under images */
+.image-desc {
+  border-radius: .5em;
+  font-weight: 600;
+  font-size: .9rem;
+  color: #422;
+  text-align: center;
+  margin-top: .5em;
+  background-color: rgba(100,100,255,.5);
+
+}
