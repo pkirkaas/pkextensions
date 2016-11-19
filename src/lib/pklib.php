@@ -2176,6 +2176,24 @@ function isValidImagePath($filePath) {
   return $mimeType;
 }
 
+/** If the $filePath is a valid info & can get dimensions, return width/height,
+ * else 0/false
+ * @param type $filePath
+ */
+function aspectRatio($filePath) {
+  if (!($mimeType = isValidImagePath($filePath))) return false;
+  $exif = exif_read_data($filePath);
+  if (($computed = keyVal('COMPUTED', $exif))
+      && ($width=keyVal('Width',$computed)) && ($height=keyVal('Height',$computed))) {
+    return $width/$height;
+  }
+  #If no exif data, use GD:
+  //$gdresource = imagecreatefromstring (file_get_contents($filePath));
+  $sz = getimagesize($filePath);
+  if (($width=keyVal(0,$sz)) && ($height=keyVal(1,$sz))) return $width/$height;
+  return false;
+}
+
 /** Kind of hokey function that takes two arrays, and returns true if the second
  * array equals the first, up to the depth of the first. For example, 
  * ['image'], ['image','gif'] would return true...

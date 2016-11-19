@@ -56,3 +56,12 @@ div.row.results.cg-set div.bs-col {
   padding: 2px;
   border-radius: 2px;
 }
+
+/** For labels under images */
+.image-desc {
+  border-radius: .5em;
+  text-align: center;
+  margin-top: .5em;
+  background-color: rgba(255,200,240,.3);
+
+}
