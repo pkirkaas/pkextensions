@@ -113,7 +113,7 @@ Class PkMediaHelper {
       $fullpath = $fullsrcdir.$entry;
       if (!$mimeType = isValidImagePath($fullpath)) continue;
       $root_name = substr($entry, 0, strrpos($entry, "."));
-      $exif = exif_read_data($fullpath);
+      $exif = @exif_read_data($fullpath);
       $img_item = [
         'mimeType' => $mimeType,
         'file_name' =>$entry,
