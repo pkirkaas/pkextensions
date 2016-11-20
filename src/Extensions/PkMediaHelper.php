@@ -5,6 +5,7 @@ use Imagine\Gd\Imagine as GdImagine;
 use Imagine\Image;
 use Imagine\Image\Box;
 use PkExtensions\PkException;
+use Exception;
 /**
  * Class to add media manipulation functionality to existing media tools,
  * like Imagine/Imagine
@@ -113,7 +114,13 @@ Class PkMediaHelper {
       $fullpath = $fullsrcdir.$entry;
       if (!$mimeType = isValidImagePath($fullpath)) continue;
       $root_name = substr($entry, 0, strrpos($entry, "."));
-      $exif = @exif_read_data($fullpath);
+      $exif = [];
+      try {
+        $exif = @exif_read_data($fullpath);
+      } catch (Exception $e) {
+        error_log("Exception Reading EXIF: ".$e->getMessage());
+        pkdebug("Exception reading EXIF:", $e);
+      }
       $img_item = [
         'mimeType' => $mimeType,
         'file_name' =>$entry,
