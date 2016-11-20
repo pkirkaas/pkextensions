@@ -157,6 +157,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
   $align: map-get($params,align);
   $font: map-get($params,font);
   $size: map-get($params,size);
+  $textshadow: map-get($params,textshadow);
+  $boxshadow: map-get($params,boxshadow);
   
   $map:();
   @if $border {
@@ -182,7 +184,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
   @for $i from 0 through $szrange {
     $sz: if($i!=0, $i, null);
-    $szmap: (font-size:($i/10)+$size);
+    $szmap: (font-size:($i/5)+$size);
     @each $bga in map-keys($bgmap) {
       $bmap: map-get($bgmap,$bga);
       @each $ca in map-keys($clmap) {
@@ -192,14 +194,33 @@ $grid-gutter-width:          1.875rem !default; // 30px
           @include mk-decblock($cmap);
           @include mk-decblock($bmap);
           @include mk-decblock($szmap);
+          @include mk-boxshadow($boxshadow);
+          @include mk-textshadow($textshadow);
         }
       }
     }
   }
+}
 
+@mixin mk-boxshadow($map:()) {
+  @if not(empty($map)) {
+    @if $map == true {
+      box-shadow: 1rem 1rem 3rem -1rem rgba(0,0,0,.5);
+    }
+  }
+}
+@mixin mk-textshadow ($map:()) {
+  @if not(empty($map)) {
+    @if $map == true {
+      text-shadow: .1rem .1rem .3rem  rgba(0,0,0,.5);
+    }
+  }
 
 }
-@include mk-format((cname:head-text,
+//Example Classname: .au-head-flt-bgdk2 
+//
+/*
+@include mk-format((cname:head,
     szrange:3,
      color:#456,crange:1,
      background:#cde,
@@ -207,3 +228,27 @@ $grid-gutter-width:          1.875rem !default; // 30px
      border: #aaf,
      display: inline,
      ));
+*/
+
+@mixin v-padding($sz) {
+  padding-top: $sz;
+  padding-bottom: $sz;
+}
+
+@mixin v-margin($sz) {
+  margin-top: $sz;
+  margin-bottom: $sz;
+}
+
+@mixin h-margin($sz: auto) {
+  margin-left: $sz;
+  margin-right: $sz;
+}
+
+@mixin mk-wrapper($map:()) {
+  border: solid #aaa 1px;
+  background: rgba(220,250, 180, .3);
+  border-radius: .5em;
+  @include mk-boxshadow(true);
+}
+
