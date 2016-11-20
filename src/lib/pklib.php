@@ -2182,7 +2182,13 @@ function isValidImagePath($filePath) {
  */
 function aspectRatio($filePath) {
   if (!($mimeType = isValidImagePath($filePath))) return false;
-  $exif = exif_read_data($filePath);
+  $exif = null;
+  try {
+    $exif = @exif_read_data($filePath);
+  } catch (Exception $e) {
+    error_log("Exception Reading EXIF for file [$filePath]: ".$e->getMessage());
+    pkdebug("Exception reading EXIF for file [$filePath]:", $e);
+  }
   if (($computed = keyVal('COMPUTED', $exif))
       && ($width=keyVal('Width',$computed)) && ($height=keyVal('Height',$computed))) {
     return $width/$height;
