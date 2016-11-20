@@ -40,3 +40,170 @@ $grid-gutter-width:          1.875rem !default; // 30px
     @content
   }
 }
+
+@mixin mx-text-format($sz:medium, $weight:400, $color:black) {}
+
+
+@mixin absolutecenter($axis: "both"){
+  position:absolute;
+  @if $axis == "y"{
+    margin-top: 0;
+    margin-bottom: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  @if $axis == "x"{
+    margin-left: 0;
+    margin-right: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  @if $axis == "both"{
+    margin: 0;
+    top:50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+  }
+}
+
+//In SCSS, '' & 0 are true
+@function empty($value) {
+  @if not($value) 
+      or $value == "" 
+      or $value == 0
+      or $value == ()
+      or length($value) == 0 {
+    @return true;
+  }
+  @return false;
+}
+// Builds a declaration block from mapped property/values
+
+@mixin mk-decblock($map:()) {
+  $keys: map-keys($map);
+  @each $key in $keys {
+    #{$key}: map-get($map,$key);
+  }
+}
+@mixin mk-classdef($cname,$maplist) {
+  .#{$cname} {
+    @each $map in $maplist {
+      @include mk-decblock($map);
+    }
+  }
+}
+@mixin mk-decblock($map:()) {
+  $keys: map-keys($map);
+  @each $key in $keys {
+    @if not(empty($key) or empty(map-get($map,$key))) {
+      #{$key}: map-get($map,$key);
+    }
+  }
+}
+@function empty($value) {
+  @if not($value) 
+      or $value == "" 
+      or $value == 0
+      or $value == ()
+      or length($value) == 0 {
+    @return true;
+  }
+  @return false;
+}
+
+.test-map {
+  $map:();
+  $map: map-merge($map,(background:blue));
+  $map: map-merge($map,(border:solid black 3px));
+  @include mk-decblock($map);
+}
+
+@mixin make-bg($cname: mhead, $color: #da8) {
+  .#{$cname}-a { background-color: lighten($color,20%); }
+  .#{$cname}-b { background-color: darken($color,20%); }
+}
+
+/** Makes (multiple) text format classes, based on $args map:
+ * All class names prepended by 'au-'
+ * Params:
+ * cname: format - class name(s) will be au-cname
+ * weight: null - font-weight
+ * szrange: 0 or int - how many class sizes
+ * crange: null or true - generate lighter & darker fonts?
+ * bgrange: null or 1 - generate light & dark bg?
+ * background: null - or color
+ * margin: null - or margin
+ * padding: null or padding
+ * align: null - or center or left or right
+ * color: null or color
+ * border: null or color
+ * 
+*/
+
+
+@mixin mk-format($args:()) {
+  $defaults: (cname:format,szrange:0, size:1em);
+  $params: map-merge($defaults,$args);
+  $cname: map-get($params,cname);
+  $bname: au-#{$cname};
+  $border: map-get($params,border);
+  $szrange: map-get($params,szrange);
+  $crange: map-get($params,crange);
+  $bgrange: map-get($params,bgrange);
+  $background: map-get($params,background);
+  $color: map-get($params,color);
+  $weight: map-get($params,weight);
+  $display: map-get($params,display);
+  $align: map-get($params,align);
+  $font: map-get($params,font);
+  $size: map-get($params,size);
+  
+  $map:();
+  @if $border {
+    $map: map-merge($map, (border: solid $border 1px,
+      border-radius: .5em));
+  }
+  $map:map-merge($map,(display:$display,
+      text-align:$align,
+      font-family:$font));
+
+  $clmap: if($color and $crange, 
+        ('-flt':(color:lighten($color,20%)),
+          '':(),
+          '-fdk':(color:darken($color,20%))),
+          ('':(color:$color)));
+
+
+  $bgmap: if($background and $bgrange, 
+        ('-bglt':(background:lighten($color,20%)),
+          '':(background:$background),
+          '-bgdk':(background:darken($background,20%))),
+          ('':(background:$background)));
+
+  @for $i from 0 through $szrange {
+    $sz: if($i!=0, $i, null);
+    $szmap: (font-size:($i/10)+$size);
+    @each $bga in map-keys($bgmap) {
+      $bmap: map-get($bgmap,$bga);
+      @each $ca in map-keys($clmap) {
+        $cmap: map-get($clmap,$ca);
+        .#{$bname}#{$ca}#{$bga}#{$sz} {
+          @include mk-decblock($map);
+          @include mk-decblock($cmap);
+          @include mk-decblock($bmap);
+          @include mk-decblock($szmap);
+        }
+      }
+    }
+  }
+
+
+}
+@include mk-format((cname:head-text,
+    szrange:3,
+     color:#456,crange:1,
+     background:#cde,
+     bgrange:1,
+     border: #aaf,
+     display: inline,
+     ));
