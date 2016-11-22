@@ -130,11 +130,11 @@ $grid-gutter-width:          1.875rem !default; // 30px
  * weight: null - font-weight
  * szrange: 0 or int - how many class sizes
  * crange: null or true - generate lighter & darker fonts?
- * bgrange: null or 1 - generate light & dark bg?
- * background: null - or color
- * margin: null - or margin
- * padding: null or padding
- * align: null - or center or left or right
+ * bgrange: null or 1 - generate light & dark bg? (Prefer: Use wrapper)
+ * background: null - or color (Prefer: Use wrapper for BG)
+ * margin: null - or margin (Prefer: Use wrapper)
+ * padding: null or padding (Prefer: Use wrapper)
+ * align: null - or center or left or right (Prefer: Use wrapper)
  * color: null or color
  * border: null or color
  * 
@@ -245,10 +245,46 @@ $grid-gutter-width:          1.875rem !default; // 30px
   margin-right: $sz;
 }
 
-@mixin mk-wrapper($map:()) {
-  border: solid #aaa 1px;
-  background: rgba(220,250, 180, .3);
-  border-radius: .5em;
-  @include mk-boxshadow(true);
+/** Makes text/section wrappers, with MAP args/defaults:
+ * boxshadow: default for the mk-boxshadow mixin
+ * border: the border color, or false
+ * background: the background color, or false
+ * align: text alignment of the contained text - left, right, center
+ * v-padding: 1em
+ * v-margin: 1em
+ */
+
+@mixin mk-wrapper($args:()) {
+  $defaults: (
+    boxshadow:true,
+    border:#aaa,
+    background:rgba(230,240,250,.3),
+    v-padding: 1em,
+    v-margin: 1em,
+    );
+  $params: map-merge($defaults,$args);
+
+  $boxshadow: map-get($params,boxshadow);
+  $border: map-get($params,border);
+  $background: map-get($params,background);
+  $v-padding: map-get($params,v-padding);
+  $v-margin: map-get($params,v-margin);
+
+  @if $border {
+    border: solid $border 1px;
+    border-radius: .5em;
+  }
+  @if $background {
+    background: $background;
+  }
+  @if $boxshadow {
+    @include mk-boxshadow($boxshadow);
+  }
+  @if $v-padding {
+    @include v-padding($v-padding);
+  }
+  @if $v-margin {
+    @include v-margin($v-margin);
+  }
 }
 
