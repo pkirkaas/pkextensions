@@ -23,6 +23,8 @@ $inner-border-spread: 1px !default;
 body {
   
 }
+
+/*
 .section {
   border: solid #aaf 1px;
   border-radius: 5px;
@@ -30,6 +32,7 @@ body {
   padding: 5px;
   background-color: rgba(255,255,255,.2);
 }
+*/
 
 h3 {
   text-align: center;
@@ -165,6 +168,9 @@ h3 {
 .minwidth-25em, .minwidth25em { min-width: 25em ! important; }
 .width-100, .width100 { width: 100px ! important; }
 .width-50, .width50 { width: 50px ! important; }
+.width-30, .width30 { width: 30px ! important; }
+.width-25, .width25 { width: 25px ! important; }
+.width-20, .width20 { width: 20px ! important; }
 .width-auto, .widthauto { width: auto ! important; }
 .height-auto, .heightauto { height: auto ! important; }
 .minwidth-50, .minwidth50 { min-width: 50px ! important; }
@@ -208,6 +214,11 @@ h3 {
 .pad-top-10, .padding-top-10 { padding-top: 10px ! important; }
 .pad-top-15, .padding-top-15 { padding-top: 15px ! important; }
 .pad-top-20, .padding-top-20 { padding-top: 20px ! important; }
+
+
+.pad-l-5, .padding-l-5 { padding-left: 5px ! important; }
+.pad-r-5, .padding-r-5 { padding-right: 5px ! important; }
+.pad-lr-5, .padding-lr-5 { padding-left: 5px ! important; padding-right: 5px !important; }
 
 
 .margin-0, .margin0 { margin: 0px ! important; }

@@ -4,6 +4,7 @@ $idx = -1;
 if (empty($models)) $models = [];
 $default_params = [
   'wrap_class' => 'row inp-row',
+  'tds_class' => 'section-nomargin',
   //'delete_button' => "<div class='col-sm-1'><span class='js btn data-set-delete pkmvc-button'>Delete</span></div>",
   'delete_class' => "pkmvc-button pk-compact",
   'delete_content' => "Delete",
@@ -46,7 +47,7 @@ $params['new_item_button'] = keyVal('new_item_button',$params,$new_item_button);
  
   */
   ?>
-   <div class="templatable-data-sets section">
+   <div class="templatable-data-sets {{$params['tds_class']}}">
   <!-- This hidden allows deletion of the last item -->
   <input type='hidden' name='{{$relationship}}' value='' />
   <div class='{{$params['wrap_class']}}'> 

@@ -241,6 +241,11 @@ $grid-gutter-width:          1.875rem !default; // 30px
      ));
 */
 
+@mixin h-padding($sz) {
+  padding-left: $sz;
+  padding-right: $sz;
+}
+
 @mixin v-padding($sz) {
   padding-top: $sz;
   padding-bottom: $sz;
@@ -262,7 +267,12 @@ $grid-gutter-width:          1.875rem !default; // 30px
  * background: the background color, or false
  * align: text alignment of the contained text - left, right, center
  * v-padding: 1em
+ * h-padding: null
  * v-margin: 1em
+ * h-margin: null
+ * border-radius: null
+ * margin: null, if present, overrides v & h margin
+ * padding: null, if present, overrides v & h padding
  */
 
 @mixin mk-wrapper($args:()) {
@@ -272,19 +282,25 @@ $grid-gutter-width:          1.875rem !default; // 30px
     background:rgba(230,240,250,.3),
     v-padding: 1em,
     v-margin: 1em,
+    border-radius: 5px,
     );
   $params: map-merge($defaults,$args);
 
   $align: map-get($params,align);
   $boxshadow: map-get($params,boxshadow);
   $border: map-get($params,border);
+  $border-radius: map-get($params,border-radius);
   $background: map-get($params,background);
+  $padding: map-get($params,padding);
+  $margin: map-get($params,margin);
+  $h-padding: map-get($params,h-padding);
+  $h-margin: map-get($params,h-margin);
   $v-padding: map-get($params,v-padding);
   $v-margin: map-get($params,v-margin);
 
   @if $border {
     border: solid $border 1px;
-    border-radius: .5em;
+    border-radius: $border-radius;
   }
   @if $align {
     text-align: $align;
@@ -295,12 +311,54 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @if $boxshadow {
     @include mk-boxshadow($boxshadow);
   }
-  @if $v-padding {
-    @include v-padding($v-padding);
+  @if $padding {
+    padding: $padding;
+  } @else {
+    @if $h-padding {
+      @include h-padding($h-padding);
+    }
+    @if $v-padding {
+      @include v-padding($v-padding);
+    }
   }
-  @if $v-margin {
-    @include v-margin($v-margin);
+  @if $margin {
+    margin: $margin;
+  } @else {
+    @if $h-margin {
+      @include h-margin($h-margin);
+    }
+    @if $v-margin {
+      @include v-margin($v-margin);
+    }
   }
+}
+
+/** Uses mk-wrapper, above, with different defaults */
+@mixin mk-section($args:()) {
+  $defaults: (
+    border: #aaf,
+    margin: 5px,
+    padding: 5px,
+    background:  rgba(255,255,255,.2),
+    border-radius: 5px,
+    );
+  $params: map-merge($defaults,$args);
+  @include mk-wrapper($params);
+}
+@mixin mk-section-nomargin($args:()) {
+  $defaults: (
+    margin: 0,
+  );
+  $params: map-merge($defaults,$args);
+  @include mk-section($params);
+}
+
+.section {
+  @include mk-section;
+}
+
+.section-nomargin {
+  @include mk-section-nomargin;
 }
 
 @mixin text-align($align:center) {
