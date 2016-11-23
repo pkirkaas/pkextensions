@@ -22,7 +22,7 @@ div.speech-bubble{
    padding: 1em;
    color: white;
    display: inline-block;
-   width: 70%; 
+   width: 90%; 
    min-height: 6em; 
    border-radius: 1em;
 }
@@ -37,6 +37,8 @@ div.speech-bubble.left {
 div.speech-bubble.right {
    background: red;
 }
+/*
+// Not browser independent yet - FF & Chrome differ, also w. themselves on refresh
 div.speech-bubble::before,
 div.speech-bubble::after {
    content:"";
@@ -55,12 +57,11 @@ div.speech-bubble.left::before {
 div.speech-bubble.right:after {
    border-left: 2.5em solid red;
    margin-left: .5em;
-   /*
-   margin-left: 410px;
-   left: 70%;
-   */
+ //  margin-left: 410px;
+ //  left: 70%;
    top: 1.8em;
 }
+*/
 
 
 
