@@ -1,0 +1,18 @@
+/** Mods/add-ons to default BS 4
+ */
+
+//Customizing TAB inactive Background & Font color
+.nav-tabs .nav-link {
+  @if  variable-exists(nav-tabs-inactive-link-hover-color) {
+    color: $nav-tabs-inactive-link-hover-color;
+  }
+  @if  variable-exists(nav-tabs-inactive-link-hover-bg) {
+    background-color: $nav-tabs-inactive-link-hover-bg
+  }
+}
+
+@if   variable-exists(nav-tabs-bg-color) {
+  ul.nav.nav-tabs {
+    background-color: $nav-tabs-bg-color ;
+  }
+}
