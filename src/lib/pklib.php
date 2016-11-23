@@ -1018,6 +1018,10 @@ function filter_server_url($var, $default = '/', $filter = FILTER_VALIDATE_URL, 
 function filter_server($var, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
   return filter_input(INPUT_SERVER, $var, $filter, $options);
 }
+      
+function userIP() {
+  return filter_input(INPUT_SERVER,'REMOTE_ADDR', FILTER_VALIDATE_IP) ; 
+}
 
 function filter_url($url) {
   if (filter_var($url, FILTER_VALIDATE_URL)) {
