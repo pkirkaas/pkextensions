@@ -1,6 +1,7 @@
 <!-- BS 4 Modal Template for popping up big pictures -->
 
 <!-- Modal -->
+<div class='hidden'>
 <div class="modal fade bs4-dialog-content" tabindex="-1" role="dialog" data-bs4-dialog='bs4-big-picture-modal' aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -20,5 +21,6 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 
