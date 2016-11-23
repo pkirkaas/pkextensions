@@ -399,7 +399,8 @@ function getCousins(parentSelector, cousinSelector, me, first) {
  * @returns jQuery
  */
 function jQuerify(arg) {
-  if (arg instanceof jQuery) {
+  if (isjQuery(arg)) {
+  //if (arg instanceof jQuery) {
     return arg;
   }
   return jQuery(arg);
@@ -1042,10 +1043,30 @@ function isObject(obj) {
 function isEmpty(avar) {
   return (avar === undefined) || !avar || (isObject(avar) && !Object.keys(avar).length);
 }
+function isjQuery(obj) {
+  return (obj && (obj instanceof jQuery || obj.constructor.prototype.jquery));
+}
 
+/** Returns the maximum outerHeight of elements in avar
+ * 
+ * @param mixed avar - can be a jQuery collection, selector, or HTML string
+ * @returns int maxheight
+ */
+function maxHeight(avar) {
+  var els = jQuerify(avar);
+  var lmaxHeight = 0;
+  els.each(function() {
+    if ($(this).outerHeight() > lmaxHeight) {
+        lmaxHeight = $(this).outerHeight();
+    }
+  });
+  return lmaxHeight;
+}
+/*
 function isjQuery(avar) {
   return isObject(avar) && (avar instanceof jQuery);
 }
+*/
 
 /**
  * Is the argument an integer or string convertable to an int?

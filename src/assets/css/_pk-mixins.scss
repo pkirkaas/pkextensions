@@ -1,4 +1,13 @@
 /** Mixins to add to BootStrap (4). Assumes "_variables.scss' is in the GULP path */
+/*
+//Optional Google Fonts
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700"
+          rel="stylesheet">
+font-family: 'Montserrat', sans-serif;
+font-family: 'Open Sans', verdana;
+font-family: 'Oswald', verdana;
+font-family: 'Lato', verdana;
+*/
 
 @import 'variables';
 // If they weren't previously defined, use defaults
@@ -128,6 +137,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
  * Params:
  * cname: format - class name(s) will be au-cname
  * weight: null - font-weight
+ * font: null - font-family
  * szrange: 0 or int - how many class sizes
  * crange: null or true - generate lighter & darker fonts?
  * bgrange: null or 1 - generate light & dark bg? (Prefer: Use wrapper)
@@ -189,6 +199,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
       $bmap: map-get($bgmap,$bga);
       @each $ca in map-keys($clmap) {
         $cmap: map-get($clmap,$ca);
+        @debug #{$bname}#{$ca}#{$bga}#{$sz};
         .#{$bname}#{$ca}#{$bga}#{$sz} {
           @include mk-decblock($map);
           @include mk-decblock($cmap);
@@ -264,6 +275,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     );
   $params: map-merge($defaults,$args);
 
+  $align: map-get($params,align);
   $boxshadow: map-get($params,boxshadow);
   $border: map-get($params,border);
   $background: map-get($params,background);
@@ -273,6 +285,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @if $border {
     border: solid $border 1px;
     border-radius: .5em;
+  }
+  @if $align {
+    text-align: $align;
   }
   @if $background {
     background: $background;
