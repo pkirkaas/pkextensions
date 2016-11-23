@@ -130,6 +130,25 @@ function objDataDecode(objtype, objid) {
 
 
 $(function () {
+  //Initialize popDefObj if not already
+  if (typeof  popDefObj === 'undefined') {
+   window.popDefObj = {
+        dataModelType:'data-model-type-name',
+        dataModelId:'data-model-id',
+        jsPopupTmpCallerDataAttr:'data-js-popup-template-calls',
+        jsPopupTmpCalledDataAttr:'data-js-popup-template-called',
+        encodedDataHolderClass:'encoded-data-holder',
+        encDatMdlDataAttr:'data-encoded-data-objtype',
+        encDatIdDataAttr:'data-encoded-data-objid',
+        encDatDatDataAttr:'data-encoded-data-data',
+        popTemplateClass:'pop-hidden-js-template',
+        popCallerClass:'pop-details-for-obj',
+        popAttrNameDataAttr:'data-enc-attr-name',
+        valueTemplateClass:'enc-attr-val-tpl',
+        valueHolderClass:'enc-attr-val-holder-tpl'
+     };
+     console.error("!!! popDefObj was undefined - should have been in template/layout!!!");
+  }
   //console.log("Trying to get data atts");
   //var res = getDecodedData('borrower','1');
   var res = getDecodedData();
@@ -144,7 +163,6 @@ $(function () {
   }
   */
 
-});
 
 
 
@@ -159,6 +177,7 @@ $(function () {
 //$('body').on('hover', '.'+popDefObj.popTemplateClass, function (event) {
 //$('body').on('hover', '['+popDefObj.jsPopupTmpCallerDataAttr+']', function (event) {
 //$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
+//Putting this INSIDE init function, to be sure we get popDefObj - remove if it breaks! 28 Nov 16
 $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 
   var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
@@ -245,6 +264,7 @@ $('body').on( {
     }
 }, '.'+popDefObj.popCallerClass);
 
+});
         
 
 

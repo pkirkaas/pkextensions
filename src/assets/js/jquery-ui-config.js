@@ -16,7 +16,9 @@ $(function () {
 /** Better Initialize Date Picker */
 $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
     $(this).datepicker({
-      dateFormat: 'yy-mm-dd'
+      dateFormat: 'yy-mm-dd',
+      changeYear: true,
+      yearRange: '1930:2020'
   });
 });
 /** Persist current tab and return to it - but clear if doesn't exist in this
