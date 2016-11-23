@@ -133,7 +133,10 @@ $(function () {
       var selected = jqSelEl.attr('selected');
       var data_selected = jqSelEl.attr('data-selected');
       //Using attr('selected') On Purpose, since built by templater that way
-      jqSelEl.val(data_selected);
+      if ((typeof data_selected) !== 'undefined') {
+        console.log('SETTING Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
+        jqSelEl.val(data_selected);
+      }
       console.log('Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
     });
 
@@ -1016,6 +1019,7 @@ $(function () {
 });
 */
 //Just forms with class '.chck-frm'
+/*
 $(function () {
   $('body').on('change', 'form.chck-frm', function (event) {
     $(window).on('beforeunload', function (event) { 
@@ -1030,6 +1034,7 @@ $(function () {
     $(window).off('beforeunload');
   });
 });
+*/
 
 function isObject(obj) {
   return obj === Object(obj);

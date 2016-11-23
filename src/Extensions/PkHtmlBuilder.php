@@ -22,16 +22,9 @@ class PkHtmlBuilder extends HtmlBuilder {
       $attributes['title'] = html_encode($attributes['tooltip']);
       unset ($attributes['tooltip']);
     }
-    $ph = keyVal('placeholder',$attributes);
-    if ($ph == "Date Established") {
-      pkdebug("Attributes PRE unset::",$attributes);
-    }
     unset ($attributes['']);
     unset ($attributes[null]);
     unset ($attributes[0]);
-    if ($ph == "Date Established") {
-      pkdebug("Attributes Post unset::",$attributes);
-    }
     return parent::attributes($attributes);
   }
 
