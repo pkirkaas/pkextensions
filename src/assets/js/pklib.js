@@ -134,10 +134,9 @@ $(function () {
       var data_selected = jqSelEl.attr('data-selected');
       //Using attr('selected') On Purpose, since built by templater that way
       if ((typeof data_selected) !== 'undefined') {
-        console.log('SETTING Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
+    //    console.log('SETTING Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
         jqSelEl.val(data_selected);
       }
-      console.log('Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
     });
 
 
@@ -210,12 +209,11 @@ function showHelpDialog() {
 
 $(function () {
   $('body').on('click', '[data-pk-ajax-element]', function (event) {
-    console.log("Yes, clicked ajax");
     var target = $(event.target);
     var ajax_url = htmlDecode(target.attr('data-ajax-url'));
     var ajax_params = htmlDecode(target.attr('data-ajax-params'));
     var ajax_data = parseStr(ajax_params);
-    console.log('raw target args:', target.attr('data-response-target-arg'));
+    //console.log('raw target args:', target.attr('data-response-target-arg'));
 
     var func_arg = JSON.parse(target.attr('data-func-arg'));
     var attr_arg = JSON.parse(target.attr('data-attr-arg'));
@@ -224,11 +222,13 @@ $(function () {
     var attr_target = target.attr('data-attr-target');
     var func_target = target.attr('data-func-target');
 
+/*
     console.log('ajax_url: ', ajax_url, ' -- ajax_params: ', ajax_params, ' -- ajax_data: ', ajax_data,
             '-func_arg: ', func_arg, ' Type FA:', typeof (func_arg), '-func_target: ', func_target,
             '-selector_arg: ', selector_arg, ' Type SA:', typeof (selector_arg), '-selector_target: ', selector_target,
             '-attr_arg: ', attr_arg, ' Type AA:', typeof (attr_arg), '-attr_target: ', attr_target
             );
+    */
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,
@@ -320,7 +320,7 @@ jQuery.fn.extend({
 });
 
 function demoResponseTarget(target, data, arg) {
-  console.log("DemoResponseTarget ARGS: ", data, arg, 'target: ', target);
+  //console.log("DemoResponseTarget ARGS: ", data, arg, 'target: ', target);
 }
 
 
@@ -505,12 +505,14 @@ function resetFormElement(e) {
  * @returns {makeDialog.dlg|$}
  */
 
+/*
 $('body').on('click', 'img.avatar', function (event) {
   //console.log("Clicking..");
 });
 $('body').on('hover', 'img.avatar', function (event) {
-  console.log("Hovering..");
+  //console.log("Hovering..");
 });
+*/
 
 $(function () {
   var dlgonload = $('.dialog-on-load');
@@ -669,7 +671,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
 
   //console.log("DialogOpts:", dialogOptions);
   dialogClass = dialogOptions['dialogClass'];
-  console.log('dialogOptions', dialogOptions);
+  //console.log('dialogOptions', dialogOptions);
   dlg.dialog(dialogOptions);
   dlg.title = function (title) {
     dlg.dialog('option', 'title', title);
@@ -737,7 +739,7 @@ function makeDialog(selector, opts) {
       dialogOptions[opt] = opts[opt];
     }
   }
-  console.log("OverridableOpts", overridableOptions, 'opts', opts, 'DialogOpts', dialogOptions);
+  //console.log("OverridableOpts", overridableOptions, 'opts', opts, 'DialogOpts', dialogOptions);
   if (opts && opts.title) {
     dlg.attr('title', opts.title);
   }
@@ -967,7 +969,7 @@ function getArrToStr(getArr) {
       search_in.html(bodyHtml);
       if ($(spanSelector).length) {
         var topOffset =  $(spanSelector).offset().top - 120; 
-        console.log("TopOffset:", topOffset);
+        //console.log("TopOffset:", topOffset);
         window.scrollTo(0, topOffset);
       }
     }
@@ -1031,7 +1033,7 @@ $(function () {
     });
   });
   $('form.chck-frm').submit (function (event) {
-    console.log("Got in onload - trying 'off' ...");
+    //console.log("Got in onload - trying 'off' ...");
     $(window).off('beforeunload');
   });
 });
