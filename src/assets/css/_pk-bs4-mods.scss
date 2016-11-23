@@ -16,3 +16,28 @@
     background-color: $nav-tabs-bg-color ;
   }
 }
+
+//Tootik Override - add 'center' config
+  // Positions (From tootik scss 'right')
+  [data-tootik][data-tootik-conf*='center'] {
+    &:before {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50% , -50%);
+    }
+    &:after {
+      bottom: auto;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    &:hover,
+    &:focus {
+      &:before {
+        transform: translate(-50%, -50%);
+      }
+      &:after {
+        transform: translate(-50%, -50%);
+      }
+    }
+  }
