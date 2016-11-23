@@ -110,6 +110,7 @@ class PkFormBuilder extends FormBuilder {
   public function radioset($name, $list = [], $value = null, $options = [], $unset = null) {
     $options['class'] = keyVal('class', $options) . ' rs-layout';
     $rs_style = keyVal('rs-style', $options);
+    unset($options['rs-style']);
     $out = "\n<div class='radioset rs-layout $rs_style'>\n";
     $out .= "\n<input type='hidden' name='$name' value='$unset' />\n";
     foreach ($list as $key => $label) {
