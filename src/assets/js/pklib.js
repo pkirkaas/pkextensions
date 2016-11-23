@@ -1020,6 +1020,7 @@ $(function () {
 */
 //Just forms with class '.chck-frm'
 /*
+*/
 $(function () {
   $('body').on('change', 'form.chck-frm', function (event) {
     $(window).on('beforeunload', function (event) { 
@@ -1034,7 +1035,6 @@ $(function () {
     $(window).off('beforeunload');
   });
 });
-*/
 
 function isObject(obj) {
   return obj === Object(obj);
