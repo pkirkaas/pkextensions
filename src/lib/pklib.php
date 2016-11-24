@@ -1962,19 +1962,34 @@ function equivalent($a, $b) {
 
 /** Displays a number as dollar format - or if array arg, totals the numeric 
  * values of the array and retuns them as a $ formatted string
- * @param type $num
- * @param type $prec
- * @return type
+ * @param numeric|numeric array $num - the value or array of values to represent
+ * @param int|string|array $opts:
+ *   if int - precision $prec.
+ *   If string - $wrap_class: enclose results in div w. class; negative in "$wrap_class negative-dollar-value"
+ *   If boolean true - $wrap_class: enclose results in div w. class 'dollar-format'; negative in "$wrap_class negative-value"
+ *   If array, look for those keys, & 'hide0' as well, for multiple options 
+ * @return string - dollar formatted
  */
 function dollar_format($num, $opts = 0, $hide0=false) {
-  if (!is_array ($opts )) $opts=['prec'=>$opts];
+  if (!is_array ($opts )) {
+    if (is_intish($opts) && ($opts !== true)) $opts=['prec'=>$opts];
+    else if (ne_string($opts) || ($opts===true)) $opts=['wrap_class'=>$opts];
+    else $opts = [];
+  }
   $prec = keyVal('prec', $opts, 0);
+  $wrap_class = keyVal('wrap_class', $opts);
+  if ($wrap_class === true) $wrap_class="dollar-format";
   $hide0 = keyVal('hide0',$opts,$hide0);
   if (is_array($num)) {
     $num = array_sum($num);
   }
   if (($num === null) || ($num === '') || ($hide0 && !$num)) return '';
-  return '$' . number_format($num, $prec);
+  $formatted = '$' . number_format($num, $prec);
+  if (!$wrap_class) return $formatted;
+  if ($num < 0) {
+    $wrap_class.= ' negative-dollar-value';
+  }
+  return "<div class='pk-dollar-value $wrap_class'>$formatted</div>\n";
 }
 
 /** Returns the key value of the array if it exists, or null

@@ -2,7 +2,8 @@
 namespace PkExtensions\Formatters;
 use PkExtensions\PkDisplayValueInterface;
 class PkFormatDollar implements PkDisplayValueInterface{
-  public static function displayValue($value=null) {
-    return dollar_format($value);
+  /** See docs for dollar_format for $opts */
+  public static function displayValue($value=null, $opts = null) {
+    return dollar_format($value, $opts);
   }
 }

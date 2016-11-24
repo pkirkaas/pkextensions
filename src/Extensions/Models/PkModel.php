@@ -687,10 +687,13 @@ class $createclassname extends Migration {
     if (!$key) return null;
 
     $name = removeEndStr($key, static::$displayValueSuffix);
-    //if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
     if ($name && in_array($name,static::getDisplayValueFields(),1)) {
       return $this->displayValue($name);
     }
+    if (in_array($key,static::getMethodsAsAttributeNames(),true)) {
+      return $this->$key();
+    }
+    if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
     return parent::__get($key);
   }
     public function getAttribute($key) {
@@ -707,6 +710,9 @@ class $createclassname extends Migration {
     $name = removeEndStr($method,  static::$displayValueSuffix);
     if (ne_string($name) &&  in_array($name,static::getDisplayValueFields(),1)) {
       return $this->displayValueMethod($name, $args);
+    }
+    if (in_array($method,static::getMethodsAsAttributeNames(),true)) {
+      return call_user_func_array([$this,$method], $args);
     }
     return parent::__call($method, $args);
   }
@@ -1152,8 +1158,9 @@ class $createclassname extends Migration {
         continue;
       }
       if ($fn === $fieldName) {
-        //$fldVal = $this->$fieldName;
-        //pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
+        $fldVal = $this->$fieldName;
+        $class = get_class($this);
+        pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
         return $rc::displayValue($this->$fieldName,$args);
       }
     }

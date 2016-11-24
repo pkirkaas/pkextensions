@@ -22,14 +22,14 @@ foreach ($fieldmap as $fieldName => $title) {
 ?>
 <div class='row grid-head-row'>
   @foreach($titles as $title)
-  <div class='col-md-{{$colsz}}  pkl1 grid-head-col {{$titleClass}}'>{{$title}}</div>
+  <div class='col-md-{{$colsz}}  pkl1 grid-head-col {{$titleClass}}'>{!!hpure($title)!!}</div>
   @endforeach
 </div>
 @foreach ($collection as $item)
 <div class='row grid-data-row'>
   @foreach($fields as $field)
     <div class='col-md-{{$colsz}} grid-data-col {{$valueClass}}'>
-      {{$item->$field}}
+      {!!hpure($item->$field)!!}
     </div>
   @endforeach
 </div>

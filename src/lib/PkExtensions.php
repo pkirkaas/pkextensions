@@ -14,8 +14,19 @@ class checkBox implements PkDisplayValueInterface {
 }
 
 class DollarFormat implements PkDisplayValueInterface {
-  public static function displayValue($value = null) {
-    return dollar_format($value);
+  /**Returns an optionally DIV wrapped formatted dollar string 
+   * @param numeric|numeric array $value
+   * 
+   * Confusingly, $wrap_class can be a class string or true, then the
+   * result is wrapped in a div, with 'negative-dollar-value' if negative
+   * If $wrap_class is integer, the precision/decimal places
+   * If $wrap_class is array, should be keyed with any/all of:
+   *   'prec', 'wrap_class', 'hide0'
+   * @param int|boolean|array|string $wrap_class
+   * @return string dollar format
+   */
+  public static function displayValue($value = null, $wrap_class = null) {
+    return dollar_format($value, $wrap_class);
   }
 }
 class PercentFormat implements PkDisplayValueInterface {
