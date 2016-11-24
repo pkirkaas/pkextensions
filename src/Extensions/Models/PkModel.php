@@ -926,7 +926,7 @@ class $createclassname extends Migration {
       $keys = [];
       $keyName = $tstInstance->getKeyName();
       $relarr = $arr[$relationName];
-      if (is_array($relarr))
+      if (is_array($relarr)) {
           foreach ($relarr as $relrow) {
           //if (!array_key_exists($keyName,$relrow)) continue; //Not a relationship item
           if (!empty($relrow[$keyName])) { #This should be an update
@@ -954,7 +954,7 @@ class $createclassname extends Migration {
             }
             #Again, compensate for empty string POSTED instead of NULL
             if (!array_key_exists($keyName, $relrow)) {
-              pkdebug("Relrow:", $relrow);
+              pkdebug("keyName [$keyName]; Relrow:", $relrow);
             }
             if (!$relrow[$keyName]) $relrow[$keyName]=null;
             //if (!keyVal($keyName,$relrow)) $relrow[$keyName]=null;
@@ -969,6 +969,7 @@ class $createclassname extends Migration {
           /** END EITHER */
           $keys[] = $relInstance->getKey();
         }
+    }
       #Delete if id not in array AND foreign key = foreign key
       //   pkdebug("Delete [$relationName]s where [$foreignKey]=[$modelId] AND Keys NOT  in: ", $keys);
       if (!sizeof($keys)) $this->$relationName()->delete();

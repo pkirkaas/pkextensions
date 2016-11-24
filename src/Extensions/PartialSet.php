@@ -85,12 +85,12 @@ class PartialSet extends \ArrayObject {
   public function decomposeArray($x = null) {
     $type=typeOf($x);
     //pkdebug("TYPE: $type");
-    if (!$x) return ' ';
+    if (!$x) return '';
     if (!is_array($x)) {
       if (is_scalar($x) || (is_object($x) && method_exists($x,'__toString'))) {
         return $x . $this->separator;
       }
-      return ' ';
+      return '';
     }
     $str = $this->separator;
     foreach ($x as $y) {
@@ -105,7 +105,7 @@ class PartialSet extends \ArrayObject {
     if (count($this) && is_arrayish($this)) {
       foreach ($this as $key => $item) {
         if ($key === 'custom_opts') continue;
-        $str.= ' ' . $this->decomposeArray($item) . $this->separator;
+        $str.= '' . $this->decomposeArray($item) . $this->separator;
       }
     }
     return $str . $this->separator;
