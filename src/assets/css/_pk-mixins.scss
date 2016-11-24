@@ -53,6 +53,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mx-text-format($sz:medium, $weight:400, $color:black) {}
 
 
+
 @mixin absolutecenter($axis: "both"){
   position:absolute;
   @if $axis == "y"{
@@ -365,12 +366,12 @@ $grid-gutter-width:          1.875rem !default; // 30px
   text-align: $align;
 }
 
-.left-align {
+.left-align, .l-a {
   @include text-align(left);
 }
-.right-align {
+.right-align, .r-a {
   @include text-align(right);
 }
-.center-align {
+.center-align, .c-a {
   @include text-align(center);
 }

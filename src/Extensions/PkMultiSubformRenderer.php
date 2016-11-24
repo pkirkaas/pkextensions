@@ -34,10 +34,16 @@ use PkExtensions\Models\PkModel;
  * // (Generally, build $subform_data in a foreach )
  * echo $subform;
  * // If you want to keep the default classes/atts for pklib.js, but ADD css
- * // classes, use appent_atts():
+ * // classes, use append_atts():
 //$subform->append_atts('create_button','tst-create-btn-class');
 //$subform->append_atts('deletable_dataset','tst-dds-class');
 //$subform->append_atts('js_template',['class'=>'tst-add-class-arr']);
+ * So you can put the Delete button as a SIBLING of the other elements in the deletable data set,
+ * by NOT wrapping them in a 'row' when you create the subform, but setting the
+ * 
+  * $sfout->append_atts('deletable_dataset','row');
+ * // and setting:
+    'delete_button_wrap_attributes' => ['class'=>'col-sm-2'],
  */
 class PkMultiSubformRenderer  extends PkHtmlRenderer {
   /**
@@ -73,6 +79,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
   public $js_template_tag = 'fieldset';
   public $hidden_key = 'id'; #The default hidden key of the 'many' table
   public $js_template_attributes=['disabled'=>true,'style'=>'display: none;', 'class'=>'template-container'];
+  public $form_header = null; #A stringish value, like HTML BS Header row
   /** Generally, the table name */
   public $basename = null; #Generally, the name of the 'many' table
   /** Generally, the owner ID - like cart_id for 'items'
@@ -134,6 +141,9 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
     $cnt = 0;
     if (is_arrayish($this->subform_data)) $cnt = count($this->subform_data);
     $out->div(RENDEROPEN,$this->templatables_attributes);
+      if ($this->form_header) {
+        $out[] = $this->form_header;
+      }
       if (is_arrayish($this->subform_data)) foreach ($this->subform_data as $idx=> $row) {
         $out[] = $this->makeSubformPart($baseSubForm, $idx, $row);
       }

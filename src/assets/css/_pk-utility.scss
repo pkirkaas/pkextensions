@@ -785,3 +785,14 @@ $i: 1;
   background-color: rgba(100,100,255,.5);
 
 }
+
+.row.pk-lbl-row [class*="col-"] {
+   @extend .pk-lbl;
+}
+
+.row.col-inner-border [class*="col-"] {
+   @extend .inner-border;
+}
+.row.pk-val-row [class*="col-"] {
+   @extend .pk-val;
+}

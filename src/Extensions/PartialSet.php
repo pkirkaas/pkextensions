@@ -56,10 +56,13 @@ class PartialSet extends \ArrayObject {
 
 
 
+  /*
   public function __construct($arg = []) {
     parent::__construct($arg);
     $this->separator = ' ';
   }
+   * 
+   */
 
   /** Don't trust native "count()"
    */
