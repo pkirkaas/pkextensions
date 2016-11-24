@@ -209,7 +209,30 @@ abstract class PkModel extends Model {
     return $tablename;
   }
 
+  /** Super flexible - can define a table field in static $table_field_defs = [
+   * 'fld1'=>'integer',
+   * 'fld2'=>['integer,'index'],
+   * 'fld3'=>['type'=>'integer','methods'=>['nullable','index'=>$column_names,]],
+   * 'fld4'=>['methods'=>['index'=>$column_names,],'comments'=>'A comment',]],,
+   * 'fld5'=>['string','type_args'=>2000, 'methods'=>['index'=>$column_names,'default'=>'Hello',]]],,
+   * #type_args are arguments to the column create method, like string size, etc
+   * 
+   * @param type $fielddefs
+   * @param type $change
+   * @return string
+   */
   public static function buildMigrationFieldDefs($fielddefs = [], $change = false) {
+    $eloquentMigrationColumnDefs = [
+      'bigIncrements', 'bigInteger', 'binary', 'boolean', 'char', 'date', 'dateTime', 
+      'dateTimeTz', 'decimal', 'double', 'enum', 'float', 'increments', 'integer', 
+      'ipAddress', 'json', 'jsonb', 'longText', 'macAddress', 'mediumIncrements', 
+      'mediumInteger', 'mediumText', 'morphs', 'nullableTimestamps', 'rememberToken', 
+      'smallIncrements', 'smallInteger', 'softDeletes', 'string', 'string', 'text', 
+      'time', 'timeTz', 'tinyInteger', 'timestamp', 'timestampTz', 'timestamps', 
+      'timestampsTz', 'unsignedBigInteger', 'unsignedInteger', 'unsignedMediumInteger', 
+      'unsignedSmallInteger', 'unsignedTinyInteger', 'uuid', ];
+
+
     $changestr = '';
     $indices = ['index', 'unique', 'primary'];
     if ($change) $changestr = '->change()';
@@ -221,6 +244,21 @@ abstract class PkModel extends Model {
       if (is_string($def))
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
       else if (is_array($def)) {
+        $defvals = array_values($def);
+        if (array_key_exists('type',$def)) {
+          $type = keyVal('type', $def, 'integer');
+        } else { #Column def could be just a value in the def array
+          foreach ($eloquentMigrationColumnDefs as $emd) {
+            if (in_array($emd,$defvals,1)) {
+              $type = $emd;
+              break;
+            }
+          }
+          if (!isset($type)) $type='integer';
+        }
+
+
+
         $type = keyVal('type', $def, 'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $comment = keyval('comment', $def);
@@ -246,6 +284,16 @@ abstract class PkModel extends Model {
                 $methodChain .= "->$method($args)";
           }
         }
+        #Look for $def VALUES, for attributes that don't require args
+        #index, for example, could be in "methods", with args, or just a value
+        #in the def array
+        $standaloneModifiers = ['primary','index','unique','nullable','unsigned',];
+        foreach($standaloneModifiers as $sam) {
+          if (in_array($sam,$defvals,true)) {
+            $methodChain.=  "->$sam()";
+          }
+        }
+
         $out .= $fielddef . $methodChain . "$changestr;\n";
       }
     }
