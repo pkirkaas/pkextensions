@@ -302,8 +302,16 @@ jQuery.fn.extend({
           console.error('Invalid Number: ',content);
           jqobj.html('');
         }
+        var wrap_class = jqobj.attr('data-wrap-class');
+        if (wrap_class) {
+          jqobj.addClass(wrap_class);
+        } else {
+          jqobj.addClass('pk-dollar-value');
+          jqobj.addClass('dollar-format');
+        }
         var sign = '';
         if (num < 0) {
+          jqobj.addClass('negative-dollar-value');
           num = -num;
           sign = '-';
         }
