@@ -928,6 +928,11 @@ if (function_exists('pk_array_flatten')) {
 
 }
 
+/** Like 'is_scalar', but returns true for null. Anything usable as an array key*/
+function is_simple($val) {
+  return is_scalar($val) || is_null($val);
+}
+
 /**
  * Like array_merge(), except instead of a list of arrays to merge, takes an 
  * array of arrays to merge, and returns the merged array.
@@ -2067,10 +2072,14 @@ function dollar_format($num, $opts = 0, $hide0=false) {
  * @param array|object $container - array/object to check for the key
  *   #NOTE Object container STILL EXPERIMENTAL - NOT SO USEFUL SINCE ONLY FOR PUBLIC ATTRIBUTES (including static); ALSO WON'T WORK FOR MAGIC GETS!
  * @param mixed $default - the default value to return if no key value in array for key, default null
+ * @param - if true & container is Object, force a get to trigger magic method.
  * @return mixed - The value of array for $key, if any, or else the default (null)
  */
-function keyValOrDefault($key = '', $container = [], $default = null) {
+function keyValOrDefault($key , $container = [], $default = null,$forceAttrGet = false) {
   if (is_object($container)) {
+    if ($forceAttrGet)  {
+      return $container->$key;
+    }
       $array = get_all_object_vars($container);
   } else if (is_array($container)) {
     $array = $container;
@@ -2089,8 +2098,8 @@ function keyValOrDefault($key = '', $container = [], $default = null) {
 }
 
 /** Just shorter */
-function keyVal($key = '', $container = [], $default = null) {
-  return keyValOrDefault($key,$container, $default);
+function keyVal($key = '', $container = [], $default = null, $forceAttrGet=false) {
+  return keyValOrDefault($key,$container, $default,$forceAttrGet);
 }
 
 /** Gets the CURRENT values of the static vars (including NULL) of a OBJECT INSTANCE, EVEN IF MODIFIED BY AN INSTANCE

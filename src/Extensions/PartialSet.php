@@ -125,5 +125,32 @@ class PartialSet extends \ArrayObject {
     $this->exchangeArray($array);
     return $this;
   }
+  /** Dump current copy of the string, the key values of THIS partial set
+   *  replaced by the key/value pairs in the arguments. THIS CHANGES THE VALUE
+   * OF THIS OBJECT - but it can still be used as a template in a loop...
+   * @param type $key
+   * @param type $val
+   */
+  public function ds($key,$val) {
+    $this[$key] = $val;
+    return $this->__toString();
+  }
+
+  /** Return a new static, with the keys initialized
+   * This is to allow a user to later insert items at arbitrary locations in the
+   * arrayObject
+   * @param simple|arrayish $keys
+   * @return static 
+   */
+  public static function initKeys($keys=null) {
+    $new = new static();
+    if (is_simple($keys)) $keys = [$keys];
+    if (is_arrayish($keys)) {
+      foreach ($keys as $key) {
+        $new[$key]=null;
+      }
+    } 
+    return $new;
+  }
 
 }
