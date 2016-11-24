@@ -14,6 +14,8 @@ if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
  * PkMultiSubformRenderer
  */
 class PkHtmlRenderer extends PartialSet {
+  public static $raw_depth = 0; #See if we can use this to keep track of raw depth....
+  public static $raw_threshold = 0; #See if we can use this to keep track of raw depth....
   #These are called with $this->nocontent($tagname, $attributes)
   public static $selfclosing_tags = [
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img', 'input',
@@ -57,12 +59,25 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public $tagStack = [];
-  public function addTagStack($tag) {
-    $this->tagStack[] = $tag;
+  public function addTagStack($tagarr) {
+    $this->tagStack[] = $tagarr;
     return count($this->tagStack);
   }
+  public function popTagStack() {
+    $tagrr = array_pop($this->tagStack);
+    $tagparams = reset($tagrr);
+    $tag = key($tagarr);
+    if (keyVal('raw',$tagparams)) {
+      static::decRawCount();
+    }
+    return $tag;
+  }
   public function content($content='') {
-    $this[] = hpure($content);
+    if(static::getRawCount()) {
+      $this[] = $content;
+    } else {
+      $this[] = hpure($content);
+    }
     return $this;
   }
   public function rawcontent($content='') {
@@ -166,6 +181,27 @@ class PkHtmlRenderer extends PartialSet {
    * 
    */
 
+  public function filterOutput($raw) {
+
+  }
+
+  public static function resetRawCount($i = 0) {
+    static::$raw_depth = $i;
+  }
+
+  public static function incRawCount() {
+    static::$raw_depth ++;
+    return static::$raw_depth;
+  }
+
+  public static function decRawCount() {
+    static::$raw_depth --;
+    return static::$raw_depth;
+  }
+
+  public static function getRawCount() {
+    return static::$raw_depth;
+  }
 
 
 
@@ -190,6 +226,7 @@ class PkHtmlRenderer extends PartialSet {
   /**
    * Generate HTML element of type $tag
    * Change to allow $content to be assoc array with same params as args
+   * EXPERIMENT: Try Using Raw Count to prevent filtering of input els.
    * @param string $tag - the HTML tag - required
    * @param scalar|array|null $content
    * @param string|array|null $attributes
@@ -202,17 +239,21 @@ class PkHtmlRenderer extends PartialSet {
       $attributes = keyVal('attributes', $content,$attributes);
       $raw = keyVal('raw', $content,false,$raw);
     }
+    if ($raw) {
+      static::incRawCount();
+    }
     $attributes = $this->cleanAttributes($attributes);
     if (!$content) $content = ' ';
     if ($content === true) {
       $spaces = $this->spaceDepth();
-      $size = $this->addTagStack($tag);
+      $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
       $this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
       return $this;
     } else {
-      if (!$raw) $content = hpure($content);
+      if (!$raw && !static::getRawCount()) $content = hpure($content);
       $this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
         $content</$tag>\n";
+      if ($raw) static::decRawCount();
       return $this;
     }
   }
@@ -433,7 +474,8 @@ class PkHtmlRenderer extends PartialSet {
 
   /**Close with matched tag */
   public function close() {
-    $tag = array_pop($this->tagStack);
+    //$tag = array_pop($this->tagStack);
+    $tag = $this->popTagStack();
     $this[] = $this->spaceDepth()."</$tag>\n";
     return $this;
   }
