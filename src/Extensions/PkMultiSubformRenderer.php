@@ -21,6 +21,12 @@ use PkExtensions\Models\PkModel;
  * $subform->text('name',$attributes);
  * $subform->text('ssn');
  * //$subform->$tpl_fields = ['id','name','ssn']; #But can omit 'id' if default
+ * 
+ * 
+ * 
+ * !!! NEED TO USE THIS CLASS's form input builders - since it extends them.
+ * !! Regular PkForm::input's won't work!
+ * 
  * $subform->subform_data = [
  *   ['id'=>7, 'name'=>'Joe', 'ssn'=>'555-33-4444',],
  *   ['id'=>9, 'name'=>'Jane', 'ssn'=>'666-22-8888',],
@@ -46,7 +52,10 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    * eg, ['id','name','ssn'];
    * @var null|array
    */
-  public $tpl_fields=null;
+  public $tpl_fields=null; #The Template Field Names to use - either the keys or vals
+  public $label_array=null; #The Optional label array.
+  #If $tpl_fields array is AssocArray, the keys are field Names & values become $label_arr
+
   public $cnt_tpl = '__CNT_TPL__';
   public $fld_tpl_prefix = '__FLD_TPL__';
   public $templatables_attributes = ['class'=>'templatable-data-sets'];
@@ -80,6 +89,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
         $this->$key = $val;
       }
     }
+    //pkdebug("Args:", $args,"THIS", $this);
     parent::__construct();
   }
   /*
@@ -102,6 +112,22 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
         $this->tpl_fields[]=$this->hidden_key;
       }
     }
+    $this->subform_data = eloquentToArray($this->subform_data);
+    //$subform_data = eloquentToArray($this->subform_data);
+    //return 'Hello';
+    //$this->subform_data = [];
+    /*
+    if (is_array_assoc($this->tpl_fields)) {
+      if (!$this->label_array) {
+        $this->label_array = array_values($this->tpl_fields);
+      }
+      $this->tpl_fields = array_keys($this->tpl_fields);
+    }
+     * 
+     */
+      
+  // $tpl_fields=null; #The Template Field Names to use - either the keys or vals
+  //public $label_array=null; #The Optional label array.
     $baseSubForm = parent::__toString();
     $out = new PkHtmlRenderer();
     $out[] = "\n";

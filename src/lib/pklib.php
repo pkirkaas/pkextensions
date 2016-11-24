@@ -832,6 +832,36 @@ function is_array_assoc($array) {
   return ($array !== array_values($array));
 }
 
+function is_arrayish_assoc($val) {
+  $arrCopy = getAsArray($val);
+  if (!$arrCopy || !is_array($arrCopy) || !count($arrCopy)) return false;
+  if (is_array($arrCopy)) return is_array_assoc($arrCopy);
+  return false;
+}
+function is_arrayish_indexed($val) {
+  $arrCopy = getAsArray($val);
+  if (!$arrCopy || !is_array($arrCopy) || !count($arrCopy)) return false;
+  if (is_array($arrCopy)) return is_array_indexed($arrCopy);
+  return false;
+}
+
+/** Tries to convert PHP Objects that implement ArrayAccess into PHP arrays.
+ * Imperfect stub so far, for PHP ArrayObject, & Laravel Collection
+ * @param mixed $val - the value to convert
+ * @return array|false|null: Array if we manage - null if it could be done
+ * but we didn't, or false if it doesn't implement ArrayAccess
+ */
+function getAsArray($val) {
+  if (is_array($val)) return $val;
+  if (!is_arrayish($val)) return false;
+  #Now we have something that implements ArrayAccess:
+  if ($val instanceOf ArrayObject) {
+    return $val->getArrayCopy();
+  }
+  if (method_exists($val,'toArray')) return $val->toArray();
+  return null;
+}
+
 /** Checks that $array is an indexed array. If $sequential = true (default),
  * also verifies the integer indices are consecutive starting from 0
  * @param array $array
@@ -1212,6 +1242,13 @@ function arrayish_keys_exist($keys, $arr = null) {
   return true;
 }
 
+/** Both ArrayObject & Laravel Collections implement ArrayAccess - but they
+ * they DON'T have the same array clone:
+ *     ElloquentCollection->toArray()
+ *     ArrayObject->getArrayCopy()
+ * @param ArrayAccess $arg
+ * @return type
+ */
 function is_arrayish($arg) {
   return (is_array($arg) || ($arg instanceOf ArrayAccess));
 }

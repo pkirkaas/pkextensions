@@ -1207,8 +1207,8 @@ class $createclassname extends Migration {
       }
       if ($fn === $fieldName) {
         $fldVal = $this->$fieldName;
-        $class = get_class($this);
-        pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
+        //$class = get_class($this);
+        //pkdebug("In [$class] val: [$fldVal] About to call: [$fn] on [$rc]");
         return $rc::displayValue($this->$fieldName,$args);
       }
     }

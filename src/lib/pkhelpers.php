@@ -5,11 +5,29 @@
  * Paul Kirkaas
  */
 use PkExtensions\PartialSet;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection as BaseCollection;
+//use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
+
 use Jenssegers\Agent\Agent as MobileDetectAgent;
 use Carbon\Carbon;
 //use PkLibConfig; #Defined in pklib
 
-#Test update
+/** Tries to return the argument in a pure PHP array, or false.
+ * Even tries to execute ->get()->toArray on Eloquent Builder
+ */
+function eloquentToArray($var) {
+  if (is_array($var)) return $var;
+  if (!$var) return false;
+  if (is_scalar($var)) return false;
+  if (($var instanceOf Builder) || ($var instanceOf Relation)) {
+    $var = $var->get();
+  }
+  if ($var instanceOf BaseCollection) return $var->toArray();
+  return getAsArray($var);
+}
 
 function setAppLog() {
   PkLibConfig::setSuppressPkDebug(false);
