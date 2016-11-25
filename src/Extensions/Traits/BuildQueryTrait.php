@@ -701,7 +701,7 @@ trait BuildQueryTrait {
 
     $trimmedMatches = PkMatch::filterMatchArr($matchObjs,
         ['modelName'=>$modelName,'modelMethods'=>true,'emptyCrit'=>true]);
-    pkdebug("The Trimmed Match Collection:", $trimmedMatches);
+    //pkdebug("The Trimmed Match Collection:", $trimmedMatches);
     if (!count($trimmedMatches)) return $collection;
     $trimmedCollection = $collection->reject(function ($item) use ($trimmedMatches) {
       foreach($trimmedMatches as $match) {
@@ -737,25 +737,25 @@ trait BuildQueryTrait {
   public static function htmlQueryControl($params=[]) {
     $basename = $params['basename'];
     $queryDef = static::getFullQueryDef($basename);
-    pkdebug("queryDef:", $queryDef);
+    //pkdebug("queryDef:", $queryDef);
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
       $criteriaSet = keyVal('criteriaSet', $queryDef);
-    pkdebug("criteriaSet:", $criteriaSet);
+    //pkdebug("criteriaSet:", $criteriaSet);
       if (!$criteriaSet) {
         $criteria = keyVal('criteria', $queryDef);
         if (ne_arrayish($criteria)) {
           $criteriaSet = keyVal('criteriaSet',$criteria);
-    pkdebug("criteriaSet:", $criteriaSet);
+    //pkdebug("criteriaSet:", $criteriaSet);
         }
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
         $comptype = keyVal('comptype', $queryDef, 'numeric');
         $criteriaSet = PkMatch::getCriteriaSets($comptype);
-    pkdebug("criteriaSet:", $criteriaSet);
+    //pkdebug("criteriaSet:", $criteriaSet);
       }
     }
-    pkdebug("criteriaSet:", $criteriaSet);
+    //pkdebug("criteriaSet:", $criteriaSet);
     $params['criteriaSet'] = $criteriaSet;
     /*
     $fieldDefArr = keyVal('field_defs', $queryDef);
@@ -779,7 +779,7 @@ trait BuildQueryTrait {
      * 
      */
     $tmpCtl =  PkHtmlRenderer::buildQuerySet($params);
-    pkdebug("TMPCTL: \n$tmpCtl\n");
+    //pkdebug("TMPCTL: \n$tmpCtl\n");
 
     return PkHtmlRenderer::buildQuerySet($params);
     //pkdebug("The QueryDef for [ $basename ]:", $fieldDef);

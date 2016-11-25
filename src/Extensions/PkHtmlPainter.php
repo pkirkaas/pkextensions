@@ -26,7 +26,6 @@ class PkHtmlPainter {
    * what to extract & provide the components IT calls.
    */
   public function clean_opts($args,$defaults,$show=false) {
-//    if ($show) pkdebug("ARGS:",$args,"DEFAULTS",$defaults);
     if ($args && is_stringish($args)) {
         $args = ['content'=>$args];
     }
@@ -36,7 +35,6 @@ class PkHtmlPainter {
       unset($args['requiredClasses']);
       $params = array_merge($defaults,$args);
     }
- //   if ($show) pkdebug("PARAMS", $params);
     $attributes = keyVal('attributes',$params,[]); 
     $attributes['class'] = keyVal('class',$params).' '.keyVal('requiredClasses',$params)
         .' ' .keyVal('add-class',$params). ' '.keyVal('class',$attributes);
@@ -49,7 +47,6 @@ class PkHtmlPainter {
         'content' => keyVal('content',$params),
         'component_args'=>keyVal('component_args',$params),
     ];
-    //pkdebug("method vars:", $method_vars,'Atts', $attributes);
     return ['method_vars'=>$method_vars,
             'attributes'=>$attributes,];
   }
@@ -67,6 +64,7 @@ class PkHtmlPainter {
 
   }
 
+  ###############  This section to support scrolling subforms 1 to many creation & deletion 
   /** Make a create button. Options:
    *  'content' - what to show in the button
    *  'tag' - default 'div'
@@ -90,7 +88,6 @@ class PkHtmlPainter {
 
     $res = $this->clean_opts($args,$defaults,1);
     $method_vars = $res['method_vars'];
-    //pkdebug("After Create Button clean opts: Res",$res);
     $content = keyVal('content', $method_vars);
     $tag = keyVal('tag', $method_vars);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
@@ -142,7 +139,6 @@ class PkHtmlPainter {
     $res = $this->clean_opts($args,$defaults);
     $method_vars = $res['method_vars'];
     $content = keyVal('content', $method_vars);
-    pkdebug("CONTENT $content");
     $tag = keyVal('tag', $method_vars);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
@@ -157,13 +153,6 @@ class PkHtmlPainter {
     return $this->injectTpl($hr->$tag($ps,
         keyVal('attributes',$res)),$ps_tpl,$ps_key);
 
-    /*
-    pkdebug("OUT ", $out);
-    return $out;
-    return $this->injectTpl($hr->$tag($content.$this->mkCreateBtn($createBtnArgs)),
-        keyVal('attributes',$res),$ps_tpl,$ps_key);
-     * 
-     */
   }
 
 }

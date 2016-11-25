@@ -65,8 +65,9 @@ class PkHtmlRenderer extends PartialSet {
   }
   public function popTagStack() {
     $tagrr = array_pop($this->tagStack);
+    if (!$tagrr) return;
     $tagparams = reset($tagrr);
-    $tag = key($tagarr);
+    $tag = key($tagrr);
     if (keyVal('raw',$tagparams)) {
       static::decRawCount();
     }
