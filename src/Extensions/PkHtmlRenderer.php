@@ -73,7 +73,7 @@ class PkHtmlRenderer extends PartialSet {
     return $tag;
   }
   public function content($content='') {
-    if(static::getRawCount()) {
+    if(static::getRawCount() || ($content instanceOf PkHtmlRenderer)) {
       $this[] = $content;
     } else {
       $this[] = hpure($content);
@@ -250,7 +250,10 @@ class PkHtmlRenderer extends PartialSet {
       $this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
       return $this;
     } else {
-      if (!$raw && !static::getRawCount()) $content = hpure($content);
+      #Trust that text already wrapped in PhHtmlRenderer has already been filtered
+      if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
+        $content = hpure($content);
+      }
       $this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
         $content</$tag>\n";
       if ($raw) static::decRawCount();

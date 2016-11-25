@@ -54,7 +54,7 @@ class PkHtmlPainter {
             'attributes'=>$attributes,];
   }
 
-  /** Returns the "content" injected into PartialSet $tpl, according to $key (default: 'content')
+  /** Returns the "content" injected into PkHtmlRenderer $tpl, according to $key (default: 'content')
    * 
    * @param type $content
    * @param type $tpl
@@ -72,7 +72,7 @@ class PkHtmlPainter {
    *  'tag' - default 'div'
    *  'attributes' - if string, assumed classes & converted to array. 
    *       But the classes required for JS ['js create-new-data-set'] will always be added
-   * 'ps_tpl' Optional: PartialSet template to inject the results in. Default key: 'content'
+   * 'ps_tpl' Optional: PkHtmlRenderer template to inject the results in. Default key: 'content'
    * 'ps_key' - if other than 'content' 
    * 'class' - to override the default (but not the REQUIRED) css classes
    * 'attributes' - for HTML
@@ -125,7 +125,7 @@ class PkHtmlPainter {
    * @return string
    */
   public function mkJsTemplate($content=null) {
-    $ps = new PartialSet();
+    $ps = new PkHtmlRenderer();
       $ps['template-open']="<fieldset disabled style='display:none;' class='template-container'>\n";
       $ps['content'] = $content;
       $ps['template-close']="</fieldset>\n";
@@ -138,6 +138,7 @@ class PkHtmlPainter {
         'tag' => 'div',
         'requiredClasses'=>'templatable-data-sets',
     ];
+    //PkHtmlRenderer::incRawCount();
     $res = $this->clean_opts($args,$defaults);
     $method_vars = $res['method_vars'];
     $content = keyVal('content', $method_vars);
@@ -147,19 +148,22 @@ class PkHtmlPainter {
     $ps_key = keyVal('ps_key', $method_vars);
     $createBtnArgs = keyVal('createBtnArgs',keyVal('component_args',$method_vars));
     $hr = new PkHtmlRenderer();
-    $ps = new PartialSet();
+    $ps = new PkHtmlRenderer();
     $cbtn = $this->mkCreateBtn($createBtnArgs);
     $ps[]=$content;
     $ps[]=$cbtn;
-    pkdebug("PS: , $ps");
-    //return $ps;
-    $out = $this->injectTpl($hr->rawdiv($ps,
+    #This is where I had trouble with Renderer automatically "Purifying" output
+    #AND the arg count was wrong 28 Nov 16
+    return $this->injectTpl($hr->$tag($ps,
         keyVal('attributes',$res)),$ps_tpl,$ps_key);
 
+    /*
     pkdebug("OUT ", $out);
     return $out;
     return $this->injectTpl($hr->$tag($content.$this->mkCreateBtn($createBtnArgs)),
         keyVal('attributes',$res),$ps_tpl,$ps_key);
+     * 
+     */
   }
 
 }
