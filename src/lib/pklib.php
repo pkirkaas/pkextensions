@@ -22,7 +22,7 @@ define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 class PkLibConfig {
-  static $suppressPkDebug = true;
+  static $suppressPkDebug = false;
   public static function getSuppressPkDebug() {
     return static::$suppressPkDebug;
   }
@@ -236,6 +236,43 @@ function pkdebug_base() {
   static $callno = 0;
   if (PkLibConfig::getSuppressPkDebug()) return null;
   $stack = debug_backtrace();
+  $retvals=[];
+  $keys = ['file','object','function','line','args'];
+  $uninteresting = ['pkdebug','pkdebug_base', 'call_user_func_array', __FILE__];
+  foreach ($stack as $aframe) { #Set line at the first interesting
+    foreach($keys as $key) {
+      $tst = keyVal($key,$aframe);
+      if (!keyVal($key,$retvals) && $tst &&
+            !in_array($tst,$uninteresting) && ($key !== 'line')) {
+          $retvals[$key] = $tst;
+          if (!keyVal('line',$retvals) && keyVal('line',$aframe)) {
+            $retvals['line'] = keyVal('line',$aframe);
+          }
+      }
+
+    }
+  }
+  
+  //$stacksize = sizeof($stack);
+  $out = '';
+  //$out = "\nLOG OUT: STACKSIZE: $stacksize";
+  if (!$callno) {
+    $out .= "\nLOG: ". date('j-M-y; H:i:s') ;
+  } else {
+//    $out .= "\n\n";
+
+  }
+  $callno ++;
+  $idx = 0;
+  //while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx+1]['function'],-3)==='Log')) {
+  while (! keyVal('file',keyVal($idx,$stack))
+    || keyVal('file',keyVal($idx,$stack) === __FILE__) 
+    || (substr( keyVal('function',keyVal($idx+1, $stack)),-3)==='Log')) {
+    $idx++;
+  }
+
+
+
   //$stacksize = sizeof($stack);
   $out = '';
   //$out = "\nLOG OUT: STACKSIZE: $stacksize";
@@ -257,6 +294,15 @@ function pkdebug_base() {
   } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
   }
+  /** Test $retvals - better way? */
+
+  $tstrr ="\n";
+  foreach ($retvals as $key => $value) {
+    if ($key === 'args') continue;
+    $tstrr.= "$key: $value, ";
+  }
+  $tstrr.="\n";
+  $out.=$tstrr;
   $lastarg = func_get_arg(func_num_args() - 1);
   $dumpobjs = true;
   if (is_bool($lastarg) && ($lastarg === false)) $dumpobjs = false;
