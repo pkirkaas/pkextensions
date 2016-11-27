@@ -59,6 +59,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public $tagStack = [];
+
   public function addTagStack($tagarr) {
     $this->tagStack[] = $tagarr;
     return count($this->tagStack);
@@ -68,13 +69,17 @@ class PkHtmlRenderer extends PartialSet {
     if (!$tagrr) return;
     $tagparams = reset($tagrr);
     $tag = key($tagrr);
+    /*
     if (keyVal('raw',$tagparams)) {
       static::decRawCount();
     }
+     * 
+     */
     return $tag;
   }
-  public function content($content='') {
-    if(static::getRawCount() || ($content instanceOf PkHtmlRenderer)) {
+  public function content($content='', $raw = false) {
+    //if(static::getRawCount() || ($content instanceOf PkHtmlRenderer)) {
+    if($raw || ($content instanceOf PkHtmlRenderer)) {
       $this[] = $content;
     } else {
       $this[] = hpure($content);
@@ -82,8 +87,8 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
   public function rawcontent($content='') {
-    $this[] = $content;
-    return $this;
+    //$this[] = $content;
+    return $this->content($content,true);
   }
 
   /** Takes two values, puts them each in their own div, then wraps them both in another
@@ -186,6 +191,7 @@ class PkHtmlRenderer extends PartialSet {
 
   }
 
+  /*
   public static function resetRawCount($i = 0) {
     static::$raw_depth = $i;
   }
@@ -203,6 +209,8 @@ class PkHtmlRenderer extends PartialSet {
   public static function getRawCount() {
     return static::$raw_depth;
   }
+   * 
+   */
 
 
 
@@ -235,18 +243,24 @@ class PkHtmlRenderer extends PartialSet {
    * @return html string
    */
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
+    /* // Want to use $content array for nesting 
     if (!is_stringish($content) && is_arrayish($content)) {
       $content = keyVal('content', $content);
       $attributes = keyVal('attributes', $content,$attributes);
       $raw = keyVal('raw', $content,false,$raw);
     }
+     * 
+     */
+    /*
     if ($raw) {
       static::incRawCount();
     }
+     * 
+     */
     $attributes = $this->cleanAttributes($attributes);
     //if (!$content) $content = ' ';
-    //if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
-    if ($content === true) {
+    if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
+    //if ($content === true) {
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
       $this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
@@ -263,7 +277,8 @@ class PkHtmlRenderer extends PartialSet {
 
 
 
-if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
+//if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
+if (!$raw && !($content instanceOf PkHtmlRenderer)) {
         $content = hpure($content);
       }
       $this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
@@ -283,9 +298,9 @@ if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
 
 
 
-*/
 
-      if ($raw) static::decRawCount();
+      //if ($raw) static::decRawCount();
+*/
       return $this;
     }
   }
