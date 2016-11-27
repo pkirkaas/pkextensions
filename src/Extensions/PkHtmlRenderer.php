@@ -244,19 +244,47 @@ class PkHtmlRenderer extends PartialSet {
       static::incRawCount();
     }
     $attributes = $this->cleanAttributes($attributes);
-    if (!$content) $content = ' ';
+    //if (!$content) $content = ' ';
+    //if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
     if ($content === true) {
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
       $this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
       return $this;
+    } else if (($content === false)) {
+                                ##Nest the elements
+      $spaces = $this->spaceDepth();
+      $size = $this->addDepthTagStack($tag);
+      $this[]="$spaces<$tag ".$this->attributes($attributes).">\n";
+      return $this;
     } else {
       #Trust that text already wrapped in PhHtmlRenderer has already been filtered
-      if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
+      
+
+
+
+if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
         $content = hpure($content);
       }
       $this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
         $content</$tag>\n";
+
+/*
+
+
+    if ($this->depthTagStack) {
+      $i = count($this->depthTagStack);
+      while ($i) {
+        $tag = $this->popDepthTagStack();
+        $i = count($this->depthTagStack);
+        $this[] = "</$tag>\n";
+        pkdebug("[i] $i:, tag: $tag; Depth Tag Stack: ", $this->depthTagStack);
+      }
+
+
+
+*/
+
       if ($raw) static::decRawCount();
       return $this;
     }
