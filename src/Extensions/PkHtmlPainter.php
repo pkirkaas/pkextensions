@@ -107,6 +107,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
         'createbtn_tag' => 'div',
         'class' => 'mf-btn pkmvc-button',
         'requiredClasses'=>'js btn create-new-data-set-int',
+        'data-itemcount'=>0,
 
     ];
 
@@ -117,6 +118,9 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $attributes = keyVal('attributes',$res,[]);
     if (($item_template = keyVal('item_template',$args)) && !keyVal('data-template',$attributes)) {
         $attributes['data-template']=html_encode($item_template);
+    }
+    if (($item_count = keyVal('data-itemcount',$params)) && !keyVal('data-itemcount',$attributes)) {
+        $attributes['data-itemcount']=$item_count;
     }
     $content = keyVal('createbtn_content', $params);
     $tag = keyVal('createbtn_tag', $params);
@@ -163,6 +167,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
      }
      $jsRowTpl = $this->mkSubformRow($args);
      $data_rows = keyVal('data_rows',$args,$this->data_rows);
+     $item_count = is_arrayish($data_rows) ? count($data_rows) : 0;
      $rows = new PkHtmlRenderer();
      foreach ($data_rows as $idx=>$data_row) {
        $rowargs = $args + ['data_row'=>$data_row,'idx'=>$idx];
@@ -170,7 +175,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
      }
      $create_button = keyVal('create_button',$args,$this->create_button);
      if (!$create_button) {
-       $cbtnargs = $args + ['item_template'=>$jsRowTpl];
+       $cbtnargs = $args + ['item_template'=>$jsRowTpl,'data-itemcount'=>$item_count];
        $create_button=$this->mkCreateBtn($cbtnargs);
      }
      $subform_tpl['rows']=$rows;

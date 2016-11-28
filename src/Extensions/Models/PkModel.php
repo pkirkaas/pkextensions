@@ -337,7 +337,7 @@ abstract class PkModel extends Model {
       $droppedfields = array_diff($currenttablefields, $currentmodelfields);
       $droppedfieldstr = '';
       foreach ($droppedfields as $droppedfield) {
-        if (!in_array($droppedfield, ['created_at', 'updated_at', 'deleted_at']))
+        if (!in_array($droppedfield, ['created_at', 'updated_at', 'deleted_at','remember_token']))
             $droppedfieldstr .= "$spaces\$table->dropColumn('$droppedfield');\n";
       }
       #Possibly changed fields:

@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions;
 use Illuminate\Database\Seeder;
+use DB;
 /** Just a few helpers to preserve data we want to keep
  * Usage: in your App DatabaseSeeder, extend PkSeeder in the main DatabaseSeeder
    class, and all the Seeder classes: 
