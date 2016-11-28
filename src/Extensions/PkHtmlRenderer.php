@@ -137,6 +137,51 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /**
+   *The Templating Injection! Very powerful & flexible, with reusable
+   * htmlRenderer mini-templates. Can even have default values. Example:
+   * 
+   * 
+   * #Template:
+      $wrap_tpl = new PkHtmlRenderer();
+      $wrap_tpl[] = "<div  class='";
+      $wrap_tpl['wrapper_class'] = 'col-xs-3 tpm-wrapper'; #Default
+      $wrap_tpl[] = "'>\n<div  class='block tpm-label'>\n";
+      $wrap_tpl['label']=null; #Replace
+      $wrap_tpl[] = "</div>\n<div  class='block tpm-value'>\n";
+      $wrap_tpl['input'] = null; #Replace
+      $wrap_tpl[] = "</div>\n</div>\n";
+   * 
+   * #Call:
+        PkRenderer::inject([
+            'label'=>"First Name",
+            'input'=>PkForm::text('fname', null, ['placeholder' => 'First Name','class'=>'pk-inp']),
+        ],$wrap_tpl),
+
+   *  
+   * @param assoc $arr: The key/values to insert in the template - OR, if not
+   *   an array, a "stringish" value (could be a PartialSet) inserted into
+   *   $tpl at default "content":  <tt>$tpl['content']=$arr;</tt>
+   * @param PartialSet|null: $tpl: A PartialSet/Renderer with indices matching
+   * the value keys of the input array
+   * 
+   * @return PkHtmlRenderer - with data inserted in the template
+   */
+  public function inject($arr,$tpl=null) {
+    if (!is_array($arr) && is_stringish($arr)) {
+      $arr = ['content' => $arr];
+    }
+    if ($tpl instanceOf PartialSet) {
+      $tpl = $tpl->copy();
+    } else {
+      $tpl = new PkHtmlRenderer();
+    }
+    foreach ($arr as $key =>$val) {
+      $tpl[$key] = $val;
+    }
+    return $this->content($tpl,true);
+  }
+
 
   /**
    * Takes a PkModel instance & string attribute name and displays as per $opts

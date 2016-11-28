@@ -78,6 +78,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
   public $subform_tpl;
   public $subform_tag = 'div';
   public $subform_attributes;
+  public $custom_opts; #Array of special options that any method can access, eg, ['createbtn_content'=>'New Diagnosis']
   public $row_tpl; #The Renderer template the inputs should be injected into; else just sequential
   public $row_tag = 'div';
   public $row_attributes;
@@ -111,7 +112,11 @@ class PkHtmlPainter extends PkHtmlRenderer{
 
     ];
 
+    if (!is_array($args)) $args = [];
     if (keyVal('createbtn_class',$args)) $args['class'] = $args['createbtn_class'];
+    if (!keyVal('createbtn_content',$args) && keyVal('createbtn_content',$this->custom_opts)) {
+      $args['createbtn_content'] = keyVal('createbtn_content',$this->custom_opts);
+    }
     $res = $this->clean_opts($args,$defaults,1);
     $method_vars = $res['method_vars'];
     $params = $res['params'];

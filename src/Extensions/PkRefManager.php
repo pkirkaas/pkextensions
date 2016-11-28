@@ -15,7 +15,10 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @var array key=>value; key to store in DB, value to display
    */
   public static $cache = [];
-  public static $refArr = [];
+  #ONE of these should be set, 
+  public static $refArr;# Simplest: [$key1=>$val1,$key2=>$val2,...
+  public static $idxRefArr;# indexed array of arrays: [['key'=>$key1,'value'=>$val1,],['key'=>$key2,'value'=>$val2,...
+  public static $keyRefArr; #keyed array of arrays: [$key1=>['value'=>$val1],$key2=>['value'=>$val2,]...
   public static $labels = ['', '', ''];
 
   /** Obviously, so implementing classes can get / generate their refArray other
@@ -46,11 +49,11 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * 
    */
   public static function getSelectList($null=false,$merged = false) {
-    if (!$merged) return static::getRefArr($null);
+    if (!$merged) return static::getKeyValArr($null);
     if (!is_string($merged)) $merged = ':';
 
     $refArr = [];
-    foreach ( static::getRefArr() as $key => $val) {
+    foreach ( static::getKeyValArr($null) as $key => $val) {
       $refArr[$key] = $key." $merged ".$val;
     }
     if (!$null) return $refArr;
@@ -59,8 +62,37 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
 
-  public static function getKeyValArr() {
-    if (!static::$multival) return static::getRefArr();
+  /** Really should ONLY use this, NOT getRefArr()!
+   * In this case, static::$refArr is NOT ['key'=>$value], but
+   * EITHER: 
+   * ['key'=>['value'=>$value,'other'=>$other]],
+   *  OR:
+   * [['key'=>$key,'value'=>$value,'other'=>$other,],]
+   * but THIS will return
+   * in the normalized form of ['key'=>$value] 
+   * @return array of arrays of key=>value
+   */
+  public static function getKeyValArr($null = false) {
+    if (is_array(static::$refArr)) return static::getRefArr($null);
+
+    #TODO: Restore the caching later...
+    if (is_array(static::$idxRefArr)) {
+      if ($null) $refArr = [null=>'None'];
+      else $refArr = [];
+      foreach (static::$idxRefArr as $refRow) {
+        $refArr[keyVal('key', $refRow)] = keyVal('value', $refRow);
+      }
+      return $refArr;
+    }
+    if (is_array(static::$keyRefArr)) {
+      if ($null) $refArr = [null=>'None'];
+      else $refArr = [];
+      foreach (static::$keyRefArr as $key => $refRow) {
+        $refArr[$key] = keyVal('value', $refRow);
+      }
+      return $refArr;
+    }
+    //if (!static::$multival) return static::getRefArr($null);
     $kvk = 'key-val-cache-key';
     $class = static::class;
     if (array_key_exists($class, static::$cache)) {
@@ -74,7 +106,10 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     foreach ($refArr as $refRow) {
       static::$cache[$class][$kvk][$refRow['key']] = $refRow['value'];
     }
-    return static::$cache[$class][$kvk];
+    $retArr =  static::$cache[$class][$kvk];
+    if ($null) $retArr = [null=>'None'] + $retArr;
+    return $retArr;
+    //return static::$cache[$class][$kvk];
   }
 
   public static function displayLabel($idx = null) {
@@ -82,8 +117,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
   public static function displayValue($key = null) {
-    $refArr = static::getKeyValArr();
-    return keyValOrDefault($key, $refArr, '');
+    $refArr = static::getKeyValArr(true);
+    return keyVal($key, $refArr, '');
   }
 
   public static function giveLabelAndValue($key, $idx) {
