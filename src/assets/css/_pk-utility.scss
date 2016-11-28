@@ -248,6 +248,7 @@ h3 {
   justify-content: center;
 }
 
+@include mk-spacing;
 
 .border-light, .border, .mildborder, .mild-border { border: solid #aaa 1px; }
 

@@ -271,19 +271,6 @@ function pkdebug_base() {
     $idx++;
   }
 
-
-
-  //$stacksize = sizeof($stack);
-  $out = '';
-  //$out = "\nLOG OUT: STACKSIZE: $stacksize";
-  if (!$callno) {
-    $out .= "\nLOG: ". date('j-M-y; H:i:s') ;
-  } else {
-//    $out .= "\n\n";
-
-  }
-  $callno ++;
-  $idx = 0;
   while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx+1]['function'],-3)==='Log')) {
     $idx++;
   }

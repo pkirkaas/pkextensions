@@ -194,7 +194,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
           ('':(background:$background)));
 
   @for $i from 0 through $szrange {
-    $sz: if($i!=0, $i, null);
+    $sz: if($i!=0, -$i, null);
     $szmap: (font-size:($i/5)+$size);
     @each $bga in map-keys($bgmap) {
       $bmap: map-get($bgmap,$bga);
@@ -260,6 +260,42 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin h-margin($sz: auto) {
   margin-left: $sz;
   margin-right: $sz;
+}
+
+/* Makes a bunch of left/right margins/paddings
+*/
+@mixin mk-spacing {
+  @for $i from 0 through 250 {
+    $sz: if($i!=0, -$i, null);
+    $offset: $i/5 * 1em;
+    .pad-r#{$sz} {
+      padding-right: $offset;
+    }
+    .pad-l#{$sz} {
+      padding-left: $offset;
+    }
+    .marg-r#{$sz} {
+      margin-right: $offset;
+    }
+    .marg-l#{$sz} {
+      margin-left: $offset;
+    }
+
+
+    .pad-t#{$sz} {
+      padding-top: $offset;
+    }
+    .pad-b#{$sz} {
+      padding-bottom: $offset;
+    }
+    .marg-t#{$sz} {
+      margin-top: $offset;
+    }
+    .marg-b#{$sz} {
+      margin-bottom: $offset;
+    }
+  }
+
 }
 
 /** Makes text/section wrappers, with MAP args/defaults:
@@ -330,6 +366,29 @@ $grid-gutter-width:          1.875rem !default; // 30px
     }
     @if $v-margin {
       @include v-margin($v-margin);
+    }
+  }
+}
+
+
+/** Generates a range of wrapper classes, of increasing padding/margin
+ */
+@mixin mk-au-wraps($args:()) {
+  $defaults: (cname:wrap,szrange:10, size:1em);
+  $params: map-merge($defaults,$args);
+  $cname: map-get($params,cname);
+  $size: map-get($params,size);
+  $szrange: map-get($params,szrange);
+  $bname: au-#{$cname};
+
+  @for $i from 0 through $szrange {
+    $sz: if($i!=0, -$i, null);
+    //$szmap: (font-size:($i/5)+$size);
+    $vpadmar: ($i/5)+($size/5);
+    $newparms: map-merge($params,(v-margin:$vpadmar,v-padding:$vpadmar));
+    @debug #{$bname}#{$sz};
+    .#{$bname}#{$sz} {
+        @include mk-wrapper($newparms);
     }
   }
 }
