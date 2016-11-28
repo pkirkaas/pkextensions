@@ -289,17 +289,21 @@ function pkdebug_base() {
   }
   $frame = $stack[$idx];
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
+  /* // Try using new way (below) - add option to display args & object later
   if (isset($stack[1])) {
     $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
   } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
   }
+   * 
+   */
   /** Test $retvals - better way? */
 
   $tstrr ="\n";
   foreach ($retvals as $key => $value) {
-    if ($key === 'args') continue;
-    $tstrr.= "$key: $value, ";
+    if (($key === 'object') || ($key === 'args')) continue;
+    //$tstrr.= "$key: $value, ";
+    $tstrr.= "$value; ";
   }
   $tstrr.="\n";
   $out.=$tstrr;

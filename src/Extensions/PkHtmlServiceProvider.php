@@ -9,8 +9,10 @@ class PkHtmlServiceProvider extends ServiceProvider {
 	public function register() {
 		$this->registerPkFormBuilder();
 		$this->registerPkHtmlBuilder();
+		$this->registerPkHtmlRenderer();
     $this->app->alias('pkform', 'PkExtensions\PkFormBuilder');
     $this->app->alias('pkhtml', 'PkExtensions\PkHtmlBuilder');
+    $this->app->alias('pkrenderer', 'PkExtensions\PkHtmlRenderer');
   }
 	protected function registerPkHtmlBuilder() {
 		$this->app->singleton('pkhtml', function($app) {
@@ -19,6 +21,11 @@ class PkHtmlServiceProvider extends ServiceProvider {
       return $html;
 		});
   }
+	protected function registerPkHtmlRenderer() {
+		$this->app->bind('pkrenderer', function($app) {
+			return new PkHtmlRenderer();
+		});
+	}
 	protected function registerPkFormBuilder() {
 		$this->app->singleton('pkform', function($app) {
 			//$form = new PkFormBuilder($app['html'], $app['url'], $app['session.store']->getToken());
@@ -27,6 +34,6 @@ class PkHtmlServiceProvider extends ServiceProvider {
 		});
 	}
 	public function provides() {
-		return ['pkform','pkhtml'];
+		return ['pkform','pkhtml', 'pkrenderer'];
 	}
 }

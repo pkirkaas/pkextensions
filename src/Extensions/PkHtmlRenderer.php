@@ -233,7 +233,7 @@ class PkHtmlRenderer extends PartialSet {
     return $this->tagged($tag, $content, $attributes, $raw);
   }
   /**
-   * Generate HTML element of type $tag
+   * Generate HTML CONTENT element of type $tag
    * Change to allow $content to be assoc array with same params as args
    * EXPERIMENT: Try Using Raw Count to prevent filtering of input els.
    * @param string $tag - the HTML tag - required
@@ -257,6 +257,8 @@ class PkHtmlRenderer extends PartialSet {
     }
      * 
      */
+    $ctype = typeOf($content);
+    if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
     //if (!$content) $content = ' ';
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
