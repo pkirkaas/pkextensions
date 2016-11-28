@@ -3113,6 +3113,15 @@ function is_intish($value, $nullorfalse = false) {
   return ! $diff;
 }
 
+/** is_numeric($val) returns true for $val='17';. is_number returns true for
+ * $val=17;, false for $val='17';
+ * @param type $val
+ */
+function is_number($val) {
+  if (is_int($val) || is_float($val) || is_bool($val)) return true;
+  return false;
+}
+
 function ne_string($var) {
   return $var && is_string($var) && strlen($var);
 }

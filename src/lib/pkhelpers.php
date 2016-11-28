@@ -29,6 +29,18 @@ function eloquentToArray($var) {
   return getAsArray($var);
 }
 
+/** Escape for SQL - but ->quote() quotes everything, so have to work around
+ * for numerics & dates
+ * Problem is, for string table columns that accept empty strings but not null..
+ * Enhance later with colType
+ */
+if ( ! function_exists('esc_sql')) {
+  function esc_sql($value, $colType = null) {
+    if (is_number($value)) return $value;
+    if (typeOf($value) === 'NULL') return 'NULL';
+    return app('db')->getPdo()->quote($value);
+  }
+}
 function setAppLog() {
   PkLibConfig::setSuppressPkDebug(false);
   $logDir = realpath(storage_path().'/logs');

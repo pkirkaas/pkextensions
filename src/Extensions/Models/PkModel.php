@@ -24,6 +24,7 @@ use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use \Request;
 use \Exception;
+use \DB;
 use PkExtensions\PkTestGenerator;
 
 abstract class PkModel extends Model {
@@ -691,6 +692,110 @@ class $createclassname extends Migration {
   public function getAttributeNames() {
     return array_keys($this->getAttributeDefs());
     //return Schema::getColumnListing($model->getTable());
+  }
+
+  public static function sqlToBuildRelationTables($self = true) {
+    $relClasses = static::getRelationClasses();
+    if ($self) {
+      $relClasses[]=static::class;
+    }
+    $createSqlArr = [];
+    foreach ($relClasses as $relClass) {
+      $createSqlArr[] = $relClass::sqlToBuildTable();
+    }
+    $sqlStr = implode("\n",$createSqlArr);
+    return $sqlStr;
+  }
+
+  public static function getRelationClasses($relClasses = []) {
+    //static $relationClasses = [];
+    foreach (static::$load_relations as $load_relation) {
+      if (!in_array($load_relation, $relClasses)) {
+        $relClasses = array_merge($relClasses,[$load_relation],$load_relation::getRelationClasses($relClasses));
+      }
+    }
+    $uv = array_unique($relClasses);
+    return $uv;
+  }
+  /** Gets the inserts for the current instance, then recursively for all its
+   * one-to-many relationship inserts. Have to be clever to avoid cycles
+   */
+  public function getSqlInserts() {
+    static $tablesAndKeys = []; #['table1'=>[$key1,$key2,$key3],'table2'=>[...]
+    $tableName = $this->getTable();
+    $keys = keyVal($tableName,$tablesAndKeys,[]);
+    $key=$this->getKey();
+    if (in_array($key, $keys)) return; #Hope that takes care of cycles
+
+    $sqlInsStr = $this->sqlInsertAttributes();
+    $relations = array_keys(static::$load_relations);
+    foreach ($relations as $relation) {
+      foreach ($this->$relation as $item) {
+        $sqlInsStr.=$item->sqlInsertAttributes();
+      }
+    }
+    $tablesAndKeys[$tableName][]=$key;
+    return $sqlInsStr;
+  }
+
+  /** Generates SQL string to back up object data & its relations. Reasonable
+   * general method, but to be accurate subclasses have to customize it.
+   */
+  public function sqlObjectData() {
+    $sqlCreateTbls = $this->sqlToBuildRelationTables();
+    $sqlInsAtts = $this->getSqlInserts();
+    return "$sqlCreateTbls\n\n$sqlInsAtts";
+  }
+
+  public function sqlInsertAttributes() {
+    $tableName = $this->getTable();
+    $myAttributes = $this->getAttributes();
+    $setArr = [];
+    foreach ($myAttributes as $fieldName => $value) {
+  //    $vtype = typeOf($value);
+      $escvalue = esc_sql($value);
+      //$setArr[] = "`$fieldName`=$escvalue  RAWVAL: [$value]  TYPE:  $vtype\n" ;
+      $setArr[] = "`$fieldName`=$escvalue" ;
+    }
+    $setStr = implode(", ",$setArr);
+    return "INSERT INTO `$tableName` SET $setStr;\n\n";
+    
+
+  }
+  //public function sqlInsertAttribute($name)
+  
+
+  /** Minimal, to build backup SQL
+   * 
+   */
+  public static function sqlToBuildTable() {
+    $tableName = static::getTableName();
+    $rawcols = DB::select(DB::raw("SHOW COLUMNS FROM `$tableName`"));
+    $colDefArr = [];
+    foreach ($rawcols as $rawcol) {
+      $colDefArr[] = static::sqlToBuildCol($rawcol);
+    }
+    $colDefStr = implode(",\n",$colDefArr);
+    $createTable=" CREATE TABLE IF NOT EXISTS `$tableName` (\n$colDefStr\n); ";
+    return $createTable;
+  }
+
+  /** Uses output of the Raw SHOW COLUMNS FROM query above. 
+   * to build 
+   * @param stdClass $colDef:
+   *   ->Field: field name
+   *   ->Type
+   *   ->Null: NO/YES
+   *   ->Key: null/UNI/PRI
+   *   ->Default
+   *   ->Extra: null/autoincrement/
+   *   
+   */
+  public static function sqlToBuildCol($colDef) {
+    if ($colDef->Null === 'NO') $nullable = ' NOT NULL ';
+    else $nullable = ' NULL ';
+    //return "      `{$colDef->Field}` {$colDef->Type} $nullable {$colDef->Extra} "; 
+    return "      `{$colDef->Field}` {$colDef->Type} $nullable "; 
   }
 
   /** Returns associative array of table column names as keys, and the
