@@ -263,14 +263,14 @@ class PkHtmlRenderer extends PartialSet {
     //if ($content === true) {
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
-      $this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
-      return $this;
+      //$this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
+      return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">\n");
     } else if (($content === false)) {
                                 ##Nest the elements
       $spaces = $this->spaceDepth();
       $size = $this->addDepthTagStack($tag);
-      $this[]="$spaces<$tag ".$this->attributes($attributes).">\n";
-      return $this;
+      //$this[]="$spaces<$tag ".$this->attributes($attributes).">\n";
+      return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">\n");
     } else {
       #Trust that text already wrapped in PhHtmlRenderer has already been filtered
       
@@ -281,8 +281,9 @@ class PkHtmlRenderer extends PartialSet {
 if (!$raw && !($content instanceOf PkHtmlRenderer)) {
         $content = hpure($content);
       }
-      $this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
-        $content</$tag>\n";
+      //$this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
+      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
+        $content</$tag>\n");
 
 /*
 
@@ -308,8 +309,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
   public function nocontent($tag, $attributes=null) {
     $attributes = $this->cleanAttributes($attributes);
     //pkdebug("TAG: [$tag], atts:",$attributes);
-    $this[] = "<$tag ". PkHtml::attributes($attributes).">\n";
-    return $this;
+    //$this[] = "<$tag ". PkHtml::attributes($attributes).">\n";
+    return $this->rawcontent("<$tag ". PkHtml::attributes($attributes).">\n");
   }
 
 
@@ -326,8 +327,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $selected=keyVal('selected',$options,$selected);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    $this[] = PkForm::select($name, $list, $selected, $options);
-    return $this;
+    //$this[] = PkForm::select($name, $list, $selected, $options);
+    return $this->rawcontent( PkForm::select($name, $list, $selected, $options));
   }
 
   public function multiselect($name, $list = [], $values=null, $options=[], $unset = null) {
@@ -343,8 +344,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $values=keyVal('values',$options,$values);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    $this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
-    return $this;
+    //$this[] = PkForm::multiselect($name, $list, $values, $options, $unset);
+    return $this->rawcontent( PkForm::multiselect($name, $list, $values, $options, $unset));
   }
 
   /** Appends / adds $att_val to the CLASS property </tt>{$att_name}_attributes</tt>
@@ -409,8 +410,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $checked=keyVal('checked',$options,$checked);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    $this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
-    return $this;
+    //$this[]= PkForm::boolean($name,  $checked, $options, $unset, $value);
+    return $this->rawcontent(PkForm::boolean($name,  $checked, $options, $unset, $value));
   }
 
   public function input($type, $name, $value = null, $options = []) {
@@ -424,8 +425,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $value=keyVal('value',$options,$value);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    $this[] = PkForm::input($type, $name, $value, $options);
-    return $this;
+    //$this[] = PkForm::input($type, $name, $value, $options);
+    return $this->rawcontent(PkForm::input($type, $name, $value, $options));
   }
 
   /** Don't just default to 'tagged', cuz it's input
@@ -445,8 +446,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $value=keyVal('value',$options,$value);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    $this[] = PkForm::textarea($name, $value, $options);
-    return $this;
+    //$this[] = PkForm::textarea($name, $value, $options);
+    return $this->rawcontent(PkForm::textarea($name, $value, $options));
   }
 
 
@@ -454,8 +455,8 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
   /** Make it look cleaner by just using many of the PkForm shortcuts */
   public function submitButton($label = 'Submit', $options = []) {
       if (is_string($options)) $options = ['class'=>$options];
-    $this[] = PkForm::submitButton($label,$options);
-    return $this;
+    //$this[] = PkForm::submitButton($label,$options);
+    return $this->rawcontent(PkForm::submitButton($label,$options));
   }
 
 
@@ -515,16 +516,16 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
     //pkdebug("RENDEROUT\n\n$___PKMVC_RENDERER_OUT\n\n");
-    $this[] = $___PKMVC_RENDERER_OUT;
-    return $this;
+    //$this[] = $___PKMVC_RENDERER_OUT;
+    return $this->rawcontent( $___PKMVC_RENDERER_OUT);
   }
 
   /**Close with matched tag */
   public function close() {
     //$tag = array_pop($this->tagStack);
     $tag = $this->popTagStack();
-    $this[] = $this->spaceDepth()."</$tag>\n";
-    return $this;
+    //$this[] = $this->spaceDepth()."</$tag>\n";
+    return $this->rawcontent( $this->spaceDepth()."</$tag>\n");
   }
 
   #Alias for ->close()
@@ -632,16 +633,18 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
     if (is_array($opts)) { 
       $coltag = keyVal('coltag',$opts,'td');
     }
-    $this[]="<tr>\n";
+    //$this[]="<tr>\n";
+    $this->content("<tr>\n");
     foreach ($data as $idx =>$datum) {
       if (!is_array($datum)) $datum = ['value'=>$datum];
       $value = keyVal('value',$datum);
       $lcoltag = keyVal('coltag',$datum,$coltag);
       $latts =  keyVal('colatts',$datum);
-      $this[] = "  <$lcoltag $latts>$value</$lcoltag>\n";
+      //$this[] = "  <$lcoltag $latts>$value</$lcoltag>\n";
+      $this->content( "  <$lcoltag $latts>$value</$lcoltag>\n");
     }
-    $this[]="</tr>\n";
-    return $this;
+    //$this[]="</tr>\n";
+    return $this->content("</tr>\n");
   }
 
   /** Totally misconceived
@@ -798,21 +801,26 @@ if (!$raw && !($content instanceOf PkHtmlRenderer)) {
 
   /**Don't want to use these anymore - just wrap - but keep in case used in older apps*/
   public function textset( $name='', $value=null, $labeltext=null, $inputatts = [], $labelatts=[], $wrapatts = []) {
-    $this[] = PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
-    return $this;
+    //$this[] = PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts);
+    //return $this;
+    return $this->rawcontent( PkForm::textset( $name, $value, $labeltext, $inputatts, $labelatts, $wrapatts));
   }
-  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) { $this[] = PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts);
-     return $this;
+  public function inputlabelset($type, $name='', $value=null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
+    //$this[] = PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+    // return $this;
+    return $this->rawcontent(PkForm::inputlabelset($type, $name, $value, $labeltext, $inatts, $labatts, $wrapatts));
   }
 
   public function textareaset($name, $value = null, $labeltext = '', $inatts = [], $labatts = [], $wrapatts =[]) {
-    $this[] = PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts);
-    return $this;
+    //$this[] = PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts);
+    //return $this;
+    return $this->rawcontent(PkForm::textareaset($name, $value, $labeltext, $inatts, $labatts, $wrapatts));
   }
 
   public function selectset( $name='', $list=[], $selected = null, $labeltext=null, $inatts = [], $labatts=[], $wrapatts = []) {
-     $this[] = PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts);
-     return $this;
+     //$this[] = PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts);
+     //return $this;
+     return $this->rawcontent(PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts));
   }
 
 
