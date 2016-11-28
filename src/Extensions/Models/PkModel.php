@@ -725,13 +725,17 @@ class $createclassname extends Migration {
     $tableName = $this->getTable();
     $keys = keyVal($tableName,$tablesAndKeys,[]);
     $key=$this->getKey();
-    if (in_array($key, $keys)) return; #Hope that takes care of cycles
+    if (in_array($key, $keys)) {
+      pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
+      return; #Hope that takes care of cycles
+    }
 
     $sqlInsStr = $this->sqlInsertAttributes();
     $relations = array_keys(static::$load_relations);
     foreach ($relations as $relation) {
       foreach ($this->$relation as $item) {
-        $sqlInsStr.=$item->sqlInsertAttributes();
+        //$sqlInsStr.=$item->sqlInsertAttributes();
+        $sqlInsStr.=$item->getSqlInserts();
       }
     }
     $tablesAndKeys[$tableName][]=$key;
