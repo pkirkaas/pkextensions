@@ -4,7 +4,7 @@ use PkExtensions\Models\PkModel;
 use PkForm;
 use PkRenderer;
 /** A base class to generate HTML pages & Forms.  */
-#Just playing while I figure out what I want to do with it...
+#See bottom of file for examples
 
 /** For methods with <tt>$args=[]</tt>, the param keys are:
  * 'content' - and the default if NOT $args is arrayish: Stringable content
@@ -106,7 +106,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
         'createbtn_content'=>'Create',
         'createbtn_tag' => 'div',
         'class' => 'mf-btn pkmvc-button',
-        'requiredClasses'=>'js btn create-new-data-set',
+        'requiredClasses'=>'js btn create-new-data-set-int',
 
     ];
 
@@ -122,9 +122,10 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $tag = keyVal('createbtn_tag', $params);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
+    pkdebug("args:",$args,"attributes", $attributes);
     $hr=new PkHtmlRenderer();
     return $this->create_button = $this->injectTpl($hr->$tag($content,
-        keyVal('attributes',$res)),$ps_tpl,$ps_key);
+        $attributes),$ps_tpl,$ps_key);
     //return $this->injectTpl($hr->$tag($content,
     //    keyVal('attributes',$res)),$ps_tpl,$ps_key);
   }
@@ -297,3 +298,36 @@ class PkHtmlPainter extends PkHtmlRenderer{
 
 
 
+
+/** Examples:
+ * 
+#Diagnoses
+$diagnoses = $client->diagnoses;
+$diagrows = [];
+foreach ($diagnoses as $diagnosis) {
+  $diagrows[]= ['diagnosiscode_id' => $diagnosis->diagnosiscode_id,'id'=>$diagnosis->id];
+}
+#New HtmlPainter for Diagnosis Subform
+
+$cdrow_tpl = new PkHtmlRenderer(["<div class='col-sm-9'>",
+    'diagnosiscode_id'=>null,
+    "</div><div class='col-sm-3'>",'delete_button'=>null,"</div>\n"]);
+$params = [
+    'basename'=>'diagnoses',
+    'row_attributes'=>'row',
+    'row_tpl'=>$cdrow_tpl,
+    'tpl_fields' => [
+        'id'=>'hidden',
+        'diagnosiscode_id'=>['select',['list'=>DiagnosisRef::getSelectList(true,true),
+            'options'=>['class'=>'form-control pk-val']]],
+        ],
+    'data_rows' => $diagrows,
+];
+
+$diagsf = new PkHtmlPainter($params);
+$diagwrapper = PkRenderer::div([
+  PkRenderer::div('Diagnoses','pk-h5 pk-label sect-head client-info form-sect'),
+  PkRenderer::content($diagsf->mkSubform()),
+], 'section inline multiform diagnoses-subform');
+
+ */

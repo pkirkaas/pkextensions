@@ -94,6 +94,28 @@ $(function () {
     }
     $(event.target).before(newstr);
   });
+
+/** As above, except the template is encoded in the create button itself, in
+ * the data-template attribute
+ */
+  $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
+    //Get a copy of the template element
+    //var tpl = $(event.target).closest('div.templatable-data-sets').find('.template-container').first().html();
+    var tpl=$(event.target).attr("data-template");
+    console.log("New TPL: ",tpl);
+
+    //Get the current count element (one higher than the max index, if multi)
+    var cnt = $(event.target).attr('data-itemcount');
+    var newstr = tpl;
+    if (cnt === 'single') {
+      $(event.target).css('display', 'none');
+    } else {
+      cnt = parseInt(cnt);
+      newstr = tpl.replace(/__CNT_TPL__/g, cnt);
+      $(event.target).attr('data-itemcount', ++cnt);
+    }
+    $(event.target).before(newstr);
+  });
   $('body').on('click', '.pkmvc-button.showHelp', function (event) {
     showHelpDialog();
   });
