@@ -275,17 +275,18 @@ class PkHtmlRenderer extends PartialSet {
       return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">\n");
     } else {
       #Trust that text already wrapped in PhHtmlRenderer has already been filtered
-      
-
-
 
 //if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
-if (!$raw && !($content instanceOf PkHtmlRenderer)) {
-        $content = hpure($content);
-      }
       //$this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
-      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
-        $content</$tag>\n");
+      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">\n");
+      if (is_array($content)){
+        foreach ($content as $citem) {
+          $this->content($citem,$raw);
+        }
+      } else {
+        $this->content($content,$raw);
+      }
+      $this->rawcontent($this->spaceDepth()."</$tag>\n");
 
 /*
 

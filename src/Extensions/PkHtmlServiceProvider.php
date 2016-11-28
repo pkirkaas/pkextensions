@@ -24,7 +24,7 @@ class PkHtmlServiceProvider extends ServiceProvider {
 	protected function registerPkHtmlRenderer() {
 		$this->app->bind('pkrenderer', function($app) {
 			return new PkHtmlRenderer();
-		});
+		},false);
 	}
 	protected function registerPkFormBuilder() {
 		$this->app->singleton('pkform', function($app) {
