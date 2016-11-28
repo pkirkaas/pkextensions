@@ -258,7 +258,7 @@ class PkHtmlRenderer extends PartialSet {
      * 
      */
     $ctype = typeOf($content);
-    if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
+    //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
     //if (!$content) $content = ' ';
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE

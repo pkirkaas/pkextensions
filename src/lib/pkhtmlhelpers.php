@@ -4,6 +4,23 @@ use Collective\Html\FormBuilder;
 use PkExtensions\PartialSet;
 use PkExtensions\PkHtmlRenderer;
 
+/**
+ * Makes an attributes array, combining $arg1 & $arg2
+ * @param array|string $arg1: If string, makes ['class'=>$arg1]
+ * @param array|string|null $arg2 If string, makes ['class'=>$arg2]
+ * Assumes all the values are strings - so combines them, space separated
+ * @return array $attributes
+ */
+function merge_attributes($arg1,$arg2=[]) {
+  if (is_simple($arg1)) $arg1 = ['class'=>$arg1];
+  if (!$arg2) return $arg1;
+  if (is_scalar($arg2)) $arg2 = ['class'=>$arg2];
+  $keys = array_unique(array_merge(array_keys($arg1),array_keys($arg2)));
+  foreach ($keys as $key) {
+    $arg1[$key] = keyVal($key,$arg1).' '.keyVal($key,$arg2);
+  }
+  return $arg1;
+}
 
 /** Try to redo this rationally - but works as test in kirkaas.com gallery*/
 /**

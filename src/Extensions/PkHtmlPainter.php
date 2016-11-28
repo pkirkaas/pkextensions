@@ -2,6 +2,7 @@
 namespace PkExtensions;
 use PkExtensions\Models\PkModel;
 use PkForm;
+use PkRenderer;
 /** A base class to generate HTML pages & Forms.  */
 #Just playing while I figure out what I want to do with it...
 
@@ -9,9 +10,15 @@ use PkForm;
  * 'content' - and the default if NOT $args is arrayish: Stringable content
  * 'attributes' attributes array, or if just string, classes
  */
-class PkHtmlPainter {
+class PkHtmlPainter extends PkHtmlRenderer{
   public $csrf_token;
   public function __construct($args=[]) {
+    foreach ($args as $key => $val) {
+      if (property_exists($this,$key)) {
+        $this->$key = $val;
+      }
+    }
+    parent::__construct();
   }
 
   public function wrapForm($args=[]) {
@@ -48,7 +55,8 @@ class PkHtmlPainter {
         'component_args'=>keyVal('component_args',$params),
     ];
     return ['method_vars'=>$method_vars,
-            'attributes'=>$attributes,];
+            'attributes'=>$attributes,
+             'params'=>$params];
   }
 
   /** Returns the "content" injected into PkHtmlRenderer $tpl, according to $key (default: 'content')
@@ -65,6 +73,21 @@ class PkHtmlPainter {
   }
 
   ###############  This section to support scrolling subforms 1 to many creation & deletion 
+  public $create_button;
+  public $delete_button;
+  public $subform_tpl;
+  public $subform_tag = 'div';
+  public $subform_attributes;
+  public $row_tpl; #The Renderer template the inputs should be injected into; else just sequential
+  public $row_tag = 'div';
+  public $row_attributes;
+  public $tpl_fields;#Defines Inputs, fldname=>input def:
+     #  ['id'=>'hidden',
+     #   'diagnosiscode_id'=>['select',['list'=>DiagnosisRef::getSelectList(true,true)]], ],
+  public $data_rows=[]; #indexed array of [['fname1'=>$fval11,'fname2'=>$fval21],['fname1'=>$fval12,...
+  public $basename;
+
+
   /** Make a create button. Options:
    *  'content' - what to show in the button
    *  'tag' - default 'div'
@@ -72,6 +95,7 @@ class PkHtmlPainter {
    *       But the classes required for JS ['js create-new-data-set'] will always be added
    * 'ps_tpl' Optional: PkHtmlRenderer template to inject the results in. Default key: 'content'
    * 'ps_key' - if other than 'content' 
+   * 'item_template': The Form item template to encode into this 'Create' button's 'data-template' attribute
    * 'class' - to override the default (but not the REQUIRED) css classes
    * 'attributes' - for HTML
    * 'add-class' - to SUPLEMENT the default
@@ -79,45 +103,159 @@ class PkHtmlPainter {
    */
   public function mkCreateBtn($args=[]) {
     $defaults = [
-        'content'=>'Create',
-        'tag' => 'div',
+        'createbtn_content'=>'Create',
+        'createbtn_tag' => 'div',
         'class' => 'mf-btn pkmvc-button',
         'requiredClasses'=>'js btn create-new-data-set',
 
     ];
 
+    if (keyVal('createbtn_class',$args)) $args['class'] = $args['createbtn_class'];
     $res = $this->clean_opts($args,$defaults,1);
     $method_vars = $res['method_vars'];
-    $content = keyVal('content', $method_vars);
-    $tag = keyVal('tag', $method_vars);
+    $params = $res['params'];
+    $attributes = keyVal('attributes',$res,[]);
+    if (($item_template = keyVal('item_template',$args)) && !keyVal('data-template',$attributes)) {
+        $attributes['data-template']=html_encode($item_template);
+    }
+    $content = keyVal('createbtn_content', $params);
+    $tag = keyVal('createbtn_tag', $params);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
     $hr=new PkHtmlRenderer();
-    return $this->injectTpl($hr->$tag($content,
+    return $this->create_button = $this->injectTpl($hr->$tag($content,
         keyVal('attributes',$res)),$ps_tpl,$ps_key);
+    //return $this->injectTpl($hr->$tag($content,
+    //    keyVal('attributes',$res)),$ps_tpl,$ps_key);
   }
 
   public function mkDelBtn($args=[]) {
     $defaults = [
-        'content'=>'Delete',
-        'tag' => 'div',
+        'delbtn_content'=>'Delete',
+        'delbtn_tag' => 'div',
         'class' => 'mf-btn pkmvc-button',
         'requiredClasses'=>'js btn data-set-delete',
 
     ];
+    if (keyVal('delbtn_class',$args)) $args['class'] = $args['delbtn_class'];
     $res = $this->clean_opts($args,$defaults);
     $method_vars = $res['method_vars'];
-    $content = keyVal('content', $method_vars);
-    $tag = keyVal('tag', $method_vars);
+    $params = $res['params'];
+    $content = keyVal('delbtn_content', $params);
+    $tag = keyVal('delbtn_tag', $params);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
     $hr=new PkHtmlRenderer();
-    return $this->injectTpl($hr->$tag($content,
+    return $this->delete_button = $this->injectTpl($hr->$tag($content,
         keyVal('attributes',$res)),$ps_tpl,$ps_key);
   }
 
+  public function mkSubform($args=[]) {
+     $subform_tag = keyVal('subform_tag',$args,$this->subform_tag);
+     $subform_attributes = merge_attributes(
+         keyVal('subform_attributes',$args,$this->subform_attributes),'templatable-data-sets');
+     $subform_tpl = keyVal('subform_tpl',$args,$this->subform_tpl);
+     if ($subform_tpl instanceOf PartialSet) {
+       $subform_tpl = $subform_tpl->copy();
+     } else {
+       $subform_tpl = new PkHtmlRenderer();
+     }
+     $jsRowTpl = $this->mkSubformRow($args);
+     $data_rows = keyVal('data_rows',$args,$this->data_rows);
+     $rows = new PkHtmlRenderer();
+     foreach ($data_rows as $idx=>$data_row) {
+       $rowargs = $args + ['data_row'=>$data_row,'idx'=>$idx];
+       $rows[$idx] = $this->mkSubformRow($rowargs);
+     }
+     $create_button = keyVal('create_button',$args,$this->create_button);
+     if (!$create_button) {
+       $cbtnargs = $args + ['item_template'=>$jsRowTpl];
+       $create_button=$this->mkCreateBtn($cbtnargs);
+     }
+     $subform_tpl['rows']=$rows;
+     $subform_tpl['create'] = $create_button;
+     return PkRenderer::$subform_tag($subform_tpl,$subform_attributes);
+  }
+
+
+  public function mkSubformRow($args=[]) {
+     $row_tpl = keyVal('row_tpl',$args,$this->row_tpl);
+     if ($row_tpl instanceOf PartialSet) {
+       $row_tpl = $row_tpl->copy();
+     } else {
+       $row_tpl = new PkHtmlRenderer();
+     }
+     $delete_button = keyVal('delete_button',$args,$this->delete_button);
+     if (!$delete_button) $delete_button = $this->mkDelBtn();
+     $row_tag = keyVal('row_tag',$args,$this->row_tag);
+     $row_attributes = merge_attributes(
+         keyVal('row_attributes',$args,$this->row_attributes),'deletable-data-set');
+     $tpl_fields = keyVal('tpl_fields',$args,$this->tpl_fields);
+     $basename = keyVal('basename',$args,$this->basename);
+     $idx = keyVal('idx',$args);
+     $data_row = keyVal('data_row',$args,[]);
+     foreach ($tpl_fields as $fname => $inputdef) {
+       $row_tpl[$fname]=$this->mkInputFromDef([
+           'name' => $this->mkInputName($fname,$idx,$basename),
+           'def'=>$inputdef,
+           'value'=>keyVal($fname,$data_row),
+        ]);
+     }
+     $row_tpl['delete_button'] = $delete_button;
+     return PkRenderer::$row_tag($row_tpl,$row_attributes);
+  }
+
+  public function mkInputName($fname,$idx=null,$basename=null) {
+    if (!$basename) $basename = $this->basename;
+    if (($idx==='')|($idx===null)) $idx = '__CNT_TPL__';
+    return $basename.'['.$idx.']['.$fname.']';
+  }
+
+  public function mkInputFromDef($args=[]) {
+    $name=keyVal('name',$args);
+    $value=keyVal('value',$args);
+    $def=keyVal('def', $args);
+    $type = 'text';
+    $params = [];
+    $options = [];
+    #Parse $def - can be many forms
+    if (is_string($def)) {
+      $type = $def;
+    } else if (is_array($def)){
+      $type = keyVal('type',$def,keyVal(0,$def,'text'));
+      $params = keyVal('params',$def,keyVal(1,$def,$def));
+      $options = keyVal('options',$params,$params);
+    }
+    $inp = new PkHtmlRenderer();
+    if ($type === 'select') {
+      $list = keyVal('list',$params);
+      unset($params['list']);
+      return $inp->select($name,$list,$value,$options);
+    } else if ($type === 'textarea') {
+      return $inp->textarea($name,$value,$options);
+    } else {
+      return $inp->input($type,$name,$value,$options);
+    }
+  }
+
+//$field_arr,$idx=null,$basename=null,$row_tpl = null
+  /**
+   * Makes a subform row
+   * @param assoc array $args:
+   *   'field_input_arr': assoc array of field key names=>values, or just indexed array of field names
+   *   'idx': The integer index of the row, or '__CNT_TPL__' if in the 'create' template
+   *   'basename' - The basename to use for the form input name
+  public function mkSubformRow($args = []) {
+
+  }
+   */
+
+
+
+
   /** These methods can insert the content now, or return a keyed template for the
    * content to be inserted or replaced repeatedly
+   * !! Deprecated for data-template encoding within Create Button
    * @param type $content
    * @return string
    */

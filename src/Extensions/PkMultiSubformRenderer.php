@@ -91,6 +91,7 @@ class PkMultiSubformRenderer  extends PkHtmlRenderer {
    * @param array $args - initialization array
    */
   public function __construct($args=[]) {
+    throw new PkException ("Deprecated! Use PkHtmlPainter instead.");
     foreach ($args as $key => $val) {
       if (property_exists($this,$key)) {
         $this->$key = $val;
