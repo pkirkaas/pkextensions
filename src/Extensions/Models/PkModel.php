@@ -742,6 +742,36 @@ class $createclassname extends Migration {
     return $sqlInsStr;
   }
 
+  /** 
+   * Return all the tables w. Primary Key name & values, 'owned' by this Model
+   * @staticvar array $tablesAndKeys
+   * @return array: ['table'=>['key_name'=>'id','keys'=>[3,4,6,12]],...
+   */
+  public function getTablesAndKeys($tablesAndKeys=[]) {
+    //static $tablesAndKeys = []; #['table1'=>[$key1,$key2,$key3],'table2'=>[...]
+    $tableName = $this->getTable();
+    $keydata = keyVal($tableName,$tablesAndKeys,[]);
+    $keys=keyVal('keys',$keydata,[]);
+    $keyName = $this->getKeyName();
+    $key=$this->getKey();
+    if (in_array($key, $keys)) {
+      pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
+      return $tablesAndKeys; #Hope that takes care of cycles
+    }
+    $relations = array_keys(static::$load_relations);
+    foreach ($relations as $relation) {
+      foreach ($this->$relation as $item) {
+        $tablesAndKeys = $item->getTablesAndKeys($tablesAndKeys);
+        //pkdebug("TKS:", $tks);
+      }
+    }
+    $tablesAndKeys[$tableName]['keys'][]=$key;
+    $tablesAndKeys[$tableName]['key_name']=$keyName;
+    //pkdebug("Leaving TBL: [$tableName]; keyName: [$keyName], key: [$key], keys:",$keys," tablesAndKeys: ",$tablesAndKeys);
+    return $tablesAndKeys;
+
+  }
+
   /** Generates SQL string to back up object data & its relations. Reasonable
    * general method, but to be accurate subclasses have to customize it.
    */
