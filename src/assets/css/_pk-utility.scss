@@ -797,3 +797,14 @@ $i: 1;
 .row.pk-val-row [class*="col-"] {
    @extend .pk-val;
 }
+
+/** A jQuery UI Dialog Box that should pop-up on page load if it exists*/
+.jqui-dlg-pop-load {
+  display: none;
+}
+
+.pk-warn-dlg .ui-dialog-titlebar {
+  color: red;
+  font-weight: bold;
+  font-size: large;
+}

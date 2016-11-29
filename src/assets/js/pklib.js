@@ -810,6 +810,33 @@ function makeDialog(selector, opts) {
  
  */
 
+/** To Pop Up a dialog box on Window Load, if it exists */
+$(function () {
+
+  var dbx = $('.jqui-dlg-pop-load');
+  closeText = dbx.attr('data-closetext');
+  if(!dbx.length) return;
+  var title = dbx.attr('data-title'); 
+  var dialogClass = dbx.attr('data-dialogClass'); 
+  var dialogDefaults = {
+    modal: true,
+    autoOpen: true,
+    minWidth: 800,
+    resizable: true,
+    draggable: true,
+    title: title,
+    dialogClass: dialogClass,
+    buttons: [{
+        text: closeText,
+        click: function () {
+          $(this).dialog('close');
+        }
+      }
+    ]
+  };
+  $('.jqui-dlg-pop-load').dialog(dialogDefaults);
+});
+
 
 
 function containsSubstr(theVar, subStr) {
