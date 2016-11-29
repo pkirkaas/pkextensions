@@ -98,6 +98,28 @@ function toCamelCase($str, $capitalise_first_char = false) {
   return preg_replace_callback('/_([a-z])/', $func, $str);
 }
 
+/** Sort of the revers of 'slugify' - takes a variable or field name & tries
+ * to make it pretty as a 'label'
+ * @param string $fname
+ */
+function labify($fname) {
+  if (!ne_string($fname)) return false;
+  $clean = removeEndStr($fname,'_id');
+  if (!$clean) $clean = $fname;
+  $resarr = [];
+  $larr = explode('_',$clean);
+  foreach ($larr as $seg) {
+    $resarr[] = ucfirst($seg);
+  }
+  $label = implode(' ',$resarr);
+  return $label;
+}
+
+//But I really like 'labelize' better...
+function labelize($fname) {
+  return labify($fname);
+}
+
 /** Removes underscores and converts to lower case - so:
  * fieldName & field_name & fieldname & Field_Name all become the same.
  * Takes a string or array of strings as arg.

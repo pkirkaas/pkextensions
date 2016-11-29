@@ -131,7 +131,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $tag = keyVal('createbtn_tag', $params);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
-    pkdebug("args:",$args,"attributes", $attributes);
+    //pkdebug("args:",$args,"attributes", $attributes);
     $hr=new PkHtmlRenderer();
     return $this->create_button = $this->injectTpl($hr->$tag($content,
         $attributes),$ps_tpl,$ps_key);
@@ -270,6 +270,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
    * @param type $content
    * @return string
    */
+  /*
   public function mkJsTemplate($content=null) {
     $ps = new PkHtmlRenderer();
       $ps['template-open']="<fieldset disabled style='display:none;' class='template-container'>\n";
@@ -277,6 +278,8 @@ class PkHtmlPainter extends PkHtmlRenderer{
       $ps['template-close']="</fieldset>\n";
       return $ps;
   }
+   * 
+   */
 
   /** $args['component_args']['createBtnArgs'] is for createBtn */
   public function mkSubformTemplate($args=[]) {
@@ -304,8 +307,55 @@ class PkHtmlPainter extends PkHtmlRenderer{
 
   }
 
-}
+  public function mkBsMenu($items = [],$opts = []) {
+    $menu = "
+      <nav class='navbar navbar-dark bg-faded'>
+  <ul class='nav navbar-nav'>
+    <li class='nav-item'>
+      <a class='nav-link' href='#'>Link 1</a>
+    </li>
+    <li class='nav-item active'>
+      <a class='nav-link' href='#'>Link 2 <span class='sr-only'>(current)</span></a>
+    </li>
+    <li class='nav-item'>
+      <a class='nav-link' href='#'>Link 3</a>
+    </li>
+  </ul>
+</nav>";
+    //return "<h2>From Menu</h2>";
+    return $menu;
+  }
 
+
+  /** Takes a PkModel instance & $attname, and formats/wraps them as
+   * a label & value. If $tpl is provided, should have keys for 'pk_lbl' &
+   * 'pk_val'. Otherwise, a default is constructed
+   * 
+   * @param PkModel $model
+   * @param string $attname
+   * @param PartialSet $tpl
+   * @return stringable HTML representation
+   */
+  public function mkAttDesc($model,$attname, $tpl = null) {
+    if (!$model instanceOf PkModel) return null;
+    if (!ne_string($attname)) return null;
+    if ($tpl instanceOf PartialSet) {
+      $tpl = $tpl->copy();
+    } else {
+      $tpl = new PkHtmlRenderer();
+      $tpl[] = "<div class='pk-wrapper'>\n<div class='pk-lbl'>\n";
+      $tpl['pk_lbl'] = null;
+      $tpl[]="\n</div>\n<div class='pk-val'>\n";
+      $tpl['pk_val'] = null;
+      $tpl[]="\n</div>\n</div>\n";
+    }
+    $tpl['pk_lbl'] = $model->attdesc($attname);
+    $tpl['pk_val'] = $model->$attname;
+    return $tpl;
+
+  }
+
+}
 
 
 

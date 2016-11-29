@@ -1,10 +1,11 @@
 <?php
-
 namespace PkExtensions;
-
 //use Illuminate\Html\HtmlBuilder;
 use Collective\Html\HtmlBuilder;
 
+/** NOTE: The Parent Class HtmlBuilder has $this->url - which is NOT a URL,
+ * but a URL GENERATOR - so it has access to routes, etc.
+ */
 class PkHtmlBuilder extends HtmlBuilder {
   public $name_prefix = null;
   #Allow setting of attribute name prefix globally for builder, or
@@ -29,6 +30,25 @@ class PkHtmlBuilder extends HtmlBuilder {
   }
 
 
+  /** This will use the 'desc' key in the Route declaration as a default title for the link,
+   * if $title === false (don't want to override default too much - but see
+   * $this->defaultLinkRoute() below)
+   * @param type $name
+   * @param type $title
+   * @param type $parameters
+   * @param type $attributes
+   * @return type
+   */
+    public function linkRoute($name, $title = null, $parameters = [], $attributes = []) {
+      if ($title === false) {
+        $title =  keyVal('desc',app()['router']->getRoutes()->getByName('client_viewprofile')->getAction());
+      }
+      return parent::linkRoute($name,$title,$parameters, $attributes);
+    }
+    public function linkRouteDefault($name,$parameters = [], $attributes = [], $title = null) {
+      if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName('client_viewprofile')->getAction());
+      return parent::linkRoute($name,$title,$parameters,$attributes);
+    }
   /*
    * //Remove 11 Nov 16 -- maybe not necessary?
   protected function toHtmlString($html) {

@@ -177,10 +177,10 @@ abstract class PkModel extends Model {
   public static function attdesc($attname) {
     $defs = static::getTableFieldDefs();
     if (!in_array($attname,array_keys($defs),1)) {
-      return ucfirst($attname);
+      return false; //ucfirst($attname);
     }
     $attprops = $defs[$attname];
-    $desc = keyVal('desc',$attprops,keyVal('comment',$attprops,ucfirst($attname)));
+    $desc = keyVal('desc',$attprops,keyVal('comment',$attprops,labify($attname)));
     return $desc;
   }
 
