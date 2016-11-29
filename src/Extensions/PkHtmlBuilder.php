@@ -41,12 +41,12 @@ class PkHtmlBuilder extends HtmlBuilder {
    */
     public function linkRoute($name, $title = null, $parameters = [], $attributes = []) {
       if ($title === false) {
-        $title =  keyVal('desc',app()['router']->getRoutes()->getByName('client_viewprofile')->getAction());
+        $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       }
       return parent::linkRoute($name,$title,$parameters, $attributes);
     }
     public function linkRouteDefault($name,$parameters = [], $attributes = [], $title = null) {
-      if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName('client_viewprofile')->getAction());
+      if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       return parent::linkRoute($name,$title,$parameters,$attributes);
     }
   /*

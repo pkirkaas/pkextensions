@@ -307,22 +307,22 @@ class PkHtmlPainter extends PkHtmlRenderer{
 
   }
 
-  public function mkBsMenu($items = [],$opts = []) {
-    $menu = "
-      <nav class='navbar navbar-dark bg-faded'>
-  <ul class='nav navbar-nav'>
+  public function mkBsMenu($links = [],$opts = []) {
+    $nav_class=keyVal('nav_class',$opts,'pk-nav');
+    $menu = new PkHtmlRenderer();
+    $menu[]= "
+      <nav class='$nav_class navbar navbar-dark'>
+        <ul class='nav navbar-nav'>\n";
+    foreach ($links as $link) {
+      $menu[]="
     <li class='nav-item'>
-      <a class='nav-link' href='#'>Link 1</a>
-    </li>
-    <li class='nav-item active'>
-      <a class='nav-link' href='#'>Link 2 <span class='sr-only'>(current)</span></a>
-    </li>
-    <li class='nav-item'>
-      <a class='nav-link' href='#'>Link 3</a>
-    </li>
-  </ul>
-</nav>";
-    //return "<h2>From Menu</h2>";
+      $link
+    </li>\n";
+    }
+
+   $menu[] = "
+     </ul>
+    </nav>\n";
     return $menu;
   }
 

@@ -41,3 +41,30 @@
       }
     }
   }
+
+
+  // Play with customizing navbars
+
+  nav.navbar.pk-nav {
+    background: red;
+    .nav-link {
+      color: #ccf;
+      font-size: 1.5rem;
+      &:hover {
+        color: white;
+        text-shadow:0 0 1px white;
+      }
+    }
+    .nav-item + .nav-item {
+      margin-left: 2rem;
+
+    }
+  } 
+
+
+
+  /*
+  .navbar-nav .nav-item + .nav-item {
+    margin-left: 4rem;
+}
+*/
