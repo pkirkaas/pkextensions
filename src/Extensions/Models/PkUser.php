@@ -49,6 +49,8 @@ class PkUser extends PkModel
 
     ];
 
+  public static $allowUpdate = 0; #To allow user registration/update 
+
 
   /** Can be overridden - but basic try here */
   public function getName() {
@@ -61,8 +63,8 @@ class PkUser extends PkModel
     return $this->authUpdate();
   }
   public function authUpdate() {
-    if (isCli()) return true;
-    if (!static::instantiated($this)) return false;
+    if (isCli() || static::$allowUpdate) return true;
+    if (!static::instantiated($this)) return true;
     $me = Auth::user();
     if ($this->is($me) || $me->isAdmin()) return true;
     
