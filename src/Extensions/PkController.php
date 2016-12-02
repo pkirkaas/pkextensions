@@ -12,6 +12,7 @@ namespace PkExtensions;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
+use Illuminate\Validation\ValidationException;
 use PkExtensions\Models\PkModel;
 use Request;
 use \Exception;
@@ -19,6 +20,12 @@ use \Closure;
 
 class PkController extends Controller {
   public static $errorMsgBag; #The error messages, if any. Try static first
+
+  /**
+   * Adds to or creates a ViewErrorBag & flashes the error for handling in the
+   * layout (or wherever). Can be called from any controller method.
+   * @param string $msg
+   */
   public static function addErrorMsg($msg) {
     if (!static::$errorMsgBag instanceOf MessageBag) {
       static::$errorMsgBag = new MessageBag();
@@ -34,6 +41,20 @@ class PkController extends Controller {
     $viewErrorBag->put('PkControllerErrors', static::$errorMsgBag);
     //session()->flash('errors',static::$errorMsgBag);
   }
+
+  /**
+  #Validation for ProcessSubmit()
+   * Since we provide processSubmit() for most simple Form->DB saves, can be
+   * used by several methods in same controller. If a method wants to validate,
+   * just set <tt>$this->validationrules=['zip'=>'required'];</tt> (and optionally
+   * the other validation parameters), and processSubmit will validate on the rules.
+   * @var type 
+   */
+  public $validationrules; #Allows methods to set their own validators
+  public $validationmessages = []; #Allows methods to set their own validators
+  public $validationcustomattributes = []; #Allows methods to set their own validators
+  #Alternatively, the method creates its own custom validator, and sets it:
+  public $validator;
 
   /** Verify if we should process this submit, called by $this->processSubmit();
    * If method not a POST, return false. Otherwise, check the submit button name and value
@@ -81,6 +102,17 @@ class PkController extends Controller {
 //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
   public function processSubmit($opts = null, $inits = null) {
     if (!$this->ShouldProcessSubmit($opts)) return null;
+    if ($this->validationrules)  { #Perform validation
+      $this->validate(request(),
+          $this->validationrules,
+          $this->validationmessages,
+          $this->validationcustomattributes);
+    }
+    if ($this->validator) {
+      if ($this->validator->fails()) {
+        $this->throwValidationException(request(), $this->validator);
+      }
+    }
     #In a POST && met 'shouldProcessSubmit' requirements
     if ($opts instanceOf PkModel) {
       $pkmodel = $opts;
