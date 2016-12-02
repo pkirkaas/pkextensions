@@ -445,10 +445,10 @@ trait BuildQueryTrait {
    */
   public function executeSearch() {
     $collection = $this->buildQueryOnModel()->get();
-    $sz = count($collection);
+    //$sz = count($collection);
     //pkdebug("Just ran query from BQT: SZ: $sz");
     $newcol = $this->filterOnMethods($collection);
-    $sza = count($newcol);
+    //$sza = count($newcol);
     //pkdebug("SXA:  $sza");
     return $newcol;
   }

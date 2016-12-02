@@ -206,15 +206,16 @@ function pkwarn() {
   $warnout = "\nWarning LOG: " . date('j-M-y; H:i:s') . "\n$out\n";
   pkdebugOut($warnout); // Also writes to debug log out
   PkLibConfig::$isWarning = 0;
-  return (keyVal(0, $args));
+  return false;
+  //return (keyVal(0, $args));
 }
 
 function pkdebug() {
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out);
-  return (keyVal(0, $args));
-  //return false;
+  return false;
+  //return (keyVal(0, $args));
 }
 
 /** Take a stab to Try to get function/method/file this function was called from
