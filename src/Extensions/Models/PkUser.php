@@ -66,6 +66,7 @@ class PkUser extends PkModel
     if (isCli() || static::$allowUpdate) return true;
     if (!static::instantiated($this)) return true;
     $me = Auth::user();
+    if (!$me instanceOf static) return false;
     if ($this->is($me) || $me->isAdmin()) return true;
     
     return false;
