@@ -1,5 +1,6 @@
 <?php
 /** The form to request a password reset */
+/** DEPRECATED FOR 'requestreset.blade.php */
 ?>
 @extends('app')
 @section('content')

@@ -9,7 +9,7 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-
+use Illuminate\Notifications\Notifiable;
 /*
  * Set up some reasonable defaults. 
  */
@@ -24,7 +24,7 @@ use Request;
 class PkUser extends PkModel  
     implements AuthenticatableContract, AuthorizableContract,
         CanResetPasswordContract {
-    use Authenticatable, Authorizable, CanResetPassword;
+    use Authenticatable, Authorizable, CanResetPassword, Notifiable;
     public static $onetimeMigrationFuncs = [
       'remember_token' => 'rememberToken()',
       ];
