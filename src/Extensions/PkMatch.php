@@ -338,11 +338,11 @@ class PkMatch {
   }
 
   public function numericComp($arg = null) {
-      if ($this->compfield == 'assetdebtratio')  pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg,$this);
+      //if ($this->compfield == 'assetdebtratio')  pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg,$this);
     //pkdebug("ArG",$arg,'this', $this);
     if (!is_numeric($this->val) || !is_numeric($arg)) {
       //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
-      return pkdebug("A PROBLEM: For thisMathc;", $this, 'this->val', $this->val, " or [arg] ", $arg, " is not numeric");
+      return pkwarn("A PROBLEM: For thisMathc;", $this, 'this->val', $this->val, " or [arg] ", $arg, " is not numeric");
     }
     /** Restore to this clean state when debugged...
       if ($this->crit === '<' ) return $arg <  $this->val;
@@ -358,35 +358,35 @@ class PkMatch {
      */
     if ($this->crit === '<') {
       $res = ($arg < $this->val);
-      if ($this->compfield == 'assetdebtratio')  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio')  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '<=') {
       $res = ( $arg <= $this->val);
-      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '>=') {
       $res = ($arg >= $this->val);
-      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '>') {
       $res = ($arg > $this->val);
-      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
     if ($this->crit === '=') {
       $res = ( $arg == $this->val);
-      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
     if ($this->crit === '!=') {
       $res = ($arg != $this->val);
-      if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
+      //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
     throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");

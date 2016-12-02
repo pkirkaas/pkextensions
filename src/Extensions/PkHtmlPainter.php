@@ -1,6 +1,9 @@
 <?php
 namespace PkExtensions;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkController;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use PkForm;
 use PkRenderer;
 /** A base class to generate HTML pages & Forms.  */
@@ -352,10 +355,71 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $tpl['pk_lbl'] = $model->attdesc($attname);
     $tpl['pk_val'] = $model->$attname;
     return $tpl;
-
   }
 
+
+/** Makes an initially hidden jQueryUI dialog box template, that will be popped
+ * up on page load by pklib.js function.
+ * @param stringish $content - HTML box to wrap in popup dialog template.
+ * @param PartialSet $wrapTpl - Optional template - insert $content at $wrapTpl['content']
+ * @return PkHtmlRenderer - wrapped content
+ */
+  public static function mkPopUp($content) {
+    return PkRenderer::rawdiv($content,'jqui-dlg-pop-load-wrapper');
+  }
+
+  /** Examines session('errorBag') - if empty, nothing, else creates pop up
+   * qQuery dialog box with error content
+   */
+  public static function mkErrorPopUp() {
+    //$errorMsgBag = session('errorBag');
+    //$errorMsgBag = session('errors');
+    $errorSet = session('errors');
+    if (!$errorSet) return null;
+    if ($errorSet instanceOf ViewErrorBag) {
+      $errorBags = $errorSet->getBags();
+    } else if ($errorSet instanceOf MessageBag) {
+      $errorBags = [$errorSet];
+    }
+    $allMsgs = [];
+    foreach ($errorBags as $errorBag) {
+      foreach($errorBag->all() as $msg) {
+        $allMsgs[] = $msg;
+      }
+    }
+    
+//    $errors = $errorMsgBag->get('error');
+    if (!$allMsgs || !is_array($allMsgs)) {
+      pkwarn("Got an Error Msg bag with invalid 'errors':",$allMsgs);
+      return null;
+    }
+    $errorItems = new PkHtmlRenderer();
+    foreach ($allMsgs as $error) {
+      $errorItems->rawli($error);
+    }
+    $errorList = PkRenderer::ul($errorItems,'popup error-list');
+    $errorMsgOut = PkRenderer::div($errorList,
+        ['class'=>"error-popup-box",
+            'data-title'=>"The following Errors Occurred",
+            'data-dialogClass'=>'pk-warn-dlg error-dlg-box']);
+        /*
+        [
+        PkRenderer::div("The following errors occurred",'error-head'),
+        $errorList,
+    ]
+         * 
+        $errorList,
+        ,['class'=>"error-popup-box", 'data-title'=>"The following Errors Occurred", 'data-dialogClass'=>'error-dlg-box']);
+         */
+    return static::mkPopUp($errorMsgOut);
+  }
+
+
+
+
+#Close class
 }
+
 
 
 

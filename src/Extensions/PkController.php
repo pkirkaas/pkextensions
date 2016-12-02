@@ -11,12 +11,29 @@ namespace PkExtensions;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use PkExtensions\Models\PkModel;
 use Request;
 use \Exception;
 use \Closure;
 
 class PkController extends Controller {
+  public static $errorMsgBag; #The error messages, if any. Try static first
+  public static function addErrorMsg($msg) {
+    if (!static::$errorMsgBag instanceOf MessageBag) {
+      static::$errorMsgBag = new MessageBag();
+    }
+    static::$errorMsgBag->add('error',$msg);
+    //session()->forget('errorBag');
+    //session(['errorBag'=>static::$errorMsgBag]);
+    $viewErrorBag = session('errors');
+    if (! ($viewErrorBag instanceOf ViewErrorBag)) {
+      $viewErrorBag = new ViewErrorBag();
+      session()->flash('errors',static::$viewErrorBag);
+    }
+    $viewErrorBag->put('PkControllerErrors', static::$errorMsgBag);
+    //session()->flash('errors',static::$errorMsgBag);
+  }
 
   /** Verify if we should process this submit, called by $this->processSubmit();
    * If method not a POST, return false. Otherwise, check the submit button name and value

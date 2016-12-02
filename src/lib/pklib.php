@@ -17,12 +17,14 @@
  */
 //$defaultTimeZone = date_default_timezone_get ();
 date_default_timezone_set("America/Los_Angeles");
- //The supported MySql date range is '1000-01-01' to '9999-12-31'.
+//The supported MySql date range is '1000-01-01' to '9999-12-31'.
 define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 class PkLibConfig {
+
   static $suppressPkDebug = false;
+
   public static function getSuppressPkDebug() {
     return static::$suppressPkDebug;
   }
@@ -30,6 +32,11 @@ class PkLibConfig {
   public static function setSuppressPkDebug($suppress = true) {
     static::$suppressPkDebug = $suppress;
   }
+
+  static $warnLogName = 'app.warn.log';
+  static $warnLogDir; #Defaults to same dir as debug app log
+  static $isWarning = 0; #Toggled by pkwarn to 1, then pkdebugOut, then back to 0
+
 }
 
 Class Undefined {
@@ -104,14 +111,14 @@ function toCamelCase($str, $capitalise_first_char = false) {
  */
 function labify($fname) {
   if (!ne_string($fname)) return false;
-  $clean = removeEndStr($fname,'_id');
+  $clean = removeEndStr($fname, '_id');
   if (!$clean) $clean = $fname;
   $resarr = [];
-  $larr = explode('_',$clean);
+  $larr = explode('_', $clean);
   foreach ($larr as $seg) {
     $resarr[] = ucfirst($seg);
   }
-  $label = implode(' ',$resarr);
+  $label = implode(' ', $resarr);
   return $label;
 }
 
@@ -174,25 +181,40 @@ function tmpdbg() {
 /** Like PkDebug, except first arg is the name of a logfile - 
  * To create a specific named Log function, do:
   function myLog( ) {
-    $args = func_get_args();
-    array_unshift($args, LOGFILE);
-    return call_user_func_array('pkdebugNamedLog',$args);
-  } 
+  $args = func_get_args();
+  array_unshift($args, LOGFILE);
+  return call_user_func_array('pkdebugNamedLog',$args);
+  }
  */
 function pkdebugNamedLog() {
   $args = func_get_args();
   //$logName = array_shift($args);
   //$logPath = getAppLogDir() . '/' . $logName;
-  $logPath =  array_shift($args);
+  $logPath = array_shift($args);
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out, $logPath);
+}
+
+/* Works like pkdebug, except used for "warnings" of events that are recovered
+ * from, but shouldn't happen. Also calls pkdebug, to write there as well.
+ */
+
+function pkwarn() {
+  $args = func_get_args();
+  $out = call_user_func_array("pkdebug_base", $args);
+  PkLibConfig::$isWarning = 1;
+  $warnout = "\nWarning LOG: " . date('j-M-y; H:i:s') . "\n$out\n";
+  pkdebugOut($warnout); // Also writes to debug log out
+  PkLibConfig::$isWarning = 0;
+  return (keyVal(0, $args));
 }
 
 function pkdebug() {
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out);
-  return false;
+  return (keyVal(0, $args));
+  //return false;
 }
 
 /** Take a stab to Try to get function/method/file this function was called from
@@ -244,7 +266,6 @@ function getCallingFrame($baseFile = null) {
   $retinfo['type'] = keyVal('type', $stack[$baseIdx], '');
   $retinfo['idx'] = $baseIdx;
   return $retinfo;
-
 }
 
 /**
@@ -258,57 +279,52 @@ function pkdebug_base() {
   static $callno = 0;
   if (PkLibConfig::getSuppressPkDebug()) return null;
   $stack = debug_backtrace();
-  $retvals=[];
-  $keys = ['file','object','function','line','args'];
-  $uninteresting = ['pkdebug','pkdebug_base', 'call_user_func_array', __FILE__];
+  $retvals = [];
+  $keys = ['file', 'object', 'function', 'line', 'args'];
+  $uninteresting = ['pkdebug', 'pkdebug_base', 'call_user_func_array', __FILE__];
   foreach ($stack as $aframe) { #Set line at the first interesting
-    foreach($keys as $key) {
-      $tst = keyVal($key,$aframe);
-      if (!keyVal($key,$retvals) && $tst &&
-            !in_array($tst,$uninteresting) && ($key !== 'line')) {
-          $retvals[$key] = $tst;
-          if (!keyVal('line',$retvals) && keyVal('line',$aframe)) {
-            $retvals['line'] = keyVal('line',$aframe);
-          }
+    foreach ($keys as $key) {
+      $tst = keyVal($key, $aframe);
+      if (!keyVal($key, $retvals) && $tst &&
+          !in_array($tst, $uninteresting) && ($key !== 'line')) {
+        $retvals[$key] = $tst;
+        if (!keyVal('line', $retvals) && keyVal('line', $aframe)) {
+          $retvals['line'] = keyVal('line', $aframe);
+        }
       }
-
     }
   }
-  
+
   //$stacksize = sizeof($stack);
   $out = '';
   //$out = "\nLOG OUT: STACKSIZE: $stacksize";
   if (!$callno) {
-    $out .= "\nLOG: ". date('j-M-y; H:i:s') ;
+    $out .= "\nLOG: " . date('j-M-y; H:i:s');
   } else {
 //    $out .= "\n\n";
-
   }
   $callno ++;
   $idx = 0;
   //while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx+1]['function'],-3)==='Log')) {
-  while (! keyVal('file',keyVal($idx,$stack))
-    || keyVal('file',keyVal($idx,$stack) === __FILE__) 
-    || (substr( keyVal('function',keyVal($idx+1, $stack)),-3)==='Log')) {
+  while (!keyVal('file', keyVal($idx, $stack)) || keyVal('file', keyVal($idx, $stack) === __FILE__) || (substr(keyVal('function', keyVal($idx + 1, $stack)), -3) === 'Log')) {
     $idx++;
   }
 
-  while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx+1]['function'],-3)==='Log')) {
+  while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx + 1]['function'], -3) === 'Log')) {
     $idx++;
   }
   $frame = $stack[$idx];
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
   /* // Try using new way (below) - add option to display args & object later
-  if (isset($stack[1])) {
+    if (isset($stack[1])) {
     $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
-  } else {
+    } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
-  }
+    }
    * 
    */
   /** Test $retvals - better way? */
-
-  $tstrr ="\n";
+  $tstrr = "\n";
   foreach ($retvals as $key => $value) {
     if (($key === 'object') || ($key === 'args')) continue;
     //$tstrr.= "$key: $value, ";
@@ -330,7 +346,8 @@ function pkdebug_base() {
       $printMsg = $dumpobjs;
     }
     if ($msg instanceOf Doctrine_Pager) $printMsg = false;
-    if ($printMsg && (is_object($msg) || is_array($msg))) $msg = displayData($msg);
+    if ($printMsg && (is_object($msg) || is_array($msg)))
+        $msg = displayData($msg);
     //$out .= ('Type: ' . $type . ($printMsg ? ': Payload: ' . $msg : '') . "\n  ");
     $out .= ($type . ($printMsg ? ': ' . $msg : '') . "\n  ");
   }
@@ -463,9 +480,9 @@ function pkvardump($arg, $disableXdebug = true) {
     ob_start();
     Var_Dump($arg);
     $vardump = ob_get_contents();
-  //Experimenting 6/16 - replacing with ob_end_flush...
-   // ob_end_clean();
-  ob_end_flush();
+    //Experimenting 6/16 - replacing with ob_end_flush...
+    // ob_end_clean();
+    ob_end_flush();
   } else {
     $vardump = print_r($arg, true);
   }
@@ -540,6 +557,8 @@ function appLogReset($reset = null) {
  * @throws Exception
  */
 function pkdebugOut($str, $logpath = null) {
+
+  //PkLibConfig::$isWarning = 1;
   if ($logpath) error_log("Logpath is: [$logpath]");
   static $first = true;
   if ($logpath) $reset = false;
@@ -550,6 +569,19 @@ function pkdebugOut($str, $logpath = null) {
     //$logpath =  WP_CONTENT_DIR.'/app.log';
     //$logpath = $_SERVER['DOCUMENT_ROOT'] . '/logs/app.log';
     if (!$logpath) $logpath = appLogPath();
+    if (PkLibConfig::$isWarning) {
+      if (PkLibConfig::$warnLogDir) {
+        $warnpath = PkLibConfig::$warnLogDir . '/' . PkLibConfig::$warnLogName;
+      } else {
+        $warnpath = getAppLogDir() . '/' . PkLibConfig::$warnLogName;
+      }
+      $fp = fopen($warnpath, 'a+');
+      if (!$fp) {
+        throw new Exception("Failed to open Warning Log [$warnpath] for writing");
+      }
+      fwrite($fp, $str);
+      fclose($fp);
+    }
     if ($first && $reset) {
       $first = false;
       $fp = fopen($logpath, 'w+');
@@ -611,13 +643,14 @@ function getFileExtension($filePath, $tolower = true) {
   if ($tolower) $ext = strtolower($ext);
   return $ext;
 }
+
 /**
  * Removes the protocol, domain, and parameters, just returns
  * indexed array of route segments. ex, for URL:
  * http://www.example.com/some/lengthy/path?with=get1&another=get2
  * ... returns: array('some', 'lengthy', 'path');
  * @param Boolean|String $default: If the first two segments are missing, should
-   *   return ['index','index'] as default?
+ *   return ['index','index'] as default?
  * @param int $depth default = 2: How many segments to set to the default 'index' the base URL
  * we return the default value for them? Default false, otherwise probably 'index'
  * @return Array: Route Segments
@@ -649,13 +682,12 @@ function getRouteSegments($default = false, $depth = 2) {
  */
 function isHttps() {
   return is_array($_SERVER) && !empty($_SERVER) &&
-    (
+      (
       (array_key_exists('HTTPS', $_SERVER) && (strtolower($_SERVER["HTTPS"]) === "on")) ||
-      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && (strtolower(substr($_SERVER["SERVER_PROTOCOL"],0,5))==='https')) ||
-      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && (strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"])==='https')) 
-    );
+      (array_key_exists('SERVER_PROTOCOL', $_SERVER) && (strtolower(substr($_SERVER["SERVER_PROTOCOL"], 0, 5)) === 'https')) ||
+      (array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && (strtolower($_SERVER["HTTP_X_FORWARDED_PROTO"]) === 'https'))
+      );
 }
-
 
 /**
  * 
@@ -815,18 +847,17 @@ function setGet($getkey, $getval = null, $qstr = null) {
   return $returl;
 }
 
-
 /** Sets (changes or adds or unsets/clears) get parameters to values. Only works
  * with/returns the query string, not the whole URL.
  * 
  * @param array $paramArr -- assoc arr of GET [$key => $val]. If $val = '', sets
  * &key=&nextkey=nextval - but if $val === NULL, clears the 
  * @param string|null $qstr -- if string, assumed a query string and paramArr added;
-     if '', returned str is just from the $paramArr; if NULL, the current REQUEST QUERY
-     is used, and $paramArr added or replaced into it.
+  if '', returned str is just from the $paramArr; if NULL, the current REQUEST QUERY
+  is used, and $paramArr added or replaced into it.
  * 
 
- @return string - query string
+  @return string - query string
  */
 function setGets(array $paramArr, $qstr = null) {
   if ($qstr === null) {
@@ -897,6 +928,7 @@ function is_arrayish_assoc($val) {
   if (is_array($arrCopy)) return is_array_assoc($arrCopy);
   return false;
 }
+
 function is_arrayish_indexed($val) {
   $arrCopy = getAsArray($val);
   if (!$arrCopy || !is_array($arrCopy) || !count($arrCopy)) return false;
@@ -917,7 +949,7 @@ function getAsArray($val) {
   if ($val instanceOf ArrayObject) {
     return $val->getArrayCopy();
   }
-  if (method_exists($val,'toArray')) return $val->toArray();
+  if (method_exists($val, 'toArray')) return $val->toArray();
   return null;
 }
 
@@ -987,7 +1019,7 @@ if (function_exists('pk_array_flatten')) {
 
 }
 
-/** Like 'is_scalar', but returns true for null. Anything usable as an array key*/
+/** Like 'is_scalar', but returns true for null. Anything usable as an array key */
 function is_simple($val) {
   return is_scalar($val) || is_null($val);
 }
@@ -1112,9 +1144,9 @@ function filter_server_url($var, $default = '/', $filter = FILTER_VALIDATE_URL, 
 function filter_server($var, $filter = FILTER_SANITIZE_FULL_SPECIAL_CHARS, $options = null) {
   return filter_input(INPUT_SERVER, $var, $filter, $options);
 }
-      
+
 function userIP() {
-  return filter_input(INPUT_SERVER,'REMOTE_ADDR', FILTER_VALIDATE_IP) ; 
+  return filter_input(INPUT_SERVER, 'REMOTE_ADDR', FILTER_VALIDATE_IP);
 }
 
 function filter_url($url) {
@@ -1707,7 +1739,6 @@ function getDomainHard($url = null) {
   return $domain;
 }
 
-
 /**
  * Returns a POST array without dots in keys converted to '_' BUT NOTE!
  * DOES NOT WORK WITH 'enctype' => 'multipart/form-data',
@@ -2071,16 +2102,17 @@ function equivalent($a, $b) {
  *   If array, look for those keys, & 'hide0' as well, for multiple options 
  * @return string - dollar formatted
  */
-function dollar_format($num, $opts = 0, $hide0=false) {
-  if (!is_array ($opts )) {
-    if (is_intish($opts) && ($opts !== true)) $opts=['prec'=>$opts];
-    else if (ne_string($opts) || ($opts===true)) $opts=['wrap_class'=>$opts];
+function dollar_format($num, $opts = 0, $hide0 = false) {
+  if (!is_array($opts)) {
+    if (is_intish($opts) && ($opts !== true)) $opts = ['prec' => $opts];
+    else if (ne_string($opts) || ($opts === true))
+        $opts = ['wrap_class' => $opts];
     else $opts = [];
   }
   $prec = keyVal('prec', $opts, 0);
   $wrap_class = keyVal('wrap_class', $opts);
-  if ($wrap_class === true) $wrap_class="dollar-format";
-  $hide0 = keyVal('hide0',$opts,$hide0);
+  if ($wrap_class === true) $wrap_class = "dollar-format";
+  $hide0 = keyVal('hide0', $opts, $hide0);
   if (is_array($num)) {
     $num = array_sum($num);
   }
@@ -2134,12 +2166,12 @@ function dollar_format($num, $opts = 0, $hide0=false) {
  * @param - if true & container is Object, force a get to trigger magic method.
  * @return mixed - The value of array for $key, if any, or else the default (null)
  */
-function keyValOrDefault($key , $container = [], $default = null,$forceAttrGet = false) {
+function keyValOrDefault($key, $container = [], $default = null, $forceAttrGet = false) {
   if (is_object($container)) {
-    if ($forceAttrGet)  {
+    if ($forceAttrGet) {
       return $container->$key;
     }
-      $array = get_all_object_vars($container);
+    $array = get_all_object_vars($container);
   } else if (is_array($container)) {
     $array = $container;
   } else {
@@ -2157,8 +2189,8 @@ function keyValOrDefault($key , $container = [], $default = null,$forceAttrGet =
 }
 
 /** Just shorter */
-function keyVal($key = '', $container = [], $default = null, $forceAttrGet=false) {
-  return keyValOrDefault($key,$container, $default,$forceAttrGet);
+function keyVal($key = '', $container = [], $default = null, $forceAttrGet = false) {
+  return keyValOrDefault($key, $container, $default, $forceAttrGet);
 }
 
 /** Gets the CURRENT values of the static vars (including NULL) of a OBJECT INSTANCE, EVEN IF MODIFIED BY AN INSTANCE
@@ -2170,8 +2202,8 @@ function get_static_vars($object) {
   $instanceobjkeys = array_keys(get_object_vars($object)); #only returns instance attributes
   $class = get_class($object);
   $result = [];
-  foreach  (get_class_vars($class) as $name => $value) {
-    if (!in_array($name,$instanceobjkeys)) $result[$name] = $value;
+  foreach (get_class_vars($class) as $name => $value) {
+    if (!in_array($name, $instanceobjkeys)) $result[$name] = $value;
   }
   return $result;
 }
@@ -2193,8 +2225,7 @@ function get_static_vars($object) {
 function get_all_object_vars($object, $permissions = null) {
   if (!is_object($object)) return null;
   if ($permissions === null) {
-    $permissions =  ReflectionProperty::IS_STATIC |  ReflectionProperty::IS_PUBLIC
-        | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE;
+    $permissions = ReflectionProperty::IS_STATIC | ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE;
   }
   $reflector = new ReflectionClass($object);
   $properties = $reflector->getProperties($permissions);
@@ -2288,14 +2319,15 @@ function getFileMimeType($filePath) {
  * @return false || string - mime-type
  */
 function isValidImagePath($filePath) {
-  if (!$filePath || !is_string($filePath) || !file_exists($filePath)) return false;
+  if (!$filePath || !is_string($filePath) || !file_exists($filePath))
+      return false;
   $mimeType = getFileMimeType($filePath);
   if (!$mimeType || !is_string($mimeType)) return false;
   $mimeArr = explode('/', $mimeType);
   //pkdebug("mimeType: [$mimeType], mimeArr:", $mimeArr);
   if (!$mimeArr || !is_array($mimeArr) ||
       !(count($mimeArr) === 2) || !($mimeArr[0] === 'image')) return false;
-  
+
   //pkdebug("Returninb: $mimeType");
   return $mimeType;
 }
@@ -2310,17 +2342,17 @@ function aspectRatio($filePath) {
   try {
     $exif = @exif_read_data($filePath);
   } catch (Exception $e) {
-    error_log("Exception Reading EXIF for file [$filePath]: ".$e->getMessage());
+    error_log("Exception Reading EXIF for file [$filePath]: " . $e->getMessage());
     pkdebug("Exception reading EXIF for file [$filePath]:", $e);
   }
-  if (($computed = keyVal('COMPUTED', $exif))
-      && ($width=keyVal('Width',$computed)) && ($height=keyVal('Height',$computed))) {
-    return $width/$height;
+  if (($computed = keyVal('COMPUTED', $exif)) && ($width = keyVal('Width', $computed)) && ($height = keyVal('Height', $computed))) {
+    return $width / $height;
   }
   #If no exif data, use GD:
   //$gdresource = imagecreatefromstring (file_get_contents($filePath));
   $sz = getimagesize($filePath);
-  if (($width=keyVal(0,$sz)) && ($height=keyVal(1,$sz))) return $width/$height;
+  if (($width = keyVal(0, $sz)) && ($height = keyVal(1, $sz)))
+      return $width / $height;
   return false;
 }
 
@@ -2683,12 +2715,12 @@ function manageStaticCache(&$cacheArr, $levels = []) {
  * If null, return current moment as SQL date/time
  * @return string The SQL date/time
  */
-function unixtimeToSql($unixtime = null,$just_date = false) {
+function unixtimeToSql($unixtime = null, $just_date = false) {
   if (!$unixtime) {
     $unixtime = time();
   }
   if ($just_date) $fmt = 'Y-m-d';
-  else $fmt='Y-m-d H:i:s';
+  else $fmt = 'Y-m-d H:i:s';
   $mysqldate = date($fmt, $unixtime);
   return $mysqldate;
 }
@@ -2699,16 +2731,16 @@ function unixtimeToSql($unixtime = null,$just_date = false) {
  * @return boolean
  */
 function validSqlDate($val) {
-  if (!$val ||!is_string($val)) return false;
-  if(preg_match ("/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/", $val)) return true;
+  if (!$val || !is_string($val)) return false;
+  if (preg_match("/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/", $val)) return true;
   // This seems to only work with DateTime
   $matches = [];
-  if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $val, $matches)) { 
-    if (checkdate($matches[2], $matches[3], $matches[1])) { 
-        return true; 
-    } 
-  } 
-  return false; 
+  if (preg_match("/^(\d{4})-(\d{2})-(\d{2}) ([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$/", $val, $matches)) {
+    if (checkdate($matches[2], $matches[3], $matches[1])) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /** Returns seconds diff (+future or -past) between $sqlDt1 & $sqlDt2
@@ -2718,8 +2750,8 @@ function validSqlDate($val) {
  * @param boolean $just_date - just use date, not date-time for now
  * @return int|null - seconds diff, or null if invalid SQL date format
  */
-function sqlDateCmp($sqlDt1,$sqlDt2=null, $just_date=false) {
-  if (!$sqlDt2) $sqlDt2 = unixtimeToSql(null,$just_date);
+function sqlDateCmp($sqlDt1, $sqlDt2 = null, $just_date = false) {
+  if (!$sqlDt2) $sqlDt2 = unixtimeToSql(null, $just_date);
   if (!validSqlDate($sqlDt1) || !validSqlDate($sqlDt2)) return null;
   return strtotime($sqlDt1) - strtotime($sqlDt2);
 }
@@ -2730,8 +2762,8 @@ function sqlDateCmp($sqlDt1,$sqlDt2=null, $just_date=false) {
  * @return int|boolean|null - #seconds in future if future, or 0 if NOW,
  *    or FALSE if past, or NULL if invalid SQL date format
  */
-function sqlDateFuture($sqlDt, $just_date=false) {
-  $diff = sqlDateCmp($sqlDt,null,$just_date);
+function sqlDateFuture($sqlDt, $just_date = false) {
+  $diff = sqlDateCmp($sqlDt, null, $just_date);
   if (!is_numeric($diff)) return $diff;
   if ($diff < 0) return false;
   return $diff;
@@ -2743,8 +2775,8 @@ function sqlDateFuture($sqlDt, $just_date=false) {
  * @return int|boolean|null - #seconds in past if past, or 0 if NOW,
  *    or FALSE if past, or NULL if invalid SQL date format
  */
-function sqlDatePast($sqlDt, $just_date=false) {
-  $diff = sqlDateCmp($sqlDt,null,$just_date);
+function sqlDatePast($sqlDt, $just_date = false) {
+  $diff = sqlDateCmp($sqlDt, null, $just_date);
   if (!is_numeric($diff)) return $diff;
   if ($diff > 0) return false;
   return -$diff;
@@ -2960,7 +2992,6 @@ function intOrNull($value = null) {
   return null;
 }
 
-
 /** Case Insensitive "in_array" - works only with strings, of course
  * 
  * @param mixed $needle
@@ -2969,10 +3000,8 @@ function intOrNull($value = null) {
  * @return boolean
  */
 function in_array_ci($needle, $haystack, $strict = false) {
-    return in_array(strtolower($needle), array_map('strtolower', $haystack), $strict);
+  return in_array(strtolower($needle), array_map('strtolower', $haystack), $strict);
 }
-
-
 
 /**
  * Returns a percentage, if arguments valid, else $invalid
@@ -2981,20 +3010,20 @@ function in_array_ci($needle, $haystack, $strict = false) {
  * @param string $invalid - what to return if invalid, like "N/A". Default: ''
  * @return string - the percentage, or $invalid
  */
-function percentage ($a, $b, $invalid = '') {
-    if (!$b || !is_numeric($b) || !is_numeric($a)) return $invalid;
-    $dr = (int) (($a * 100)/$b);
-    return $dr.'%';
+function percentage($a, $b, $invalid = '') {
+  if (!$b || !is_numeric($b) || !is_numeric($a)) return $invalid;
+  $dr = (int) (($a * 100) / $b);
+  return $dr . '%';
 }
 
 /** Just checks if the HTTP Request method was a post
  * @return boolean
  */
 function isPost() {
-  return $_SERVER['REQUEST_METHOD'] === 'POST' ;
+  return $_SERVER['REQUEST_METHOD'] === 'POST';
 }
 
-/**I use lots of arrays for configuration, where I expect the form to be an
+/* * I use lots of arrays for configuration, where I expect the form to be an
  * associative array of keys, each with a value array, like:
  * [$key1=>['p1'=>$scalar1, 'p2'=>$scalar2,..], $key2=>['p1'=>$vv1,...]]
  * 
@@ -3036,12 +3065,13 @@ function isPost() {
  * 
  * @return array of form: [$keyName => ['valkey1' => $valOrDefault, 'valkey2
  */
-function normalizeConfigArray(array $arr = [], $struct = null ) {
+
+function normalizeConfigArray(array $arr = [], $struct = null) {
   if (!$arr || !is_array($arr) || !count($arr)) return [];
   $defkey = $defarr = null;
   if (is_string($struct)) $defkey = $struct;
   if (is_array($struct)) {
-    $defkey = keyVal(0,$struct);
+    $defkey = keyVal(0, $struct);
     unset($struct[0]);
     $defarr = $struct;
   }
@@ -3051,12 +3081,12 @@ function normalizeConfigArray(array $arr = [], $struct = null ) {
       $retarr[$origval] = $defarr;
     } else if (is_string($origkey)) {
       if (is_scalar($origval) && $defkey) {
-        $newval =  [$defkey => $origval];
+        $newval = [$defkey => $origval];
       } else {
         $newval = $origval;
       }
       if (is_array($newval) && is_array($defarr)) {
-        $newval = array_merge($defarr,$newval);
+        $newval = array_merge($defarr, $newval);
       }
       $retarr[$origkey] = $newval;
     } else { #What to do?
@@ -3064,8 +3094,8 @@ function normalizeConfigArray(array $arr = [], $struct = null ) {
     }
   }
   return $retarr;
-
 }
+
 /**
  * For getting valid params or defaults. REMOVES $param key=>values if 
  * $key not in $default - so safe to use with extract($result);
@@ -3075,7 +3105,7 @@ function normalizeConfigArray(array $arr = [], $struct = null ) {
  * @param type $params
  * @param type $defaults
  */
-function getParamsOrDefault($params = [],$defaults = []) {
+function getParamsOrDefault($params = [], $defaults = []) {
   $badkeys = array_diff(array_keys($params), array_keys($defaults));
   foreach ($badkeys as $badkey) {
     unset($params[$badkey]);
@@ -3089,17 +3119,18 @@ function getParamsOrDefault($params = [],$defaults = []) {
  * @param type $arg1
  * @param type $argx
  */
-function firstKeyVal($key,$arg1=null, $argx=null) {
+function firstKeyVal($key, $arg1 = null, $argx = null) {
   $args = func_get_args();
   $key = array_shift($args);
   foreach ($args as $arg) {
-    $test = keyVal($key,$arg);
+    $test = keyVal($key, $arg);
     if ($test) return $test;
   }
   return null;
 }
 
 /** Checks these exist and are not empty */
+
 /**
  * Checks if a value (including string) is "intish". PHP is_numeric returns
  * true for '12', but is_int returns false. <tt>is_intish('12')</tt> returns true
@@ -3113,13 +3144,13 @@ function firstKeyVal($key,$arg1=null, $argx=null) {
 
 function is_intish($value, $nullorfalse = false) {
   #Objects and arrays never
-  if (!is_scalar($value) && !($value===null)) return false;
-  if($nullorfalse && !$value) return true; #Zeroish
+  if (!is_scalar($value) && !($value === null)) return false;
+  if ($nullorfalse && !$value) return true;#Zeroish
   if (!is_numeric($value) && !is_bool($value)) return false;
   $intval = (int) $value;
   $diff = abs($value - $intval);
   //pkdebug("Value:", $value, "DIFF", $diff, 'INTVAL', $intval);
-  return ! $diff;
+  return !$diff;
 }
 
 /** is_numeric($val) returns true for $val='17';. is_number returns true for
@@ -3134,9 +3165,11 @@ function is_number($val) {
 function ne_string($var) {
   return $var && is_string($var) && strlen($var);
 }
+
 function ne_array($var) {
   return $var && is_array($var) && count($var);
 }
+
 function ne_arrayish($var) {
   return $var && is_arrayish($var) && count($var);
 }
@@ -3144,7 +3177,6 @@ function ne_arrayish($var) {
 function ne_intish($var) {
   return is_intish($var) && $var;
 }
-
 
 /** Sets the members of Object object to the corresponding key values of the
  * associative $atts array
@@ -3155,18 +3187,10 @@ function ne_intish($var) {
 function setInstanceAtts($obj, array $atts = []) {
   if (!is_object($obj)) return false;
   foreach ($atts as $key => $value) {
-    if (property_exists($obj,$key)) {
+    if (property_exists($obj, $key)) {
       $obj->$key = $value;
       unset($atts[$key]);
-    } 
+    }
   }
   return $atts;
 }
-
-
-
-
-
-
-
-

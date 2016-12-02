@@ -810,12 +810,12 @@ function makeDialog(selector, opts) {
  
  */
 
-/** To Pop Up a dialog box on Window Load, if it exists */
+/** To Pop Up a dialog box on Window Load, if it exists (Version 1. V2 below) */
 $(function () {
 
   var dbx = $('.jqui-dlg-pop-load');
-  closeText = dbx.attr('data-closetext');
   if(!dbx.length) return;
+  closeText = dbx.attr('data-closetext');
   var title = dbx.attr('data-title'); 
   var dialogClass = dbx.attr('data-dialogClass'); 
   var dialogDefaults = {
@@ -837,6 +837,42 @@ $(function () {
   $('.jqui-dlg-pop-load').dialog(dialogDefaults);
 });
 
+
+
+/** jqui-dlg-pop-load-wrapper is JUST the wrapper - the dialog is within
+ * So all the data-XXX attributes for the dlg box should be in a div WITHIN
+ * the jqui-dlg-pop-load-wrapper div
+ */
+$(function () {
+  var $dlgwrap = $('.jqui-dlg-pop-load-wrapper');
+  if (!$dlgwrap.length) return;
+  $dlgwrap.hide();
+  console.log("Wrapper found & hidden - looking for first child...");
+  //var $dbx = $dlgwrap.find(':first-child');
+  var $dbx = $dlgwrap.find('div').first();
+  console.log("First Child:",$dbx[0],'Size:',$dbx.length);
+  if(!$dbx.length) return;
+  closeText = $dbx.attr('data-closetext') ? $dbx.attr('data-closetext')  : 'Close';
+  var title = $dbx.attr('data-title'); 
+  var dialogClass = $dbx.attr('data-dialogClass');
+  var dialogDefaults = {
+    modal: true,
+    autoOpen: true,
+    minWidth: 600,
+    resizable: true,
+    draggable: true,
+    title: title,
+    dialogClass: dialogClass,
+    buttons: [{
+        text: closeText,
+        click: function () {
+          $(this).dialog('close');
+        }
+      }
+    ]
+  };
+  $dbx.dialog(dialogDefaults);
+});
 
 
 function containsSubstr(theVar, subStr) {
