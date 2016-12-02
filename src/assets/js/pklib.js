@@ -605,6 +605,22 @@ $(function () {
  * with CSS class: js-dialog-button, and launches a display:none; HTML
  * Dialog element, with customized parameters - 
  * 
+ * OR -- BETTER - if the button/popper has a data-dialog-encoded attribute,
+ * builds it from that! BUT!! Has to be encoded within a single DIV, & put all
+ * the options in there. EX.
+    $encdlg = html_encode(PkRenderer::div($this->mkJsUpdateDiagForm($oldclients), [
+        'class' => 'diag-edit-js', 
+        'data-ajaxurl' => URL::route('ajax_edit_diagnosis'),
+        'data-title' => "Warning!  These Clients have Diagnoses older than 3 months",
+        'data-minWidth' => 800, 'data-closetext' => "Remind me Later",
+        'data-dialogClass' => 'pk-warn-dlg']));
+    return PkRenderer::div('Open', [
+        'data-tootik' => "Manage & Review Old Diagnoses",
+        'data-dialog-encoded' => $encdlg,
+        'class' => 'pkmvc-button inline js-dialog-button',
+    ]);
+
+ * 
  * js-dialog-button can be any type of element (like img), and multiple per page.
  * Options / data-params for js-dialog-button:
  * 
@@ -648,23 +664,22 @@ $(function () {
  */
 
 $('body').on('click', '.js-dialog-button', function (event) {
-  var src = $(event.target).attr('data-dialog');
-  if (!src) return;
+  var dlgHtml = $(event.target).attr('data-dialog-encoded');
+  if (!dlgHtml) {
+    var src = $(event.target).attr('data-dialog');
+    if (!src) return;
+    var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+    if (dlg.length === 0) return;
+    var dlgHtml = dlg.prop('outerHTML');
+  }
   var param1 = $(event.target).attr('data-param1') || '';
   var param2 = $(event.target).attr('data-param2') || '';
   var param3 = $(event.target).attr('data-param3') || '';
-  //var clone = $(event.target).attr('data-clone');
-  var clone = true;
-  var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
-  if (dlg.length === 0)
-    return;
-  var dlgHtml = dlg.prop('outerHTML');
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
   //console.log("After all the replacements, dlgHtml:",dlgHtml);
   dlg = $(dlgHtml);
-  //else  console.log('clone was false', clone);
   //opts.title = dlg.attr('data-title');
   var closeText = $(event.target).attr('data-closetext');
   if (!closeText) closeText = dlg.attr('data-closetext');
@@ -709,8 +724,8 @@ $('body').on('click', '.js-dialog-button', function (event) {
   //dlg.dialog('option','dialogClass', dialogClass);
   dlg.dialog('open');
   return dlg;
-
 });
+
 
 //Do similar for Bootstrap 4 Modals/Dialogs
 $('body').on('click', '.bs4-dialog-button', function (event) {
