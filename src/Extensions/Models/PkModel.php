@@ -899,7 +899,7 @@ class $createclassname extends Migration {
     if (in_array($key,static::getMethodsAsAttributeNames(),true)) {
       return $this->$key();
     }
-    if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
+    //if ($name) pkdebug("Name: [$name] valfields",static::getDisplayValueFields());
     return parent::__get($key);
   }
     public function getAttribute($key) {

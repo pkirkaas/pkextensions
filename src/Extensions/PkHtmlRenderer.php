@@ -43,6 +43,11 @@ class PkHtmlRenderer extends PartialSet {
     'number', 'password', 'radio', 'range', 'min', 'max', 'value', 'step', 'reset', 'search', 'submit', 
     'tel', 'text', 'time', 'url', 'week', 
     ];
+ public static  $dialogAtts = ['data-title','data-closetext', 'data-modal',
+      'data-autoOpen', 'data-buttons', 'data-closeOnEscape',
+      'data-dialogClass', 'data-minHeight', 'data-minWidth',
+      'data-width', 'data-height', 'class',
+        ];
 
   public static function contentTag($tag) {
     if (!$tag || !is_string($tag)) return false;

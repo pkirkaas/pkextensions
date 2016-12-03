@@ -76,6 +76,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
   }
 
   ###############  This section to support scrolling subforms 1 to many creation & deletion 
+  public $header; #Optional lead/head content
   public $create_button;
   public $delete_button;
   public $subform_tpl;
@@ -185,6 +186,10 @@ class PkHtmlPainter extends PkHtmlRenderer{
      if (!$create_button) {
        $cbtnargs = $args + ['item_template'=>$jsRowTpl,'data-itemcount'=>$item_count];
        $create_button=$this->mkCreateBtn($cbtnargs);
+     }
+     $header = keyVal('header',$args,$this->header);
+     if ($header) {
+       $subform_tpl['header'] = $header;
      }
      $subform_tpl['rows']=$rows;
      $subform_tpl['create'] = $create_button;
@@ -412,6 +417,94 @@ class PkHtmlPainter extends PkHtmlRenderer{
         ,['class'=>"error-popup-box", 'data-title'=>"The following Errors Occurred", 'data-dialogClass'=>'error-dlg-box']);
          */
     return static::mkPopUp($errorMsgOut);
+  }
+
+  #####################  Packaging HTML for Dialogs & Popus, in data atts, etc
+
+  /** Wraps content to be appropriate for a jQuery/pklib.js Pop Up Dialog */
+  public function wrapDlg($content,$args=[]) {
+    if (!$args) $args = [];
+    if (ne_string($args)) $args = ['class'=>$args];
+    $atts = [];
+
+    foreach ($args as $key => $value) {
+      if (removeStartStr($key,'data-') || 
+        in_array($key,static::$dialogAtts)) {
+          $atts[$key] = $value;
+      } 
+    }
+
+    $extraClass = keyVal('extra_class',$args);
+    $atts = merge_attributes($atts, $extraClass);
+
+    return PkRenderer::div($content,$atts);
+  }
+
+  /** Takes packaged HTML for a jQuery dialog, encodes it into an element
+   * data-dialog-encoded attribute, assigns the jQuery class, & returns it,
+   * ready to click on & pop.
+   * @param type $dlg
+   * @param type $args
+   */
+  public function encodeDlgInEl($dlg,$args=[]) {
+    if (!$args) $args = [];
+    if (ne_string($args)) $args = ['class'=>$args];
+    $defaults = [
+        'class' => 'pkmvc-button',
+        'content'=>'Click',
+        'tag'=>'div',
+    ];
+    $requiredClass = 'js-dialog-button';
+    $params = array_merge($defaults,$args);
+    $extraClass = keyVal('extra_class',$params); unset($params['extra_class']);
+    $content = $params['content']; unset($params['content']);
+    $tag = $params['tag']; unset($params['tag']);
+    $atts = merge_attributes($params,"$requiredClass $extraClass");
+    $atts['data-dialog-encoded'] = html_encode($dlg);
+    return PkRenderer::$tag($content,$atts);
+
+  }
+
+  ###########  Input & form element wrappers  ************
+
+
+  public $labelAttributes = 'block tpm-label';
+  public $valueAttributes = 'block tpm-value';
+  public $wrapperAttributes = 'tpm-wrapper';
+
+  public $defaultColClass = 'col-xs-2';
+
+
+
+  /** The BS Column Class (if any) should is a separate param, 'wrapperColClass'
+   * Default is 'col-xs-2', but any 'wrapperColClass' will replace it, including
+   * if the key exists but is empty.
+   * 
+   * @param type $inp
+   * @param type $lbl
+   * @param array|string $args - if string, the BS Col Class
+   * @return type
+   */
+  public function pair($inp,$lbl=null,$args=[]) {
+    $defaults = [
+        'labelAttributes' => $this->labelAttributes,
+        'valueAttributes' => $this->valueAttributes,
+        'wrapperAttributes' => $this->wrapperAttributes,
+    ];
+    if (is_array($args) && array_key_exists('wrapperColClass',$args)) {
+      $wrapperColClass = $args['wrapperColClass'];
+    } else if (ne_string($args)) {
+      $wrapperColClass = $args;
+    } else {
+      $wrapperColClass = $this->defaultColClass;
+    }
+    return PkRenderer::wrap([
+        'value'=>$inp,
+        'label'=>$lbl,
+        'labelAttributes'=>merge_att_arrs('labelAttributes',$defaults,$args),
+        'valueAttributes'=>merge_att_arrs('valueAttributes',$defaults,$args),
+        'wrapperAttributes'=>merge_attributes(merge_att_arrs('wrapperAttributes',$defaults,$args),$wrapperColClass),
+    ]);
   }
 
 

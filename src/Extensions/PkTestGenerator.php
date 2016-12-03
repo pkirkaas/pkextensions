@@ -185,7 +185,7 @@ class PkTestGenerator {
     return $rndTime;
   }
 
-  /** Get a date about n months in the future or past
+  /** Get a sql date about n months in the future or past
    * @param boolean $time = false - just the date. If true, DateTime
    */
 
@@ -241,16 +241,18 @@ class PkTestGenerator {
     return $mysqldate;
   }
 
-  /* Takes actual dates and returens something in between. Takes Unix or SQL,
+  /* Takes actual dates and returns something in between. Takes Unix or SQL,
    * and returns the date in the same format 
    */
-  public static function randDateBetween($date1, $date2) {
-    if (to_int($date1) && $to_int($date2)) {
+  public static function randDateBetween($date1, $date2=null) {
+    if (to_int($date1) && (is_null($date2) || to_int($date2))) {
       $sql = false;
-    } else if (is_string($date1) && is_string($date2)) {
+      if (!$date2) $date2=time();
+    } else if (is_string($date1) && (is_null($date2) || is_string($date2))) {
       $sql = true;
       $date1 = strtotime($date1);
-      $date2 = strtotime($date2);
+      if (!$date2) $date2=time();
+      else $date2 = strtotime($date2);
    } else {
      try {
         throw new \Exception("We don't know how to deal with the arguments");

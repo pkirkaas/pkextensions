@@ -2726,6 +2726,19 @@ function unixtimeToSql($unixtime = null, $just_date = false) {
   return $mysqldate;
 }
 
+/** Difference between the SQL date & Unix Date in Seconds - 
+ * Positive values are SQL date AFTER UNIX, negative before.
+ * If Unix date is null, defaults to now.
+ * @param string $sqlDate
+ * @param null|int $unixDate
+ */
+function diffSqlDate($sqlDate,$unixDate=null) {
+  if (!validSqlDate($sqlDate)) return false;
+  $sqlToUnix = strtotime($sqlDate);
+  if ($unixDate === null) $unixDate = time();
+  return $sqlToUnix - $unixDate;
+}
+
 /** Tests if $val is valid SQL Date/Time string
  * Pulled it off the web, so who knows..?
  * @param mixed $val
