@@ -821,3 +821,19 @@ div.error-popup-box.ui-dialog-content {
 .pre-wrap {
   white-space: pre-wrap;
 }
+
+
+@mixin mk-offsets() {
+  @for $i from 0 through 100 {
+    $ex: if($i!=0, -$i, null);
+    $sz: $i/10 *1em;
+    .top#{$ex} {
+      top: $sz;
+    }
+    .left#{$ex} {
+      left: $sz;
+    }
+  }
+}
+
+@include mk-offsets;
