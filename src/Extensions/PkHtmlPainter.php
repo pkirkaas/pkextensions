@@ -493,7 +493,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
     ];
     if (is_array($args) && array_key_exists('wrapperColClass',$args)) {
       $wrapperColClass = $args['wrapperColClass'];
-    } else if (ne_string($args)) {
+    } else if (!is_array($args)){ #Default is [], so explicitly set, also to null.
       $wrapperColClass = $args;
     } else {
       $wrapperColClass = $this->defaultColClass;

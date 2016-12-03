@@ -367,7 +367,24 @@ class PkHtmlRenderer extends PartialSet {
   }
 
 
-  //Inputs 
+  //Inputs  & Forms
+
+  public function form($content, array $options = []) {
+    return $this->rawcontent(PkForm::open($options) . $content . PkForm::close());
+  }
+
+  public function model($model, $options=[]) {
+    return $this->rawcontent(PkForm::model($model,$options));
+  }
+
+  public function close() {
+    return $this->rawcontent(PkForm::close());
+  }
+
+  public function open( $options=[]) {
+    return $this->rawcontent(PkForm::open($options));
+  }
+
   public function select($name, $list = [], $selected = null, $options = []) {
     if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
@@ -574,7 +591,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   /**Close with matched tag */
-  public function close() {
+  public function closematch() {
     //$tag = array_pop($this->tagStack);
     $tag = $this->popTagStack();
     //$this[] = $this->spaceDepth()."</$tag>\n";
@@ -583,7 +600,7 @@ class PkHtmlRenderer extends PartialSet {
 
   #Alias for ->close()
   public function RENDERCLOSE() {
-    return $this->close();
+    return $this->closematch();
   }
 
 

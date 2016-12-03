@@ -39,7 +39,8 @@ class PercentFormat implements PkDisplayValueInterface {
 
 class DateFormat implements PkDisplayValueInterface {
   public static function displayValue($value = null, $fmt = null) {
-    if (!$fmt) $fmt = 'M j, Y';
+    //if (!$fmt) $fmt = 'M j, Y';
+    if (!$fmt) $fmt = 'y M j';
     return friendlyCarbonDate($value, $fmt);
   }
 }
