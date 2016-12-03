@@ -22,6 +22,24 @@ function merge_attributes($arg1,$arg2=[]) {
   return $arg1;
 }
 
+/** Seems nutty, but take two associative arrays of attribute arrays, and
+ * merge them with the above method, only for the given keys
+ * @param type $keys
+ * @param type $arr1
+ * @param type $arr2
+ */
+function merge_att_arrs($keys, $arr1=[], $arr2 = []) {
+  if (!$keys) return [];
+  if (ne_string($keys)) {
+    return merge_attributes(keyVal($keys,$arr1), keyVal($keys,$arr2));
+  }
+  $out = [];
+  foreach ($keys as $key) {
+    $out[$key] = merge_attributes(keyVal($key,$arr1), keyVal($key,$arr2));
+  }
+  return $out;
+}
+
 /** Try to redo this rationally - but works as test in kirkaas.com gallery*/
 /**
  * 
