@@ -698,23 +698,24 @@ class PkHtmlRenderer extends PartialSet {
    * @return html table row string
    */
   public function tablerow($data=[],$opts='td') {
+    pkdebug("Data:",$data);
     if (!is_array($data)) $data = [$data];
     if (is_string($opts)) $opts = ['coltag' => $opts];
     if (is_array($opts)) { 
       $coltag = keyVal('coltag',$opts,'td');
     }
     //$this[]="<tr>\n";
-    $this->content("<tr>\n");
+    $this->rawcontent("<tr>\n");
     foreach ($data as $idx =>$datum) {
       if (!is_array($datum)) $datum = ['value'=>$datum];
       $value = keyVal('value',$datum);
       $lcoltag = keyVal('coltag',$datum,$coltag);
       $latts =  keyVal('colatts',$datum);
-      //$this[] = "  <$lcoltag $latts>$value</$lcoltag>\n";
-      $this->content( "  <$lcoltag $latts>$value</$lcoltag>\n");
+      pkdebug( "About to return:  <$lcoltag $latts>$value</$lcoltag>\n");
+      $this->rawcontent( "  <$lcoltag $latts>$value</$lcoltag>\n");
     }
     //$this[]="</tr>\n";
-    return $this->content("</tr>\n");
+    return $this->rawcontent("</tr>\n");
   }
 
   /** Totally misconceived

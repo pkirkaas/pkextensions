@@ -274,9 +274,11 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .pad-l#{$sz} {
       padding-left: $offset;
     }
+    .m-r#{$sz},
     .marg-r#{$sz} {
       margin-right: $offset;
     }
+    .m-l#{$sz},
     .marg-l#{$sz} {
       margin-left: $offset;
     }
@@ -288,9 +290,11 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .pad-b#{$sz} {
       padding-bottom: $offset;
     }
+    .m-t#{$sz} ,
     .marg-t#{$sz} {
       margin-top: $offset;
     }
+    .m-b#{$sz} ,
     .marg-b#{$sz} {
       margin-bottom: $offset;
     }

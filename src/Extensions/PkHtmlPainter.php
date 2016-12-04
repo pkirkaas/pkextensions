@@ -319,18 +319,16 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $nav_class=keyVal('nav_class',$opts,'pk-nav');
     $menu = new PkHtmlRenderer();
     $menu[]= "
-      <nav class='$nav_class navbar navbar-dark'>
-        <ul class='nav navbar-nav'>\n";
+      <nav class='$nav_class navbar navbar-dark'>";
+    $menu[]= " <ul class='nav navbar-nav'>\n";
     foreach ($links as $link) {
       $menu[]="
     <li class='nav-item'>
       $link
     </li>\n";
     }
-
-   $menu[] = "
-     </ul>
-    </nav>\n";
+    $menu[] = " </ul>";
+    $menu[] = " </nav>\n";
     return $menu;
   }
 
@@ -498,7 +496,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
     } else {
       $wrapperColClass = $this->defaultColClass;
     }
-    return PkRenderer::wrap([
+    return PkRenderer::rawwrap([
         'value'=>$inp,
         'label'=>$lbl,
         'labelAttributes'=>merge_att_arrs('labelAttributes',$defaults,$args),
