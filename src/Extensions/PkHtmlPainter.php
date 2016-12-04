@@ -506,6 +506,34 @@ class PkHtmlPainter extends PkHtmlRenderer{
   }
 
 
+  ################   Generic Builders ################
+  public $defaultTblClass = 'pk-tbl';
+
+  /** Just the simplest of table generators for q & d output. If $header 
+   * 
+   * @param 2 dimen array, $data - even if empty.
+   * @param array|scalar|null $header
+   */
+  public function mkTbl($data=[],$header=null) {
+    if ($header && is_simple($header)) {
+      $header = [$header];
+    }
+    $fullRow = (count($header)===1) ? ['colspan'=>99] : [];
+    $thb = new PkHtmlBuilder();
+    foreach ($header as $th) {
+      $thb->rawth($th,$fullRow);
+    }
+    $trb = PkRenderer::tr($thb);
+    foreach ($data as $dr) {
+      $tdb = new PkHtmlBuilder();
+      foreach ($dr as $td) {
+        $tdb->rawtd($td);
+      }
+      $trb->tr($tdb);
+    }
+    return PkRenderer::table($trb,$this->defaultTblClass);
+  }
+
 
 
 #Close class

@@ -2818,6 +2818,7 @@ function sqlDateToFriendly($sqldate = null, $format = 'M j, Y') {
   return unixDateToFriendly(sqlDateToUnix($sqldate), $format);
 }
 
+
 function execInBackground($cmd) {
   if (substr(php_uname(), 0, 7) == "Windows") {
     pclose(popen("start /B " . $cmd, "r"));

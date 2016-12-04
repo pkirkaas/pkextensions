@@ -134,6 +134,29 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return $refArr;
   }
 
+  /** Takes a subset of keys & returns in array w. values.
+   * If $indexed == false, returns [$key1=>$val1,$key2=>$val2..
+   * else [['key'=>$key1, 'value'=>$val2],...
+   * @param type $keys
+   * @param type $indexed
+   * @return array of matching $keys/$values
+   */
+  public static function keyValues($keys,$indexed=false) {
+    if (is_simple($keys)) $keys = [$keys];
+    $refArr = static::getKeyValArr();
+    $retArr = [];
+    foreach ($keys as $key) {
+      if (array_key_exists($key,$refArr)) {
+        if ($indexed) {
+          $retArr[]=['key'=>$key,'value'=>$refArr[$key]];
+        } else {
+          $retArr[$key] = $refArr[$key];
+        }
+      }
+    }
+    return $retArr;
+  }
+
   /**
    * 
    * @param int|null $first - return just the first N keys, if present
