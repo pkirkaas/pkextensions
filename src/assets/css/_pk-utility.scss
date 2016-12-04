@@ -839,9 +839,14 @@ div.error-popup-box.ui-dialog-content {
 @include mk-offsets;
 
 // An initial default table style for pk-tbl
+
 $pk-tbl-border-color: #aaa !default;
+
+table.pk-tbl,
 table.pk-tbl {
+  td, th {
   border-collapse: collapse;
   border: solid $pk-tbl-border-color 1px;
   padding: .5em;
+  }
 }

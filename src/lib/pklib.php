@@ -1347,7 +1347,8 @@ function arrayish_keys_exist($keys, $arr = null) {
  * @return type
  */
 function is_arrayish($arg) {
-  return (is_array($arg) || ($arg instanceOf ArrayAccess));
+  return (is_array($arg) || ($arg instanceOf ArrayAccess)
+      || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
 }
 
 /** Similar to above (array_keys_exist()), only returns the value at the 
@@ -2103,7 +2104,11 @@ function equivalent($a, $b) {
  *   If array, look for those keys, & 'hide0' as well, for multiple options 
  * @return string - dollar formatted
  */
+function d_f($num, $opts = 0, $hide0 = false) {
+  return dollar_format($num, $opts, $hide0);
+}
 function dollar_format($num, $opts = 0, $hide0 = false) {
+  if ($opts === null) $db=1; else $db=0;
   if (!is_array($opts)) {
     if (is_intish($opts) && ($opts !== true)) $opts = ['prec' => $opts];
     else if (ne_string($opts) || ($opts === true))
@@ -2117,6 +2122,7 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
   if (is_array($num)) {
     $num = array_sum($num);
   }
+  //if($db)pkdebug('hide0', $hide0, 'num', $num, 'wrap-class',$wrap_class,'prec',$prec);
   if (($num === null) || ($num === '') || ($hide0 && !$num)) return '';
   $formatted = '$' . number_format($num, $prec);
   if (!$wrap_class) return $formatted;

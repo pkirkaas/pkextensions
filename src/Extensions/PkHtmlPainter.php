@@ -519,13 +519,13 @@ class PkHtmlPainter extends PkHtmlRenderer{
       $header = [$header];
     }
     $fullRow = (count($header)===1) ? ['colspan'=>99] : [];
-    $thb = new PkHtmlBuilder();
+    $thb = new PkHtmlRenderer();
     foreach ($header as $th) {
       $thb->rawth($th,$fullRow);
     }
     $trb = PkRenderer::tr($thb);
     foreach ($data as $dr) {
-      $tdb = new PkHtmlBuilder();
+      $tdb = new PkHtmlRenderer();
       foreach ($dr as $td) {
         $tdb->rawtd($td);
       }

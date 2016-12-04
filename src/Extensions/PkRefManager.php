@@ -142,8 +142,10 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @return array of matching $keys/$values
    */
   public static function keyValues($keys,$indexed=false) {
+    //foreach($keys as $key) pkdebug("Key",$key);
     if (is_simple($keys)) $keys = [$keys];
     $refArr = static::getKeyValArr();
+    //pkdebug("refar",$refArr);
     $retArr = [];
     foreach ($keys as $key) {
       if (array_key_exists($key,$refArr)) {
