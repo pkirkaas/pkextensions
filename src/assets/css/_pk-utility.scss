@@ -850,3 +850,9 @@ table.pk-tbl {
   padding: .5em;
   }
 }
+
+.sect-sep {
+  border-bottom: solid 1px $pk-tbl-border-color;
+  font-weight: bold;
+  margin-top: .5em;
+}

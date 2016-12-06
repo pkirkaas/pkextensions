@@ -396,8 +396,9 @@ class $createclassname extends Migration {
    */
   public static function dropTable($tablename = null) {
     if (!$tablename) $tablename = static::getTableName();
-
-    Schema::drop($tablename);
+    if (Schema::hasTable($tablename)) {
+      Schema::drop($tablename);
+    }
     //DB::raw("DROP TABLE IF EXISTS `$tablename`");
   }
 

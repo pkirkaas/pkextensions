@@ -514,7 +514,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
    * @param 2 dimen array, $data - even if empty.
    * @param array|scalar|null $header
    */
-  public function mkTbl($data=[],$header=null) {
+  public function mkTbl($data=[],$header=null,$args=null) {
     if ($header && is_simple($header)) {
       $header = [$header];
     }

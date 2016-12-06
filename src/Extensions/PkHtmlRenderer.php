@@ -747,6 +747,11 @@ class PkHtmlRenderer extends PartialSet {
     return $out;
   }
 
+  public function __callStatic($method, $args) {
+    $rnd = new static();
+    return call_user_func_array([$rnd,$method], $args);
+  }
+
   public function __call($method, $args) {
     $raw = false;
     if ($tag = removeStartStr($method,'raw')) {
