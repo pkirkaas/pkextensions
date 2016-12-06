@@ -1071,8 +1071,6 @@ class $createclassname extends Migration {
    * boolean true is an error - error message or Validator containing errors, etc.
    */
   public function saveRelations(Array $arr = []) {
-    if (!$this->authUpdate())
-        throw new Exception("Not authorized to update this object");
     $relations = $this->getLoadRelations();
     $foreignKey = $this->getForeignKey();
     $this->fillFillables($arr);
@@ -1408,8 +1406,6 @@ class $createclassname extends Migration {
    * @throws Exception
    */
   public function save(array $opts = []) {
-    if (!$this->authUpdate())
-        throw new Exception("Not authorized to update this record");
     if ($this->useBuildFillableOptions) {
       foreach ($this->fillableOptions as $field => $value) {
         if (is_array($value)) {
@@ -1419,6 +1415,8 @@ class $createclassname extends Migration {
       }
     }
     if ($this->emptyStringToNull) $this->convertEmptyStringToNullForNumerics();
+    if (!$this->authUpdate())
+        throw new Exception("Not authorized to update this record");
     $result = parent::save($opts);
     if ($result) $this->postSave($opts);
     return $result;
