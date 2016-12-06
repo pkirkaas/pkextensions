@@ -489,6 +489,15 @@ class PkHtmlRenderer extends PartialSet {
     return $this->rawcontent(PkForm::boolean($name,  $checked, $options, $unset, $value));
   }
 
+  public function radio($name, $value = null, $checked = null, $options = []){
+    $options = $this->cleanAttributes($options);
+    return $this->rawcontent(PkForm::radio($name, $value, $checked, $options));
+  }
+  public function checkbox($name, $value = 1, $checked = null, $options = []) {
+    $options = $this->cleanAttributes($options);
+    return $this->rawcontent(PkForm::checkbox($name, $value, $checked, $options));
+  }
+
   public function input($type, $name, $value = null, $options = []) {
     if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);

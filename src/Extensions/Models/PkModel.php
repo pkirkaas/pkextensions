@@ -557,6 +557,7 @@ class $createclassname extends Migration {
    * $return boolean|static - false if not instantiated or not the same object, else the object
    */
   public function is(Model $var) {
+    if (!$var || !($var instanceOf Model)) return false;
     if (method_exists(get_parent_class(),'is')) {
       if (!parent::is($var)) return false;
     }
@@ -577,9 +578,8 @@ class $createclassname extends Migration {
    * @return boolean
    */
   public function authDelete() {
-    return true;
+    //return true;
     if (isCli()) return true;
-
     return $this->authUpdate();
   }
 
