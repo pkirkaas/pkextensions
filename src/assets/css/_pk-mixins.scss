@@ -270,13 +270,14 @@ $grid-gutter-width:          1.875rem !default; // 30px
     $offset: $i/5 * 1em;
     @if $i < 20 {
       //$foffset: $offset + 1em;
+      $foffset: $offset/5;
       .fs#{$sz},
       .f-s#{$sz} {
-        font-size: 1em + $offset;
+        font-size: 1em + $foffset !important;
       }
       .fs-#{$sz},
       .f-s-#{$sz} {
-        font-size: 1em - $offset;
+        font-size: 1em - $foffset !important;
       }
     } 
     //Paddings
@@ -453,10 +454,13 @@ $grid-gutter-width:          1.875rem !default; // 30px
     @each $c2 in $hl {
       @each $c3 in $hl {
         .bg-#{$c1}#{$c2}#{$c3} {
-          background-color: unquote('#')+$c1+$c2+$c3;
+          background-color: unquote('#')+$c1+$c2+$c3 !important;
         }
         .c-#{$c1}#{$c2}#{$c3} {
-          color: unquote('#')+$c1+$c2+$c3;
+          color: unquote('#')+$c1+$c2+$c3 !important;
+        }
+        .bc-#{$c1}#{$c2}#{$c3} {
+          border-color: unquote('#')+$c1+$c2+$c3 !important;
         }
       }
     }
@@ -464,3 +468,20 @@ $grid-gutter-width:          1.875rem !default; // 30px
 }
 
 @include mk-colors;
+
+
+.generic-base-header {
+  font-family: verdana;
+  color: #000;
+  font-weight: bold;
+}
+
+@mixin mk-site-headers($base-header: generic-base-header, $name:sh) {
+  @for $i from 1 through 20 {
+    .#{$name}#{$i} {
+      @extend  .#{$base-header};
+      font-size: $i/5 + 1rem;
+      @include v-margin($i/10 + .5rem);
+    }
+  }
+}

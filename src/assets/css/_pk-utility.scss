@@ -864,3 +864,26 @@ table.pk-tbl {
   font-weight: bold;
   margin-top: .5em;
 }
+
+/****  Assume some nice fonts: **/
+/**
+
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700|Roboto:400,700|Raleway:400,600,700"
+*/
+
+.oswald { font-family: 'Oswald', verdana; }
+.lato { font-family: 'Lato', arial; }
+.roboto { font-family: 'Roboto', verdana; }
+.open-sans { font-family: 'Open Sans', verdana; }
+.montserrat { font-family: 'Montserrat', verdana; }
+.raleway { font-family: 'Raleway', verdana; }
+
+
+/** Test with:
+<div class='x-large oswald'>This is Oswald</div>
+<div class='x-large lato'>This is Lato</div>
+<div class='x-large roboto'>This is Roboto</div>
+<div class='x-large open-sans'>This is Open Sans</div>
+<div class='x-large montserrat'>This is Montesserat</div>
+<div class='x-large raleway'>This is Raleway</div>
+*/
