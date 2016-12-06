@@ -2723,9 +2723,7 @@ function manageStaticCache(&$cacheArr, $levels = []) {
  * @return string The SQL date/time
  */
 function unixtimeToSql($unixtime = null, $just_date = false) {
-  if (!$unixtime) {
-    $unixtime = time();
-  }
+  if (!$unixtime) { $unixtime = time(); }
   if ($just_date) $fmt = 'Y-m-d';
   else $fmt = 'Y-m-d H:i:s';
   $mysqldate = date($fmt, $unixtime);
@@ -2817,6 +2815,7 @@ function sqlDateToUnix($sqldate = null) {
 }
 
 function unixDateToFriendly($unixdate = null, $format = 'M j, Y') {
+  if ($unixdate === null) $unixdate = time();
   return date($format, $unixdate);
 }
 

@@ -446,3 +446,21 @@ $grid-gutter-width:          1.875rem !default; // 30px
 .center-align, .c-a {
   @include text-align(center);
 }
+
+@mixin mk-colors {
+  $hl: 0 2 4 6 8 a c e f;
+  @each $c1 in $hl {
+    @each $c2 in $hl {
+      @each $c3 in $hl {
+        .bg-#{$c1}#{$c2}#{$c3} {
+          background-color: unquote('#')+$c1+$c2+$c3;
+        }
+        .c-#{$c1}#{$c2}#{$c3} {
+          color: unquote('#')+$c1+$c2+$c3;
+        }
+      }
+    }
+  }
+}
+
+@include mk-colors;

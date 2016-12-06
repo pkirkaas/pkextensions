@@ -24,6 +24,12 @@ class PkHtmlPainter extends PkHtmlRenderer{
     parent::__construct();
   }
 
+  public function mkPrintButton($args=[]) {
+    $label = keyVal('label',$args,'Print');
+    $class = keyVal('class',$args,'pkmvc-button inline ').' print-button ';
+    return PkRenderer::div($label,$class);
+  }
+
   public function wrapForm($args=[]) {
     
   }
