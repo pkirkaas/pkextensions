@@ -62,6 +62,22 @@
   } 
 
 
+label.inline-remember {
+  color: white;
+}
+
+form.inline-login.inline-form button.btn-primary {
+  position: relative;
+  top: -25px;
+
+}
+
+body nav.navbar.pk-top-menu {
+  height: 50px;
+  a.nav-link {
+    margin-top: 5px;
+  }
+}
 
   /*
   .navbar-nav .nav-item + .nav-item {
