@@ -369,8 +369,13 @@ class PkHtmlRenderer extends PartialSet {
 
   //Inputs  & Forms
 
-  public function form($content, array $options = []) {
-    return $this->rawcontent(PkForm::open($options) . $content . PkForm::close());
+  public function form($content, $options = []) {
+    $options = merge_attributes($options);
+    //return $this->rawcontent(PkForm::open($options) . $content . PkForm::close());
+    $this->rawcontent(PkForm::open($options));
+    $this->rawcontent($content); 
+    $this->rawcontent(PkForm::close());
+    return $this;
   }
 
   public function model($model, $options=[]) {
@@ -747,7 +752,7 @@ class PkHtmlRenderer extends PartialSet {
     return $out;
   }
 
-  public function __callStatic($method, $args) {
+  public static function __callStatic($method, $args) {
     $rnd = new static();
     return call_user_func_array([$rnd,$method], $args);
   }

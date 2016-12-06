@@ -12,6 +12,7 @@ use PkExtensions\PkHtmlRenderer;
  * @return array $attributes
  */
 function merge_attributes($arg1,$arg2=[]) {
+  //pkdebug("Orig: ",$arg1,$arg2);
   if (is_simple($arg1)) $arg1 = ['class'=>$arg1];
   if (!$arg2) return $arg1;
   if (is_scalar($arg2)) $arg2 = ['class'=>$arg2];
@@ -19,6 +20,7 @@ function merge_attributes($arg1,$arg2=[]) {
   foreach ($keys as $key) {
     $arg1[$key] = keyVal($key,$arg1).' '.keyVal($key,$arg2);
   }
+  //pkdebug("Returning: Arg1:", $arg1, "Keys:", $keys);
   return $arg1;
 }
 

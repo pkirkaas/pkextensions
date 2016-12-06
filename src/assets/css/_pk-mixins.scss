@@ -268,9 +268,19 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @for $i from 0 through 250 {
     $sz: if($i!=0, -$i, null);
     $offset: $i/5 * 1em;
+    @if $i < 20 {
+      $foffset: $offset + 1em;
+      .fs#{$sz},
+      .f-s#{$sz} {
+        font-size: $foffset;
+      }
+
+    } 
+    .p-r#{$sz},
     .pad-r#{$sz} {
       padding-right: $offset;
     }
+    .p-l#{$sz},
     .pad-l#{$sz} {
       padding-left: $offset;
     }
@@ -283,7 +293,35 @@ $grid-gutter-width:          1.875rem !default; // 30px
       margin-left: $offset;
     }
 
+    .p#{$sz},
+    .pad#{$sz} {
+      padding: $offset;
+    }
+    .m#{$sz},
+    .marg#{$sz} {
+      margin: $offset;
+    }
 
+    .p-v#{$sz},
+    .pad-v#{$sz} {
+      padding-top: $offset;
+      padding-bottom: $offset;
+    }
+    .m-v#{$sz},
+    .marg-v#{$sz} {
+      margin-top: $offset;
+      margin-bottom: $offset;
+    }
+    .p-h#{$sz},
+    .pad-h#{$sz} {
+      padding-left: $offset;
+      padding-right: $offset;
+    }
+    .m-h#{$sz},
+    .marg-h#{$sz} {
+      margin-right: $offset;
+      margin-left: $offset;
+    }
     .pad-t#{$sz} {
       padding-top: $offset;
     }
@@ -299,6 +337,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
       margin-bottom: $offset;
     }
   }
+}
+
+@mixin mk-font-size {
 
 }
 
