@@ -269,73 +269,40 @@ $grid-gutter-width:          1.875rem !default; // 30px
     $sz: if($i!=0, -$i, null);
     $offset: $i/5 * 1em;
     @if $i < 20 {
-      $foffset: $offset + 1em;
+      //$foffset: $offset + 1em;
       .fs#{$sz},
       .f-s#{$sz} {
-        font-size: $foffset;
+        font-size: 1em + $offset;
       }
-
+      .fs-#{$sz},
+      .f-s-#{$sz} {
+        font-size: 1em - $offset;
+      }
     } 
-    .p-r#{$sz},
-    .pad-r#{$sz} {
-      padding-right: $offset;
-    }
-    .p-l#{$sz},
-    .pad-l#{$sz} {
-      padding-left: $offset;
-    }
-    .m-r#{$sz},
-    .marg-r#{$sz} {
-      margin-right: $offset;
-    }
-    .m-l#{$sz},
-    .marg-l#{$sz} {
-      margin-left: $offset;
-    }
+    //Paddings
+    .p-r#{$sz}, .pad-r#{$sz} { padding-right: $offset; }
+    .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset; }
+    .p-t#{$sz}, .pad-t#{$sz} { padding-top: $offset; }
+    .p-b#{$sz}, .pad-b#{$sz} { padding-bottom: $offset; }
+    .p-v#{$sz}, .pad-v#{$sz} { padding-top: $offset; padding-bottom: $offset; }
+    .p-h#{$sz}, .pad-h#{$sz} { padding-left: $offset; padding-right: $offset; }
+    .p#{$sz}, .pad#{$sz} { padding: $offset; }
 
-    .p#{$sz},
-    .pad#{$sz} {
-      padding: $offset;
-    }
-    .m#{$sz},
-    .marg#{$sz} {
-      margin: $offset;
-    }
+    .m-r#{$sz}, .marg-r#{$sz} { margin-right: $offset; }
+    .m-l#{$sz}, .marg-l#{$sz} { margin-left: $offset; }
+    .m-t#{$sz} , .marg-t#{$sz} { margin-top: $offset; }
+    .m-b#{$sz} , .marg-b#{$sz} { margin-bottom: $offset; }
+    .m-v#{$sz}, .marg-v#{$sz} { margin-top: $offset; margin-bottom: $offset; }
+    .m-h#{$sz}, .marg-h#{$sz} { margin-right: $offset; margin-left: $offset; }
 
-    .p-v#{$sz},
-    .pad-v#{$sz} {
-      padding-top: $offset;
-      padding-bottom: $offset;
-    }
-    .m-v#{$sz},
-    .marg-v#{$sz} {
-      margin-top: $offset;
-      margin-bottom: $offset;
-    }
-    .p-h#{$sz},
-    .pad-h#{$sz} {
-      padding-left: $offset;
-      padding-right: $offset;
-    }
-    .m-h#{$sz},
-    .marg-h#{$sz} {
-      margin-right: $offset;
-      margin-left: $offset;
-    }
-    .pad-t#{$sz} {
-      padding-top: $offset;
-    }
-    .pad-b#{$sz} {
-      padding-bottom: $offset;
-    }
-    .m-t#{$sz} ,
-    .marg-t#{$sz} {
-      margin-top: $offset;
-    }
-    .m-b#{$sz} ,
-    .marg-b#{$sz} {
-      margin-bottom: $offset;
-    }
+    .m-r-#{$sz}, .marg-r-#{$sz} { margin-right: -$offset; }
+    .m-l-#{$sz}, .marg-l-#{$sz} { margin-left: -$offset; }
+    .m-t-#{$sz}, .marg-t-#{$sz} { margin-top: -$offset; }
+    .m-b-#{$sz}, .marg-b-#{$sz} { margin-bottom: -$offset; }
+    .m-v-#{$sz}, .marg-v-#{$sz} { margin-top: $offset; margin-bottom: -$offset; }
+    .m-h-#{$sz}, .marg-h-#{$sz} { margin-right: $offset; margin-left: -$offset; }
+
+    .m#{$sz}, .marg#{$sz} { margin: $offset; }
   }
 }
 
