@@ -202,6 +202,15 @@ class PkHtmlPainter extends PkHtmlRenderer{
      return PkRenderer::$subform_tag($subform_tpl,$subform_attributes);
   }
 
+  public function mkBtn($label,$opts=[]) {
+    $defaults = [
+        'class' => 'pkmvc-button inline',
+    ];
+    $atts = merge_attributes($defaults,$opts);
+    $tag = keyVal('tag',$atts,'div');
+    unset($atts['tag']);
+    return PkRenderer::$tag($label,$atts);
+  }
 
   public function mkSubformRow($args=[]) {
      $row_tpl = keyVal('row_tpl',$args,$this->row_tpl);

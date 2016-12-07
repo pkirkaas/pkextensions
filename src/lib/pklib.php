@@ -2814,6 +2814,7 @@ function sqlDateToUnix($sqldate = null) {
   return $unixtime;
 }
 
+  // American style m/d/y:   'n/j/y'
 function unixDateToFriendly($unixdate = null, $format = 'M j, Y') {
   if ($unixdate === null) $unixdate = time();
   return date($format, $unixdate);

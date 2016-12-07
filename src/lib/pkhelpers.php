@@ -55,6 +55,7 @@ function setAppLog() {
  * @param string $format
  */
 function friendlyCarbonDate($date = null, $format =  'M j, Y') {
+  // American style m/d/y:   'n/j/y'
   if (!$date) return "Never/None";
   $date = new Carbon($date);
   $min = Carbon::minValue();
