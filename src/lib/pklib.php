@@ -316,12 +316,13 @@ function pkdebug_base() {
   }
   $frame = $stack[$idx];
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
-  /* // Try using new way (below) - add option to display args & object later
+   // Try using new way (below) - add option to display args & object later
     if (isset($stack[1])) {
     $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
     } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
     }
+    /*
    * 
    */
   /** Test $retvals - better way? */
@@ -500,6 +501,7 @@ function pkvardump($arg, $disableXdebug = true) {
  */
 function appLogPath($path = null) {
   if (PkLibConfig::getSuppressPkDebug()) {
+    error_log("Debug Suppressed - No Log");
     return getNullPath();
   }
   if (isCli()) {
@@ -513,6 +515,7 @@ function appLogPath($path = null) {
   if ($path === false) {
     $logpath = $defaultPath;
     $res = makePathToFile($logpath);
+    error_log("The used log path...$logpath");
     return $logpath;
   }
   if (!$path) {
@@ -520,10 +523,12 @@ function appLogPath($path = null) {
       $logpath = $defaultPath;
     }
     $res = makePathToFile($logpath);
+    error_log("The used log path...$logpath");
     return $logpath;
   }
   $logpath = $path;
   $res = makePathToFile($logpath);
+    error_log("The used log path...$logpath");
   return $logpath;
 }
 

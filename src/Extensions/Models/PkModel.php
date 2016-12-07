@@ -234,6 +234,7 @@ abstract class PkModel extends Model {
       'unsignedSmallInteger', 'unsignedTinyInteger', 'uuid', ];
 
 
+    pkdebug("Incoming field def:", $fielddefs);
     $changestr = '';
     $indices = ['index', 'unique', 'primary'];
     if ($change) $changestr = '->change()';
@@ -241,6 +242,8 @@ abstract class PkModel extends Model {
     $spaces = "    ";
     //foreach (static::$table_field_defs as $fieldName => $def) {
     foreach ($fielddefs as $fieldName => $def) {
+      $type = null;
+      pkdebug("Defs for '$fieldName',", $def);
       $methodChain = '';
       if (is_string($def))
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
@@ -249,9 +252,11 @@ abstract class PkModel extends Model {
         if (array_key_exists('type',$def)) {
           $type = keyVal('type', $def, 'integer');
         } else { #Column def could be just a value in the def array
+          pkdebug("FieldName: $fieldName;  dfvvals", $defvals);
           foreach ($eloquentMigrationColumnDefs as $emd) {
             if (in_array($emd,$defvals,1)) {
               $type = $emd;
+              pkdebug("Broke on match for $emd");
               break;
             }
           }
@@ -260,7 +265,7 @@ abstract class PkModel extends Model {
 
 
 
-        $type = keyVal('type', $def, 'integer');
+        //$type = keyVal('type', $def, 'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $comment = keyval('comment', $def);
         $default = keyval('default', $def);
@@ -288,7 +293,7 @@ abstract class PkModel extends Model {
         #Look for $def VALUES, for attributes that don't require args
         #index, for example, could be in "methods", with args, or just a value
         #in the def array
-        $standaloneModifiers = ['primary','index','unique','nullable','unsigned',];
+        $standaloneModifiers = ['primary','index','unique','nullable','unsigned','useCurrent',];
         foreach($standaloneModifiers as $sam) {
           if (in_array($sam,$defvals,true)) {
             $methodChain.=  "->$sam()";
@@ -383,6 +388,7 @@ class $createclassname extends Migration {
     $migrationtablecontent = $migrationheader .
         $fieldDefStr . $migrationFunctions . $close . $down . $closeclass;
     //return "migrationcontent: [\n\n$migrationtablecontent\n\nPath:\n\n$migrationfile";
+    //echo  $migrationtablecontent;
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
