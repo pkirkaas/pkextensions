@@ -551,6 +551,12 @@ class PkHtmlPainter extends PkHtmlRenderer{
     return PkRenderer::table($trb,$this->defaultTblClass);
   }
 
+  /** It makes a form based on options, but als passes back a PartialSet template that the 
+   * calling function can then populate 
+   */
+  public function mkFrm() {
+
+  }
 
 
 #Close class
