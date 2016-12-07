@@ -803,19 +803,22 @@ $i: 1;
   display: none;
 }
 
+$pk-warn-dlg-titlebar-color: red !default;
 .pk-warn-dlg .ui-dialog-titlebar {
-  color: red;
+  color: $pk-warn-dlg-titlebar-color;
   font-weight: bold;
   font-size: large;
 }
 
+$pk-warn-dlg-color: #800 !default;
 .pk-warn-dlg.error-dlg-box li {
-  color: #800;
+  color: $pk-warn-dlg-color;
   font-size: large;
 }
 
+$pk-warn-dlg-background: rgba(255,100,100,.4) !default;
 div.error-popup-box.ui-dialog-content {
-  background: rgba(255,100,100,.4);
+  background: $pk-warn-dlg-background;
 }
 
 .pre-wrap {
