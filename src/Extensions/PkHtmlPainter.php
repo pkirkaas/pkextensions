@@ -258,6 +258,8 @@ class PkHtmlPainter extends PkHtmlRenderer{
       return $inp->select($name,$list,$value,$options);
     } else if ($type === 'textarea') {
       return $inp->textarea($name,$value,$options);
+    } else if ($type === 'boolean') {
+      return $inp->boolean($name,$value,$options);
     } else {
       return $inp->input($type,$name,$value,$options);
     }

@@ -262,6 +262,10 @@ $grid-gutter-width:          1.875rem !default; // 30px
   margin-right: $sz;
 }
 
+.m-a {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
 /* Makes a bunch of left/right margins/paddings
 */
 @mixin mk-spacing {
