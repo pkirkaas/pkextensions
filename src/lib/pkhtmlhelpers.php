@@ -18,7 +18,7 @@ function merge_attributes($arg1,$arg2=[]) {
   if (is_scalar($arg2)) $arg2 = ['class'=>$arg2];
   $keys = array_unique(array_merge(array_keys($arg1),array_keys($arg2)));
   foreach ($keys as $key) {
-    $arg1[$key] = keyVal($key,$arg1).' '.keyVal($key,$arg2);
+    $arg1[$key] = trim(keyVal($key,$arg1).' '.keyVal($key,$arg2));
   }
   //pkdebug("Returning: Arg1:", $arg1, "Keys:", $keys);
   return $arg1;

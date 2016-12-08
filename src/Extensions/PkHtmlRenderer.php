@@ -767,6 +767,7 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   public function __call($method, $args) {
+    $method = trim($method);
     $raw = false;
     if ($tag = removeStartStr($method,'raw')) {
       $method = $tag;

@@ -207,9 +207,14 @@ class PkHtmlPainter extends PkHtmlRenderer{
         'class' => 'pkmvc-button inline',
     ];
     $atts = merge_attributes($defaults,$opts);
-    $tag = keyVal('tag',$atts,'div');
+    $tag =trim(keyVal('tag',$atts,'div'));
     unset($atts['tag']);
     return PkRenderer::$tag($label,$atts);
+  }
+  public function mkLinkBtn($route,$label=null,$params=[], $opts=[]) {
+      $opts['href'] = route($route,$params);
+      $opts['tag'] = 'a';
+      return $this->mkBtn($label,$opts);
   }
 
   public function mkSubformRow($args=[]) {
