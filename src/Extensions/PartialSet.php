@@ -40,6 +40,7 @@ class PartialSet extends \ArrayObject {
    */
 
   #$something = $this->opt_something;
+  /*
   public function __get($name) {
     $optName = removeStartStr($name,'opt_');
     if (!$optName) return parent::__get($name);
@@ -52,8 +53,8 @@ class PartialSet extends \ArrayObject {
     if (!$optName) return parent::__set($name, $value);
     return $this->custom_opts[$optName] = $value;
   }
-
-
+   * 
+   */
 
 
   /*
