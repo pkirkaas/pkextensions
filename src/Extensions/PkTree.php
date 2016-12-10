@@ -29,7 +29,9 @@ class PkTree extends PartialSet {
       'button', 'canvas', 'caption', 'center', 'cite', 'code', 'colgroup',
       'datalist', 'dd', 'del', 'details', 'dfn', 'dialog', 'dir', 'div',
       'dl', 'dt', 'em', 'fieldset', 'figcaption', 'figure', 'font',
-      'footer', 'form', 'frame', 'frameset', 'h1', 'h2', 'h3', 'h4',
+      'footer',
+      //'form', //Try custom
+      'frame', 'frameset', 'h1', 'h2', 'h3', 'h4',
       'h5', 'h6', 'head', 'header', 'html', 'i', 'iframe', 'ins', 'kbd',
       'label', 'legend', 'li', 'main', 'map', 'mark', 'menu', 'menuitem',
       'meter', 'nav', 'noframes', 'noscript', 'object', 'ol', 'optgroup',
@@ -43,7 +45,7 @@ class PkTree extends PartialSet {
   /** Means handled by special "custom" methods - $this->customselect,
    * $this->customtextarea, etc.*/
   public static $custom_tags = [
-      'select', 'textarea', 'radio', 'checkbox', 'boolean',
+      'select', 'textarea', 'radio', 'checkbox', 'boolean', 'submitButton', 'form',
 
   ];
 
@@ -71,24 +73,24 @@ class PkTree extends PartialSet {
 
   public static function contentTag($tag) {
     if (!$tag || !is_string($tag)) return false;
-    $tag = strtolower($tag);
+    //$tag = strtolower($tag);
     return in_array($tag, static::$content_tags, true);
   }
 
   public static function customTag($tag) {
     if (!$tag || !is_string($tag)) return false;
-    $tag = strtolower($tag);
+    //$tag = strtolower($tag);
     return in_array($tag, static::$custom_tags, true);
   }
 
   public static function selfClosingTag($tag) {
     if (!$tag || !is_string($tag)) return false;
-    $tag = strtolower($tag);
+    //$tag = strtolower($tag);
     return in_array($tag, static::$selfclosing_tags, true);
   }
 
   public static function isTag($tag) {
-    return static::selfClosingTag($tag) || static::contentTag($tag);
+    return static::selfClosingTag($tag) || static::contentTag($tag) || ($tag === 'form');
   }
 
   public static function isInputType($tag) {
@@ -149,13 +151,28 @@ class PkTree extends PartialSet {
   //$this->makeOpenTag
   public function isContentElement() {
     //return in_array($this->pktag, static::$content_tags, 1);
-    return $this->contentTag($this->getPkTag());
+    $tag = $this->getPkTag();
+    return $this->contentTag($tag) || ($tag == 'form');
   }
 
   public function renderOpener() {
-    if (static::isTag($this->getPkTag())) {
-      return "<{$this->getPkTag()} " . PkHtml::attributes($this->attributes) . ">";
+    $tag = $this->getPkTag();
+    error_log("RenderOpener; tag: [$tag]");
+    if (static::isTag($tag) && ($tag !== 'form')) {
+      return "<$tag " . PkHtml::attributes($this->attributes) . ">";
     }
+    if ($tag === 'form') {
+      return "FORM ".$this->getSpecialOpen();
+    }
+  }
+
+  #So far, just for the special 'form' element from FormBuilder
+  public $specialOpen;
+  public function getSpecialOpen() {
+    return $this->specialOpen;
+  }
+  public function setSpecialOpen($specialOpen) {
+    $this->specialOpen = $specialOpen;
   }
 
   public function renderCloser() {
@@ -233,25 +250,29 @@ class PkTree extends PartialSet {
   }
 
   /** 
-   * Node Types:
-   *   1 => Content Node
-   *   2 => Unstructured Content - 
-   *   3 => No Content Node 
-   *   4 => Special No Content Node  (textarea/select
+   * Node Types: - < 10 Can have children; > 10 can't
+   *   1 => Content Node Can have children
+   *   2 => Unstructured Content - Can have children 
+   *   3 => Special - form! Can have children
+   *   11 => Self-Closing tag - No Children
+   *   12 => No Content Node  - No Children
+   *   13  => Special No Content Node  (textarea/select, etc) - No Children
    *   (NOTE! For this purpose, we consider textarea & select to be NO CONTENT
    */
   public function getNodeType() {
-    if (!($pktag = $this->getPkTag())) return 2;
-    if ($this->selfClosingTag($pktag)) return 3;
-    if (in_array($pktag,static::$no_child_tags,1)) return 4;
-    if ($this->contentTag($pktag)) return 1;
-    if ($this->customTag($pktag)) return 5;
+    $pktag = $this->getPkTag();
+    if ($this->contentTag($pktag)) return 1; #Regular content tag/element
+    if (!$pktag) return 2; #unstructured / non-node content
+    if ($pktag === 'form') return 3; 
+    if ($this->selfClosingTag($pktag)) return 11; 
+    if (in_array($pktag,static::$no_child_tags,1)) return 12;
+    if ($this->customTag($pktag)) return 13;
     throw new \Exception ("Invalid Node Type: [$pktag]");
   }
 
   /** Can this node CONTAIN other nodes? */
   public function canHaveChildren() {
-    return in_array($this->getNodeType(),[1,2],1);
+    return $this->getNodeType() < 10;
   }
 
   /** does __call handle this method? */
@@ -302,14 +323,20 @@ class PkTree extends PartialSet {
 
   public function setPkTag($tag) {
     $tag = trim($tag);
-    if(!$this->isTag($tag) && !$this->isInputType($tag)) return false;
+    if($tag && !$this->isTag($tag) && !$this->isInputType($tag)) {
+      throw new \Exception("Setting Illegal Tag: [$tag]");
+    }
     if ($this->isInputType($tag)) $tag = 'input';
     return $this->pktag = $tag;
   }
 
   public function getPkTag() {
-    if(!$this->isTag($this->pktag)) return false;
-    return $this->pktag;
+    $tag = $this->pktag;
+    if($tag && !$this->isTag($tag)) {
+    //if(!$this->isTag($this->pktag)) {
+      throw new \Exception("Getting Illegal Tag: [$tag]");
+    }
+    return $tag;
   }
 
 
@@ -346,6 +373,35 @@ class PkTree extends PartialSet {
   public function customboolean($name, $checked = null, $options = [], $unset = '0', $value = 1) {
     $options = $this->cleanAttributes($options);
     return $this->rawcontent(PkForm::boolean($name, $checked, $options, hpure($unset), hpure($value)));
+  }
+
+  public function customsubmitButton ($label = 'Submit', $options = []) {
+    $options = $this->cleanAttributes($options);
+    return $this->rawcontent(PkForm::submitButton($label, $options));
+  }
+
+  public function customform($content = null, array $options=[]) {
+    if (array_key_exists('model', $options)) {
+      $model = $options['model'];
+      unset($options['model']);
+    }
+    $open = PkForm::open($options).'';
+    $this->setSpecialOpen($open);
+    //$this->setSpecialOpen(PkForm::open($options));
+    if (isset($model)) PkForm::setModel($model);
+    $this->setPkTag('form');
+    pkdebug("OPEN:", $open, "SpecialOpen:", $this->getSpecialOpen());
+
+
+    ### Use RAW = true while debugging - address later!!!
+    if (is_array($content)) {
+      foreach ($content as $citem) {
+        $this->content($citem,true);
+      }
+    } else {
+      $this->content($content, true);
+    }
+    return $this;
   }
 
 
