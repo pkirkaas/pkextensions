@@ -84,11 +84,10 @@ class PkHtmlRenderer extends PartialSet {
   }
   public function content($content='', $raw = false) {
     //if(static::getRawCount() || ($content instanceOf PkHtmlRenderer)) {
-    if($raw || ($content instanceOf PkHtmlRenderer)) {
-      $this[] = $content;
-    } else {
-      $this[] = hpure($content);
+    if(!$raw && !($content instanceOf self) && !($content instanceOf PkTree)) {
+      $content = hpure($content);
     }
+    $this[] = new self([$content]);
     return $this;
   }
   public function rawcontent($content='') {
@@ -152,9 +151,9 @@ class PkHtmlRenderer extends PartialSet {
       $wrap_tpl[] = "<div  class='";
       $wrap_tpl['wrapper_class'] = 'col-xs-3 tpm-wrapper'; #Default
       $wrap_tpl[] = "'>\n<div  class='block tpm-label'>\n";
-      $wrap_tpl['label']=null; #Replace
+      $wrap_tpl['label']=null|true; #Replace - if null, hpure, if true, raw
       $wrap_tpl[] = "</div>\n<div  class='block tpm-value'>\n";
-      $wrap_tpl['input'] = null; #Replace
+      $wrap_tpl['input'] = null|true; #Replace - if null, hpure, if true, raw
       $wrap_tpl[] = "</div>\n</div>\n";
    * 
    * #Call:
@@ -173,6 +172,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return PkHtmlRenderer - with data inserted in the template
    */
   public function inject($arr,$tpl=null) {
+    pkdebug("ARR:",$arr,"TPL", $tpl);
     if (!is_array($arr) && is_stringish($arr)) {
       $arr = ['content' => $arr];
     }
@@ -182,6 +182,9 @@ class PkHtmlRenderer extends PartialSet {
       $tpl = new PkHtmlRenderer();
     }
     foreach ($arr as $key =>$val) {
+      $raw = (keyVal($key,$tpl) === true);
+      //if($key === 'notes') pkdebug("KEY: [$key], keyval key/tpl", keyVal('notes',$tpl), "TPL['notes']:",$tpl['notes']);
+      if (!$raw) $val = hpure($val);
       $tpl[$key] = $val;
     }
     return $this->content($tpl,true);

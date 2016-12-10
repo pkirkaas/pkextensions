@@ -316,13 +316,14 @@ function pkdebug_base() {
   }
   $frame = $stack[$idx];
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
+   $fline = keyVal('line',$frame);
    // Try using new way (below) - add option to display args & object later
+    /*
     if (isset($stack[1])) {
     $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
     } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
     }
-    /*
    * 
    */
   /** Test $retvals - better way? */
@@ -332,7 +333,7 @@ function pkdebug_base() {
     //$tstrr.= "$key: $value, ";
     $tstrr.= "$value; ";
   }
-  $tstrr.="\n";
+  $tstrr.="; LINE: $fline\n";
   $out.=$tstrr;
   $lastarg = func_get_arg(func_num_args() - 1);
   $dumpobjs = true;
@@ -2180,6 +2181,10 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
  */
 function keyValOrDefault($key, $container = [], $default = null, $forceAttrGet = false) {
   if (is_object($container)) {
+    if (is_arrayish($container)) { #Dereference like an array, not object
+      if ($container->offsetExists($key)) return $container[$key];
+      return $default;
+    }
     if ($forceAttrGet) {
       return $container->$key;
     }

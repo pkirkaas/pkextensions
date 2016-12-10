@@ -93,6 +93,7 @@ function pk_showcheck($val = null, $checked = "&#9745;", $unchecked ="&#9744;", 
 }
 
 function hpure($input = '') {
+  if ($input === null) return null;
   static $htmlpurifier = null;
   if (!$htmlpurifier) {
     $config = HTMLPurifier_Config::createDefault();

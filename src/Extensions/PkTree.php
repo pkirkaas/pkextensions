@@ -11,8 +11,9 @@
 namespace PkExtensions;
 
 use PkHtml;
-use PkExtensions\PartialSet;
-use PkExtensions\HtmlRenderer;
+use PkForm;
+//use PkExtensions\PartialSet;
+//use PkExtensions\PkHtmlRenderer;
 
 class PkTree extends PartialSet {
   #These are called with $this->nocontent($tagname, $attributes)
@@ -32,11 +33,19 @@ class PkTree extends PartialSet {
       'label', 'legend', 'li', 'main', 'map', 'mark', 'menu', 'menuitem',
       'meter', 'nav', 'noframes', 'noscript', 'object', 'ol', 'optgroup',
       'option', 'output', 'p', 'pre', 'progress', 'q', 'rp', 'rt', 'ruby',
-      's', 'samp', 'script', 'section', 'select', 'small', 'span',
+      's', 'samp', 'script', 'section',  'small', 'span',
       'strike', 'strong', 'style', 'sub', 'summary', 'sup', 'table',
-      'tbody', 'td', 'textarea', 'tfoot', 'th', 'thead', 'time', 'title',
+      'tbody', 'td',  'tfoot', 'th', 'thead', 'time', 'title',
       'tr', 'tt', 'u', 'ul', 'var', 'video',
   ];
+
+  /** Means handled by special "custom" methods - $this->customselect,
+   * $this->customtextarea, etc.*/
+  public static $custom_tags = [
+      'select', 'textarea', 'radio', 'checkbox', 'boolean',
+
+  ];
+
   public static $input_types = [
       'checkbox', 'color', 'date', 'datetime', 'datetime-local', 'email', 'file', 'hidden', 'image', 'month',
       'number', 'password', 'radio', 'range', 'min', 'max', 'value', 'step', 'reset', 'search', 'submit',
@@ -56,13 +65,19 @@ class PkTree extends PartialSet {
 
   # Specially handled content tags that can't have children
   public static $no_child_tags = [
-      'select', 'textarea',
+      'select', 'textarea', 'input', 'boolean',
   ];
 
   public static function contentTag($tag) {
     if (!$tag || !is_string($tag)) return false;
     $tag = strtolower($tag);
     return in_array($tag, static::$content_tags, true);
+  }
+
+  public static function customTag($tag) {
+    if (!$tag || !is_string($tag)) return false;
+    $tag = strtolower($tag);
+    return in_array($tag, static::$custom_tags, true);
   }
 
   public static function selfClosingTag($tag) {
@@ -82,45 +97,22 @@ class PkTree extends PartialSet {
   /////  !!!!  Deal with inputs later !!!!!!
 
   public $depth = 0;
-  /*
-  public $tagStack = [];
-
-  public function addTagStack($tagarr) {
-    $this->tagStack[] = $tagarr;
-    return count($this->tagStack);
-  }
-
-  public function popTagStack() {
-    $tagrr = array_pop($this->tagStack);
-    if (!$tagrr) return;
-    $tagparams = reset($tagrr);
-    $tag = key($tagrr);
-    return $tag;
-  }
-   * 
-   */
 
   public $pktag;
   public $attributes;
 
   ## An element can only have one tag and one set of attributes
 
-  //public function __construct($pktag = null, $theval = null, $attributes=[]) {
-    /*
-  public function __construct() {
-    $this->attributes = $attributes;
-    $this->pktag = $pktag;
-    $this->content($theval);
-  }
-     */
 
-  // Not sure if I should return anything from this or not? Try not, first
+  // Should I return "this" or $content?  Try $content
   public function content($content = '', $raw = false) {
-    if ($raw || ($content instanceOf PartialSet)) {
-      $this[] = $content;
-    } else {
-      $this[] = hpure($content);
+    if (!$raw && !($content instanceOf self) && !($content instanceOf PkHtmlRenderer)) {
+      $content = hpure($content);
     }
+    $content = new self([$content]);
+    $this[] = $content;
+    return $content;
+    //return $this;
   }
 
   public function rawcontent($content = '') {
@@ -197,7 +189,7 @@ class PkTree extends PartialSet {
   public function tagged($tag, $content = null, $attributes = null, $raw = false) {
     $this->setPkTag($tag);
     $gottag = $this->getPkTag();
-    pkdebug("TAG: [$tag]; gottag: [$gottag]");
+    //pkdebug("TAG: [$tag]; gottag: [$gottag]");
     $ctype = typeOf($content);
     $this->attributes = $this->cleanAttributes($attributes);
     if (is_array($content)) {
@@ -234,22 +226,6 @@ class PkTree extends PartialSet {
     return $this;
   }
 
-  public function input($type, $name, $value = null, $options = []) {
-    if (!$this->isInputType($type)) {
-      throw new \Exception ("Invalid Input Type: [$type]");
-    }
-    $options = $this->cleanAttributes($options);
-    #If value exists in options, override arg
-    //$options['value']=keyVal('value',$options,$value);
-    $options['value']=$value;
-    $options['type']=$type;
-    #Set name in options
-    //$options['name']=keyVal('name',$options,$name);
-    $options['name']=$name;
-    return $this->nocontent('input',$options);
-  }
-
-
   public function spaceDepth() {
     //$size = count($this->tagStack);
     $out = '';
@@ -271,12 +247,20 @@ class PkTree extends PartialSet {
     if ($this->selfClosingTag($pktag)) return 3;
     if (in_array($pktag,static::$no_child_tags,1)) return 4;
     if ($this->contentTag($pktag)) return 1;
+    if ($this->customTag($pktag)) return 5;
     throw new \Exception ("Invalid Node Type: [$pktag]");
   }
 
   /** Can this node CONTAIN other nodes? */
   public function canHaveChildren() {
     return in_array($this->getNodeType(),[1,2],1);
+  }
+
+  /** does __call handle this method? */
+  public function isHandled($method) {
+    return $this->isTag($method) ||
+           $this->isInputType($method) ||
+           $this->customTag($method);
   }
 
   public function __call($method, $args) {
@@ -286,10 +270,9 @@ class PkTree extends PartialSet {
       $method = $tag;
       $raw = true;
     }
-    if(!$this->isTag($method) && !$this->isInputType($method)) {
+    if (!$this->isHandled($method)) {
       throw new \Exception ("Unhandled __call type: [$method]");
     }
-
     if (!$this->canHaveChildren()) {
       throw new \Exception ("Can't create a child node for this nodetype: [{$this->getPkTag()}]");
     }
@@ -304,6 +287,11 @@ class PkTree extends PartialSet {
     $child->depth = 1 + $this->depth;
     $this[] = $child;
     #TODO: Do something with $raw
+    if ($this->customTag($method)) {
+      $custommethod = 'custom'.$method;
+      return call_user_func_array([$child, $custommethod], $args);
+
+    }
 
     array_unshift($args, $method);
     //if (in_array($method, static::$content_tags)) {
@@ -318,7 +306,7 @@ class PkTree extends PartialSet {
 
     if (in_array($method, static::$input_types)) {
       //$args = array_unshift($args,$method,$args);
-      return call_user_func_array([$child, 'input'], $args);
+      return call_user_func_array([$child, 'custominput'], $args);
 
       ## It's a content/dom element -create a child
     } 
@@ -345,43 +333,59 @@ class PkTree extends PartialSet {
    * @param string $value - the ta content - in between the open/close tags
    * @param string|array $options - attributes
    */
-  /**
-  public function textarea($name, $value = null, $options = []) {
+
+  public function custominput($type, $name, $value = null, $options = []) {
+    if (!$this->isInputType($type)) {
+      throw new \Exception ("Invalid Input Type: [$type]");
+    }
     $options = $this->cleanAttributes($options);
     #If value exists in options, override arg
-    $value=keyVal('value',$options,$value);
+    //$options['value']=keyVal('value',$options,$value);
+    //$options['value']=$value;
+    //$options['type']=$type;
     #Set name in options
-    $options['name']=keyVal('name',$options,$name);
-    //$this[] = PkForm::textarea($name, $value, $options);
-    return $this->tagged('textarea',$value,$options);
+    //$options['name']=keyVal('name',$options,$name);
+    //$options['name']=$name;
+    //return $this->nocontent('input',$options);
+    $inp = PkForm::input($type, $name, $value, $options);
+   // pkdebug("The inp ctl:", $inp);
+    return $this->rawcontent($inp);
   }
-   * 
-   */
 
-  public function textarea($name, $value = null, $options = []) {
-    $options = $this->cleanAttributes($options);
+
+  public function customtextarea($name, $value = null, $options = []) {
+    //$options = $this->cleanAttributes($options);
+    //
     #If value exists in options, override arg
-    $value=hpure(keyVal('value',$options,$value));
-    $name = keyVal('name',$options,$name);
-    unset($options['name']);
-    unset($options['value']);
+    //$value=hpure(keyVal('value',$options,$value));
+    //$name = keyVal('name',$options,$name);
+    //unset($options['name']);
+    //unset($options['value']);
     #Set name in options
-    return $this->rawcontent(PkForm::textarea($name, hpure($value), $options));
+    //$ta = PkForm::textarea($name, $value, $options);
+    //pkdebug("TA:", $ta);
+    //return $this->rawcontent($ta);
+    $value = hpure($value);
+    pkdebug("VALUE: ", $value);
+    return $this->rawcontent(PkForm::textarea($name, $value, $options));
   }
 
-  public function select($name, $list = [], $selected = null, $options = []) {
+  public function customselect($name, $list = [], $selected = null, $options = []) {
     $options = $this->cleanAttributes($options);
     #If selected exists in options, override arg
-    $selected=hpure(keyVal('selected',$options,$selected));
+    //$selected=hpure(keyVal('selected',$options,$selected));
     #Set name in options
-    $name=keyVal('name',$options,$name);
-    unset($options['name']);
-    unset($options['selected']);
+    //$name=keyVal('name',$options,$name);
+    //unset($options['name']);
+    //unset($options['selected']);
     //$this[] = PkForm::select($name, $list, $selected, $options);
+    //$thectl = PkForm::select($name, $list, $selected, $options);
+    //pkdebug("The select ctl:", $thectl);
+    //return $this->rawcontent( $thectl );
     return $this->rawcontent( PkForm::select($name, $list, $selected, $options));
   }
 
-  public function checkbox($name, $value = 1, $checked = null, $options = []) {
+  public function customcheckbox($name, $value = 1, $checked = null, $options = []) {
     $options = $this->cleanAttributes($options);
     $name=keyVal('name',$options,$name);
     $value=hpure(keyVal('value',$options,$value));
@@ -389,7 +393,7 @@ class PkTree extends PartialSet {
     unset($options['value']);
     return $this->rawcontent(PkForm::checkbox($name, hpure($value), $checked, $options));
   }
-  public function radio($name, $value = null, $checked = null, $options = []) {
+  public function customradio($name, $value = null, $checked = null, $options = []) {
     $options = $this->cleanAttributes($options);
     $name=keyVal('name',$options,$name);
     $value=hpure(keyVal('value',$options,$value));
@@ -398,7 +402,7 @@ class PkTree extends PartialSet {
     return $this->rawcontent(PkForm::radio($name, hpure($value), $checked, $options));
   }
 
-  public function boolean($name, $checked = null, $options = [], $unset = '0', $value = 1) {
+  public function customboolean($name, $checked = null, $options = [], $unset = '0', $value = 1) {
     $options = $this->cleanAttributes($options);
     $name=keyVal('name',$options,$name);
     $value=hpure(keyVal('value',$options,$value));
