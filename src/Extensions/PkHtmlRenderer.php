@@ -160,7 +160,7 @@ class PkHtmlRenderer extends PartialSet {
         PkRenderer::inject([
             'label'=>"First Name",
             'input'=>PkForm::text('fname', null, ['placeholder' => 'First Name','class'=>'pk-inp']),
-        ],$wrap_tpl),
+        ],$wrap_tpl,['input']),
 
    *  
    * @param assoc $arr: The key/values to insert in the template - OR, if not
@@ -168,10 +168,11 @@ class PkHtmlRenderer extends PartialSet {
    *   $tpl at default "content":  <tt>$tpl['content']=$arr;</tt>
    * @param PartialSet|null: $tpl: A PartialSet/Renderer with indices matching
    * the value keys of the input array
+   * @param array $rawkeys - alternate method for specifying a "raw" input
    * 
    * @return PkHtmlRenderer - with data inserted in the template
    */
-  public function inject($arr,$tpl=null) {
+  public function inject($arr,$tpl=null,$rawkeys=[]) {
     pkdebug("ARR:",$arr,"TPL", $tpl);
     if (!is_array($arr) && is_stringish($arr)) {
       $arr = ['content' => $arr];
@@ -182,8 +183,7 @@ class PkHtmlRenderer extends PartialSet {
       $tpl = new PkHtmlRenderer();
     }
     foreach ($arr as $key =>$val) {
-      $raw = (keyVal($key,$tpl) === true);
-      //if($key === 'notes') pkdebug("KEY: [$key], keyval key/tpl", keyVal('notes',$tpl), "TPL['notes']:",$tpl['notes']);
+      $raw = (keyVal($key,$tpl) === true) || in_array($key,$rawkeys,true);
       if (!$raw) $val = hpure($val);
       $tpl[$key] = $val;
     }
