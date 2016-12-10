@@ -157,12 +157,11 @@ class PkTree extends PartialSet {
 
   public function renderOpener() {
     $tag = $this->getPkTag();
-    error_log("RenderOpener; tag: [$tag]");
     if (static::isTag($tag) && ($tag !== 'form')) {
       return "<$tag " . PkHtml::attributes($this->attributes) . ">";
     }
     if ($tag === 'form') {
-      return "FORM ".$this->getSpecialOpen();
+      return $this->getSpecialOpen();
     }
   }
 
@@ -176,8 +175,12 @@ class PkTree extends PartialSet {
   }
 
   public function renderCloser() {
+    $tag = $this->getPkTag();
+    if ($tag === 'form') {
+      return PkForm::close();
+    }
     if ($this->isContentElement()) {
-      return "</{$this->getPkTag()}>\n";
+      return "</$tag>\n";
     }
   }
 
@@ -333,7 +336,6 @@ class PkTree extends PartialSet {
   public function getPkTag() {
     $tag = $this->pktag;
     if($tag && !$this->isTag($tag)) {
-    //if(!$this->isTag($this->pktag)) {
       throw new \Exception("Getting Illegal Tag: [$tag]");
     }
     return $tag;
@@ -380,26 +382,44 @@ class PkTree extends PartialSet {
     return $this->rawcontent(PkForm::submitButton($label, $options));
   }
 
+  /** !!!!!!!!  TO WORK WITH MODEL BINDING - MUST CALL CORRECTLY SO FORM IS BOUND
+   *  to Model before inputs are evaluated --
+   * WRONG:  
+    $frm->form([
+      $frm::div([
+        $frm::pair($frm::text('date',null,['class' =>'datepicker auto-attach pk-inp']), 'Date', 'col-sm-4'),
+        $frm::pair($frm::select('interaction_id',InteractionRef::getSelectList(), null,'pk-inp'),'Type of Interaction?','col-sm-4'),
+        $frm::pair( $frm::text('summary',null,['class' =>' pk-inp']),'Summary','col-sm-4'),
+      ],'row'), $frm::submitButton(),
+    ], ['model'=>$clientlog]);
+   * 
+   * RIGHT:
+    $frm->form(null,['model'=>$clientlog])->div([
+        $frm::pair($frm::text('date',null,['class' =>'datepicker auto-attach pk-inp']), 'Date', 'col-sm-4'),
+        $frm::pair($frm::select('interaction_id',InteractionRef::getSelectList(), null,'pk-inp'),'Type of Interaction?','col-sm-4'),
+        $frm::pair( $frm::text('summary',null,['class' =>' pk-inp']),'Summary','col-sm-4'),
+      ],'row')->submitButton();
+   * THAT WAS THE WHOLE POINT OF THE NEW PKTREE RENDERER!
+   * @param type $content
+   * @param array $options
+   * @return \PkExtensions\PkTree
+   */
   public function customform($content = null, array $options=[]) {
     if (array_key_exists('model', $options)) {
       $model = $options['model'];
       unset($options['model']);
     }
-    $open = PkForm::open($options).'';
-    $this->setSpecialOpen($open);
-    //$this->setSpecialOpen(PkForm::open($options));
-    if (isset($model)) PkForm::setModel($model);
+    if (isset($model)) {
+      PkForm::setModel($model);
+    }
+    $this->setSpecialOpen(PkForm::open($options));
     $this->setPkTag('form');
-    pkdebug("OPEN:", $open, "SpecialOpen:", $this->getSpecialOpen());
-
-
-    ### Use RAW = true while debugging - address later!!!
     if (is_array($content)) {
       foreach ($content as $citem) {
-        $this->content($citem,true);
+        $this->content($citem);
       }
     } else {
-      $this->content($content, true);
+      $this->content($content);
     }
     return $this;
   }
