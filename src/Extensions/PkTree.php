@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Painters;
+namespace PkExtensions;
 
 use PkHtml;
 use PkExtensions\PartialSet;
@@ -79,10 +79,14 @@ class PkTree extends PartialSet {
 
   ## An element can only have one tag and one set of attributes
 
-  public function __construct($pktag = null, $theval = null) {
+  //public function __construct($pktag = null, $theval = null, $attributes=[]) {
+    /*
+  public function __construct() {
+    $this->attributes = $attributes;
     $this->pktag = $pktag;
     $this->content($theval);
   }
+     */
 
   public function content($content = '', $raw = false) {
     if ($raw || ($content instanceOf PkHtmlRenderer)) {
@@ -106,15 +110,18 @@ class PkTree extends PartialSet {
     $this->getIterator()->rewind();
     foreach ($this as $key => $value) {
       if ($value instanceOf self) {
-        $ps[] = $value->unwind();
+        $ps[] = "  ".$value->unwind();
       } else {
-        $ps[] = $value;
+        $ps[] = "  ".$value;
       }
     }
     $ps[] = $this->renderCloser();
     return $ps;
   }
-
+  public static function __callStatic($method, $args) {
+    $rnd = new static();
+    return call_user_func_array([$rnd,$method], $args);
+  }
   /////  !!!!  Deal with inputs later !!!!!!
   //$this->makeOpenTag
   public function isContentElement() {
@@ -123,7 +130,7 @@ class PkTree extends PartialSet {
 
   public function renderOpener() {
     if (static::isTag($this->pktag)) {
-      return "<{$this->pktag} " . PkHtml::attributes($this->attributes) . ">\n";
+      return "<{$this->pktag} " . PkHtml::attributes($this->attributes) . ">";
     }
   }
 
@@ -132,33 +139,6 @@ class PkTree extends PartialSet {
       return "</{$this->pktag}>\n";
     }
   }
-
-  /** Does this instance represent a 'content' HTML element, non-content, 
-   * input, or mixed?
-   */
-  public function nodeType() {
-    
-  }
-
-//  public function __call($name,$args) {
-  // }
-  /*
-    public function down($pktag=null, $theval=null) {
-    $child = new static($pktag, $theval);
-    $child->depth = 1 + $this->depth;
-    $this[] = $child;
-    return $child;
-    }
-    public function unwind() {
-    $this->whitespace($this->pktag, keyVal(0,$this->theval));
-    foreach ($this as $key => $value) {
-    pkdebug("KEY: $key; val:", $value);
-    $value->unwind();
-    }
-    $this->whitespace('/'.$this->pktag);
-    }
-   * 
-   */
 
   /** Just return $this->tagged with $raw default to true rather than false
    * 
@@ -213,14 +193,14 @@ class PkTree extends PartialSet {
   }
 
   public function nocontent($tag, $attributes = null) {
-    $this->$attributes = $this->cleanAttributes($attributes);
+    $this->attributes = $this->cleanAttributes($attributes);
     return $this;
   }
 
   public function spaceDepth() {
-    $size = count($this->tagStack);
+    //$size = count($this->tagStack);
     $out = '';
-    for ($i = 0; $i < $size; $i++)
+    for ($i = 0; $i < $this->depth; $i++)
       $out .= '  ';
     return $out;
   }
@@ -233,7 +213,8 @@ class PkTree extends PartialSet {
       $raw = true;
     }
 
-    $child = new static($method);
+    $child = new static();
+    $child->pktag = $method;
     $child->depth = 1 + $this->depth;
     $this[] = $child;
     #TODO: Do something with $raw
