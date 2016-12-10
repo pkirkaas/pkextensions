@@ -108,7 +108,9 @@ class PkTree extends PartialSet {
     if (!$raw && !($content instanceOf self) && !($content instanceOf PkHtmlRenderer)) {
       $content = hpure($content);
     }
-    $content = new self([$content]);
+    if (!($content instanceOf PartialSet)) {
+      $content = new self([$content]);
+    }
     $this[] = $content;
     return $content;
     //return $this;
