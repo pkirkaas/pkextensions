@@ -128,7 +128,7 @@ class PkTree extends PartialSet {
   }
 
   public function __toString() {
-    return "<p>Hello</p>" . $this->unwind() . " ";
+    return $this->unwind() . "";
   }
 
   ### Don't use PKDEBUG $THIS in here - INFINITE NESTING!
@@ -196,6 +196,8 @@ class PkTree extends PartialSet {
   //I'm the child - just got created & got this handed to me...
   public function tagged($tag, $content = null, $attributes = null, $raw = false) {
     $this->setPkTag($tag);
+    $gottag = $this->getPkTag();
+    pkdebug("TAG: [$tag]; gottag: [$gottag]");
     $ctype = typeOf($content);
     $this->attributes = $this->cleanAttributes($attributes);
     if (is_array($content)) {
@@ -331,7 +333,7 @@ class PkTree extends PartialSet {
   }
 
   public function getPkTag() {
-    if($this->isTag($this->pktag)) return false;
+    if(!$this->isTag($this->pktag)) return false;
     return $this->pktag;
   }
 
