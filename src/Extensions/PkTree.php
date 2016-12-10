@@ -5,6 +5,7 @@
  * Much of the custom input code is taken from the Laravel Collective
  * Html & Form Builders
  * Copyright (c) <Adam Engebretson>
+ * The MIT License (MIT)
  *
  */
 
@@ -93,8 +94,6 @@ class PkTree extends PartialSet {
   public static function isInputType($tag) {
     return in_array($tag, static::$input_types,1);
   }
-
-  /////  !!!!  Deal with inputs later !!!!!!
 
   public $depth = 0;
 
@@ -277,24 +276,14 @@ class PkTree extends PartialSet {
       throw new \Exception ("Can't create a child node for this nodetype: [{$this->getPkTag()}]");
     }
     $child = new static();
-    //$child->pktag = $method;
-    /*
-    if (!$child->setPktag($method)) {
-      throw new \Exception("Illegal tag: [$method]");
-    }
-     * 
-     */
     $child->depth = 1 + $this->depth;
     $this[] = $child;
-    #TODO: Do something with $raw
     if ($this->customTag($method)) {
       $custommethod = 'custom'.$method;
       return call_user_func_array([$child, $custommethod], $args);
-
     }
 
     array_unshift($args, $method);
-    //if (in_array($method, static::$content_tags)) {
     if ($this->contentTag($method)) {
       return call_user_func_array([$child, 'tagged'], $args);
     }
@@ -305,7 +294,6 @@ class PkTree extends PartialSet {
     } 
 
     if (in_array($method, static::$input_types)) {
-      //$args = array_unshift($args,$method,$args);
       return call_user_func_array([$child, 'custominput'], $args);
 
       ## It's a content/dom element -create a child
@@ -328,88 +316,36 @@ class PkTree extends PartialSet {
 
   ############  Use Laravel Collective Form methods for inputs/selects/etc.
 
-  /** Don't just default to 'tagged', cuz it's input
-   * @param string $name - the ta 'name' attribute
-   * @param string $value - the ta content - in between the open/close tags
-   * @param string|array $options - attributes
-   */
-
   public function custominput($type, $name, $value = null, $options = []) {
     if (!$this->isInputType($type)) {
       throw new \Exception ("Invalid Input Type: [$type]");
     }
     $options = $this->cleanAttributes($options);
-    #If value exists in options, override arg
-    //$options['value']=keyVal('value',$options,$value);
-    //$options['value']=$value;
-    //$options['type']=$type;
-    #Set name in options
-    //$options['name']=keyVal('name',$options,$name);
-    //$options['name']=$name;
-    //return $this->nocontent('input',$options);
-    $inp = PkForm::input($type, $name, $value, $options);
-   // pkdebug("The inp ctl:", $inp);
-    return $this->rawcontent($inp);
+    return $this->rawcontent(PkForm::input($type, $name, $value, $options));
   }
 
 
   public function customtextarea($name, $value = null, $options = []) {
-    //$options = $this->cleanAttributes($options);
-    //
-    #If value exists in options, override arg
-    //$value=hpure(keyVal('value',$options,$value));
-    //$name = keyVal('name',$options,$name);
-    //unset($options['name']);
-    //unset($options['value']);
-    #Set name in options
-    //$ta = PkForm::textarea($name, $value, $options);
-    //pkdebug("TA:", $ta);
-    //return $this->rawcontent($ta);
-    $value = hpure($value);
-    pkdebug("VALUE: ", $value);
+    $options = $this->cleanAttributes($options);
     return $this->rawcontent(PkForm::textarea($name, $value, $options));
   }
 
   public function customselect($name, $list = [], $selected = null, $options = []) {
     $options = $this->cleanAttributes($options);
-    #If selected exists in options, override arg
-    //$selected=hpure(keyVal('selected',$options,$selected));
-    #Set name in options
-    //$name=keyVal('name',$options,$name);
-    //unset($options['name']);
-    //unset($options['selected']);
-    //$this[] = PkForm::select($name, $list, $selected, $options);
-    //$thectl = PkForm::select($name, $list, $selected, $options);
-    //pkdebug("The select ctl:", $thectl);
-    //return $this->rawcontent( $thectl );
     return $this->rawcontent( PkForm::select($name, $list, $selected, $options));
   }
 
   public function customcheckbox($name, $value = 1, $checked = null, $options = []) {
     $options = $this->cleanAttributes($options);
-    $name=keyVal('name',$options,$name);
-    $value=hpure(keyVal('value',$options,$value));
-    unset($options['name']);
-    unset($options['value']);
     return $this->rawcontent(PkForm::checkbox($name, hpure($value), $checked, $options));
   }
   public function customradio($name, $value = null, $checked = null, $options = []) {
     $options = $this->cleanAttributes($options);
-    $name=keyVal('name',$options,$name);
-    $value=hpure(keyVal('value',$options,$value));
-    unset($options['name']);
-    unset($options['value']);
     return $this->rawcontent(PkForm::radio($name, hpure($value), $checked, $options));
   }
 
   public function customboolean($name, $checked = null, $options = [], $unset = '0', $value = 1) {
     $options = $this->cleanAttributes($options);
-    $name=keyVal('name',$options,$name);
-    $value=hpure(keyVal('value',$options,$value));
-    $unset=hpure(keyVal('unset',$options,$unset));
-    unset($options['name']);
-    unset($options['value']);
-    unset($options['unset']);
     return $this->rawcontent(PkForm::boolean($name, $checked, $options, hpure($unset), hpure($value)));
   }
 

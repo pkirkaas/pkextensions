@@ -54,6 +54,11 @@ abstract class PkModel extends Model {
    */
   public static $table_field_defs = [ 'id' => 'increments',];
 
+  /** Fields to clean of dangerous HTML tags before saving
+   *
+   * @var array - example: ['notes']; 
+   */
+  public static $escape_fields = [];
 
 
 //Display Value Fields
@@ -1421,6 +1426,10 @@ class $createclassname extends Migration {
       }
     }
     if ($this->emptyStringToNull) $this->convertEmptyStringToNullForNumerics();
+    #Clean dangerous HTML from specified fields
+    foreach (static::$escape_fields as $field) {
+      if ($this->$field) $this->$field = hpure($this->$field);
+    }
     if (!$this->authUpdate())
         throw new Exception("Not authorized to update this record");
     $result = parent::save($opts);
