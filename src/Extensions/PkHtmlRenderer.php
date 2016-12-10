@@ -241,29 +241,6 @@ class PkHtmlRenderer extends PartialSet {
 
   }
 
-  /*
-  public static function resetRawCount($i = 0) {
-    static::$raw_depth = $i;
-  }
-
-  public static function incRawCount() {
-    static::$raw_depth ++;
-    return static::$raw_depth;
-  }
-
-  public static function decRawCount() {
-    static::$raw_depth --;
-    return static::$raw_depth;
-  }
-
-  public static function getRawCount() {
-    return static::$raw_depth;
-  }
-   * 
-   */
-
-
-
   public function rawwrap($value='', $label='',$valueClass='', $labelClass='', $wrapperClass ='') {
     if (is_array($value)) {
       $value['raw'] = true;
@@ -293,35 +270,17 @@ class PkHtmlRenderer extends PartialSet {
    * @return html string
    */
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
-    /* // Want to use $content array for nesting 
-    if (!is_stringish($content) && is_arrayish($content)) {
-      $content = keyVal('content', $content);
-      $attributes = keyVal('attributes', $content,$attributes);
-      $raw = keyVal('raw', $content,false,$raw);
-    }
-     * 
-     */
-    /*
-    if ($raw) {
-      static::incRawCount();
-    }
-     * 
-     */
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
-    //if (!$content) $content = ' ';
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
-    //if ($content === true) {
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
-      //$this[]="$spaces<$tag ".PkHtml::attributes($attributes).">\n";
       return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">\n");
     } else if (($content === false)) {
                                 ##Nest the elements
       $spaces = $this->spaceDepth();
       $size = $this->addDepthTagStack($tag);
-      //$this[]="$spaces<$tag ".$this->attributes($attributes).">\n";
       return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">\n");
     } else {
       #Trust that text already wrapped in PhHtmlRenderer has already been filtered
@@ -337,24 +296,6 @@ class PkHtmlRenderer extends PartialSet {
         $this->content($content,$raw);
       }
       $this->rawcontent($this->spaceDepth()."</$tag>\n");
-
-/*
-
-
-    if ($this->depthTagStack) {
-      $i = count($this->depthTagStack);
-      while ($i) {
-        $tag = $this->popDepthTagStack();
-        $i = count($this->depthTagStack);
-        $this[] = "</$tag>\n";
-        pkdebug("[i] $i:, tag: $tag; Depth Tag Stack: ", $this->depthTagStack);
-      }
-
-
-
-
-      //if ($raw) static::decRawCount();
-*/
       return $this;
     }
   }
@@ -916,32 +857,6 @@ class PkHtmlRenderer extends PartialSet {
      return $this->rawcontent(PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts));
   }
 
-
-  /*  Not used for now....
-  public $parent; #The owning parent of this type
-
-  public function __construct($args = []) {
-    if (!empty($args['parent']) && $args['parent'] instanceOf self) {
-      $this->parent = $args['parent'];
-    }
-    unset ($args['parent']);
-    parent::__construct($args);
-  }
-
-  public function up() {
-    if ($this->parent instanceOf self) {
-      return $this->parent;
-    }
-  }
-
-  public function down() {
-    $new = new static();
-    $this[] = $new;
-    return $new;
-  }
-   * 
-   */
-  
 
 
 }
