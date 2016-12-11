@@ -17,6 +17,7 @@ use PkForm;
 //use PkExtensions\PkHtmlRenderer;
 
 class PkTree extends PartialSet {
+  const TPLSTR = '__CNT_TPL__';
   #These are called with $this->nocontent($tagname, $attributes)
 
   public static $selfclosing_tags = [
