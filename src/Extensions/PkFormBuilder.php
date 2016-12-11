@@ -39,6 +39,9 @@ class PkFormBuilder extends FormBuilder {
    * 
    */
 
+  protected function setTextAreaSize($options) {
+    return [];
+  }
   public function form($content, array $options = []) {
     return $this->open($options) . $content . $this->close();
   }

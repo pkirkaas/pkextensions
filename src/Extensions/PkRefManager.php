@@ -198,20 +198,46 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
 
   public $datarow;
 
+  /**
+   * $datarow one of:
+   * [$key => $value] for $refArr
+   * [$key => ['value' => $value, 'extra'=>$extra] for $keyRefArr
+   * [$idx => ['key'=>$key, 'value' => $value, 'extra'=>$extra] for $idxRefArr
+   * @param array $datarow
+   */
   public function __construct($datarow = []) {
     $this->datarow = $datarow;
   }
 
   public function key() {
     $local = $this->datarow;
-    if (!static::$multival) return key($local);
-    return keyVal('key', $local);
-  }
+    reset($local);
+    if (is_array(static::$idxRefArr)) { #idxRefArr
+      return keyVal('key', $local);
+    }
+    return key($local); 
+    }
 
   public function value() {
     $local = $this->datarow;
-    if (!static::$multival) return current($local);
-    return keyVal('value', $local);
+    reset($local);
+    if (is_array(static::$refArr)) { #refArr
+      return current($local);
+    }
+    return keyVal('value', current($local));
+    //return keyVal('value', $local);
+  }
+
+  /** Returns whatever is at $key -
+   * if $refArr, just $value;
+   * if $idxRefArr or $keyRefArr, the data row
+   * 
+   * @param scalar $key
+   */
+  public function getRow($key) {
+    if (is_array(static::$refArr)) return keyVal($key,static::$refArr);
+    if (is_array(static::$keyRefArr)) return keyVal($key,static::$keyRefArr);
+    if (is_array(static::$idxRefArr)) return keyVal($key,static::$idxRefArr);
   }
 
   public static $refcache = [];
