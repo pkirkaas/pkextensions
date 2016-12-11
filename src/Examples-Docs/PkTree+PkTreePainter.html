@@ -41,9 +41,10 @@ $pkt::div() creates a NEW PkTree
 
 #Be careful NOT to return $level - or else you just get the subset!
 
-//$this::div('First','col-xs-3')->text("practices[$idx][name]",keyVal('name',$practice,null,1),  'pk-inp')->up()
-        value(new static())->div('First','col-xs-3')->text("practices[$idx][name]",keyVal('name',$practice,null,1),  'pk-inp')->up()
+#THIS gives you the clean, simple element you want & expect:
+value(new static())->div('First','col-xs-3')->text("practices[$idx][name]",keyVal('name',$practice,null,1),  'pk-inp')->up()
 
+#The problem is the old habit of returning values - just chain them...
 
 
 </body>

@@ -1,26 +1,17 @@
 <?php
-
-/**
- * Copyright (c) <Paul Kirkaas> - 2016 - Builds a DOM tree for rendering 
- * The MIT License (MIT)
- * Much of the custom input code is taken from the Laravel Collective
- * Html & Form Builders
- * Copyright (c) <Adam Engebretson>
- * The MIT License (MIT)
- *
- */
-
 namespace PkExtensions;
-
 use PkHtml;
 use PkForm;
 
-//use PkExtensions\PartialSet;
-//use PkExtensions\PkHtmlRenderer;
-
-class PkTree extends PartialSet {
-
+class PkNode {
+  public $parent;
   public $children;
+  public $depth = 0;
+
+  public function __construct() {
+    $this->children = new PartialSet();
+  }
+
   const TPLSTR = '__CNT_TPL__';
 
   #These are called with $this->nocontent($tagname, $attributes)
@@ -70,9 +61,6 @@ class PkTree extends PartialSet {
   public static $no_child_tags = [
       'select', 'textarea', 'input', 'boolean',
   ];
-  public function __construct() {
-    $this->children = new PartialSet();
-  }
 
   /** Go up the parent tree -- n $lvls, or if null, all the way
    * 
@@ -121,8 +109,6 @@ class PkTree extends PartialSet {
     return in_array($tag, static::$input_types, 1);
   }
 
-  public $depth = 0;
-  public $parent;
   public $pktag;
   public $attributes;
 
@@ -134,8 +120,7 @@ class PkTree extends PartialSet {
     $newel = new self();
     $newel->parent = $this;
     $newel->depth = $this->depth + 1;
-    //$this->children[] = $newel;
-    $this[] = $newel;
+    $this->children[] = $newel;
     return $newel;
   }
 
@@ -143,7 +128,7 @@ class PkTree extends PartialSet {
   // Should I return "this" or $content?  Try $content
   public function content($content = '', $raw = false) {
     if ($content === null) {
-      $this[] = null;
+      $this->children[] = null;
       return $this;
     }
     if (is_array($content)) {
@@ -154,14 +139,14 @@ class PkTree extends PartialSet {
     }
     if (($content instanceOf self) || ($content instanceOf PkHtmlRenderer)
         || ($content instanceOf \Illuminate\Support\HtmlString )) {
-      $this[] = $content;
+      $this->children[] = $content;
       return $this;
     } 
     if (is_string($content)) {
       if (!$raw) {
         $content = hpure($content);
       }
-      $this[] = $content;
+      $this->children[] = $content;
       return $this;
     } else {
       $type = typeOf($content);
@@ -183,8 +168,8 @@ class PkTree extends PartialSet {
   public function unwind() {
     $ps = new PartialSet();
     $ps[] = $this->renderOpener();
-    $this->getIterator()->rewind();
-    foreach ($this as $key => $value) {
+    $this->children->getIterator()->rewind();
+    foreach ($this->children as $key => $value) {
       if ($value instanceOf self) {
         $ps[] = "  " . $value->unwind();
       } else {
@@ -195,15 +180,6 @@ class PkTree extends PartialSet {
     return $ps;
   }
 
-  /*
-    public static function __callStatic($method, $args) {
-    throw new \Exception("Cant do that");
-    $rnd = new self();
-    call_user_func_array([$rnd,$method], $args);
-    //return $rnd;
-    }
-   * 
-   */
 
   /////  !!!!  Deal with inputs later !!!!!!
   //$this->makeOpenTag
@@ -274,6 +250,85 @@ class PkTree extends PartialSet {
     return $this->tagged($tag, $content, $attributes, $raw);
   }
 
+  /** Removes itself from its parent and returns */
+  public function detach() {
+    if (!$this->parent) return $this;
+    $this->parent->removeFromChildren($this);
+    $this->parent = null;
+    return $this;
+  }
+
+  /*
+  public function attach($node) {
+    if (!$node instanceOf self) throw new \Exception ("Illegal Arg to Attach");
+    $this->parent = $node;
+    $node->addChild($this);
+  }
+   * 
+   */
+
+  public function take($node) {
+    if (!$node instanceOf self) throw new \Exception ("Illegal Arg to take");
+    $node->detach();
+    $this->addChild($node);
+  }
+  public function addChild($node, $key=null) {
+    if (!$node instanceOf self) throw new \Exception ("Illegal Arg to AddChild");
+    if ($this->hasChild($node)) return; 
+    if (is_scalar($key)) {
+      $this->children[$key] = $node;
+    }
+    if (!$this->hasChild($node)) {
+      if ($node->parent) {
+        $node->detach();
+      }
+      $this->children[]=$node;
+      $node->parent = $this;
+    }
+  }
+
+  public function hasChild($node) {
+    if (!$node instanceOf self) throw new \Exception ("Illegal Arg to hasChild");
+    foreach ($this->children as $child) {
+      if ($node === $child) return true;
+    }
+    return false;
+  }
+
+  public function swap($node) {
+    if (!$node instanceOf self) throw new \Exception ("Illegal Arg to swap");
+    $nodeParent = $node->parent;
+    $myParent = $this->parent;
+    if ($myParent) {
+      $myKey = $myParent->removeFromChildren($this);
+    }
+    if ($nodeParent) {
+      $nkey = $nodeParent->removeFromChildren($node);
+    }
+
+    if($myParent) {
+      $myParent->children[$myKey] = $node;
+      $node->parent = $myParent;
+    }
+    if($nodeParent) {
+      $nodeParent->children[$nkey] = $this;
+      $this->parent = $nodeParent;
+    }
+  }
+
+
+
+  public function removeFromChildren($node) {
+    if (!$node instanceOf self) return false;
+    foreach ($this->children as $key => $child) {
+      if ($node === $child) {
+        $node->parent = null;
+        $this->children->release($key);
+        return $key;
+      }
+    }
+  }
+
   /**
    * Generate HTML CONTENT element of type $tag
    * Change to allow $content to be assoc array with same params as args
@@ -286,6 +341,16 @@ class PkTree extends PartialSet {
    */
   //I'm the child - just got created & got this handed to me...
   public function tagged($tag, $content = null, $attributes = null, $raw = false) {
+    if ( $this->isAncestor($content)) { #We want to insert this into a new element
+      //$val = $content->up()->release();
+      $val = $this->detach();
+      $content->addChild($val);
+      //$val = $content->detach();
+      pkdebug("Yes, Matched This; contentatts:", $content->attributes,'THESE ATTS', $this->attributes,"Arg Atts", $attributes, 'THIS IS', $this);
+      //$content = $val;
+  //    return ;
+   //   $this->content($val);
+    }
     $this->setPkTag($tag);
     $this->attributes = $this->cleanAttributes($attributes);
     $this->content($content, $raw);
@@ -361,6 +426,12 @@ class PkTree extends PartialSet {
   }
 
   public function __call($method, $args) {
+    //$key = $this->key();
+    //$value = $this->current();
+    //$depth = $this->depth;
+    //pkdebug("KEY: [$key], DEPTH: [$depth]; VAL: [$value]");
+
+    //if ($this->key() !== null)$this->offsetUnset($this->key());
     $method = trim($method);
     $raw = false;
     if ($tag = removeStartStr($method, 'raw')) {
@@ -493,10 +564,24 @@ class PkTree extends PartialSet {
     return $this;
   }
 
-  /** Merges/injects all the contents of $this into the new target */
-  public function merge(PkTree $mrg) {
-    $mrg->content($this);
-    return $mrg;
+  
+
+  public function wrap($tag=null, $attributes = []) {
+    $node = new self();
+    $node->$tag($this, $attributes);
+
+    return $node;
   }
 
+  /** Merges/injects all the contents of $this into the new target */
+  public function merge(PkTree $mergeTo) {
+    $top = $this->up();
+    $val = $top->current();
+    //$mergeTo->content($val);
+    $top->offsetUnset($top->key());
+    //return $mergeTo;
+    //$this->offsetSet($this->key(), $mergeTo);
+  }
+
+  
 }

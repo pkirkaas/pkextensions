@@ -79,8 +79,28 @@ class PartialSet extends \ArrayObject {
     return array_keys($this->getArrayCopy());
   }
 
+  /** Gets the current VALUE */
   public function current() {
     return $this->getIterator()->current();
+  }
+
+  public function key() {
+    return $this->getIterator()->key();
+  }
+
+  /** Unsets the key (current if null) &
+   * returns the value
+   * @param type $key
+   * @return type
+   */
+  public function release($key = null) {
+    if ($key === null) $key=$this->key();
+    if ($key === null) return;
+    if ($this->offsetExists($key)) {
+      $val = $this->offsetGet($key);
+      $this->offsetUnset($key);
+      return $val;
+    }
   }
 
   public function decomposeArray($x = null) {
