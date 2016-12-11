@@ -234,7 +234,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * 
    * @param scalar $key
    */
-  public function getRow($key) {
+  public static function getRow($key) {
     if (is_array(static::$refArr)) return keyVal($key,static::$refArr);
     if (is_array(static::$keyRefArr)) return keyVal($key,static::$keyRefArr);
     if (is_array(static::$idxRefArr)) return keyVal($key,static::$idxRefArr);

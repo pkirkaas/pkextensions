@@ -27,21 +27,23 @@ class PkFormBuilder extends FormBuilder {
     parent::__construct($pkhtml, $url, $view, $csrfToken);
   }
 
-  /*
     public function open(array $options = []) {
-    //$this->model = keyval('model',$options);
-    $open = parent::open($options);
-    return $open;
+      if (array_key_exists('model', $options)) {
+        PkForm::setModel($options['model']);
+        unset($options['model']);
+      }
+    return parent::open($options);
     }
-   * 
-   */
-  /*
-   * 
-   */
 
   protected function setTextAreaSize($options) {
-    return [];
+    if (isset($options['size'])) {
+          return $this->setQuickTextAreaSize($options);
+    }
+    return $options;
   }
+
+
+
   public function form($content, array $options = []) {
     return $this->open($options) . $content . $this->close();
   }

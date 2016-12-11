@@ -93,7 +93,7 @@ class PkController extends Controller {
    * 'Submit' button has the name 'modelset', and the fully namespaced value of
    * the model class. We need to get the original set of models, because we don't
    * want to delete models that didn't belong to that collection in the first place...
-   * @param PkModel $pkmodel
+   * @param PkModel $pkmodel - if you are processing a one-to-many subform, the model should be the 'one'
    * @param Arrayish PkModels $pkmodels - optional
    * @param array $inits - initial/default values if not found in POST
    * @param type $modelkey

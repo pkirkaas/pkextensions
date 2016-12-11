@@ -406,11 +406,8 @@ class PkTree extends PartialSet {
    */
   public function customform($content = null, array $options=[]) {
     if (array_key_exists('model', $options)) {
-      $model = $options['model'];
+      PkForm::setModel($options['model']);
       unset($options['model']);
-    }
-    if (isset($model)) {
-      PkForm::setModel($model);
     }
     $this->setSpecialOpen(PkForm::open($options));
     $this->setPkTag('form');
