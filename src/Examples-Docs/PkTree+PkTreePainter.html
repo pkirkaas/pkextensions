@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'/>
+  <style>
+  .title {
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+  }
+  </style>
+
+  <link type='text/css' rel='stylesheet' href='MyStyleSheet.css'/>
+  <title>PkTree+PkTreePainter</title>
+</head>
+<body>
+<div class='title'>HTML Dom Renderers PkTree & PkTreePainter</div>
+<h1>Introduction</h1>
+<p>These classes render HTML, building DOM trees, & rendering them as HTML.
+
+<p><tt>PkTreePainter</tt> extends <tt>PkTree</tt>, but different intentions.
+
+<p>PkTree can be used to build DOM Trees, built up & nested.
+
+<p>PkTreePainter: Used to build small, configurable components - buttons, forms, sections.
+
+<h1>PkTree</h1>
+<p>Extends PartialSet - builds any DOM element & inserts it into the tree.
+
+<pre>
+$pkt = new PkTree();
+$level = $pkt->div($content1,$attributes1)->h2($content2,$attributes2);
+#h2 is inside div
+#$level is at the node h2
+#$pkt is at base
+#adding to $level puts content inside h2
+#addint to $pkt puts content at base level
+#But it all goes into $pkt when you return it
+
+$pkt::div() creates a NEW PkTree
+
+#Be careful NOT to return $level - or else you just get the subset!
+
+//$this::div('First','col-xs-3')->text("practices[$idx][name]",keyVal('name',$practice,null,1),  'pk-inp')->up()
+        value(new static())->div('First','col-xs-3')->text("practices[$idx][name]",keyVal('name',$practice,null,1),  'pk-inp')->up()
+
+
+
+</body>
+</html>
+

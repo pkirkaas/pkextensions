@@ -73,9 +73,38 @@ class PkTreePainter extends PkTree {
     $pkt = new self();
     $pkt->$labelTag($lbl, $labelAttributes);
     $pkt->$valueTag($val, $valueAttributes);
-    return $this::$wrapTag($pkt, $wrapperAttributes);
+    return $this->fresh()->$wrapTag($pkt, $wrapperAttributes);
   }
 
+  /**
+   * Wraps/nests an $el as specified by $opts 
+   * @param stringable|array $el - text or dom element or array of elements to be wrapped
+   *   if array, entire array nested / wrapped as specified by $opts
+   * Example: $this->nest(['<h2>Simple Text</h2>','<h3>H3 Header</h3>'],'section');
+   * @param string|array $opts - simplest, if just string, wrap $el
+      * Example: $tpp->wrap('Simple Text','section')=>"<div class'section'>Simple Text</div>"
+   * in a div of class $opts -
+   * if $opts array, might have 'tag' key - the rest are html attributes
+   * Example: $opts = ['tag'=>'h2', 'class'=>'site-header',...]
+   *   return "<h2 class='site-header'>$el</h2>"
+   * 
+   */
+  public function nest($el,$opts = []) {
+    $ret = new self();
+    if (is_simple($opts)) {
+      //return $ret->div($el,$opts);
+      $ret->div($el,$opts);
+      return $ret;
+    }
+    if (is_array($opts)) {
+      $tag = keyVal('tag',$opts,'div');
+      unset($opts['tag']);
+      //return $ret->$tag($el, $opts);
+      $ret->$tag($el, $opts);
+      return $ret;
+    }
+    throw new \Exception("Invalid argument for OPTS: ".print_r($opts,1));
+  }
 
   
 }

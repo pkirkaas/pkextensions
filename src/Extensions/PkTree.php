@@ -72,6 +72,28 @@ class PkTree extends PartialSet {
       'select', 'textarea', 'input', 'boolean',
   ];
 
+  /** Go up the parent tree -- n $lvls, or if null, all the way
+   * 
+   * @param int|null $lvl - how many levels/ancestors to go up?
+   * @return static - a parent element
+   */
+  public function up($lvl = null) {
+    $tst = $this;
+    if ($lvl === null) {
+      while ($tst->parent) {
+        $tst = $tst->parent;
+      }
+      return $tst; #Should be the root
+    }
+    if (!is_int($lvl)) throw new \Exception("Invalid lvl: ".print_r($lvl,1));
+    while ($lvl && $tst->parent) {
+      $tst = $tst->parent;
+      $lvl--;
+    }
+    return $tst;
+
+  }
+
   public static function contentTag($tag) {
     if (!$tag || !is_string($tag)) return false;
     //$tag = strtolower($tag);
@@ -99,6 +121,7 @@ class PkTree extends PartialSet {
   }
 
   public $depth = 0;
+  public $parent;
 
   public $pktag;
   public $attributes;
@@ -113,6 +136,8 @@ class PkTree extends PartialSet {
     }
     if (!($content instanceOf PartialSet)) {
       $content = new self([$content]);
+      $content->parent=$this;
+      $content->depth = $this->depth + 1;
     }
     $this[] = $content;
     return $content;
@@ -144,10 +169,15 @@ class PkTree extends PartialSet {
   }
 
 
+  /*
   public static function __callStatic($method, $args) {
-    $rnd = new static();
-    return call_user_func_array([$rnd,$method], $args);
+    throw new \Exception("Cant do that");
+    $rnd = new self();
+    call_user_func_array([$rnd,$method], $args);
+    //return $rnd;
   }
+   * 
+   */
   /////  !!!!  Deal with inputs later !!!!!!
   //$this->makeOpenTag
   public function isContentElement() {
@@ -286,7 +316,18 @@ class PkTree extends PartialSet {
            $this->customTag($method);
   }
 
+  public function fresh() {
+    return new static();
+  }
+
   public function __call($method, $args) {
+    if (isset($this) && (get_class($this) === static::class)) {
+       pkdebug("not static");
+    } else {
+        pkdebug("STATIC!!");
+    }
+
+
     $method = trim($method);
     $raw = false;
     if ($tag = removeStartStr($method, 'raw')) {
@@ -301,6 +342,7 @@ class PkTree extends PartialSet {
     }
     $child = new static();
     $child->depth = 1 + $this->depth;
+    $child->parent = $this;
     $this[] = $child;
     if ($this->customTag($method)) {
       $custommethod = 'custom'.$method;
