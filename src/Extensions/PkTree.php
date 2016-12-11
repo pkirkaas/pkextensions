@@ -356,8 +356,10 @@ class PkTree extends PartialSet {
         $this->customTag($method);
   }
 
-  public function fresh() {
-    return new static();
+  public function fresh($content=null) {
+    $ret = new static();
+    if ($content) $ret->content($content);
+    return $ret->up();
   }
 
   public function __call($method, $args) {
