@@ -40,7 +40,7 @@ class PkController extends Controller {
       session()->flash('errors',static::$viewErrorBag);
     }
     $viewErrorBag->put('PkControllerErrors', static::$errorMsgBag);
-    //session()->flash('errors',static::$errorMsgBag);
+    session()->flash('errors',static::$errorMsgBag);
   }
 
   /**

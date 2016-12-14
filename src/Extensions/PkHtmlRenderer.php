@@ -173,7 +173,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return PkHtmlRenderer - with data inserted in the template
    */
   public function inject($arr,$tpl=null,$rawkeys=[]) {
-    pkdebug("ARR:",$arr,"TPL", $tpl);
+    //pkdebug("ARR:",$arr,"TPL", $tpl);
     if (!is_array($arr) && is_stringish($arr)) {
       $arr = ['content' => $arr];
     }

@@ -425,7 +425,7 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $errorList = PkRenderer::ul($errorItems,'popup error-list');
     $errorMsgOut = PkRenderer::div($errorList,
         ['class'=>"error-popup-box",
-            'data-title'=>"The following Errors Occurred",
+            'data-title'=>"Notice:",
             'data-dialogClass'=>'pk-warn-dlg error-dlg-box']);
         /*
         [
