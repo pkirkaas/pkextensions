@@ -20,6 +20,7 @@ use \Closure;
 
 class PkController extends Controller {
   public static $errorMsgBag; #The error messages, if any. Try static first
+  public static $viewErrorBag; #The error messages, if any. Try static first
 
   /**
    * Adds to or creates a ViewErrorBag & flashes the error for handling in the
