@@ -200,7 +200,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
       $bmap: map-get($bgmap,$bga);
       @each $ca in map-keys($clmap) {
         $cmap: map-get($clmap,$ca);
-        @debug #{$bname}#{$ca}#{$bga}#{$sz};
+        //@debug #{$bname}#{$ca}#{$bga}#{$sz};
         .#{$bname}#{$ca}#{$bga}#{$sz} {
           @include mk-decblock($map);
           @include mk-decblock($cmap);
@@ -403,7 +403,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     //$szmap: (font-size:($i/5)+$size);
     $vpadmar: ($i/5)+($size/5);
     $newparms: map-merge($params,(v-margin:$vpadmar,v-padding:$vpadmar));
-    @debug #{$bname}#{$sz};
+    //@debug #{$bname}#{$sz};
     .#{$bname}#{$sz} {
         @include mk-wrapper($newparms);
     }
@@ -433,6 +433,15 @@ $grid-gutter-width:          1.875rem !default; // 30px
 .section {
   @include mk-section;
 }
+
+// New BS4A6 row has -15px margin by default. Compensate....
+.bs4-section {
+  $params: (
+    padding: 20px,
+    );
+  @include mk-section($params);
+}
+
 
 .section-nomargin {
   @include mk-section-nomargin;
