@@ -29,7 +29,9 @@ class PkHtmlServiceProvider extends ServiceProvider {
 	protected function registerPkFormBuilder() {
 		$this->app->singleton('pkform', function($app) {
 			//$form = new PkFormBuilder($app['html'], $app['url'], $app['session.store']->getToken());
-			$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['view'], $app['session.store']->getToken());
+      //As of Laravel 5.4, getToken replaced with "token"
+			//$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['view'], $app['session.store']->getToken());
+			$form = new PkFormBuilder($app['pkhtml'], $app['url'], $app['view'], $app['session.store']->token());
 			return $form->setSessionStore($app['session.store']);
 		});
 	}
