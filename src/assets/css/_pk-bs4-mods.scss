@@ -46,6 +46,7 @@
   // Play with customizing navbars
 
   nav.navbar.pk-nav {
+    flex-direction: row;
     background: red;
     .nav-link {
       color: #ccf;

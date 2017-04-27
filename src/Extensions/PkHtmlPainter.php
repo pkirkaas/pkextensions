@@ -339,10 +339,11 @@ class PkHtmlPainter extends PkHtmlRenderer{
 
   public function mkBsMenu($links = [],$opts = []) {
     $nav_class=keyVal('nav_class',$opts,'pk-nav');
+    $nav_ul_class=keyVal('nav_ul_class',$opts,'flex-row');
     $menu = new PkHtmlRenderer();
     $menu[]= "
-      <nav class='$nav_class navbar navbar-dark'>";
-    $menu[]= " <ul class='nav navbar-nav'>\n";
+      <nav class='$nav_class navbar navbar-inverse'>";
+    $menu[]= " <ul class='nav navbar-nav $nav_ul_class'>\n";
     foreach ($links as $link) {
       $menu[]="
     <li class='nav-item'>

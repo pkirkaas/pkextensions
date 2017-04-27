@@ -527,10 +527,14 @@ a.undecorated {
 }
 
 .row-flex, 
+.flex-row, 
+.flex-col, 
 .col-flex {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;
 }
+.flex-col, 
 .col-flex {
   flex-direction: column;
 }
