@@ -42,25 +42,25 @@ $labels = '  hidden-lg-up pk-lbl res-lbl';
     @foreach ($users as $user)
     <div class='row conversant deletable-data-set pk-row-lg'>
 
-      <div class='self-center {{$labels}} conv-with pk-col-md-1 pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>Thread With:</div>
-      <div class='self-center pk-col-lg-2 conv-with  pk-col-md-2 pk-col-sm-4  pk-col-xs-6 pk-flex-resize-lg'>{{$user->getname()}}</div>
+      <div class='self-center {{$labels}} conv-with pk-col-md-1 pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>Thread With:</div>
+      <div class='self-center pk-col-lg-2 conv-with  pk-col-md-2 pk-col-sm-4  pk-col-sm-6 pk-flex-resize-lg'>{{$user->getname()}}</div>
 
-      <div class=' pk-col-lg-1  pk-col-md-1 pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'><div class='{{$user->favorited_class()}} '></div></div>
+      <div class=' pk-col-lg-1  pk-col-md-1 pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'><div class='{{$user->favorited_class()}} '></div></div>
 
-      <div class='self-center {{$labels}}  pk-col-md-1  pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>Msgs:</div>
-      <div class='self-center pk-col-lg-1  pk-col-md-1  pk-col-sm-1 pk-col-xs-2  pk-flex-resize-lg'>
+      <div class='self-center {{$labels}}  pk-col-md-1  pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>Msgs:</div>
+      <div class='self-center pk-col-lg-1  pk-col-md-1  pk-col-sm-1 pk-col-sm-2  pk-flex-resize-lg'>
         <div class='self-center'>{{$user->numMessagesWithMe()}}</div></div>
 
-      <div class='self-center  {{$labels}} pk-col-md-1   pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>Last Contact:</div>
-      <div class='self-center pk-col-lg-2  pk-col-md-2  pk-col-sm-3 pk-col-xs-4 pk-flex-resize-lg'>{{friendlyCarbonDate($user->lastContact())}}</div>
+      <div class='self-center  {{$labels}} pk-col-md-1   pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>Last Contact:</div>
+      <div class='self-center pk-col-lg-2  pk-col-md-2  pk-col-sm-3 pk-col-sm-4 pk-flex-resize-lg'>{{friendlyCarbonDate($user->lastContact())}}</div>
 
-      <div class='pk-col-lg-2  pk-col-md-1  pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>
+      <div class='pk-col-lg-2  pk-col-md-1  pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>
         @include('controls.viewconversation-button',['them'=>$user, 'class'=>'inline', 'label'=>'View<br>Thread'])
       </div>
-      <div class='pk-col-lg-2 pk-col-md-1  pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>
+      <div class='pk-col-lg-2 pk-col-md-1  pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>
         @include('controls.deleteconversation-button',['them'=>$user, 'class'=>'inline'])
       </div>
-      <div class='pk-col-lg-2 pk-col-md-1  pk-col-sm-2 pk-col-xs-4 pk-flex-resize-lg'>
+      <div class='pk-col-lg-2 pk-col-md-1  pk-col-sm-2 pk-col-sm-4 pk-flex-resize-lg'>
         @include('controls.viewprofile-button',['them'=>$user, 'class'=>'inline', 'label'=>'Visit<br>Profile'])
       </div>
 

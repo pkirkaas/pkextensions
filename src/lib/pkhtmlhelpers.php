@@ -64,7 +64,7 @@ function grid_layout($items, $opts=[]) {
   }
   $item_width = $num_columns/$items_per_row;
   $numcols = count($items);
-  $colclass = "col-xs-$item_width $col_class";
+  $colclass = "col-sm-$item_width $col_class";
   $grout = new PkHtmlRenderer();
   $grout->rawdiv(RENDEROPEN,"row $row_class");
     foreach ($items as $i=>$item) {

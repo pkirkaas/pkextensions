@@ -25,7 +25,7 @@ $out->div(RENDEROPEN,'row inner-border');
         'label' => 'Relationship',
         'labelAttributes' => 'block tpm-label',
         'valueAttributes' => 'block tpm-value',
-        'wrapperAttributes' => 'col-xs-3 tpm-wrapper',
+        'wrapperAttributes' => 'col-sm-3 tpm-wrapper',
     ]);
     $out[]=$statout;
     $out->RENDERCLOSE();
@@ -36,7 +36,7 @@ $out->RENDERCLOSE();
 
 
 $data=['Item 1', "Item 2", "Item 3",];
-$colclasses=["col-xs-2","col-xs-4", "col-xs-6"];
+$colclasses=["col-sm-2","col-sm-4", "col-sm-6"];
 $rowclass = 'head-row';
 $colclass='inner-border';
 $out->row($data,$colclasses,$rowclass,$colclass);

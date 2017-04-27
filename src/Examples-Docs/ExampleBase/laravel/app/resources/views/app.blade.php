@@ -37,7 +37,7 @@ $user = Auth::user();
       </button>
 
       <!-- Nav Content -->
-      <div class="collapse navbar-toggleable-xs main-menu" id="nav-content">
+      <div class="collapse navbar-toggleable-sm main-menu" id="nav-content">
         <ul class="nav navbar-nav">
           <li class="navbar-brand nav-item dropdown site-brand-li">
             <a class="nav-link dropdown-toggle site-brand" data-toggle="dropdown"

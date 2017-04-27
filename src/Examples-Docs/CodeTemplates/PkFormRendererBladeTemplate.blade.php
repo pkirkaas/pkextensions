@@ -21,7 +21,7 @@ $diagsf = new PkMultiSubformRenderer([
 //Test adding attributes
 $diagsf->append_atts('create_button','tst-create-btn-class');
 $diagsf->append_atts('deletable_dataset','row'); #To put the Delete button in a row
-$diagsf->append_atts('delete_button_wrap','col-xs-3'); #To put the Delete button in a row
+$diagsf->append_atts('delete_button_wrap','col-sm-3'); #To put the Delete button in a row
 $diagsf->append_atts('js_template',['class'=>'tst-add-class-arr']);
 
 $diagsf->subform_data = $diagrows;
@@ -38,7 +38,7 @@ $infoout->wrap([
     'label' => 'Client First Name',
     'labelAttributes' => 'block tpm-label',
     'valueAttributes' => 'block tpm-value',
-    'wrapperAttributes' => 'col-xs-4 tpm-wrapper',
+    'wrapperAttributes' => 'col-sm-4 tpm-wrapper',
 ]);
 
  #Note arguement 'true' to ::getRefArr(true) - prepends null=>'None' to array
@@ -48,7 +48,7 @@ $infoout->wrap([
       'label' => 'Insurance Status',
       'labelAttributes' => 'block tpm-label',
       'valueAttributes' => 'block tpm-value',
-      'wrapperAttributes' => 'col-xs-4 tpm-wrapper',
+      'wrapperAttributes' => 'col-sm-4 tpm-wrapper',
     ]);
 $out[] = $infoout;
 $out[]=$diagsf;
