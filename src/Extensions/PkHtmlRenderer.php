@@ -149,7 +149,7 @@ class PkHtmlRenderer extends PartialSet {
    * #Template:
       $wrap_tpl = new PkHtmlRenderer();
       $wrap_tpl[] = "<div  class='";
-      $wrap_tpl['wrapper_class'] = 'col-xs-3 tpm-wrapper'; #Default
+      $wrap_tpl['wrapper_class'] = 'col-sm-3 tpm-wrapper'; #Default
       $wrap_tpl[] = "'>\n<div  class='block tpm-label'>\n";
       $wrap_tpl['label']=null|true; #Replace - if null, hpure, if true, raw
       $wrap_tpl[] = "</div>\n<div  class='block tpm-value'>\n";
@@ -624,7 +624,7 @@ class PkHtmlRenderer extends PartialSet {
     $this->$div(RENDEROPEN, $row);
     foreach ($data as $i => $datum) {
       if (!$colclasses) {
-        $colclasses = "col-xs-$colsz";
+        $colclasses = "col-sm-$colsz";
       }
       if (is_array($colclasses)) {
         $itemclass = $colclasses[$i];

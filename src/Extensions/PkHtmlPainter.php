@@ -493,12 +493,12 @@ class PkHtmlPainter extends PkHtmlRenderer{
   public $valueAttributes = 'block tpm-value';
   public $wrapperAttributes = 'tpm-wrapper';
 
-  public $defaultColClass = 'col-xs-2';
+  public $defaultColClass = 'col-sm-2';
 
 
 
   /** The BS Column Class (if any) should is a separate param, 'wrapperColClass'
-   * Default is 'col-xs-2', but any 'wrapperColClass' will replace it, including
+   * Default is 'col-sm-2', but any 'wrapperColClass' will replace it, including
    * if the key exists but is empty.
    * 
    * @param type $inp
