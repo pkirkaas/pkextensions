@@ -1423,8 +1423,11 @@ function max_idx($arr, $next = false) {
   return $ret;
 }
 
-function is_iterable($var) {
-  return (is_array($var) || $var instanceof Traversable);
+// Finally implemented as native function in PHP >= 7.1
+if (!function_exists('is_iterable')) {
+  function is_iterable($var) {
+    return (is_array($var) || $var instanceof Traversable);
+  }
 }
 
 /**
