@@ -73,6 +73,9 @@ class PkTree extends PartialSet {
   public function __construct() {
     $this->children = new PartialSet();
   }
+  /*
+   * 
+   */
 
   /** Go up the parent tree -- n $lvls, or if null, all the way
    * 
@@ -131,13 +134,21 @@ class PkTree extends PartialSet {
    * @return self - empty child
    */
   public function spawn() {
-    $newel = new self();
+    $newel = new static();
     $newel->parent = $this;
     $newel->depth = $this->depth + 1;
     //$this->children[] = $newel;
     $this[] = $newel;
     return $newel;
   }
+  /*
+  public function next() {
+    $next = new static();
+    $this[]=$next;
+    return $this;
+  }
+   * 
+   */
 
   ## An element can only have one tag and one set of attributes
   // Should I return "this" or $content?  Try $content
@@ -170,6 +181,18 @@ class PkTree extends PartialSet {
     return $this;
   }
 
+  public function debugInfo() {
+    $infoArray = parent::debugInfo();
+    $infoArray['depth'] = $this->depth;
+    if (!$this->children instanceOf PartialSet) {
+      $infoArray['childCount'] ='NULL';
+    } else {
+      $infoArray['childCount'] =$this->children->count();
+    }
+    $infoArray['pkTag'] = $this->getPkTag();
+    return $infoArray;
+  }
+
   public function rawcontent($content = '') {
     return $this->content($content, true);
   }
@@ -180,17 +203,30 @@ class PkTree extends PartialSet {
 
   ### Don't use PKDEBUG $THIS in here - INFINITE NESTING!
 
+ // public function
+
   public function unwind() {
+    pkDebugOut($this->debugInfoStr());
     $ps = new PartialSet();
-    $ps[] = $this->renderOpener();
     $this->getIterator()->rewind();
+    $ps[] = $this->renderOpener();
+    foreach  ($this->children as $child) {
+      $ps[]=$child->unwind();
+    }
     foreach ($this as $key => $value) {
+      pkDebugOut("The Key is: ".print_r($key,1));
       if ($value instanceOf self) {
         $ps[] = "  " . $value->unwind();
       } else {
         $ps[] = "  " . $value;
       }
     }
+    /*
+    if ($this->children instanceOf Self) {
+      $ps[] = "  " . $this->children->unwind();
+    }
+     * 
+     */
     $ps[] = $this->renderCloser();
     return $ps;
   }
@@ -352,6 +388,19 @@ class PkTree extends PartialSet {
   /** Can this node CONTAIN other nodes? */
   public function canHaveChildren() {
     return $this->getNodeType() < 10;
+  }
+
+  public function insert($content=null,$raw=false) {
+    if (!$this->canHaveChildren()) throw new PkException('Wrong type of node type for inserting: pktag' .$this->getPkTag());
+    //if (!$this->children) {
+    $newEl = new static();
+    $newEl->parent = $this;
+    $newEl->depth = $this->depth +1;
+    $this->children[] = $newEl;
+    if ($content !== null) {
+      $newEl->content($content,$raw);
+    } 
+    return $newEl;
   }
 
   /** does __call handle this method? */

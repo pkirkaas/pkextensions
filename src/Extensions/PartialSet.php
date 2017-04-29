@@ -88,6 +88,18 @@ class PartialSet extends \ArrayObject {
     return $this->getIterator()->key();
   }
 
+  public function debugInfoStr() {
+    return print_r($this->debugInfo(),1);
+  }
+
+  public function debugInfo() {
+    return ['key'=>$this->key(),
+        'count'=>$this->count(),
+        'sizeOf'=>$this->sizeOf(),
+        'array_keys'=>$this->array_keys(),
+          ];
+  }
+
   /** Unsets the key (current if null) &
    * returns the value
    * @param type $key

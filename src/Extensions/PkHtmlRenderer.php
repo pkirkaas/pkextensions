@@ -601,7 +601,6 @@ class PkHtmlRenderer extends PartialSet {
    *    $datum[1] assoc arr of atts or string class name
    *     for the column
    * @param array $opts: (but can be $rowclass string, then $colclass is string)
-   *    @param string $rowclass - optional additional class for the row
    *    @param string $rowatts - optional additional attributes for the row
    *    @param string $colclass - optional additional class for every column
    *    @param boolean $raw
@@ -611,11 +610,11 @@ class PkHtmlRenderer extends PartialSet {
     if (is_stringish($data)) $data=[$data];
     if (!is_array_indexed($data)) throw new PkException(["Invalid data type",$data]);
     if (is_array($opts)) {
-      $rowclass= keyVal('rowclass', $opts, '');
       $colclass=keyVal('colclass',$opts, $colclass);
-      $rowatts = keyVal('rowatts',$opts,[]);
-      $rowatts['class'] = keyVal('class',$rowatts,$rowclass);
       $raw = keyVal('raw', $opts);
+      unset($opts['colclass']);
+      unset($opts['raw']);
+      $rowatts = $opts;
     } else {
       $rowatts=['class'=>$opts];
       $raw=false;
@@ -625,12 +624,13 @@ class PkHtmlRenderer extends PartialSet {
     } else {
       $div = 'div';
     }
-    $rowatts['class'] .= "row $rowclass";
+    $rowatts['class'] = keyVal('class',$rowatts,''). " row ";
     $this->$div(RENDEROPEN, $rowatts);
     foreach ($data as $i => $datum) {
+      $val=$atts=null;
       if (is_stringish($datum)) {
         $val = $datum;
-        $atts = ['class' =>" col $colclass "];
+        $atts = ['class' =>""];
       } else if (is_array_indexed($datum)) { #$datum[0] must be stringish
         if (!is_stringish ($val=$datum[0])) throw new PkException(['Invalid Datum',$datum]);
         $atts = keyVal(1,$datum, '');
@@ -642,8 +642,8 @@ class PkHtmlRenderer extends PartialSet {
       }
       if (!is_array_assoc($atts)) throw new PkException(['Invalid Atts',$atts]);
       $atts['class'] = keyVal('class',$atts,'');
-      if (strpos('col',$atts['class']) === false) $colclass.= ' col ';
-      $atts['class'] .= " $colclass ";
+      //if (strpos($atts['class'],'col') === false) $atts['class'].= ' col ';
+      $atts['class'] .= " $colclass col ";
       $this->$div($val,$atts);
     }
     $this->RENDERCLOSE();
