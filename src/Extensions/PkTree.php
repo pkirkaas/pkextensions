@@ -195,6 +195,11 @@ class PkTree extends PartialSet {
     return $ps;
   }
 
+  public static function __callStatic($method, $args) {
+    $rnd = new static();
+    return call_user_func_array([$rnd,$method], $args);
+  }
+
   /*
     public static function __callStatic($method, $args) {
     throw new \Exception("Cant do that");

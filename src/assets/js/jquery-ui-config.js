@@ -25,7 +25,7 @@ $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
  * page
  */
 $(function () {
-  var navsel = 'li.nav-item a.nav-link'; //The tab link cicked on
+  var navsel = 'ul.nav-tabs li.nav-item a.nav-link'; //The tab link cicked on
   $('body').on('click', navsel, function (event) {
     localStorage.setItem('lastTab', $(event.target).attr('href'));
   });

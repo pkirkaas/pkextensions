@@ -1,6 +1,7 @@
 <?php
 /** Renders HTML - can be included in Blade templates, but also implements a
  * custom templating/HTML rendering system.
+ * Accessable as the PkRenderer facade
  * 
  */
 namespace PkExtensions;
@@ -592,6 +593,67 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   /**
+   * May 2017 -- Try re-implementing function row() below - trying again
+   * Very simple BS Row Renderer. Makes a <div class='row $rowclass'>
+   * Then iterates through $data array and wraps each datum in corresponding col class
+   * @param array|stringish $data - INDEXED ARRAY (not ISH) of stringish datums
+   *    OR EACH DATUM is also an INDEXED array, $datum[0] stringish,
+   *    $datum[1] assoc arr of atts or string class name
+   *     for the column
+   * @param array $opts: (but can be $rowclass string, then $colclass is string)
+   *    @param string $rowclass - optional additional class for the row
+   *    @param string $rowatts - optional additional attributes for the row
+   *    @param string $colclass - optional additional class for every column
+   *    @param boolean $raw
+   * @return $this
+   */
+  public function bs_row($data, $opts=[], $colclass='') {
+    if (is_stringish($data)) $data=[$data];
+    if (!is_array_indexed($data)) throw new PkException(["Invalid data type",$data]);
+    if (is_array($opts)) {
+      $rowclass= keyVal('rowclass', $opts, '');
+      $colclass=keyVal('colclass',$opts, $colclass);
+      $rowatts = keyVal('rowatts',$opts,[]);
+      $rowatts['class'] = keyVal('class',$rowatts,$rowclass);
+      $raw = keyVal('raw', $opts);
+    } else {
+      $rowatts=['class'=>$opts];
+      $raw=false;
+    }
+    if ($raw) {
+      $div = 'rawdiv';
+    } else {
+      $div = 'div';
+    }
+    $rowatts['class'] .= "row $rowclass";
+    $this->$div(RENDEROPEN, $rowatts);
+    foreach ($data as $i => $datum) {
+      if (is_stringish($datum)) {
+        $val = $datum;
+        $atts = ['class' =>" col $colclass "];
+      } else if (is_array_indexed($datum)) { #$datum[0] must be stringish
+        if (!is_stringish ($val=$datum[0])) throw new PkException(['Invalid Datum',$datum]);
+        $atts = keyVal(1,$datum, '');
+        if (is_stringish($atts)) {
+          $atts = ['class'=>$atts];
+        }
+      } else {
+        throw new PkException(['Invalid Datum',$datum]);
+      }
+      if (!is_array_assoc($atts)) throw new PkException(['Invalid Atts',$atts]);
+      $atts['class'] = keyVal('class',$atts,'');
+      if (strpos('col',$atts['class']) === false) $colclass.= ' col ';
+      $atts['class'] .= " $colclass ";
+      $this->$div($val,$atts);
+    }
+    $this->RENDERCLOSE();
+    return $this;
+  }
+ 
+  
+
+  /**
+   * May 2017 -- See above function bs_row() - trying again
    * Very simple BS Row Renderer. Makes a <div class='row $rowclass'>
    * Then iterates through $data array and wraps each datum in corresponding col class
    * @param array $data - indexed array of stringish datums for the row
@@ -635,6 +697,7 @@ class PkHtmlRenderer extends PartialSet {
       $this->$div($datum,$data_colclass);
     }
     $this->RENDERCLOSE();
+    return $this;
   }
 
 
