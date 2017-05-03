@@ -142,6 +142,47 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+
+
+  /** Re-implement wrap above - wrap two elements in a third. The first argument
+   * (value) will be displayed second; the second argument (label) first, both
+   * wrapped in the wrap tag(default: div) with the wrapatts.
+   * @param stringish|array $value - the SECOND element - typically beneath
+   * Can be simple "stringish", or an array of stringish value and attributes,
+   * of the element,  with optional element tag (default: div)
+   * Ex: "Today" OR ['Today','col'], OR ['Today', ['class'=>'col val', data-xx=>'yy', 'tag'=>'h1']]
+   * @param stringish|array $label - as above
+   * @param string|array $wrapatts - the wrap attributes and tag (default: div)
+   *   If just a string, the wrap div class
+   */
+  public function wrap2($value=null, $label=null,$wrapatts=null, $raw=false) {
+    #Normalize Wrapatts
+    $wrapatts = arrayifyArg($wrapatts, 'class', ['tag'=>'h2', 'class'=>'pk-wrap']);
+    #Normalize Value
+    $valArr = arrayifyArg($value, 'value', ['tag'=>'h3', 'class'=>'pk-val']);
+    #Normalize Label
+    $lblArr = arrayifyArg($label, 'value', ['tag'=>'h4', 'class'=>'pk-lbl']);
+
+    $raw = keyVal('raw', $wrapatts,$raw);
+    $rawprefix = '';
+    if ($raw) $rawprefix = 'raw';
+    $lblval = $lblArr['value'];
+    $lbltag = $lblArr['tag'];
+    $valval = $valArr['value'];
+    $valtag = $valArr['tag'];
+    unset ($valArr['value']);
+    unset ($valArr['tag']);
+    unset ($lblArr['value']);
+    unset ($lblArr['tag']);
+    unset($wrapatts['tag']);
+    $wraptag = $rawprefix. keyVal('tag',$wrapatts,'div');
+    $this->$wraptag(RENDEROPEN,$wrapatts);
+    $this->$lbltag($lblval,$lblArr);
+    $this->$valtag($valval,$valArr);
+    $this->RENDERCLOSE();
+    return $this;
+  }
+
   /**
    *The Templating Injection! Very powerful & flexible, with reusable
    * htmlRenderer mini-templates. Can even have default values. Example:

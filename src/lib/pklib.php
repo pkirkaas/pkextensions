@@ -316,9 +316,9 @@ function pkdebug_base() {
   }
   $frame = $stack[$idx];
   $frame['function'] = isset($stack[$idx + 1]['function']) ? $stack[$idx + 1]['function'] : '';
-   $fline = keyVal('line',$frame);
-   // Try using new way (below) - add option to display args & object later
-    /*
+  $fline = keyVal('line', $frame);
+  // Try using new way (below) - add option to display args & object later
+  /*
     if (isset($stack[1])) {
     $out .= "\nF$idx: " . $frame['file'] . ": " . $frame['function'] . ': ' . $frame['line'] . ": \n  ";
     } else {
@@ -529,7 +529,7 @@ function appLogPath($path = null) {
   }
   $logpath = $path;
   $res = makePathToFile($logpath);
-    error_log("The used log path...$logpath");
+  error_log("The used log path...$logpath");
   return $logpath;
 }
 
@@ -1353,8 +1353,7 @@ function arrayish_keys_exist($keys, $arr = null) {
  * @return type
  */
 function is_arrayish($arg) {
-  return (is_array($arg) || ($arg instanceOf ArrayAccess)
-      || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
+  return (is_array($arg) || ($arg instanceOf ArrayAccess) || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
 }
 
 /** Similar to above (array_keys_exist()), only returns the value at the 
@@ -1425,9 +1424,11 @@ function max_idx($arr, $next = false) {
 
 // Finally implemented as native function in PHP >= 7.1
 if (!function_exists('is_iterable')) {
+
   function is_iterable($var) {
     return (is_array($var) || $var instanceof Traversable);
   }
+
 }
 
 /**
@@ -2116,8 +2117,10 @@ function equivalent($a, $b) {
 function d_f($num, $opts = 0, $hide0 = false) {
   return dollar_format($num, $opts, $hide0);
 }
+
 function dollar_format($num, $opts = 0, $hide0 = false) {
-  if ($opts === null) $db=1; else $db=0;
+  if ($opts === null) $db = 1;
+  else $db = 0;
   if (!is_array($opts)) {
     if (is_intish($opts) && ($opts !== true)) $opts = ['prec' => $opts];
     else if (ne_string($opts) || ($opts === true))
@@ -2736,7 +2739,9 @@ function manageStaticCache(&$cacheArr, $levels = []) {
  * @return string The SQL date/time
  */
 function unixtimeToSql($unixtime = null, $just_date = false) {
-  if (!$unixtime) { $unixtime = time(); }
+  if (!$unixtime) {
+    $unixtime = time();
+  }
   if ($just_date) $fmt = 'Y-m-d';
   else $fmt = 'Y-m-d H:i:s';
   $mysqldate = date($fmt, $unixtime);
@@ -2749,7 +2754,7 @@ function unixtimeToSql($unixtime = null, $just_date = false) {
  * @param string $sqlDate
  * @param null|int $unixDate
  */
-function diffSqlDate($sqlDate,$unixDate=null) {
+function diffSqlDate($sqlDate, $unixDate = null) {
   if (!validSqlDate($sqlDate)) return false;
   $sqlToUnix = strtotime($sqlDate);
   if ($unixDate === null) $unixDate = time();
@@ -2827,7 +2832,7 @@ function sqlDateToUnix($sqldate = null) {
   return $unixtime;
 }
 
-  // American style m/d/y:   'n/j/y'
+// American style m/d/y:   'n/j/y'
 function unixDateToFriendly($unixdate = null, $format = 'M j, Y') {
   if ($unixdate === null) $unixdate = time();
   return date($format, $unixdate);
@@ -2836,7 +2841,6 @@ function unixDateToFriendly($unixdate = null, $format = 'M j, Y') {
 function sqlDateToFriendly($sqldate = null, $format = 'M j, Y') {
   return unixDateToFriendly(sqlDateToUnix($sqldate), $format);
 }
-
 
 function execInBackground($cmd) {
   if (substr(php_uname(), 0, 7) == "Windows") {
@@ -3127,6 +3131,52 @@ function normalizeConfigArray(array $arr = [], $struct = null) {
       $retarr[$origkey] = $origval;
     }
   }
+  return $retarr;
+}
+
+/** Normalize/convert an arg into an associative array if it isn't already.
+ * 
+ * @param stringish|array $arg - The argument to make into an ass arr if it isn't
+ * @param string $key - the key for the primary argument, if the value is a string
+ * @param array $defaults - the defaults for the argument array
+ * @param array $addons - values to add to the argument array, if any
+ * @param array $replace - if you want you just totally replace any key values
+ * 
+ * Example: arrayifyArg(null, null, ['class'=>'col', 'tag'=>'div']) 
+ * returns: ['class'=>'col','tag'=>'div']
+ * 
+ * arrayifyArg('Name',null,['tag'=>'div']) 
+ * returns ['value'=>'Name', 'tag'=>'div]
+ */
+function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
+  $retarr = [];
+  if (is_stringish($arg)) {
+    if ($arg !== null) {
+      if (is_string($key)) $retarr = [$key => $arg];
+    }
+  } else if (is_array_assoc($arg)) {
+    $retarr = $arg;
+  } else if (is_array_indexed($arg)) { #arg[0] is $key val, $arg[1] other atts
+    $retarr = keyVal(1,$arg,[]);
+    #Cheat - if $retarr is string, assume it's a "class"
+    if (is_string($retarr)) $retarr = ['class'=>$retarr];
+    $retarr[$key] = $arg[0];
+  }
+  else if (!$arg && !$key) $retarr = [];
+  else throw new Exception("Invalid arg: " . print_r($arg, 1));
+  if ($defaults && is_array($defaults))
+      $retarr = array_merge($defaults, $retarr);
+  if ($replace && is_array_assoc($replace)) {
+    foreach ($replace as $rkey => $rval) {
+      $retarr[$rkey] = $rval;
+    }
+  }
+  if ($addons && is_array_assoc($addons)) {
+    foreach ($addons as $akey => $aval) {
+      $retarr[$akey] = keyVal($akey, $retarr, '') . ' ' . $aval . ' ';
+    }
+  }
+  if (!isset($retarr[$key])) throw new Exception("Arg key not set");
   return $retarr;
 }
 
