@@ -667,7 +667,7 @@ $(function () {
  */
 
 $('body').on('click', '.js-dialog-button', function (event) {
-  var dlgHtml = $(event.target).attr('data-dialog-encoded');
+  var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
   if (!dlgHtml) {
     var src = $(event.target).attr('data-dialog');
     if (!src) return;
@@ -675,12 +675,14 @@ $('body').on('click', '.js-dialog-button', function (event) {
     if (dlg.length === 0) return;
     var dlgHtml = dlg.prop('outerHTML');
   }
-  var param1 = $(event.target).attr('data-param1') || '';
-  var param2 = $(event.target).attr('data-param2') || '';
-  var param3 = $(event.target).attr('data-param3') || '';
+  var param1 = htmlDecode($(event.target).attr('data-param1')) || '';
+  var param2 = htmlDecode($(event.target).attr('data-param2')) || '';
+  var param3 = htmlDecode($(event.target).attr('data-param3')) || '';
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
+  //console.log("dlgHtml:", dlgHtml);
+  //return;
   //console.log("After all the replacements, dlgHtml:",dlgHtml);
   dlg = $(dlgHtml);
   //opts.title = dlg.attr('data-title');

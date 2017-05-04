@@ -270,7 +270,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 */
 @mixin mk-spacing {
   @for $i from 0 through 250 {
-    $sz: if($i!=0, -$i, null);
+    $sz: if($i!=0, -$i, 0);
     $offset: $i/3 * 1rem;
     @if $i < 50 {
       //$foffset: $offset + 1em;
