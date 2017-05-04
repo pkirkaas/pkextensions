@@ -237,7 +237,13 @@ abstract class PkModel extends Model {
       'time', 'timeTz', 'tinyInteger', 'timestamp', 'timestampTz', 'timestamps', 
       'timestampsTz', 'unsignedBigInteger', 'unsignedInteger', 'unsignedMediumInteger', 
       'unsignedSmallInteger', 'unsignedTinyInteger', 'uuid', ];
-
+    /*
+    if (!defined('DEBUG')) define('DEBUG', true);
+    \PkLibConfig::setSuppressPkDebug(false);
+    appLogPath(__DIR__ . "/buildmigration.log");
+     * (This is going to be in vendors/pkirkaas/PkEx..../Models dir
+     * 
+     */
 
     pkdebug("Incoming field def:", $fielddefs);
     $changestr = '';
@@ -267,9 +273,6 @@ abstract class PkModel extends Model {
           }
           if (!isset($type)) $type='integer';
         }
-
-
-
         //$type = keyVal('type', $def, 'integer');
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $comment = keyval('comment', $def);
@@ -279,17 +282,24 @@ abstract class PkModel extends Model {
         if ($comment) $fielddef .= "->comment(\"$comment\")";
         if ($default!==null) $fielddef .= "->default($default)";
         if (is_string($methods)) {
+          //Try this instead to normalize - 4 May 2017
+          $methods=[$methods];
+          /*
           if ($change && (in_array($methods, $indices)))
               $fielddef .= $changestr . ";\n";
           else $fielddef .="->$methods()$changestr;\n";
           $out .= $fielddef;
           continue;
+           * 
+           */
         }
+        $usedMethods=[];
         if (is_array($methods)) {
           foreach ($methods as $method => $args) {
             if (is_int($method)) {
               $method = $args;
               $args = null;
+              $usedMethods[]=$method;
             }
             if (!$change || !in_array($method, $indices))
                 $methodChain .= "->$method($args)";
@@ -299,8 +309,9 @@ abstract class PkModel extends Model {
         #index, for example, could be in "methods", with args, or just a value
         #in the def array
         $standaloneModifiers = ['primary','index','unique','nullable','unsigned','useCurrent',];
+        pkdebug("DefVals for $fieldName:",$defvals);
         foreach($standaloneModifiers as $sam) {
-          if (in_array($sam,$defvals,true)) {
+          if (in_array($sam,$defvals,true) && !in_array($sam,$usedMethods,1)) {
             $methodChain.=  "->$sam()";
           }
         }

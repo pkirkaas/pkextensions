@@ -48,6 +48,7 @@ h3 {
 .background-to-blue { background-color: rgba(240,240,255,.3); }
 .background-to-red { background-color: rgba(255,240,240,.3); }
 
+/** The mixins should have generated the equivalents 
 .background-111 { background-color: #111; }
 .background-112 { background-color: #118; } 
 .background-113 { background-color: #11f; } 
@@ -120,6 +121,7 @@ h3 {
 .color-331 { color: #ff1; }
 .color-332 { color: #ff8; }
 .color-333 { color: #fff; }
+*/
 
 .overflowauto, .overflow-auto {overflow:auto;}
 
@@ -192,6 +194,7 @@ h3 {
 .hidden { display: none; }
 .invisible { visibility: hidden; }
 
+/* Mixins again 
 .nopadding, .no-padding, .padding-0, .padding0 { padding: 0px ! important; }
 .pad-left-0, .padding-left-0 { padding-left: 0; }
 .pad-right-0, .padding-right-0 { padding-right: 0; }
@@ -236,6 +239,7 @@ h3 {
 .margin-bottom-5 { margin-bottom: 5px ! important; }
 .margin-bottom-10 { margin-bottom: 10px ! important; }
 .margin-bottom-20 { margin-bottom: 20px ! important; }
+*/
 
 .marginauto, .margin-auto, .auto-margin, .automargin {
   margin-left: auto ! important;
@@ -297,6 +301,7 @@ div.pk-tooltip { display: none; }
 /*
 div.pk-tooltip {
 */
+/** Use tootik 
 :hover > div.pk-tooltip {
   display: inline-block;
   background-color: #faa;
@@ -327,6 +332,7 @@ div.pk-tooltip {
   border: none! important ;
   background: none transparent ! important ;
 }
+*/
 /** Make a reasonable default */
 .wrapper {
 
@@ -579,11 +585,9 @@ a.undecorated {
 .horizontal-centerer { @include make-horizontal-centerer}
 
 //$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
+/* What's the point?  */
 @mixin make-pk-col {
   box-sizing: border-box;
-  /*
-  border: solid blue 1px;
-  */
   display: flex;
   align-content: center;
   flex-direction: column;
@@ -591,12 +595,8 @@ a.undecorated {
   padding: 0;
   overflow: hidden;
   flex-shrink: 0;
-  /*
-  flex-shrink: 1;
-  */
 }
 .pk-col {@include make-pk-col}
-
 
 
 
@@ -716,6 +716,7 @@ $i: 1;
   
 }
 
+/*
 @mixin pkfs($int: 0)  {
   $fsz: 1rem + $int * .1rem;
   font-size: $fsz;
@@ -745,6 +746,7 @@ $i: 1;
 .pkl4 { @include pkfs(4); @include pkfw(2); }
 .pkl5 { @include pkfs(5); @include pkfw(3); }
 .pkl6 { @include pkfs(6); @include pkfw(3); }
+*/
 
 
 .row-eq-height {
@@ -755,12 +757,6 @@ $i: 1;
 }
 
 @media print {
-  /*
-	body {
-		font-size: 80%;
-	}
-  */
-
   .print-button {
     display: none ! important;
   }
@@ -833,7 +829,7 @@ div.error-popup-box.ui-dialog-content {
 @mixin mk-offsets() {
   @for $i from 0 through 100 {
     $ex: if($i!=0, -$i, null);
-    $sz: $i/10 *1em;
+    $sz: $i/10 *1rem;
     .top#{$ex} {
       top: $sz;
     }
@@ -919,4 +915,8 @@ table.pk-tbl {
 
 .b {
   font-weight: bold;
+}
+
+hr {
+  @extend .border;
 }
