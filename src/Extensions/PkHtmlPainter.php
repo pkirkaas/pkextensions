@@ -132,7 +132,9 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $params = $res['params'];
     $attributes = keyVal('attributes',$res,[]);
     if (($item_template = keyVal('item_template',$args)) && !keyVal('data-template',$attributes)) {
+      pkdebug("Item Template:\n\n". $item_template);
         $attributes['data-template']=html_encode($item_template);
+        pkdebug("HTML Encoded:", html_encode($item_template));
     }
     if (($item_count = keyVal('data-itemcount',$params)) && !keyVal('data-itemcount',$attributes)) {
         $attributes['data-itemcount']=$item_count;
@@ -180,13 +182,18 @@ class PkHtmlPainter extends PkHtmlRenderer{
      } else {
        $subform_tpl = new PkHtmlRenderer();
      }
+     $basename = keyVal('basename',$args,$this->basename);
      $jsRowTpl = $this->mkSubformRow($args);
      $data_rows = keyVal('data_rows',$args,$this->data_rows);
      $item_count = is_arrayish($data_rows) ? count($data_rows) : 0;
      $rows = new PkHtmlRenderer();
+     //$rows->input(['name'=>$basename,'type'=>'hidden']);
+     $rows->input('hidden', $basename);
+
      foreach ($data_rows as $idx=>$data_row) {
        $rowargs = $args + ['data_row'=>$data_row,'idx'=>$idx];
-       $rows[$idx] = $this->mkSubformRow($rowargs);
+       //$rows[$idx] = $this->mkSubformRow($rowargs);
+       $rows[] = $this->mkSubformRow($rowargs);
      }
      $create_button = keyVal('create_button',$args,$this->create_button);
      if (!$create_button) {

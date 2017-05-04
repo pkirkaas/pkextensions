@@ -271,17 +271,17 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-spacing {
   @for $i from 0 through 250 {
     $sz: if($i!=0, -$i, null);
-    $offset: $i/3 * 1em;
+    $offset: $i/3 * 1rem;
     @if $i < 50 {
       //$foffset: $offset + 1em;
       $foffset: $offset/5;
       .fs#{$sz},
       .f-s#{$sz} {
-        font-size: 1em + $foffset !important;
+        font-size: 1rem + $foffset !important;
       }
       .fs-#{$sz},
       .f-s-#{$sz} {
-        font-size: 1em - $foffset !important;
+        font-size: 1rem - $foffset !important;
       }
     } 
     //Paddings
@@ -314,6 +314,22 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-font-size {
 
 }
+
+//Make font weights
+@mixin mk-weights {
+  @for $i from 1 through 9 {
+    $weight: 100 * i;
+    .fw#{$i},
+    .f-w#{$i} {
+        font-weight: $weight !important;
+      }
+  }
+}
+
+@mixin mk-weights {
+
+}
+
 
 /** Makes text/section wrappers, with MAP args/defaults:
  * boxshadow: default for the mk-boxshadow mixin
@@ -503,15 +519,30 @@ $grid-gutter-width:          1.875rem !default; // 30px
 /******************************************************************/
 /*
 Standard Classes & Mixins & Vars
+
 Spacing/Margins/Padding:
-.m-x-x
-.p-x-x
+.m-x-y
+.p-x-y
+where:
+y an int
+x in t,l,b,r,h,v, or none for all (ex, .m-h-7, .m-5)
 
-Colors: Font/Background/Border
-
+//Colors: Font/Background/Border  ex: .bg-04f
+  x in  [0 2 4 6 8 a c e f];
 .bg-xxx - background color - even digits, plus f
 .c-xxx - font color - even digits, plus f
 .bc-xxx - border color - even digits, plus f
+
+//Font Weights:
+x from 1 - 9
+.fwx
+.fw-x
+
+//Font Sizing: Based on REM , up & down:
+.fs-0, .f-s-0 { font-size: 1REM !important; }
+.fs-1, .f-s-1 { font-size: 1.04rem !important; }
+.fs--1, .f-s--1 { font-size: 0.96rem !important; }
+
 
 Google Fonts:
 .oswald { font-family: 'Oswald', verdana; }
@@ -591,11 +622,6 @@ Unfortunately a bunch ov over-compex generated text classes, lik
 .au-head-8 {
 .au-head-fdk-8 {
 //Which all has meaning
-
-
-//Font Sizing: Based on EM , up & down:
-.fs-1, .f-s-1 { font-size: 1.04em !important; }
-.fs--1, .f-s--1 { font-size: 0.96em !important; }
 
 .section { @include mk-section; }
 .section-nomargin { @include mk-section-nomargin; }

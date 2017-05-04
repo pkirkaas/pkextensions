@@ -24,8 +24,8 @@ $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
 
 
 // Consider: https://www.html5andbeyond.com/jquery-ui-datepicker-and-timepicker/
-//Consider: https://github.com/trentrichardson/jQuery-Timepicker-Addon
-// Currently: http://jonthornton.github.io/jquery-timepicker/
+//Consider: https://github.com/trentrichardson/jQuery-Timepicker-Addon (Used before, in therapy)
+// Currently: http://jonthornton.github.io/jquery-timepicker/ (as of 5/17, Regina's Mental Health
 /** Better Initialize Time Picker */
 $('body').on('focus', 'input.timepicker.auto-attach', function (e) {
   $(this).timepicker({

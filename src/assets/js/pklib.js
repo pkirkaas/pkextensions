@@ -101,12 +101,15 @@ $(function () {
   $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
     //Get a copy of the template element
     //var tpl = $(event.target).closest('div.templatable-data-sets').find('.template-container').first().html();
-    var tpl=$(event.target).attr("data-template");
+    var tpl=htmlDecode($(event.target).attr("data-template"));
+    //var tpl=$(event.target).attr("data-template");
+    //var tpl = $('<div />').html(encodedtpl).text();
     console.log("New TPL: ",tpl);
 
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
-    var newstr = tpl;
+    //var newstr = tpl;
+    var newstr = $('<div />').html(tpl).text();
     if (cnt === 'single') {
       $(event.target).css('display', 'none');
     } else {
