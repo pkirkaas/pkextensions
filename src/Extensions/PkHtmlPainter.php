@@ -132,9 +132,9 @@ class PkHtmlPainter extends PkHtmlRenderer{
     $params = $res['params'];
     $attributes = keyVal('attributes',$res,[]);
     if (($item_template = keyVal('item_template',$args)) && !keyVal('data-template',$attributes)) {
-      pkdebug("Item Template:\n\n". $item_template);
+      //pkdebug("Item Template:\n\n". $item_template);
         $attributes['data-template']=html_encode($item_template);
-        pkdebug("HTML Encoded:", html_encode($item_template));
+       // pkdebug("HTML Encoded:", html_encode($item_template));
     }
     if (($item_count = keyVal('data-itemcount',$params)) && !keyVal('data-itemcount',$attributes)) {
         $attributes['data-itemcount']=$item_count;
