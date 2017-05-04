@@ -153,8 +153,8 @@ class PkTree extends PartialSet {
   ## An element can only have one tag and one set of attributes
   // Should I return "this" or $content?  Try $content
   public function content($content = '', $raw = false) {
-    if ($content === null) {
-      $this[] = null;
+    if (($content === null) || ($content === false)) {
+      //$this[] = null;
       return $this;
     }
     if (is_array($content)) {
