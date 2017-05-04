@@ -284,6 +284,13 @@ $grid-gutter-width:          1.875rem !default; // 30px
         font-size: 1rem - $foffset !important;
       }
     } 
+    //Heights & widths
+    .height#{$sz} {height: $offset !important;}
+    .min-height#{$sz} {min-height: $offset !important;}
+    .max-height#{$sz} {max-height: $offset !important;}
+    .width#{$sz} {width: $offset !important;}
+    .min-width#{$sz} {min-width: $offset !important;}
+    .max-width#{$sz} {max-width: $offset !important;}
     //Paddings
     .p-r#{$sz}, .pad-r#{$sz} { padding-right: $offset !important; }
     .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }

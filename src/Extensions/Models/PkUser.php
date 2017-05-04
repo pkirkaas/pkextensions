@@ -105,4 +105,22 @@ class PkUser extends PkModel
       return parent::saveRelations($arr);
     }
 
+    /** Makes sure only the logged in user OR Admin can use the $user object
+     * 
+     * @param \PkExtensions\Models\PkUser $user
+     * @return boolean
+     */
+    public static function auth(PkUser $user = null) {
+      pkdebug("User Type:".typeOf($user).'; ID: '. $user->id);
+      if (!static::instantiated($user)) {
+        $user = Auth::user();
+        pkdebug("Not Instantiated? Get Auth: User Type:".typeOf($user).'; ID: '. $user->id);
+      }
+      $me = Auth::user();
+      pkdebug("Me Type:".typeOf($me).'; ID: '. $me->id);
+      if ($me != $user && !$me->isAdmin()) return  false;
+      pkdebug("About to return User");
+      return $user;
+    }
+
 }

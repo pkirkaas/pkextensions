@@ -473,7 +473,9 @@ class PkHtmlPainter extends PkHtmlRenderer{
    * ready to click on & pop.
    * @param type $dlg
    * @param type $args
+   * 
    */
+
   public function encodeDlgInEl($dlg,$args=[]) {
     if (!$args) $args = [];
     if (ne_string($args)) $args = ['class'=>$args];

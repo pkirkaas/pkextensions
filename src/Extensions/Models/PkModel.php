@@ -566,9 +566,7 @@ class $createclassname extends Migration {
   }
 
   public function real() {
-    $class = get_class($this);
-    return $class::instantiated($this);
-    //return get_class($this)::instantiated($this);
+    return static::instantiated($this);
   }
 
   /**
