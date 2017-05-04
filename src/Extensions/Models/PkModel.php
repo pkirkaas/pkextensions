@@ -975,19 +975,21 @@ class $createclassname extends Migration {
 
   /** Checks if user is allowed to delete, and 
    * performs cascading deletes on relations defined in $this->getLoadRelations()
+   * @param boolean $cascade Default: true - does cascading deletes based on Load Relations,
    * 
    */
   ## RE-ENABLE WHEN EVERYTHING ELSE WORKING - 
   ## Need to think through deleting both from here, AND from the "Save Relations"
   ## method below
-  public function delete() {
+  public function delete($cascade = true) {
     if (!$this->authDelete())
         throw new Exception("Not authorized to delete this object");
+    if (!$cascade) return parent::delete();
     foreach (array_keys($this->getLoadRelations()) as $relationSet) {
       if (is_array($relationSet) || $relationSet instanceOf BaseCollection) {
         foreach ($this->relationSet as $relationInstance) {
           if ($relationInstance instanceOf Model) {
-            $relationInstance->delete();
+            $relationInstance->delete($cascade);
           }
         }
       }
