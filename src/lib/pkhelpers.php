@@ -54,9 +54,12 @@ function setAppLog() {
  * @param mixed $date - a date parsable by Carbon, including a Carbon Date object
  * @param string $format
  */
-function friendlyCarbonDate($date = null, $format =  'M j, Y') {
+function friendlyCarbonDate($date = null, $format =  'M j, Y',$shownever = false) {
   // American style m/d/y:   'n/j/y'
-  if (!$date) return "Never/None";
+  if (!$date) {
+    if ($shownever) return "Never/None";
+    return '';
+  }
   $date = new Carbon($date);
   $min = Carbon::minValue();
   $max = Carbon::maxValue();
