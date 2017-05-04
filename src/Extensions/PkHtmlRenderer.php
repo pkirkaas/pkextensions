@@ -157,11 +157,11 @@ class PkHtmlRenderer extends PartialSet {
    */
   public function wrap2($value=null, $label=null,$wrapatts=null, $raw=false) {
     #Normalize Wrapatts
-    $wrapatts = arrayifyArg($wrapatts, 'class', ['tag'=>'h2', 'class'=>'pk-wrap']);
+    $wrapatts = arrayifyArg($wrapatts, 'class', ['tag'=>'div', 'class'=>'pk-wrap']);
     #Normalize Value
-    $valArr = arrayifyArg($value, 'value', ['tag'=>'h3', 'class'=>'pk-val']);
+    $valArr = arrayifyArg($value, 'value', ['tag'=>'div', 'class'=>'pk-val']);
     #Normalize Label
-    $lblArr = arrayifyArg($label, 'value', ['tag'=>'h4', 'class'=>'pk-lbl']);
+    $lblArr = arrayifyArg($label, 'value', ['tag'=>'div', 'class'=>'pk-lbl']);
 
     $raw = keyVal('raw', $wrapatts,$raw);
     $rawprefix = '';
@@ -648,8 +648,6 @@ class PkHtmlRenderer extends PartialSet {
    * @return $this
    */
   public function bs_row($data, $opts=[], $colclass='') {
-    if (is_stringish($data)) $data=[$data];
-    if (!is_array_indexed($data)) throw new PkException(["Invalid data type",$data]);
     if (is_array($opts)) {
       $colclass=keyVal('colclass',$opts, $colclass);
       $raw = keyVal('raw', $opts);
@@ -667,6 +665,11 @@ class PkHtmlRenderer extends PartialSet {
     }
     $rowatts['class'] = keyVal('class',$rowatts,''). " row ";
     $this->$div(RENDEROPEN, $rowatts);
+    if ($data === RENDEROPEN) { #It's just a render open - put the cols in manually
+      return $this;
+    } 
+    if (is_stringish($data)) $data=[$data];
+    if (!is_array_indexed($data)) throw new PkException(["Invalid data type",$data]);
     foreach ($data as $i => $datum) {
       $val=$atts=null;
       if (is_stringish($datum)) {
@@ -688,6 +691,25 @@ class PkHtmlRenderer extends PartialSet {
       $this->$div($val,$atts);
     }
     $this->RENDERCLOSE();
+    return $this;
+  }
+
+  /** Just make a BS4 column from the data, with additional atts
+   * 
+   * @param stringish $data
+   * @param string|assoc arr $atts - if assoc array, the div atts, if just string,
+   * make it the div class ($atts=['class'=>$atts])
+   */
+  public function bs_col($data=null,$atts=[]) {
+    if ($data && !is_stringish($data)) throw new PkException (["Invalid Data arg:", $data]);
+    if (is_stringish($atts)) $atts-['class'=>$atts];
+    if ($atts && !is_arrayish($atts)) throw new PkException (["Invalid Atts arg:", $atts]);
+    $atts['class'] = keyVal('class', $atts,''). ' col ';
+    $raw = keyVal('raw',$atts,false);
+    unset($atts['raw']);
+    $div = 'div';
+    if ($raw) $div = 'rawdiv';
+    $this->$div($data,$atts);
     return $this;
   }
  
