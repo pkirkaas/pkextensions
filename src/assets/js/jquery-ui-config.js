@@ -12,13 +12,50 @@
  });
  });
  */
+/*
+$(function () {
 
-/** Better Initialize Date Picker */
-$('body').on('focus', 'input.datepicker.auto-attach', function (e) {
-  $(this).datepicker({
-    dateFormat: 'yy-mm-dd',
+  console.log("In Init jqui");
+  var sqldt = $('input.altfield').val();
+  console.log("SQL DT:", sqldt);
+  var date = DateFromSql(sqldt);
+  console.log("Date Obj:", date);
+  $('input.datepicker.just-formatted').datepicker( {
+    setDate: date,
+    dateFormat: "DD, d MM, yy",
+    altField: ".altfield",
+    altFormat: 'yy-mm-dd',
     changeYear: true,
     yearRange: '1930:2020'
+  });
+  $('input.datepicker.just-formatted').datepicker('setDate',date);
+
+  //$('input.datepicker.just-formatted').datepicker('setDate', date);
+  //$('input.datepicker.just-formatted').val("Today");
+});
+$(function () {
+  $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
+    var sqldt = $('input.altfield').val();
+    var date = DateFromSql(sqldt);
+    $(this).datepicker({
+      dateFormat: "DD, d MM, yy",
+      altField: ".altfield",
+      altFormat: 'yy-mm-dd',
+      changeYear: true,
+      yearRange: '1930:2020',
+      setDate: date
+    });
+  });
+});
+*/
+/** Better Initialize Date Picker */
+$(function () {
+  $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
+    $(this).datepicker({
+      dateFormat: 'yy-mm-dd',
+      changeYear: true,
+      yearRange: '1930:2020'
+    });
   });
 });
 
@@ -29,7 +66,9 @@ $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
 /** Better Initialize Time Picker */
 $('body').on('focus', 'input.timepicker.auto-attach', function (e) {
   $(this).timepicker({
-    'timeFormat': 'H:i'
+    timeFormat: 'H:i',
+    minTime: '8AM',
+    maxTime: '10PM'
   });
 });
 /*

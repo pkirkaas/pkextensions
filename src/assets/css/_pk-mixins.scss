@@ -318,14 +318,13 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 }
 
-@mixin mk-font-size {
-
-}
 
 //Make font weights
 @mixin mk-weights {
   @for $i from 1 through 9 {
-    $weight: 100 * i;
+    $weight: 100 * $i;
+    //@debug $weight;
+    //@debug fw#{$i};
     .fw#{$i},
     .f-w#{$i} {
         font-weight: $weight !important;
@@ -333,9 +332,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 }
 
-@mixin mk-weights {
-
-}
+@include mk-weights;
 
 
 /** Makes text/section wrappers, with MAP args/defaults:

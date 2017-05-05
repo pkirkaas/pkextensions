@@ -1239,3 +1239,12 @@ function isArray(aval) {
  */
 function setGets(getArr) {
 }
+
+/** Try to make a JS Date object from an SQL Date or DateTime field -
+ *  !! PROBABLY BROWSER DEPENDENT
+ * @param string sqlDT
+ * @returns Date
+ */
+function DateFromSql(sqlDT) {
+  return new Date(Date.parse(sqlDT.replace('-','/','g')));
+}
