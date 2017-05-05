@@ -33,9 +33,31 @@ $(function () {
   //$('input.datepicker.just-formatted').datepicker('setDate', date);
   //$('input.datepicker.just-formatted').val("Today");
 });
+*/
 $(function () {
-  $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
-    var sqldt = $('input.altfield').val();
+    var hiddenPartners = $('input.hidden-datepicker-partner');
+    hiddenPartners.each(function ($index) {
+      var jThis = $(this);
+      var val = jThis.val();
+      if (val) var date = DateFromSql(val);
+      else var date = null;
+      var datepicker = jThis.prev('input.nameless-proxy.datepicker');
+      if (!datepicker) {
+        console.log("Couldn't find the matching datepicker for ",this);
+        return;
+      }
+      //Now we initialize the datepicker jquery object
+      datepicker.datepicker({
+        dateFormat: "d MM, yy",
+        altField:jThis,
+        altFormat: 'yy-mm-dd',
+        changeYear: true,
+        yearRange: '1930:2020'
+      });
+      datepicker.datepicker('setDate', date);
+      
+    });
+    /*
     var date = DateFromSql(sqldt);
     $(this).datepicker({
       dateFormat: "DD, d MM, yy",
@@ -44,10 +66,10 @@ $(function () {
       changeYear: true,
       yearRange: '1930:2020',
       setDate: date
-    });
   });
+  */
 });
-*/
+
 /** Better Initialize Date Picker */
 $(function () {
   $('body').on('focus', 'input.datepicker.auto-attach', function (e) {
@@ -58,6 +80,7 @@ $(function () {
     });
   });
 });
+
 
 
 // Consider: https://www.html5andbeyond.com/jquery-ui-datepicker-and-timepicker/

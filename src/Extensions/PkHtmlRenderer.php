@@ -8,6 +8,7 @@ namespace PkExtensions;
 use PkHtml;
 use PkForm;
 use PkExtensions\Models\PkModel;
+use PkRenderer;
 
 if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 
@@ -960,6 +961,28 @@ class PkHtmlRenderer extends PartialSet {
 
   }
 
+  /** Makes an un-named datepicker text input (so it doesn't POST), and pairs it
+   * with a hidden named input, 
+   * Deeply depends on support from JS
+   */
+  public function datepicker($name,$value=null,$args=[]) {
+    if (is_string($args)) $args =['class'=>$args];
+    $dpClasses = ' datepicker nameless-proxy ';
+    $args['data-ctrl-name'] = $name;
+    $args['class'] = keyVal('class',$args,''). $dpClasses;
+    /*
+    return $this->rawcontent([
+      $this->input('text',null,null,$args),
+      $this->input('hidden', $name,$value,['class'=>'hidden-datepicker-partner']),
+    ]);
+     * 
+     */
+    $ret = PkRenderer::input('text',null,null,$args);
+    $ret->input('hidden', $name,$value,['class'=>'hidden-datepicker-partner']);
+    //$ret[] = static::input('text',null,null,$args);
+    //$ret[] = static::
+    return $ret;
+  }
 
 
   /**Don't want to use these anymore - just wrap - but keep in case used in older apps*/
