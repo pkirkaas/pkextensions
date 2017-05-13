@@ -3,7 +3,7 @@
     Created on : Oct 11, 2015, 4:57:29 AM
     Author     : Paul Kirkaas
 */
-@import 'pk-variables';
+//@import 'pk-variables';
 $grid-breakpoints:(xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
 $grid-columns:               12 !default;
 $grid-gutter-width:          1.875rem !default; // 30px
@@ -20,108 +20,6 @@ $inner-border-spread: 1px !default;
   @include inner-border;
 }
 
-body {
-  
-}
-
-/*
-.section {
-  border: solid #aaf 1px;
-  border-radius: 5px;
-  margin: 5px;
-  padding: 5px;
-  background-color: rgba(255,255,255,.2);
-}
-*/
-
-h3 {
-  text-align: center;
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.background-lighter-blue { background: #ccf ! important; }
-.background-light-blue { background: #aaf ! important; }
-.background-light-red { background: #faa ! important; }
-
-.background-to-yellow { background-color: rgba(255,240,255,.2); }
-.background-to-blue { background-color: rgba(240,240,255,.3); }
-.background-to-red { background-color: rgba(255,240,240,.3); }
-
-/** The mixins should have generated the equivalents 
-.background-111 { background-color: #111; }
-.background-112 { background-color: #118; } 
-.background-113 { background-color: #11f; } 
-.background-121 { background-color: #181; }
-.background-122 { background-color: #188; }
-.background-123 { background-color: #18f; }
-.background-131 { background-color: #1f1; }
-.background-132 { background-color: #1f8; }
-.background-133 { background-color: #1ff; }
-
-.background-211 { background-color: #811; }
-.background-212 { background-color: #818; }
-.background-213 { background-color: #81f; }
-.background-221 { background-color: #881; }
-.background-222 { background-color: #888; }
-.background-223 { background-color: #88f; }
-.background-231 { background-color: #8f1; }
-.background-232 { background-color: #8f8; }
-.background-233 { background-color: #8f8; }
-
-
-.background-311 { background-color: #f11; }
-.background-312 { background-color: #f18; }
-.background-313 { background-color: #f1f; }
-.background-321 { background-color: #f81; }
-.background-322 { background-color: #f88; }
-.background-323 { background-color: #f88; }
-.background-331 { background-color: #ff1; }
-.background-332 { background-color: #ff8; }
-.background-333 { background-color: #fff; }
-
-
-
-.color-dark-red { color: #400 ! important; }
-.color-medium-red { color: #a44 ! important; }
-.color-dark-grey { color: #444 ! important; }
-.color-grey { color: #888 ! important; }
-.color-light-grey { color: #aaa ! important; }
-.color-light-red { color: #faa ! important; }
-.color-lighter-blue { color: #ccf ! important; }
-.color-dark-blue { color: #004 ! important; }
-.color-medium-blue { color: #44a ! important; }
-.color-light-blue { color: #aaf ! important; }
-.color-111 { color: #111; }
-.color-112 { color: #118; }
-.color-113 { color: #11f; }
-.color-121 { color: #181; }
-.color-122 { color: #188; }
-.color-123 { color: #18f; }
-.color-131 { color: #1f1; }
-.color-132 { color: #1f8; }
-.color-133 { color: #1ff; }
-
-.color-211 { color: #811; }
-.color-212 { color: #818; }
-.color-213 { color: #81f; }
-.color-221 { color: #881; }
-.color-222 { color: #888; }
-.color-223 { color: #88f; }
-.color-231 { color: #8f1; }
-.color-232 { color: #8f8; }
-.color-233 { color: #8f8; }
-
-.color-311 { color: #f11; }
-.color-312 { color: #f18; }
-.color-313 { color: #f1f; }
-.color-321 { color: #f81; }
-.color-322 { color: #f88; }
-.color-323 { color: #f88; }
-.color-331 { color: #ff1; }
-.color-332 { color: #ff8; }
-.color-333 { color: #fff; }
-*/
 
 .overflowauto, .overflow-auto {overflow:auto;}
 
@@ -129,54 +27,6 @@ h3 {
 .top-round-corners { border-top-left-radius: 5px ! important; border-top-right-radius: 5px ! important; }
 .bottom-round-corners { border-bottom-left-radius: 5px ! important; border-bottom-right-radius: 5px ! important; }
 .bottom-square-corners { border-bottom-left-radius: 0px ! important; border-bottom-right-radius: 0px ! important; }
-
-
-/** Spacing and sizing */
-
-.width-80pc, .width80pc {width: 80% ! important;}
-.width-90pc, .width90pc {width: 90% ! important;}
-
-
-
-.height-300, .height300 { height: 300px ! important; } 
-.minheight-300, .minheight300 { min-height: 300px ! important; } 
-.height-200, .height200 { height: 200px ! important; }
-.minheight-200, .minheight200 { min-height: 200px ! important; }
-.minheight-150, .minheight150 { min-height: 150px ! important; }
-.height-150, .height150 { height: 150px ! important; }
-.minheight-130, .minheight130 { min-height: 130px ! important; }
-.height-130, .height130 { height: 130px ! important; }
-.minheight-120, .minheight120 { min-height: 120px ! important; }
-.height-120, .height120 { height: 120px ! important; }
-.height-100, .height100 { height: 100px ! important; }
-.minheight-100, .minheight100 { min-height: 100px ! important; }
-.height-80, .height80 { height: 80px ! important; }
-.minheight-80, .minheight80 { min-height: 80px ! important; }
-.height-70, .height70 { height: 70px ! important; }
-.minheight-70, .minheight70 { min-height: 70px ! important; }
-.height-60, .height60 { height: 60px ! important; }
-.minheight-60, .minheight60 { min-height: 60px ! important; }
-.height-50, .height50 { height: 50px ! important; }
-.minheight-50, .minheight50 { min-height: 50px ! important; }
-.height-30, .height30 { height: 30px ! important; }
-.minheight-30, .minheight30 { min-height: 30px ! important; }
-
-.width-300, .width300 { width: 300px ! important; }
-
-.width-200, .width200 { width: 200px ! important; }
-.minwidth-100, .minwidth100 { min-width: 100px ! important; }
-.minwidth-20em, .minwidth20em { min-width: 20em ! important; }
-.minwidth-16em, .minwidth16em { min-width: 16em ! important; }
-.minwidth-25em, .minwidth25em { min-width: 25em ! important; }
-.width-100, .width100 { width: 100px ! important; }
-.width-50, .width50 { width: 50px ! important; }
-.width-35, .width35 { width: 35px ! important; }
-.width-30, .width30 { width: 30px ! important; }
-.width-25, .width25 { width: 25px ! important; }
-.width-20, .width20 { width: 20px ! important; }
-.width-auto, .widthauto { width: auto ! important; }
-.height-auto, .heightauto { height: auto ! important; }
-.minwidth-50, .minwidth50 { min-width: 50px ! important; }
 
 .max-width-100 {max-width: 100% !important;}
 
@@ -194,52 +44,6 @@ h3 {
 .hidden { display: none; }
 .invisible { visibility: hidden; }
 
-/* Mixins again 
-.nopadding, .no-padding, .padding-0, .padding0 { padding: 0px ! important; }
-.pad-left-0, .padding-left-0 { padding-left: 0; }
-.pad-right-0, .padding-right-0 { padding-right: 0; }
-.padding5, .padding-5 { padding: 5px ! important; }
-.padding10, .padding-10 { padding: 10px ! important; }
-.padding15, .padding-15 { padding: 15px ! important; }
-.padding20, .padding-20 { padding: 20px ! important; }
-.padding30, .padding-30 { padding: 30px ! important; }
-.padding40, .padding-40 { padding: 40px ! important; }
-.padding50, .padding-50 { padding: 50px ! important; }
-
-.pad-bottom-0, .padding-bottom-0 { padding-bottom: 0px ! important; }
-.pad-bottom-5, .padding-bottom-5 { padding-bottom: 5px ! important; }
-.pad-bottom-10, .padding-bottom-10 { padding-bottom: 10px ! important; }
-.pad-bottom-15, .padding-bottom-15 { padding-bottom: 15px ! important; }
-.pad-bottom-20, .padding-bottom-20 { padding-bottom: 20px ! important; }
-
-
-.pad-top-0, .padding-top-0 { padding-top: 0px ! important; }
-.pad-top-5, .padding-top-5 { padding-top: 5px ! important; }
-.pad-top-10, .padding-top-10 { padding-top: 10px ! important; }
-.pad-top-15, .padding-top-15 { padding-top: 15px ! important; }
-.pad-top-20, .padding-top-20 { padding-top: 20px ! important; }
-
-
-.pad-l-5, .padding-l-5 { padding-left: 5px ! important; }
-.pad-r-5, .padding-r-5 { padding-right: 5px ! important; }
-.pad-lr-5, .padding-lr-5 { padding-left: 5px ! important; padding-right: 5px !important; }
-
-
-.margin-0, .margin0 { margin: 0px ! important; }
-.margin-1, .margin1 { margin: 1px ! important; }
-.margin-2, .margin2 { margin: 2px ! important; }
-.margin-5, .margin5 { margin: 5px ! important; }
-
-
-.margin-top-5 { margin-top: 5px ! important; }
-.margin-top-10 { margin-top: 10px ! important; }
-.margin-top-20 { margin-top: 20px ! important; }
-.margin-left-5 { margin-left: 5px ! important; }
-.margin-tb-5 { margin-bottom: 5px ! important; margin-top: 5px ! important; }
-.margin-bottom-5 { margin-bottom: 5px ! important; }
-.margin-bottom-10 { margin-bottom: 10px ! important; }
-.margin-bottom-20 { margin-bottom: 20px ! important; }
-*/
 
 .marginauto, .margin-auto, .auto-margin, .automargin {
   margin-left: auto ! important;
@@ -285,101 +89,9 @@ h3 {
   box-shadow: inset 0 0 2px 0 rgba(57, 140, 255, 0.8);
 }
 
-/** To use this simple css tooltip, just be sure to put both the item you
-want to hover over, as well as the invisible tooltip, in a no-border,
-no margin, no padding, display-inline-block,position:relative div. It shouldn't
-change the layout almost at all
-
-Just put the tooltip div immediately after the element you want to hover over for
-info
-*/
-div.pk-tooltip { display: none; }
-
-.relative { position: relative ! important; }
-.absolute { position: absolute ! important; }
-
-/*
-div.pk-tooltip {
-*/
-/** Use tootik 
-:hover > div.pk-tooltip {
-  display: inline-block;
-  background-color: #faa;
-  color: #400;
-  border: solid red 1px;
-  border-radius: 5px;
-  margin: 5px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 5px;
-  position: absolute;
-  top: 50%;
-  transform:translate(0,-50%);
-  left: 20%;
-}
-.no-space {
-  margin: 0;
-  padding: 0! important ;
-  border: none! important ;
-  background: none transparent ! important ;
-}
-
-.tooltip-wrapper {
-  position: relative! important ;
-  display: inline-block;
-  margin: 0! important ;
-  padding: 0! important ;
-  border: none! important ;
-  background: none transparent ! important ;
-}
-*/
-/** Make a reasonable default */
-.wrapper {
-
-}
-
-
-/* can be combined with other clases to give a look and 
-eel to labels (descriptons), vs user input/repli8es */
-
-/* - Definitely not general utility classes...
-.pk-desc {
-  color: #556;
-  font-style: italic;
-  font-family: arial;
-  background-color: #efe;
-  padding: 5px;
-  border-radius: 5px;
-}
-
-.pk-val {
-  color: #544;
-  font-family: verdana;
-  background-color: #fef;
-  padding: 5px;
-  border-radius: 5px;
-}
-*/
 
 
 /* The CONTAINING element must be RELATIVE*/
-@mixin make-horizontal-center {
-  margin-left: 0;
-  margin-right: 0;
-  position: absolute;
-  left: 50%;
-  transform:translate(-50%,0);
-}
-
-@mixin make-vertical-center {
-  margin-top: 0;
-  margin-bottom: 0;
-  position: absolute;
-  top: 50%;
-  transform:translate(0,-50%);
-}
-
-
 .horizontal-center { @include make-horizontal-center }
 .h-center { @include make-horizontal-center }
 .vertical-center { @include make-vertical-center }
@@ -397,19 +109,11 @@ containing block needs to be positioned relatively*/
 
 }
 
-/*
-.center {
-  display: flex;
-  align-items: center;
-  justify-content: center; 
-}
-*/
-
 /* Centers a block within an enclosing positioned block*/
 /* Not sure the enclosing block needs this class, but keep in case */
 /* Also seems to work with display: inline-flex */
 /* This doesn't even seem to require that the contained centered box be positioned*/
-.centering {
+.fcenter, center-flex {
   position: relative;
   display: flex;
   align-items: center;
@@ -424,66 +128,25 @@ containing block needs to be positioned relatively*/
   align-items: flex-start;
 }
 /** Apply to the flex box */
-.flex { display: flex ! important; flex-direction: column; }
 .flexalignstretch {align-items: stretch;}
 .flexjustifyaround {justify-content: space-around;}
 
 /** Apply to the flex items */
 .flexgrow-2, .flexgrow2 { flex-grow: 2; }
 .flexgrow-1, .flexgrow1 { flex-grow: 1; }
+.flex-grow { flex-grow: 5; }
 
 
 
 /******   Text Tweaks ***********/
 .large { font-size: large ! important; }
-
 .x-large { font-size: x-large ! important; }
 .xx-large { font-size: xx-large ! important; }
-
 .table-cell { display: table-cell ! important; }
-
 .vertical-align-bottom { vertical-align: bottom !important; }
 
 
 
-/**********   CSS To Horizontally center and bottom bottom align divs in bootstrap columns **/
-
-/** This class has to be added to the column class. The height can change, BUT IT HAS TO BE EXPICITLY SET! */
-
-.aligned-col-helper {
-  height: 200px;
-  position: relative;
-  background-color: rgba(255,200,200,.2);
-}
-
-.aligned-content-wrapper {
-  border: solid red 1px;
-  text-align: center;
-  /* But I think it can be relative as well! */
-  position: absolute;
-  width: 90%;
-  margin-left: 0;
-  margin-right: 0;
-  left: 50%;
-  transform: translate(-50%,0);
-  bottom: 0; /*Or whatever padding */
-}
-
-.aligned-content-helper {
-  border: solid blue 1px;
-  margin-left: auto;
-  margin-right: auto;
-  display: block;
-}
-
-.relative-wrapper {
-  margin: 5px;
-  padding: 5px;
-  position: relative;
-  background-color: #fec;
-  border: solid green 1px;
-  height: 90%;
-}
 
 table.no-borders td,
 table.noborders td,
@@ -493,8 +156,9 @@ table.noborders th {
 }
 
 
+$boolean-input-zoom: 2 !default;
 input.boolean.viewable {
-  zoom: 2;
+  zoom: $boolean-input-zoom;
 }
 /** Make a link ordinary again..*/
 a.just-link {
@@ -517,16 +181,11 @@ a.undecorated {
 }
 
 
+// For initially hidden help divs, pop up when help button clicked
 #helpTitle, 
 #helpContent {
   display: none;
 }
-
-.droponhover.dropdown:hover .dropdown-menu,
-.droponhover.dropdown .dropdown-menu:hover {
-  display: block;
-} 
-
 .btn-wrp {
   padding: 0;
   text-align: center;
@@ -545,28 +204,6 @@ a.undecorated {
   flex-direction: column;
 }
 
-
-/** The start of a better bootstrap? At least compatible - but this MAKES SURE
- * Every column of a given (proportional) width IS exactly that width, irrespective
- * of content, all columns in a row of equal height - rows nestable within columns 
- * and will grow proportionally to fill the column...
- * Just add pk-col & pk-row classess to rows and columns to make them fixed
- */
-.pk-row-nowrap,
-.pk-row-wrap,
-.pk-row {
-  box-sizing: border-box;
-  display: flex;
-  flex-grow: 1;
-  
-}
-.pk-row-wrap {
-  flex-wrap: wrap;
-}
-.pk-row-nowrap {
-  flex-wrap: nowrap;
-}
-
 .flex-center {
   align-items: center;
   align-content: center;
@@ -574,7 +211,7 @@ a.undecorated {
 }
 
 /* Throw in everything here to try to center contents */
-@mixin make-horizontal-centerer {
+@mixin make-flex-horizontal-centerer {
   display: flex;
   align-items: center;
   align-content: center;
@@ -582,90 +219,8 @@ a.undecorated {
   text-align: center;
 }
 
-.horizontal-centerer { @include make-horizontal-centerer}
+.horizontal-centerer { @include make-flex-horizontal-centerer}
 
-//$smallest-breakpoint: map-get($grid-breakpoints, 'sm');
-/* What's the point?  */
-@mixin make-pk-col {
-  box-sizing: border-box;
-  display: flex;
-  align-content: center;
-  flex-direction: column;
-  flex-grow: 0;
-  padding: 0;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-.pk-col {@include make-pk-col}
-
-
-
-//$szlist: map-keys( $grid-breakpoints );
-$bplist: map-values( $grid-breakpoints );
-$cnt: length($bplist);
-$i: 1;
-
-@each $sz, $breakpoint in $grid-breakpoints {
-  //First we do the definitions BETWEEN two breakpoints...
-  $i: $i + 1;
-  @if $i <= $cnt {
-    $next-bp: nth($bplist,$i) - 1;
-  } @else {
-    $next-bp: 99999 * 1px ;
-  }
-
-  // Started getting inexplicable error - "Error $next-bp undefined" - but it has to
-  // be, plus sure it worked before, so maybe bug in compiler. But not using now so
-  // comment out.align-content: 
-  /*
-  @debug ('i' , $i , 'cnt', $cnt , 'breakpoint' , $breakpoint, 'next-bp', $next-bp );
-  
-  @media (min-width: $breakpoint) and (max-width: $next-bp) {
-    // Now loop and make explicit - only appliies to this media size
-  }
-  */
-  
-  // Now, all definitions for $breakpoint and Higher 
-  @media (min-width: $breakpoint) {
-    @for $colno from 1 through $grid-columns {
-      .pk-col-#{$sz}-#{$colno} {
-        @include make-pk-col;
-        flex-basis: percentage($colno / $grid-columns);
-        flex-grow: 0;
-        flex-shrink: 0;
-      }
-    } 
-    .pk-col-#{$sz} { //Aplied with standard BS columns to all widths > bp
-      @include make-pk-col
-    }
-    .pk-col-#{$sz} > .pk-row,
-     .pk-row-#{$sz}-up, //Up means the row will only flex above the size, no wrap
-     .pk-row-#{$sz}  { //No up means it will flex always, but wrap below this size
-      box-sizing: border-box;
-      display: flex;
-      flex-grow: 100;
-      flex-basis: 100%;
-      flex-wrap: nowrap;
-      width: 100%;
-    }
-  }
-  //Now media query defs for SMALLER than sz
-  @media (max-width: $breakpoint - 1px) {
-     .pk-row-#{$sz}  {
-        box-sizing: border-box;
-        display: flex;
-        flex-wrap: wrap;
-     }
-     .pk-flex-resize-#{$sz} { //Match the wrap size - if wrapping, should adapt
-       flex-grow: 1;
-       flex-shrink: 0;
-     } 
-
-    .horizontal-center-#{$sz}  { @include make-horizontal-center }
-    .vertical-center-#{$sz}  { @include make-vertical-center }
-    .horizontal-centerer-#{$sz} { @include make-horizontal-centerer}
-  }
-}
 .currency, .number, .numeric, .int, .integer, .jq-format-currency {
   text-align: right;
 }
@@ -716,45 +271,6 @@ $i: 1;
   
 }
 
-/*
-@mixin pkfs($int: 0)  {
-  $fsz: 1rem + $int * .1rem;
-  font-size: $fsz;
-}
-
-@mixin pkfw($int:0) {
-  $fw: 500 + $int * 100;
-  font-weight: $fw;
-}
-.pkfs1 { @include pkfs(1); }
-.pkfs2 { @include pkfs(2); }
-.pkfs3 { @include pkfs(3); }
-.pkfs4 { @include pkfs(4); }
-.pkfs5 { @include pkfs(5); }
-.pkfs6 { @include pkfs(6); }
-.pkfs10 { @include pkfs(10); }
-
-.pkfw1 { @include pkfw(1); }
-.pkfw2 { @include pkfw(2); }
-.pkfw3 { @include pkfw(3); }
-.pkfw4 { @include pkfw(4); }
-.pkfw5 { @include pkfw(5); }
-
-.pkl1 { @include pkfs(1); @include pkfw(1); }
-.pkl2 { @include pkfs(2); @include pkfw(1); }
-.pkl3 { @include pkfs(3); @include pkfw(2); }
-.pkl4 { @include pkfs(4); @include pkfw(2); }
-.pkl5 { @include pkfs(5); @include pkfw(3); }
-.pkl6 { @include pkfs(6); @include pkfw(3); }
-*/
-
-
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
-}
 
 @media print {
   .print-button {
@@ -775,29 +291,9 @@ $i: 1;
   display: none;
 }
 
-/** For labels under images */
-.image-desc {
-  border-radius: .5em;
-  font-weight: 600;
-  font-size: .9rem;
-  color: #422;
-  text-align: center;
-  margin-top: .5em;
-  background-color: rgba(100,100,255,.5);
-
-}
-
-.row.pk-lbl-row [class*="col"] {
-   @extend .pk-lbl;
-}
-
 .row.col-inner-border [class*="col"] {
    @extend .inner-border;
 }
-.row.pk-val-row [class*="col"] {
-   @extend .pk-val;
-}
-
 /** A jQuery UI Dialog Box that should pop-up on page load if it exists*/
 .jqui-dlg-pop-load {
   display: none;
@@ -854,14 +350,6 @@ table.pk-tbl {
   }
 }
 
-.bg-ffc {
-  background-color: #ffc;
-}
-
-.border-aaa {
-  border: solid 1px #aaa;
-}
-
 .sect-sep {
   border-bottom: solid 1px $pk-tbl-border-color;
   font-weight: bold;
@@ -895,7 +383,6 @@ table.pk-tbl {
 
 .flex { display: flex; }
 
-.flex-grow { flex-grow: 5; }
 
 .align-self-center {align-self: center;}
 

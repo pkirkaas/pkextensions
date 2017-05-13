@@ -2,12 +2,65 @@
  * overridable in individual sites
  */
 
-  .pk-template {
-    border: solid blue 1px;
-    padding: 5px;
-    margin: 5px;
-  }
- .pk-template-title {
-   color: red;
-   font-size: x-large;
+$page-template-border:  solid blue 1px !default;
+$page-template-padding:  5px !default;
+$page-template-margin:  5px !default;
+.page-template {
+  border: solid blue 1px;
+  padding: $page-template-padding;
+  margin: $page-template-margin;
+}
+
+$page-template-title-color: red !default;
+$page-template-title-font-size: x-large !default;
+.page-template-title {
+   color: $page-template-title-color;
+   font-size: $page-template-title-font-size;
  }
+
+$site-lbl-color: #228 !default;
+$site-val-color: #422 !default;
+$site-negative-value-color: #a22 !default;
+
+.pk-lbl {
+  font-weight: bold;
+  color: $site-lbl-color;
+}
+
+.pk-val {
+  color: $site-val-color;
+  font-weight: bold;
+}
+
+
+.pk-dollar-value {
+  display: inline-block;
+  text-align: right;
+}
+
+.pk-dollar-value.negative-dollar-value,
+.pk-val.pk-dollar-value.negative-dollar-value {
+  color: $site-negative-value-color;
+}
+
+
+/** For labels under images */
+.image-desc {
+  border-radius: .5em;
+  font-weight: 600;
+  font-size: .9rem;
+  color: #422;
+  text-align: center;
+  margin-top: .5em;
+  background-color: rgba(100,100,255,.5);
+
+}
+
+.row.pk-lbl [class*="col"] {
+   @extend .pk-lbl;
+}
+
+.row.pk-val [class*="col"] {
+   @extend .pk-val;
+}
+

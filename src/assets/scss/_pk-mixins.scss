@@ -9,7 +9,6 @@ font-family: 'Oswald', verdana;
 font-family: 'Lato', verdana;
 */
 
-@import 'variables';
 // If they weren't previously defined, use defaults
 $grid-breakpoints: (xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
 $grid-columns:               12 !default;
@@ -54,6 +53,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
 
 
+/* The CONTAINING element must be RELATIVE*/
 @mixin absolutecenter($axis: "both"){
   position:absolute;
   @if $axis == "y"{
@@ -75,6 +75,16 @@ $grid-gutter-width:          1.875rem !default; // 30px
     transform: translate(-50%,-50%);
   }
 }
+
+/* The CONTAINING element must be RELATIVE*/
+@mixin make-horizontal-center {
+  @include absolutecenter(x);
+}
+
+@mixin make-vertical-center {
+  @include absolutecenter(y);
+}
+
 
 //In SCSS, '' & 0 are true
 @function empty($value) {
@@ -110,109 +120,6 @@ $grid-gutter-width:          1.875rem !default; // 30px
     }
   }
 }
-@function empty($value) {
-  @if not($value) 
-      or $value == "" 
-      or $value == 0
-      or $value == ()
-      or length($value) == 0 {
-    @return true;
-  }
-  @return false;
-}
-
-.test-map {
-  $map:();
-  $map: map-merge($map,(background:blue));
-  $map: map-merge($map,(border:solid black 3px));
-  @include mk-decblock($map);
-}
-
-@mixin make-bg($cname: mhead, $color: #da8) {
-  .#{$cname}-a { background-color: lighten($color,20%); }
-  .#{$cname}-b { background-color: darken($color,20%); }
-}
-
-/** Makes (multiple) text format classes, based on $args map:
- * All class names prepended by 'au-'
- * Params:
- * cname: format - class name(s) will be au-cname
- * weight: null - font-weight
- * font: null - font-family
- * szrange: 0 or int - how many class sizes
- * crange: null or true - generate lighter & darker fonts?
- * bgrange: null or 1 - generate light & dark bg? (Prefer: Use wrapper)
- * background: null - or color (Prefer: Use wrapper for BG)
- * margin: null - or margin (Prefer: Use wrapper)
- * padding: null or padding (Prefer: Use wrapper)
- * align: null - or center or left or right (Prefer: Use wrapper)
- * color: null or color
- * border: null or color
- * 
-*/
-
-
-@mixin mk-format($args:()) {
-  $defaults: (cname:format,szrange:0, size:1em);
-  $params: map-merge($defaults,$args);
-  $cname: map-get($params,cname);
-  $bname: au-#{$cname};
-  $border: map-get($params,border);
-  $szrange: map-get($params,szrange);
-  $crange: map-get($params,crange);
-  $bgrange: map-get($params,bgrange);
-  $background: map-get($params,background);
-  $color: map-get($params,color);
-  $weight: map-get($params,weight);
-  $display: map-get($params,display);
-  $align: map-get($params,align);
-  $font: map-get($params,font);
-  $size: map-get($params,size);
-  $textshadow: map-get($params,textshadow);
-  $boxshadow: map-get($params,boxshadow);
-  
-  $map:();
-  @if $border {
-    $map: map-merge($map, (border: solid $border 1px,
-      border-radius: .5em));
-  }
-  $map:map-merge($map,(display:$display,
-      text-align:$align,
-      font-family:$font));
-
-  $clmap: if($color and $crange, 
-        ('-flt':(color:lighten($color,20%)),
-          '':(),
-          '-fdk':(color:darken($color,20%))),
-          ('':(color:$color)));
-
-
-  $bgmap: if($background and $bgrange, 
-        ('-bglt':(background:lighten($color,20%)),
-          '':(background:$background),
-          '-bgdk':(background:darken($background,20%))),
-          ('':(background:$background)));
-
-  @for $i from 0 through $szrange {
-    $sz: if($i!=0, -$i, null);
-    $szmap: (font-size:($i/5)+$size);
-    @each $bga in map-keys($bgmap) {
-      $bmap: map-get($bgmap,$bga);
-      @each $ca in map-keys($clmap) {
-        $cmap: map-get($clmap,$ca);
-        //@debug #{$bname}#{$ca}#{$bga}#{$sz};
-        .#{$bname}#{$ca}#{$bga}#{$sz} {
-          @include mk-decblock($map);
-          @include mk-decblock($cmap);
-          @include mk-decblock($bmap);
-          @include mk-decblock($szmap);
-          @include mk-boxshadow($boxshadow);
-          @include mk-textshadow($textshadow);
-        }
-      }
-    }
-  }
-}
 
 @mixin mk-boxshadow($map:()) {
   @if not(empty($map)) {
@@ -229,18 +136,6 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 
 }
-//Example Classname: .au-head-flt-bgdk2 
-//
-/*
-@include mk-format((cname:head,
-    szrange:3,
-     color:#456,crange:1,
-     background:#cde,
-     bgrange:1,
-     border: #aaf,
-     display: inline,
-     ));
-*/
 
 @mixin h-padding($sz) {
   padding-left: $sz;
@@ -262,12 +157,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
   margin-right: $sz;
 }
 
-.m-a {
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-/* Makes a bunch of left/right margins/paddings
-*/
+/* Makes a bunch of left/right margins/paddings */
 @mixin mk-spacing {
   @for $i from 0 through 250 {
     $sz: if($i!=0, -$i, 0);
@@ -323,8 +213,6 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-weights {
   @for $i from 1 through 9 {
     $weight: 100 * $i;
-    //@debug $weight;
-    //@debug fw#{$i};
     .fw#{$i},
     .f-w#{$i} {
         font-weight: $weight !important;
@@ -467,20 +355,6 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @include mk-section-nomargin;
 }
 
-@mixin text-align($align:center) {
-  text-align: $align;
-}
-
-.left-align, .l-a {
-  @include text-align(left);
-}
-.right-align, .r-a {
-  @include text-align(right);
-}
-.center-align, .c-a {
-  @include text-align(center);
-}
-
 @mixin mk-colors {
   $hl: 0 2 4 6 8 a c e f;
   @each $c1 in $hl {
@@ -523,6 +397,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
 /******************************************************************/
 /*
 Standard Classes & Mixins & Vars
+
+Site Headers:
+.sh1 -> .sh20 (Increasing in size)
 
 Spacing/Margins/Padding:
 .m-x-y

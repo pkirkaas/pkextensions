@@ -7,13 +7,6 @@ CSS / Styling that when used together create effects, like tooltips, liking some
   display: none;
 }
 
-div.super_test {
-  border: solid black 3px;
-  margin: 20px;
-  padding: 20px;
-  background-color: red;
-  font-size: xx-large;
-}
 
 /** Speach bubble effects */
 div.speech-bubble{
@@ -92,40 +85,6 @@ div.speech-bubble.right:after {
   display: -webkit-flex;
   display: -ms-flexbox;
   display:         flex;
-}
-
-
-@media (min-width: 0px) and (max-width: 767px) {
-  .fsi-row-sm-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 768px) and (max-width: 991px) {
-  .fsi-row-sm-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 992px) and (max-width: 1199px) {
-  .fsi-row-md-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
-}
-@media (min-width: 1200px) {
-  .fsi-row-lg-level {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-  }
 }
 
 /** Management of "Favoriting" & Blocking, in combo with JS / AJAX */
@@ -262,7 +221,7 @@ div.blocked:hover::after {
 }
 
 
-/** Sope button styling, also for divs, and menus? */
+/** Some button styling, also for divs, and menus? */
 $default-pkmvc-button: 1 !default;
 @if $default-pkmvc-button == 1 {
   body .pkmvc-button:focus,
@@ -354,18 +313,25 @@ body .light-button {
       border-left: 1px solid #174299;
       box-shadow: inset 0 0 5px 2px #1a47a0, 0 1px 0 #eeeeee;
   }
+
+
 /** Set of behaviors for inline login */
+$inline-login-color: #ccf !default;
 .inline-login a{
-  color: #ccf;
+  color: $inline-login-color;
 }
+$inline-login-hover-color: #aaf !default;
 .inline-login a:hover{
   text-decoration: none;
-  color: #aaf;
+  color: $inline-login-hover-color;
 }
+
+$inline-login-margin-top: 4px !default;
+$inline-login-zoom: .9 !default;
 .inline-login {
   display: inline-block;
-  margin-top: 4px;
-  zoom: .9;
+  margin-top: $inline-login-margin-top;
+  zoom: $inline-login-zoom;
 }
 
 
@@ -386,11 +352,15 @@ body .light-button {
 }
 
 /** Basis for avatar handling, also pup up ajax dialogs */
-img.avatar,
-.avatar-med,
-.avatar, .avatar-sm {
-  max-width: 13rem;
-  max-height: 13rem;
+$img-avatar-max-width: 15rem !default;
+$img-avatar-max-height: 15rem !default;
+
+img.avatar {
+  max-width: $img-avatar-max-width;
+  max-height: $img-avatar-max-height;
+  padding: 0;
+  margin: 0;
+  border: none;
   /*
   padding: 5px;
   border: 1px;
@@ -398,17 +368,35 @@ img.avatar,
   border-radius: 5px;
   */
 }
-.avatar-med {
-  max-width: 16rem;
-  max-height: 16rem;
-}
-.avatar-desc {
-  width: 13rem;
-  padding: .5rem;
-  border: 1px;
-  margin: .5rem;
+
+
+.avatar-frame {
+  margin-left: 2px;
+  margin-right: 2px;
   display: inline-block;
-  background-color: #eee;
+  width: $img-avatar-max-width;
+  height:  $img-avatar-max-height;
+  border: solid #888 1px;
+  text-align: center;
+  position: relative;
+  background-color: black;
+}
+
+
+
+
+
+$avatar-desc-width: $img-avatar-max-width !default;
+$avatar-desc-padding: .5rem !default;
+$avatar-desc-margin: .5rem !default;
+$avatar-desc-bg: #eee !default;
+.avatar-desc {
+  width: $avatar-desc-width;
+  padding: $avatar-desc-padding;
+  border: 1px;
+  margin: $avatar-desc-margin;
+  display: inline-block;
+  background: $avatar-desc-bg;
 
 }
 
@@ -421,29 +409,6 @@ img.big-picture-dialog {
   */
 
 } 
-img.avatar {
-  padding: 0;
-  margin: 0;
-  border: none;
-  max-width: 12rem ! important;
-  max-height: 12rem ! important;
-}
-.avatar-frame {
-  margin-left: 2px;
-  margin-right: 2px;
-  display: inline-block;
-  width: 12rem;
-  height: 12rem;
-  border: solid #888 1px;
-  text-align: center;
-  position: relative;
-  /*
-  display: flex;
-  justify-content: center;
-  */
-  background-color: black;
-}
-
 /** Basic uniform styling for disabled controls - both the native HTML inputs,
  * which bootstrap applies a style to through the pseudo-selector :disabled -
  * but that doesn't work with my compound inputs like "multiselect" Components
@@ -505,16 +470,5 @@ input[disabled].disabled {
  * Need to add "data-dialogClass='pk-big-picture'" to the js-dialog-button 
 */
 .ui-dialog.ui-widget.pk-big-picture {
-  margin: 0;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform:translate(-50%,-50%);
-}
-/*
-*/
-
-/** Reasonable default */
-.pk-dollar-value {
-  display: inline-block;
+  @include absolutecenter;
 }
