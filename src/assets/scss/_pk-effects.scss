@@ -326,12 +326,42 @@ $inline-login-hover-color: #aaf !default;
   color: $inline-login-hover-color;
 }
 
+form.inline-login input.form-control.checkbox-inline {
+  display: inline-block;
+  width: auto;
+  margin-left: .25rem;
+  vertical-align: middle;
+}
+
 $inline-login-margin-top: 4px !default;
 $inline-login-zoom: .9 !default;
 .inline-login {
   display: inline-block;
   margin-top: $inline-login-margin-top;
   zoom: $inline-login-zoom;
+}
+
+label.inline-remember {
+  color: white;
+  display: inline-block;
+  margin-left: .5em;
+}
+$inline-login-form-button-hpad: .4rem !default;
+$inline-login-form-button-vpad: .3rem !default;
+form.inline-login.form-inline button.btn-primary {
+  margin-left: .5em;
+  padding-left: $inline-login-form-button-hpad;
+  padding-right: $inline-login-form-button-hpad;
+  padding-top: $inline-login-form-button-vpad;
+  padding-bottom: $inline-login-form-button-vpad;
+  //position: relative;
+  //top: -5px;
+}
+
+form.inline-login.form-inline button.btn-primary {
+  @include below-bp(sm) {
+    margin-left: 0;
+  }
 }
 
 

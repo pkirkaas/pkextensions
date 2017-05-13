@@ -27,6 +27,23 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @return $sz;
 }
 
+//Build custom media size classes. Ex:
+/*
+.btn {
+  margin-left: 5px;
+ }
+
+.btn {
+@include below-bp(sm) {
+   margin-left: 0;
+  }
+}
+//Produces:
+
+@media (max-width: 575px) {
+  .btn {
+    margin-left: 0; } }
+*/
 // Can take a BS 'sz' ('xs', 'sm', etc)
 @mixin above-bp($sz) {
   $breakpoint: breakpoint($sz);

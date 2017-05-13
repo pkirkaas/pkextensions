@@ -1,5 +1,5 @@
 /** Mods/add-ons to default BS 4
- */
+*/
 
 //Customizing TAB inactive Background & Font color
 .nav-tabs .nav-link {
@@ -28,66 +28,44 @@ img.site-brand-menu-img {
   max-height: $site-brand-menu-img-max-height;
 }
 
-//Tootik Override - add 'center' config
-  // Positions (From tootik scss 'right')
-  [data-tootik][data-tootik-conf*='center'] {
-    &:before {
-      left: 50%;
-      top: 50%;
-      transform: translate(-50% , -50%);
-    }
-    &:after {
-      bottom: auto;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-    &:hover,
-    &:focus {
-      &:before {
-        transform: translate(-50%, -50%);
-      }
-      &:after {
-        transform: translate(-50%, -50%);
-      }
+// Play with customizing navbars
+//$nav-item-after-nav-item-margin-left: .5rem !default;
+$nav-item-hpad: .25rem !default;
+$pk-nav-nav-link-margin-top: 5px !default;
+$pk-top-menu-height: 50px !default;
+$pk-top-menu-nav-link-margin-top: 0 !default;
+body nav.navbar.pk-top-menu {
+  z-index: 999999;
+  flex-direction: row;
+  height: $pk-top-menu-height;
+  a.nav-link {
+    margin-top: $pk-top-menu-nav-link-margin-top;
+    color: #eee;
+    font-size: 1rem;
+    &:hover {
+      color: white;
+      text-shadow:0 0 1px white;
     }
   }
+  .site-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
 
+//@include bg-variant('.bg-inverse', $brand-inverse);
+  ul.nav.navbar-nav {
+    z-index: 100000;
+    //background-color: #666;
+    background-color: $brand-inverse;
+    opacity: 1;
+  }
+  .nav-item {
+    padding-right: $nav-item-hpad; 
+  }
+  .nav-item + .nav-item {
+    //margin-left: $nav-item-after-nav-item-margin-left;
+    padding-left: $nav-item-hpad;
 
-  // Play with customizing navbars
-
-  nav.navbar.pk-nav {
-    flex-direction: row;
-    background: red;
-    .nav-link {
-      color: #ccf;
-      font-size: 1.1rem;
-      &:hover {
-        color: white;
-        text-shadow:0 0 1px white;
-      }
-    }
-    .nav-item + .nav-item {
-      margin-left: 2rem;
-
-    }
-  } 
-
-
-label.inline-remember {
-  color: white;
-}
-
-form.inline-login.inline-form button.btn-primary {
-  position: relative;
-  //top: -25px;
-
-}
-
-body nav.navbar.pk-top-menu {
-  height: 50px;
-  a.nav-link {
-    margin-top: 5px;
   }
 }
 
@@ -95,3 +73,49 @@ body nav.navbar.pk-top-menu {
 .droponhover.dropdown .dropdown-menu:hover {
   display: block;
 } 
+
+ul.nav.navbar-nav.li {
+  text-align: center;
+}
+
+
+//Play with imports from SBC-Exchange
+.pk-top-menu ul.nav.navbar-nav > .nav-item {
+  margin-top: 0;
+}
+
+nav.navbar {
+  margin-bottom: 0;
+}
+
+
+.site-name {
+  text-shadow:0 0 1px #400;
+}
+
+
+
+//Tootik Override - add 'center' config
+// Positions (From tootik scss 'right')
+[data-tootik][data-tootik-conf*='center'] {
+  &:before {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50% , -50%);
+  }
+  &:after {
+    bottom: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  &:hover,
+    &:focus {
+    &:before {
+      transform: translate(-50%, -50%);
+    }
+    &:after {
+      transform: translate(-50%, -50%);
+    }
+  }
+}
