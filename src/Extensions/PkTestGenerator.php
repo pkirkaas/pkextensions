@@ -367,13 +367,61 @@ class PkTestGenerator {
   }
 
 
-/** Depends on having a "Sundries" Dir, with uploadable files */
-  public static function makeUploadedSpfFiles() {
-    $sampleDir = realpath(__DIR__ . "/../../../Sundries");
-    $filenames = scandir($sampleDir);
+/** UNFINISHED!
+    Copies a random file from $srcdir to default uploads dir
+    @param string|null $srcdir - the directory to "upload" from, 
+      Default: Base "Sundries" Dir
+*/
+
+/*
+  public static function randFileToUploads ($srcdir = null, $uploads_reldir = 'uploads') {
+    if (! $srcdir) {
+      $srcdir = realpath(__DIR__ . "/../../../Sundries");
+    }
+    if (!is_dir($srcdir)) {
+      throw new \Exception("Couldn't resolve [$srcdir] to a directory");
+    }
+    $filenames = scandir($srcdir);
+    $realfiles = [];
+    foreach ($filenames as $filename) {
+      $filepath = $srcdir.'/'.$filename;
+      if (!is_file($filepath)) continue;
+      $realfiles[$filename] = $filepath;
+    }
+    if (!count($realfiles)) return null;
+    #Make a default uploads file path
+    $uploads_dir = public_path()."/$uploads_reldir/");
+    if (!is_dir($uploads_dir)) {
+      throw new \Exception("Couldn't resolve [$uploads_dir] to a directory");
+    }
+#Get a random filename, copy from src dir to uploads dir
+    $rndName = static::randData(array_keys($realfiles));
+
+
+  }
+  */
+
+
+
+
+  /** "Uploads" all files from the srcdir, into a 'cache' directory.  
+    @param string|null $srcdir - the directory to "upload" from, 
+      Default: Base "Sundries" Dir
+    @return array - array of Symfony upload details
+  */
+  /*
+  public static function makeUploadedSpfFiles($srcdir=null) {
+    if (! $srcdir) {
+      $srcdir = realpath(__DIR__ . "/../../../Sundries");
+    }
+    if (!is_dir($srcdir)) {
+      throw new \Exception("Couldn't resolve [$srcdir] to a directory");
+    }
+
+    $filenames = scandir($srcdir);
     $symfups = [];
     foreach ($filenames as $filename) {
-      $fpath = $sampleDir . "/$filename";
+      $fpath = $srcdir . "/$filename";
       if (is_file($fpath)) {
         $newfpath = __DIR__ . "/cache/$filename";
         copy($fpath, $newfpath);
@@ -384,6 +432,7 @@ class PkTestGenerator {
     }
     return $symfups;
   }
+  */
 
 
 

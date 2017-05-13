@@ -1627,6 +1627,7 @@ function generateShortRandomString($length = 5) {
  */
 function combineAsArrays($arg1, $arg2) {
   $arg1 = toArray($arg1);
+  if ($arg2===null) return $arg1;
   $arg2 = toArray($arg2);
   return array_merge($arg1, $arg2);
 }
@@ -2445,7 +2446,8 @@ function array_meld($arr1, $arr2) {
   $retarr = [];
   foreach ($arr1 as $key1 => $val1) {
     $key2 = key($arr2);
-    $val2 = $arr2[$key2];
+    //$val2 = $arr2[$key2];
+    $val2 = keyVal($key2,$arr2);
     next($arr2);
     if ($key1 === $key2) {
       $retarr[$key1] = array_meld($val1, $val2);

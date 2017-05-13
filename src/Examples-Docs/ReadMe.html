@@ -6,10 +6,24 @@
   <title>Suggested Mods</title>
 </head>
 <body>
-<div class='title'>Suggested mods to standard Laravel Installation</div>
+<div class='title'>Suggested mods to standard Laravel Installation to use PkExtensions</div>
 
 <h1>Examples</h1>
 <p>See <tt>ExampleBase</tt>
+
+<h1>composer.json</h1>
+<pre>
+    "repositories": [{
+      "type": "git",
+      "url": "https://github.com/pkirkaas/PkExtensions.git"
+    } ],
+    "require": {
+        "php": ">=5.6.4",
+        "laravel/framework": "5.*",
+        "pkirkaas/PkExtensions": "dev-master",
+//...
+</pre>
+
 
 <h1>laravel/app</h1>
 <ul>
@@ -29,8 +43,9 @@ use PkExtensions\Console\Commands\ClearAll;
 use PkExtensions\Console\Commands\GenerateMigrations;
 //...
     protected $commands = [
-       GenerateMigrations::class,
+      GenerateMigrations::class,
       ClearAll::class,
+      DestroyTables::class,
     ];
 </pre>
 
