@@ -175,6 +175,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 }
 
 /* Makes a bunch of left/right margins/paddings */
+//These are REM - so absolute across the site.
 @mixin mk-spacing {
   @for $i from 0 through 250 {
     $sz: if($i!=0, -$i, 0);
@@ -182,6 +183,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     @if $i < 50 {
       //$foffset: $offset + 1em;
       $foffset: $offset/5;
+      //Font Size: REM, up and down - fs-0: 1rem;, fs-1: fs--1
       .fs#{$sz},
       .f-s#{$sz} {
         font-size: 1rem + $foffset !important;
@@ -403,8 +405,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-site-headers($base-header: generic-base-header, $name:sh) {
   @for $i from 1 through 20 {
     .#{$name}#{$i} {
-      @extend  .#{$base-header};
       font-size: $i/5 + 1rem;
+      @extend  .#{$base-header};
       @include v-margin($i/10 + .5rem);
     }
   }
@@ -443,6 +445,7 @@ x from 1 - 9
 
 
 Google Fonts:
+.verdana { font-family:  verdana; }
 .oswald { font-family: 'Oswald', verdana; }
 .lato { font-family: 'Lato', arial; }
 .roboto { font-family: 'Roboto', verdana; }

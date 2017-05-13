@@ -6,17 +6,66 @@ $page-template-border:  solid blue 1px !default;
 $page-template-padding:  5px !default;
 $page-template-margin:  5px !default;
 .page-template {
-  border: solid blue 1px;
+  //border: solid blue 1px;
   padding: $page-template-padding;
   margin: $page-template-margin;
 }
 
-$page-template-title-color: red !default;
+$page-template-title-hpad: .5em !default;
+$page-template-title-vpad: .25em !default;
+$page-template-title-color: #400 !default;
+$page-template-title-bg: #fff !default;
 $page-template-title-font-size: x-large !default;
-.page-template-title {
-   color: $page-template-title-color;
+$page-template-title-text-align: center !default;
+$page-template-title-radius: .3em !default;
+$page-title-font: 'Montserrat' !default;
+$page-subtitle-margin-top: .5em !default;
+$page-subtitle-font: 'Montserrat' !default;
+.page-template .page-title {
    font-size: $page-template-title-font-size;
+   padding: $page-template-title-vpad $page-template-title-hpad;
+   color: $page-template-title-color;
+   background: $page-template-title-bg;
+   text-align: $page-template-title-text-align;
+   border-radius: $page-template-title-radius;
+   font-family: $page-title-font, verdana;
  }
+
+.page-template .page-title.inverse {
+   background: $page-template-title-color;
+   color: $page-template-title-bg;
+ }
+
+$page-title-img-maxheight: 40px !default;
+$page-title-img-maxwidth: 40px !default;
+$page-title-img-margin-right: 1rem !default;
+.page-template .page-title img {
+  vertical-align: middle;
+  max-height: $page-title-img-maxheight;
+  max-width: $page-title-img-maxwidth;
+ }
+
+$page-template-subtitle-color: #004 !default;
+$page-template-subtitle-bg: #fff !default;
+$page-template-subtitle-font-size: large !default;
+$page-template-subtitle-text-align: left !default;
+$page-template-subtitle-hpad: $page-template-title-hpad !default;
+$page-template-subtitle-vpad: $page-template-title-vpad !default;
+$page-template-subtitle-radius: $page-template-title-radius !default;
+.page-template .page-subtitle {
+   font-size: $page-template-subtitle-font-size;
+   padding: $page-template-subtitle-vpad $page-template-subtitle-hpad;
+   color: $page-template-subtitle-color;
+   background: $page-template-subtitle-bg;
+   text-align: $page-template-subtitle-text-align;
+   border-radius: $page-template-subtitle-radius;
+   font-family: $page-subtitle-font, verdana;
+   margin-top: $page-subtitle-margin-top;
+}
+.page-template .page-subtitle.inverse {
+   background: $page-template-subtitle-color;
+   color: $page-template-subtitle-bg;
+}
 
 $site-lbl-color: #228 !default;
 $site-val-color: #422 !default;
@@ -46,9 +95,9 @@ $site-negative-value-color: #a22 !default;
 
 /** For labels under images */
 .image-desc {
+  font-size: .9rem;
   border-radius: .5em;
   font-weight: 600;
-  font-size: .9rem;
   color: #422;
   text-align: center;
   margin-top: .5em;
@@ -64,3 +113,9 @@ $site-negative-value-color: #a22 !default;
    @extend .pk-val;
 }
 
+//Used in spans to emphasize the site name in text or title
+.site-name-em {
+  //font-weight: bolder;
+  text-shadow: .1rem .1rem .1rem  rgba(0,0,0,.5);
+  font-style: italic;
+}

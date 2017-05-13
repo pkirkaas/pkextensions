@@ -39,14 +39,15 @@ body nav.navbar.pk-top-menu {
   flex-direction: row;
   height: $pk-top-menu-height;
   a.nav-link {
+    font-size: 1rem;
     margin-top: $pk-top-menu-nav-link-margin-top;
     color: #eee;
-    font-size: 1rem;
     &:hover {
       color: white;
       text-shadow:0 0 1px white;
     }
   }
+  .navbar-brand.nav-item,
   .site-brand {
     padding-top: 0;
     padding-bottom: 0;

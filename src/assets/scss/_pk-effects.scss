@@ -191,9 +191,9 @@ div.blocked::before {
 
 div.blocked::after,
 div.unblocked:after {
+  font-size: small;
   margin-top: -.3em;
   white-space: pre;
-  font-size: small;
   position: relative;
   display: block;
   transform: translateX(-60%);
@@ -333,10 +333,10 @@ form.inline-login input.form-control.checkbox-inline {
   vertical-align: middle;
 }
 
-$inline-login-margin-top: 4px !default;
+$inline-login-margin-top: 0 !default;
 $inline-login-zoom: .9 !default;
 .inline-login {
-  display: inline-block;
+  //display: inline-block;
   margin-top: $inline-login-margin-top;
   zoom: $inline-login-zoom;
 }
