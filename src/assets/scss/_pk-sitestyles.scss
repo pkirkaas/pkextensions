@@ -1,0 +1,13 @@
+/** General Styles available to all sites - with default variables
+ * overridable in individual sites
+ */
+
+  .pk-template {
+    border: solid blue 1px;
+    padding: 5px;
+    margin: 5px;
+  }
+ .pk-template-title {
+   color: red;
+   font-size: x-large;
+ }
