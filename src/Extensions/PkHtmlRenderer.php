@@ -537,13 +537,20 @@ class PkHtmlRenderer extends PartialSet {
    * if it's an indexed array, assume array of classes, implode, and do the same
    * NOTE: Overridden in subclasses to customize attributes (like SubForm)
    * @param array|string $attributes
+   * @param array|string $defaults, if equivalent key not set in attributes.
+   *   Again, $defaults can be string, then converted to $defaults=['class'=>$defaults]
    */
-  public function cleanAttributes($attributes) {
+  public function cleanAttributes($attributes, $defaults=null) {
     if (is_array_indexed($attributes)) {
       $attributes = implode (' ', $attributes);
     }
     if (is_string($attributes)) $attributes = ['class' => $attributes];
-    return $attributes;
+    if (!is_array_assoc($attributes)) $attributes = [];
+    if (!$defaults) {
+      return $attributes;
+    }
+    $defaults = $this->cleanAttributes($defaults);
+    return array_merge($defaults, $attributes);
   }
 
   /** To render regular Blade templates within a PkHtmlRenderer context
@@ -825,6 +832,15 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /** Does nothing (noop) - but can be called statically to create an empty
+   * instance: $rnd = PkRenderer::noop();
+   * //@param string $tag
+   * //@param array|string|null $atts
+   * @return $this
+   */
+  public function noop($tag=null, $atts=null) {
+    return $this;
+  }
   public function spaceDepth() {
     $size = count($this->tagStack);
     $out = '';
