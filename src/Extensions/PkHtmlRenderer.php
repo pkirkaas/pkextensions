@@ -331,6 +331,8 @@ class PkHtmlRenderer extends PartialSet {
    * @param boolean $raw - default true
    * @return html string
    */
+  //NOTE: I inserted a newline after every open tag for readability, but that's 
+  // just wrong. 
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
@@ -338,18 +340,18 @@ class PkHtmlRenderer extends PartialSet {
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
-      return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">\n");
+      return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">");
     } else if (($content === false)) {
                                 ##Nest the elements
       $spaces = $this->spaceDepth();
       $size = $this->addDepthTagStack($tag);
-      return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">\n");
+      return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">");
     } else {
       #Trust that text already wrapped in PhHtmlRenderer has already been filtered
 
 //if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
       //$this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
-      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">\n");
+      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">");
       if (is_array($content)){
         foreach ($content as $citem) {
           $this->content($citem,$raw);
@@ -459,7 +461,7 @@ class PkHtmlRenderer extends PartialSet {
     $this->$property_name = $property;
     return $this->$property_name;
   }
-  /*
+
   public function hidden($name, $value = null, $options = []) {
     if (is_arrayish($name)) {
       $name = keyVal('name', $name);
@@ -467,14 +469,12 @@ class PkHtmlRenderer extends PartialSet {
       $options = keyVal('options', $name,$options);
     }
     $options = $this->cleanAttributes($options);
-    $this[] = PkForm::hidden($name, $value, $options);
+    $this->rawcontent(PkForm::hidden($name, $value, $options));
     return $this;
   }
   public function text($name, $value = null, $options = []) {
     return $this->input('text',$name,$value,$options);
   }
-   * 
-   */
 	public function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
     if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
