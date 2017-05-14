@@ -539,9 +539,18 @@ class PkHtmlRenderer extends PartialSet {
     return $this->rawcontent(PkForm::checkbox($name, $value, $checked, $options));
   }
 
+
+  // THIS OBVIOUSLY WON'T BIND WITH MODELS, THOUGH! 
   /** Expect all the attributes to be set - that's the only arguemnt */
   public function pureinput($atts) {
     return $this->nocontent('input', $atts);
+  }
+
+  public function clonedInput($type, $name, $value = null, $options = []) {
+    $inp = new static();
+    $inp->input($type, $name, $value, $options);
+    return $inp;
+
   }
 
   public function input($type, $name, $value = null, $options = []) {
@@ -1033,7 +1042,15 @@ class PkHtmlRenderer extends PartialSet {
       $formel = 'input';
     }
     if ($formel === 'input') {
-      $frm_ctl = static::pureinput($inputpars);
+      $bkup = $inputpars;
+      $value = unsetret($inputpars,'value');
+      $name = unsetret($inputpars, 'name');
+      $type = unsetret($inputpars,'type');
+      pkdebug("Before unsetting inpars:", $bkup, "After:", $inputpars);
+      $frm_ctl = static::clonedInput($type,$name, $value, $inputpars);
+      //$frm_ctl = static::pureinput($inputpars);
+
+         // clonedInput($type, $name, $value = null, $options = []) {
     } else if ($formel === 'textarea') {
       //pkdebug("Before unsetret, TA inputpars:", $inputpars);
       $name = unsetret($inputpars,'name');
@@ -1066,14 +1083,9 @@ class PkHtmlRenderer extends PartialSet {
     $wrp_tag  = unsetret($wrapprops,'tag','div');
     $set_wrapper = new static();
     $set_wrapper->$wrp_tag([$lblwrapper,$inputwrapper],$wrapprops);
-    //$set_wrapper = $inputwrapper;
-    //$set_wrapper = $lblwrapper;
-    //pkdebug("SetWrapper:\n\n$set_wrapper");
-    //return "<h3>Will this work?</h3>";
-    //pkdebug("SetWrapper:\n\n$set_wrapper");
+    if ($formel === 'input') pkdebug("SetWrapper:\n\n$set_wrapper",
+     "Made lblwrapper w. lbl_tag [$lbl_tag]; lbl_val: [$lbl_val], lblwrapper is: [$lblwrapper], the lblprops:", $lblprops);
     return $set_wrapper;
-    //$this[] = $set_wrapper;
-    //return $this;
   }
 
   
@@ -1089,14 +1101,21 @@ class PkHtmlRenderer extends PartialSet {
 
   //public function handleInputWrap($formel, $args) {
   public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $inpWrpProps=[], $lblTpl=[], $wrpWrpProps=[]) {
+    pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
     $ret = new PkHtmlRenderer();
     if (!is_array($map) || !count($map)) return $ret;
-    if (!is_string($inpTpl)) $inpTpl = ['class'=>$inpTpl];
-    if (!is_string($lblTpl)) $lblTpl = ['class'=>$lblTpl];
+    if (is_string($inpTpl) || ($inpTpl === null)) $inpTpl = ['class'=>$inpTpl];
+    if (is_string($lblTpl) || ($lblTpl == null))  $lblTpl = ['class'=>$lblTpl];
+    if (!is_array($inpTpl) || !is_array($lblTpl)) {
+      throw new PkException(['Bad values for the TPLs: inpTpl:', $inpTpl, 'lblTpl', $lblTpl]);
+    }
+    pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
     foreach ($map as $name=>$value) {
       $inpTpl['name'] = $name;
       $lblTpl['value'] = $value;
-      $ret[] = $ret->handleInputWrap($type,$inpTpl, $inpWrpProps,$lblTpl, $wrpWrpProps);
+      $argarr = [$inpTpl, $inpWrpProps, $lblTpl, $wrpWrpProps];
+      //$ret[] = $ret->handleInputWrap($type,$inpTpl, $inpWrpProps,$lblTpl, $wrpWrpProps);
+      $ret[] = $ret->handleInputWrap($type,$argarr);
     }
     return $ret;
   }

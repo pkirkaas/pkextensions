@@ -3152,10 +3152,8 @@ function normalizeConfigArray(array $arr = [], $struct = null) {
  */
 function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
   $retarr = [];
-  if (is_stringish($arg)) {
-    if ($arg !== null) {
-      if (is_string($key)) $retarr = [$key => $arg];
-    }
+  if (is_stringish($arg) || ($arg === null)) {
+     $retarr = [$key => $arg];
   } else if (is_array_assoc($arg)) {
     $retarr = $arg;
   } else if (is_array_indexed($arg)) { #arg[0] is $key val, $arg[1] other atts
@@ -3183,8 +3181,8 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
     }
   }
   if (!isset($retarr[$key])) {
-    pkdebug("Woops! key [$key] not set in retarr:",$retarr,'OrigArg:', $arg);
-  //  $retarr[$key]=null;
+  //  pkdebug("Woops! key [$key] not set in retarr:",$retarr,'OrigArg:', $arg);
+    $retarr[$key]=null;
   }
   return $retarr;
 }
