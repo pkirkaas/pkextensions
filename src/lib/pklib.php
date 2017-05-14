@@ -3166,6 +3166,10 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
   }
   else if (!$arg && !$key) $retarr = [];
   else throw new Exception("Invalid arg: " . print_r($arg, 1));
+
+ // pkdebug("RetArr now:", $retarr, 'orig arg',$arg,'key',$key);
+//  return ['class'=>'yesterday'];
+
   if ($defaults && is_array($defaults))
       $retarr = array_merge($defaults, $retarr);
   if ($replace && is_array_assoc($replace)) {
@@ -3179,7 +3183,7 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
     }
   }
   if (!isset($retarr[$key])) {
-    pkdebug("Woops! key [$key] not set in retarr:",$retarr);
+    pkdebug("Woops! key [$key] not set in retarr:",$retarr,'OrigArg:', $arg);
   //  $retarr[$key]=null;
   }
   return $retarr;
@@ -3285,12 +3289,13 @@ function setInstanceAtts($obj, array $atts = []) {
 }
 
 function unsetret(&$arr, $key=null, $default = null) {
-  if ($key === null) {
+  if (($key === null) || !is_array($arr)) {
+    pkdebug("Odd - not quite an array op: key:, arr:",$key,$arr);
+
     $ret = $arr;
     unset ($arr);
     return $ret;
   }
-  if (!is_arrayish($arr)) return null;
   $ret = keyVal($key,$arr, $default);
   unset($arr[$key]);
   return $ret;

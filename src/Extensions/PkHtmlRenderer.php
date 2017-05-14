@@ -1013,8 +1013,8 @@ class PkHtmlRenderer extends PartialSet {
 
   public function handleInputWrap($formel, $args) {
     $inputpars = keyVal(0,$args);
-    $pararr = keyVal(1,$args,[]);
-    if (!is_array($pararr)) throw new PkException(['Unexpecte Args:', $args]);
+    //$pararr = keyVal(1,$args,[]);
+    //if (!is_array($pararr)) throw new PkException(['Unexpecte Args:', $args]);
     /*
     if (is_array_assoc($pararr)) {
       $valprops = arrayifyArg(keyVal('valprops', $pararr), 'class',['class'=>'pk-inp-wrap']);
@@ -1027,7 +1027,7 @@ class PkHtmlRenderer extends PartialSet {
       $lblprops = arrayifyArg(keyVal(2, $args),'value',['class'=>'pk-lbl']);
       $wrapprops  = arrayifyArg(keyVal(3, $args),'class',['class'=>'pk-wrapper']);
 
-    pkdebug("The Args:",$args,'valprops',$valprops,'lblprops',$lblprops,'wrapprops', $wrapprops);
+    //pkdebug("The Args:",$args,'valprops',$valprops,'lblprops',$lblprops,'wrapprops', $wrapprops);
     if (in_array($formel, static::$input_types,true)) {
       $inputpars['type'] = $formel;
       $formel = 'input';
@@ -1046,12 +1046,15 @@ class PkHtmlRenderer extends PartialSet {
       $checked = unsetret($inputpars,'checked');
       $name = unsetret($inputpars,'name');
       $value = unsetret($inputpars,'value',1);
+      if ($value === null) $value = '1';
       $unset = unsetret($inputpars,'unset','0');
-      $frm_ctl = static::boolean($name,$checked,$inputpars,$unset,$value);
+      $frm_ctl = new static();
+      //$frm_ctl->boolean($name,$checked,$inputpars,$unset,$value);
+      $frm_ctl->boolean($name,$checked,$inputpars,$unset,$value);
     } else {
       throw new PkException("Unhandled Wrap Method: [$formel]");
     }
-    pkdebug('valprops:',$valprops,'lblprops', $lblprops,'wrapprops',$wrapprops,"frmctl:\n\n$frm_ctl");
+    //pkdebug('Args:',$args,'valprops:',$valprops,'lblprops', $lblprops,'wrapprops',$wrapprops,"frmctl:\n\n$frm_ctl");
     $vw_tag = unsetret($valprops,'tag','div');
     $inputwrapper = new static();
     $inputwrapper->$vw_tag($frm_ctl,$valprops);
@@ -1059,17 +1062,43 @@ class PkHtmlRenderer extends PartialSet {
     $lbl_val =  unsetret($lblprops,'value');
     $lblwrapper = new static();
     $lblwrapper->$lbl_tag($lbl_val,$lblprops);
-    pkdebug("Made lblwrapper w. lbl_tag [$lbl_tag]; lbl_val: [$lbl_val], lblwrapper is: [$lblwrapper], the lblprops:", $lblprops);
+    //pkdebug("Made lblwrapper w. lbl_tag [$lbl_tag]; lbl_val: [$lbl_val], lblwrapper is: [$lblwrapper], the lblprops:", $lblprops);
     $wrp_tag  = unsetret($wrapprops,'tag','div');
     $set_wrapper = new static();
     $set_wrapper->$wrp_tag([$lblwrapper,$inputwrapper],$wrapprops);
     //$set_wrapper = $inputwrapper;
     //$set_wrapper = $lblwrapper;
-    pkdebug("SetWrapper:\n\n$set_wrapper");
+    //pkdebug("SetWrapper:\n\n$set_wrapper");
     //return "<h3>Will this work?</h3>";
+    //pkdebug("SetWrapper:\n\n$set_wrapper");
     return $set_wrapper;
     //$this[] = $set_wrapper;
-   // return $this;
+    //return $this;
+  }
+
+  
+  /** Uses the above function to return many nearly identical wrapped input
+   * rows. Only input[name] & label[value] differ. They are mapped by
+   * @param string $type  - boolean or textarea or...
+   * @param array $map = [$ctlName1=>lblVal1,$ctlName2=>$lblVal2,....
+   * @param array $inputTpl : substitute the ctl name here - $inputTpl['name'] ...
+   * @param mixed $inpWrapProps - just pass it along directly
+   * @param array $lblTpl : substitute the label value name here - $lblTpl['value'] ...
+   * @param mixed $wrapWrapProps - just pass it along directly
+   */
+
+  //public function handleInputWrap($formel, $args) {
+  public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $inpWrpProps=[], $lblTpl=[], $wrpWrpProps=[]) {
+    $ret = new PkHtmlRenderer();
+    if (!is_array($map) || !count($map)) return $ret;
+    if (!is_string($inpTpl)) $inpTpl = ['class'=>$inpTpl];
+    if (!is_string($lblTpl)) $lblTpl = ['class'=>$lblTpl];
+    foreach ($map as $name=>$value) {
+      $inpTpl['name'] = $name;
+      $lblTpl['value'] = $value;
+      $ret[] = $ret->handleInputWrap($type,$inpTpl, $inpWrpProps,$lblTpl, $wrpWrpProps);
+    }
+    return $ret;
   }
 
   ## Build Query controls
@@ -1170,7 +1199,6 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
 
   }
-
   /** Makes an un-named datepicker text input (so it doesn't POST), and pairs it
    * with a hidden named input, 
    * Deeply depends on support from JS
