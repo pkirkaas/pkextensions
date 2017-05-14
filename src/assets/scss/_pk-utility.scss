@@ -69,8 +69,10 @@ $inner-border-spread: 1px !default;
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
 
-.width-90, .width90, .most-width, .mostwidth { width: 90% !important; }
+.height-90, .height90, .most-height, .mostheight { height: 90% !important; }
+.height-80, .height80 { height: 80% !important; }
 
+.width-90, .width90, .most-width, .mostwidth { width: 90% !important; }
 .width-80, .width80 { width: 80% !important; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
@@ -134,6 +136,7 @@ containing block needs to be positioned relatively*/
 /** Apply to the flex items */
 .flexgrow-2, .flexgrow2 { flex-grow: 2; }
 .flexgrow-1, .flexgrow1 { flex-grow: 1; }
+.no-grow, .flexgrow-0, .flexgrow0 { flex-grow: 0; }
 .flex-grow { flex-grow: 5; }
 
 
@@ -200,9 +203,11 @@ a.undecorated {
   flex-direction: row;
 }
 .flex-col, 
-.col-flex {
+.col-flex, .flex-column {
   flex-direction: column;
 }
+
+
 
 .flex-center {
   align-items: center;

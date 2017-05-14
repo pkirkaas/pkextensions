@@ -15,6 +15,16 @@ if (!defined('RENDEROPEN')) define('RENDEROPEN', true);
 /** We allow it to know about the possibility of the extended class
  * PkMultiSubformRenderer
  */
+
+/** To wrap a pair of elements inside a wrapping el, and put that inside 
+ *  a bs4-column, AND have the label only one
+ * line and the value content stretch to most of the column; something like:
+ * 
+$descPair = PkRenderer::div([
+    PkRenderer::div('About Me...', 'pk-lbl bg-ffa no-grow'),
+    PkRenderer::div($bouncer->desc,'section bg-eee flex-grow')],
+    'section bg-ccc flex-col height-90');
+ */
 class PkHtmlRenderer extends PartialSet {
   public static $raw_depth = 0; #See if we can use this to keep track of raw depth....
   public static $raw_threshold = 0; #See if we can use this to keep track of raw depth....
@@ -86,6 +96,12 @@ class PkHtmlRenderer extends PartialSet {
   }
   public function content($content='', $raw = false) {
     //if(static::getRawCount() || ($content instanceOf PkHtmlRenderer)) {
+    if (is_array($content)) {
+      foreach ($content as $element) {
+        $this->content($element, $raw);
+      }
+      return $this;
+    }
     if(!$raw && !($content instanceOf self) && !($content instanceOf PkTree)) {
       $content = hpure($content);
     }
@@ -148,7 +164,7 @@ class PkHtmlRenderer extends PartialSet {
   /** Re-implement wrap above - wrap two elements in a third. The first argument
    * (value) will be displayed second; the second argument (label) first, both
    * wrapped in the wrap tag(default: div) with the wrapatts.
-   * @param stringish|array $value - the SECOND element - typically beneath
+   * @param stringish|array $value - the SECOND element shown - typically beneath
    * Can be simple "stringish", or an array of stringish value and attributes,
    * of the element,  with optional element tag (default: div)
    * Ex: "Today" OR ['Today','col'], OR ['Today', ['class'=>'col val', data-xx=>'yy', 'tag'=>'h1']]
@@ -357,7 +373,7 @@ class PkHtmlRenderer extends PartialSet {
   //Inputs  & Forms
 
   public function form($content, $options = []) {
-    $options = merge_attributes($options);
+    $options = $this->cleanAttributes($options);
     //return $this->rawcontent(PkForm::open($options) . $content . PkForm::close());
     $this->rawcontent(PkForm::open($options));
     $this->rawcontent($content); 

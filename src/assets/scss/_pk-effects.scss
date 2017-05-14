@@ -80,12 +80,6 @@ div.speech-bubble.right:after {
     display: table-cell;
     vertical-align: top;
 }
-.row-eq-height {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display:         flex;
-}
 
 /** Management of "Favoriting" & Blocking, in combo with JS / AJAX */
 

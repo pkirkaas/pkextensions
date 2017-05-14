@@ -177,7 +177,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 /* Makes a bunch of left/right margins/paddings */
 //These are REM - so absolute across the site.
 @mixin mk-spacing {
-  @for $i from 0 through 250 {
+  @for $i from 0 through 75 {
     $sz: if($i!=0, -$i, 0);
     $offset: $i/3 * 1rem;
     @if $i < 50 {
