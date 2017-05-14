@@ -334,11 +334,11 @@ form.inline-login input.form-control.checkbox-inline {
 }
 
 $inline-login-margin-top: 0 !default;
-$inline-login-zoom: .9 !default;
+//$inline-login-zoom: .9 !default;
 .inline-login {
   //display: inline-block;
   margin-top: $inline-login-margin-top;
-  zoom: $inline-login-zoom;
+ // zoom: $inline-login-zoom;
 }
 
 label.inline-remember {
@@ -350,12 +350,7 @@ $inline-login-form-button-hpad: .4rem !default;
 $inline-login-form-button-vpad: .3rem !default;
 form.inline-login.form-inline button.btn-primary {
   margin-left: .5em;
-  padding-left: $inline-login-form-button-hpad;
-  padding-right: $inline-login-form-button-hpad;
-  padding-top: $inline-login-form-button-vpad;
-  padding-bottom: $inline-login-form-button-vpad;
-  //position: relative;
-  //top: -5px;
+  padding:  $inline-login-form-button-vpad $inline-login-form-button-hpad;
 }
 
 form.inline-login.form-inline button.btn-primary {
@@ -364,6 +359,15 @@ form.inline-login.form-inline button.btn-primary {
   }
 }
 
+$inline-form-font-size: .8rem !default; 
+form.inline-login.form-inline {
+  font-size: $pk-top-menu-font-size;
+  .form-control{
+    //font-size: $inline-form-font-size;
+    font-size: $pk-top-menu-font-size;
+    padding: .25em .5em;
+  }
+}
 
 /** Don't remember exactly what key frames were for - some kind of animation - cool*/
 @keyframes pulse {

@@ -17,9 +17,9 @@
   }
 }
 
-img.site-brand-menu-img {
-  $site-brand-menu-img-max-width: 24px !default;
-  $site-brand-menu-img-max-height: 24px !default;
+$site-brand-menu-img-max-width: 24px !default;
+$site-brand-menu-img-max-height: 24px !default;
+img.navbar-brand-img {
   $site-brand-menu-img-margin: 0 !default;
   $site-brand-menu-img-padding: 0 !default;
   margin: $site-brand-menu-img-margin;
@@ -34,33 +34,37 @@ $nav-item-hpad: .25rem !default;
 $pk-nav-nav-link-margin-top: 5px !default;
 $pk-top-menu-height: 50px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
+$pk-top-menu-font-size: .8rem !default;
 body nav.navbar.pk-top-menu {
   z-index: 999999;
   flex-direction: row;
-  height: $pk-top-menu-height;
+  //height: $pk-top-menu-height;
+  //nav-link needs the same padding as the inline login form
   a.nav-link {
-    font-size: 1rem;
+    font-size: $pk-top-menu-font-size;
     margin-top: $pk-top-menu-nav-link-margin-top;
+    padding: 0 1em;
     color: #eee;
     &:hover {
       color: white;
       text-shadow:0 0 1px white;
     }
   }
-  .navbar-brand.nav-item,
-  .site-brand {
+  .navbar-brand.nav-item {
     padding-top: 0;
     padding-bottom: 0;
+   // font-size: $pk-top-menu-font-size;
   }
 
 //@include bg-variant('.bg-inverse', $brand-inverse);
   ul.nav.navbar-nav {
     z-index: 100000;
-    //background-color: #666;
     background-color: $brand-inverse;
-    opacity: 1;
+    position: relative;
+    top: 0;
   }
   .nav-item {
+  //font-size: $pk-top-menu-font-size;
     padding-right: $nav-item-hpad; 
   }
   .nav-item + .nav-item {
