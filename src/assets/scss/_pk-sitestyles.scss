@@ -113,6 +113,27 @@ $site-negative-value-color: #a22 !default;
    @extend .pk-val;
 }
 
+//A link within a section of text
+$a-in-text-color: #00a !default;
+a.in-text {
+  color: $a-in-text-color;
+  text-decoration: none;
+  text-shadow: .1em .1em .1em  rgba(0,0,0,.3);
+  &:hover {
+    color: lighten($a-in-text-color, 50%);
+   text-shadow: .1em .1em .3em  rgba(0,0,0,.5);
+  }
+
+}
+
+// A heavier leading line
+$headline-margin-bottom: .5em !default;
+.head-line {
+  display: block;
+  margin-bottom: $headline-margin-bottom;
+  font-weight: bolder;
+}
+
 //Used in spans to emphasize the site name in text or title
 .site-name-em {
   //font-weight: bolder;
