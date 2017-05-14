@@ -78,6 +78,22 @@ function grid_layout($items, $opts=[]) {
   return $grout;
 }
 
+/** Makes an HTML Table row.
+ * @param indexed_array $tds - the array of td data for the row
+ * @param indexed_array $tdclasses - optional - should be the same size as $tds -
+ *   the css classes to apply to that td with the same integer index
+ * @param string $rowclass - optional - the class to apply to the row
+ */
+function makeTableRow(array $tds, array $tdclasses=[], $rowclass=null) {
+  $ret = "<tr class='$rowclass'> ";
+  foreach ($tds as $idx=>$td) {
+    $tdclass = keyVal($idx,$tdclasses);
+    $ret .= " <td class='$tdclass'>$td</td> ";
+  }
+  $ret .= " </tr>\n";
+  return $ret;
+}
+
 
 /** Returns HTML of the items in a grid
  * 
