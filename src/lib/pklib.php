@@ -3178,7 +3178,10 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
       $retarr[$akey] = keyVal($akey, $retarr, '') . ' ' . $aval . ' ';
     }
   }
-  if (!isset($retarr[$key])) throw new Exception("Arg key not set");
+  if (!isset($retarr[$key])) {
+    pkdebug("Woops! key [$key] not set in retarr:",$retarr);
+  //  $retarr[$key]=null;
+  }
   return $retarr;
 }
 
@@ -3279,4 +3282,16 @@ function setInstanceAtts($obj, array $atts = []) {
     }
   }
   return $atts;
+}
+
+function unsetret(&$arr, $key=null, $default = null) {
+  if ($key === null) {
+    $ret = $arr;
+    unset ($arr);
+    return $ret;
+  }
+  if (!is_arrayish($arr)) return null;
+  $ret = keyVal($key,$arr, $default);
+  unset($arr[$key]);
+  return $ret;
 }

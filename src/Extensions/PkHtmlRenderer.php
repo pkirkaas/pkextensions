@@ -50,6 +50,13 @@ class PkHtmlRenderer extends PartialSet {
       'tr', 'tt', 'u', 'ul', 'var', 'video',
     ];
 
+  public static function getWrappableInputs() {
+    $additionalWrapIns = ['textarea', 'select','boolean'];
+    return array_merge(static::$input_types,$additionalWrapIns);
+  }
+
+
+
   public static $input_types = [
     'checkbox', 'color', 'date', 'datetime', 'datetime-local', 'email', 'file', 'hidden', 'image', 'month', 
     'number', 'password', 'radio', 'range', 'min', 'max', 'value', 'step', 'reset', 'search', 'submit', 
@@ -173,6 +180,37 @@ class PkHtmlRenderer extends PartialSet {
    *   If just a string, the wrap div class
    */
   public function wrap2($value=null, $label=null,$wrapatts=null, $raw=false) {
+    #Normalize Wrapatts
+    $wrapatts = arrayifyArg($wrapatts, 'class', ['tag'=>'div', 'class'=>'pk-wrap']);
+    #Normalize Value
+    $valArr = arrayifyArg($value, 'value', ['tag'=>'div', 'class'=>'pk-val']);
+    #Normalize Label
+    $lblArr = arrayifyArg($label, 'value', ['tag'=>'div', 'class'=>'pk-lbl']);
+
+    $raw = keyVal('raw', $wrapatts,$raw);
+    $rawprefix = '';
+    if ($raw) $rawprefix = 'raw';
+    $lblval = $lblArr['value'];
+    $lbltag = $lblArr['tag'];
+    $valval = $valArr['value'];
+    $valtag = $valArr['tag'];
+    unset ($valArr['value']);
+    unset ($valArr['tag']);
+    unset ($lblArr['value']);
+    unset ($lblArr['tag']);
+    unset($wrapatts['tag']);
+    $wraptag = $rawprefix. keyVal('tag',$wrapatts,'div');
+    $this->$wraptag(RENDEROPEN,$wrapatts);
+    $this->$lbltag($lblval,$lblArr);
+    $this->$valtag($valval,$valArr);
+    $this->RENDERCLOSE();
+    return $this;
+  }
+  public function wrap3($value=null, $label=null,$allatts=null) {
+    $wrapatts = keyVal('wrapatts',$allatts);
+    $valatts = keyVal('valatts',$allatts);
+    $lblatts = keyVal('lblatts',$allatts);
+    $raw = keyVal('raw',$allatts);
     #Normalize Wrapatts
     $wrapatts = arrayifyArg($wrapatts, 'class', ['tag'=>'div', 'class'=>'pk-wrap']);
     #Normalize Value
@@ -499,6 +537,11 @@ class PkHtmlRenderer extends PartialSet {
   public function checkbox($name, $value = 1, $checked = null, $options = []) {
     $options = $this->cleanAttributes($options);
     return $this->rawcontent(PkForm::checkbox($name, $value, $checked, $options));
+  }
+
+  /** Expect all the attributes to be set - that's the only arguemnt */
+  public function pureinput($atts) {
+    return $this->nocontent('input', $atts);
   }
 
   public function input($type, $name, $value = null, $options = []) {
@@ -876,14 +919,31 @@ class PkHtmlRenderer extends PartialSet {
       $method = $tag;
       $raw = true;
     }
+
+    #Try to wrap form inputs 
+    if ($wrapInput = removeStartStr($method,'wrap')) {
+      $wrapInput = strtolower($wrapInput);
+      if (in_array($wrapInput,static::getWrappableInputs())) {
+        return $this->handleInputWrap($wrapInput, $args);
+      }
+    }
+
+    #Check for $method = wrap[Form-Inputs]
+
+
+
+
+
     #TODO: Do something with $raw
     array_unshift($args,$method);
     if (in_array($method, static::$selfclosing_tags)) {
       return call_user_func_array([$this,'nocontent'], $args);
-    } else if (!$raw && in_array($method, static::$content_tags)) {
-      return call_user_func_array([$this,'tagged'], $args);
-    } else if ( $raw  && in_array($method, static::$content_tags)) {
-      return call_user_func_array([$this,'rawtagged'], $args);
+    } else if (in_array($method, static::$content_tags)) {
+      if ($raw) {
+        return call_user_func_array([$this,'rawtagged'], $args);
+      } else {
+        return call_user_func_array([$this,'tagged'], $args);
+      }
     } else if (in_array($method, static::$input_types)) {
       //$args = array_unshift($args,$method,$args);
       return call_user_func_array([$this,'input'], $args);
@@ -892,7 +952,125 @@ class PkHtmlRenderer extends PartialSet {
   }
 
 
+  /** Build an entire PkHtmlRenderer set, perhaps nested deeply, just from 
+   * arrays - that include the PkRenderer method name
+   * @param array $args. Indexed or Associative.  If assoc, the key 'method' must be defined.
+   * 
+   * If Indexed,  Each array /row element of $args is an ASSOCIATIVE array as above,
+   *   with at least $args[0]['method'] set
+   *    $args[0]['args'] is an array - either Associative or Indexed. If indexed, create a 
+   *     new instance of static & return user_fun_.... with $method & args.
+   *   if ($args[n]['args'] is an ASSOCIATIVE array, $args[n]['args']['method'] must be defined.
+   *     then $args[n]['args']['args'] must be an array or null. It can be an indexed or assoc array.
+   *    to the method of 
+   *   $method - the method name as a string
+   *   $content - could be array or stringish. If array, an array of strings or recursive array args to 
+   *     this method
+   *  $attributes: An associative array of attributes/args for $method
+   * @return PkHtmlRenderer representation of the tree
+   */
+  public function buildFromArray($args=[]) {
+    $method = keyVal(0,$args); #Must be string method name
+    $methodargs = keyVal(1,$args,[]); #Must be array
+    $childargs = keyVal(2,$args); #Must be indexex array of arrays just like this args array
+    if (!is_string($method) || !is_array($methodargs) ||
+        ($childargs && !is_array_indexed($childargs))) {
+      throw new PkException(["Bad Args",$args]);
+    }
+    $ret = call_user_func_array([$this,$method], $methodargs);
+    if (!$childargs) return $ret;
+    foreach ($childargs as $row) {
+      $this->buildFromArray($row);
+    }
+    return $this;
+  }
 
+  /** Wraps form elements/controls in a couple of divs, w. a label
+   * 
+   * @param string $formel - the name of a handleable form control
+   * @param array $args: an indexed array of the arguments to the _called 
+   * function.
+   *   $args[0] array of all the properties of the control we will make
+   * 
+   * Then Ideally:
+   *   $args[1]: Assoc array of all properties of the 3 wrapping elements -
+   *     $args[1]['valprops'] - values for the input wrapping class
+   *     $args[1]['labprops'] - assoc array of all properteis of the label, 
+   *       including "value" & "tag"
+   *    $args[1]['wrapprops'] - assoc array of props for the enclosing element
+   * But actually:
+   * $valprops=$arg[1],
+   * 
+   * $lblprops arg2
+   * 
+   * wrap 3
+   * 
+   * return $this, beautifully wrapped, with nice defaults
+   * 
+   */
+
+ //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
+
+  public function handleInputWrap($formel, $args) {
+    $inputpars = keyVal(0,$args);
+    $pararr = keyVal(1,$args,[]);
+    if (!is_array($pararr)) throw new PkException(['Unexpecte Args:', $args]);
+    /*
+    if (is_array_assoc($pararr)) {
+      $valprops = arrayifyArg(keyVal('valprops', $pararr), 'class',['class'=>'pk-inp-wrap']);
+      $lblprops = arrayifyArg(keyVal('lblprops', $pararr),'value',['class'=>'pk-lbl']);
+      $wrapprops  = arrayifyArg(keyVal('wrapprops', $pararr),'class',['class'=>'pk-lbl']);
+    } else {
+     * 
+     */
+      $valprops = arrayifyArg(keyVal(1, $args), 'class',['class'=>'pk-inp-wrap']);
+      $lblprops = arrayifyArg(keyVal(2, $args),'value',['class'=>'pk-lbl']);
+      $wrapprops  = arrayifyArg(keyVal(3, $args),'class',['class'=>'pk-wrapper']);
+
+    pkdebug("The Args:",$args,'valprops',$valprops,'lblprops',$lblprops,'wrapprops', $wrapprops);
+    if (in_array($formel, static::$input_types,true)) {
+      $inputpars['type'] = $formel;
+      $formel = 'input';
+    }
+    if ($formel === 'input') {
+      $frm_ctl = static::pureinput($inputpars);
+    } else if ($formel === 'textarea') {
+      //pkdebug("Before unsetret, TA inputpars:", $inputpars);
+      $name = unsetret($inputpars,'name');
+      $value = unsetret($inputpars,'value');
+      //pkdebug("After unsetret, name: $name, value: ",$value,"arrp",$inputpars);
+      $frm_ctl = static::textarea($name, $value, $inputpars);
+    } else if ($formel === 'boolean') {
+
+      // function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
+      $checked = unsetret($inputpars,'checked');
+      $name = unsetret($inputpars,'name');
+      $value = unsetret($inputpars,'value',1);
+      $unset = unsetret($inputpars,'unset','0');
+      $frm_ctl = static::boolean($name,$checked,$inputpars,$unset,$value);
+    } else {
+      throw new PkException("Unhandled Wrap Method: [$formel]");
+    }
+    pkdebug('valprops:',$valprops,'lblprops', $lblprops,'wrapprops',$wrapprops,"frmctl:\n\n$frm_ctl");
+    $vw_tag = unsetret($valprops,'tag','div');
+    $inputwrapper = new static();
+    $inputwrapper->$vw_tag($frm_ctl,$valprops);
+    $lbl_tag =  unsetret($lblprops,'tag','div');
+    $lbl_val =  unsetret($lblprops,'value');
+    $lblwrapper = new static();
+    $lblwrapper->$lbl_tag($lbl_val,$lblprops);
+    pkdebug("Made lblwrapper w. lbl_tag [$lbl_tag]; lbl_val: [$lbl_val], lblwrapper is: [$lblwrapper], the lblprops:", $lblprops);
+    $wrp_tag  = unsetret($wrapprops,'tag','div');
+    $set_wrapper = new static();
+    $set_wrapper->$wrp_tag([$lblwrapper,$inputwrapper],$wrapprops);
+    //$set_wrapper = $inputwrapper;
+    //$set_wrapper = $lblwrapper;
+    pkdebug("SetWrapper:\n\n$set_wrapper");
+    //return "<h3>Will this work?</h3>";
+    return $set_wrapper;
+    //$this[] = $set_wrapper;
+   // return $this;
+  }
 
   ## Build Query controls
   public static function buildQuerySet($params = []) {

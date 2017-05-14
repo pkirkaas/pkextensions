@@ -81,6 +81,23 @@ $site-negative-value-color: #a22 !default;
   font-weight: bold;
 }
 
+.pk-inp-wrap {
+  border: solid blue 1px;
+}
+
+
+select.pk-inp,
+input.pk-inp {
+  @extend .form-control; 
+  padding: 2px;
+  font-weight: bold;
+  //font-family: 'Times New Roman', serif;
+  font-family: 'Montserrat', arial;
+  //font-family: 'Roboto', verdana;
+  color: #400;
+  background-color: rgba(255,255,200,.4);
+}
+
 
 .pk-dollar-value {
   display: inline-block;
