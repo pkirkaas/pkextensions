@@ -412,4 +412,10 @@ class PkController extends Controller {
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT', true, 200);
   }
 
+  #Managing uploaded files
+  public static function getUrlFromUploadedFilename($fileName) {
+    $fileName = basename($fileName);
+    return url("/storage/$fileName");
+  }
+
 }
