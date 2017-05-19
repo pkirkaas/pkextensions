@@ -195,3 +195,18 @@ function yesnonull($arg) {
   if (($arg===false) || ($arg === 0)) return "No";
   return '';
 }
+
+
+
+###########   For uploaded files, get paths, URLs, defaults, etc
+
+/**
+ * Returns a URL based on the filename and Laravel default public upload dir
+ * @param string/UploadedFile $filename - the base uploaded filename, or path
+ * @param string $default - the relative URL from root of a default URL if no file
+ */
+function pkl_uploaded_url($filename, $default=null) {
+  $baseName = basename($filename);
+  $url = url("storage/$baseName");
+  return $url;
+}

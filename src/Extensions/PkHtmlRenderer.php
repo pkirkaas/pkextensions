@@ -1046,7 +1046,7 @@ class PkHtmlRenderer extends PartialSet {
       $value = unsetret($inputpars,'value');
       $name = unsetret($inputpars, 'name');
       $type = unsetret($inputpars,'type');
-      pkdebug("Before unsetting inpars:", $bkup, "After:", $inputpars);
+      //pkdebug("Before unsetting inpars:", $bkup, "After:", $inputpars);
       $frm_ctl = static::clonedInput($type,$name, $value, $inputpars);
       //$frm_ctl = static::pureinput($inputpars);
 
@@ -1083,8 +1083,11 @@ class PkHtmlRenderer extends PartialSet {
     $wrp_tag  = unsetret($wrapprops,'tag','div');
     $set_wrapper = new static();
     $set_wrapper->$wrp_tag([$lblwrapper,$inputwrapper],$wrapprops);
+    /*
     if ($formel === 'input') pkdebug("SetWrapper:\n\n$set_wrapper",
      "Made lblwrapper w. lbl_tag [$lbl_tag]; lbl_val: [$lbl_val], lblwrapper is: [$lblwrapper], the lblprops:", $lblprops);
+     * 
+     */
     return $set_wrapper;
   }
 
@@ -1101,7 +1104,7 @@ class PkHtmlRenderer extends PartialSet {
 
   //public function handleInputWrap($formel, $args) {
   public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $inpWrpProps=[], $lblTpl=[], $wrpWrpProps=[]) {
-    pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
+    //pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
     $ret = new PkHtmlRenderer();
     if (!is_array($map) || !count($map)) return $ret;
     if (is_string($inpTpl) || ($inpTpl === null)) $inpTpl = ['class'=>$inpTpl];
@@ -1109,7 +1112,7 @@ class PkHtmlRenderer extends PartialSet {
     if (!is_array($inpTpl) || !is_array($lblTpl)) {
       throw new PkException(['Bad values for the TPLs: inpTpl:', $inpTpl, 'lblTpl', $lblTpl]);
     }
-    pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
+    //pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
     foreach ($map as $name=>$value) {
       $inpTpl['name'] = $name;
       $lblTpl['value'] = $value;
