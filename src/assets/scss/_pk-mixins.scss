@@ -361,6 +361,10 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
 .section {
   @include mk-section;
+  @include below-bp(sm) {
+   margin-left: 1px;
+   margin-right: 1px;
+  }
 }
 
 // New BS4A6 row has -15px margin by default. Compensate....

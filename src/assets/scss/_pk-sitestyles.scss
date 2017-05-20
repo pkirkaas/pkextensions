@@ -9,6 +9,17 @@ $page-template-margin:  5px !default;
   //border: solid blue 1px;
   padding: $page-template-padding;
   margin: $page-template-margin;
+  @include below-bp(sm) {
+   margin: 1px;
+   padding: 1px;
+  }
+}
+
+.container-fluid {
+  @include below-bp(sm) {
+   margin: 0;
+   padding: 0;
+  }
 }
 
 $page-template-title-hpad: .5em !default;

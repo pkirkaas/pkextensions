@@ -7,9 +7,10 @@ $('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
     var user_name = $(event.target).attr('data-user_name');
     tpl = tpl.replace(/__CNT_TPL__/g, user_id_to);
     tpl = tpl.replace(/__USR_NAME__/g, user_name);
+    var defaultWidth = Math.min(600,$(window).width());
 		$(tpl).dialog( {
       modal : true,
-      width : 600,
+      minWidth: defaultWidth,
       dialogClass : 'col-sm-8 dialog-responsive',
       resizable : true,
       buttons : {

@@ -224,8 +224,9 @@ $(function () {
 
 function showHelpDialog() {
   var helpDialog = showHelpDialog.helpDialog;
+  var defaultWidth = Math.min(1100,$(window).width());
   if (!helpDialog) {
-    helpDialog = makeDialog('', {minHeight: 500, minWidth: 1100});
+    helpDialog = makeDialog('', {minHeight: 500, minWidth: defaultWidth});
     showHelpDialog.helpDialog = helpDialog;
   }
   if ($('#helpTitle').html()) {
@@ -601,10 +602,11 @@ $(function () {
     var closeText = dlgonload.attr('data-closetext');
     if (!closeText)
       closeText = 'Okay';
+    var defaultWidth = Math.min(600,$(window).width());
     var dialogDefaults = {
       modal: true,
       autoOpen: true,
-      width: 600,
+      width: defaultWidth,
       resizable: true,
       draggable: true,
       buttons: [{
@@ -727,12 +729,14 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var closeText = $(event.target).attr('data-closetext');
   if (!closeText)
     closeText = dlg.attr('data-closetext');
-  if (!closeText)
+  if (!closeText) {
     closeText = 'Okay';
+  }
+  var defaultWidth = Math.min(600,$(window).width());
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
-    width: 600,
+    width: defaultWidth,
     buttons: [{
         text: closeText,
         click: function () {
@@ -809,10 +813,11 @@ function makeDialog(selector, opts) {
   selector = selector || '<div></div>';
 
   var dlg = $(selector);
+  var defaultWidth = Math.min(600,$(window).width());
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
-    width: 600,
+    width: defaultWidth,
     buttons: {
       //Cancel : function () { $(this).dialog('destroy'); }
       Cancel: function () {
@@ -880,10 +885,11 @@ $(function () {
   closeText = dbx.attr('data-closetext');
   var title = dbx.attr('data-title');
   var dialogClass = dbx.attr('data-dialogClass');
+  var defaultWidth = Math.min(600,$(window).width());
   var dialogDefaults = {
     modal: true,
     autoOpen: true,
-    minWidth: 800,
+    minWidth: defaultWidth,
     resizable: true,
     draggable: true,
     title: title,
@@ -919,10 +925,11 @@ $(function () {
   closeText = $dbx.attr('data-closetext') ? $dbx.attr('data-closetext') : 'Close';
   var title = $dbx.attr('data-title');
   var dialogClass = $dbx.attr('data-dialogClass');
+  var defaultWidth = Math.min(600,$(window).width());
   var dialogDefaults = {
     modal: true,
     autoOpen: true,
-    minWidth: 600,
+    minWidth: defaultWidth,
     resizable: true,
     draggable: true,
     title: title,
