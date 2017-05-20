@@ -205,23 +205,23 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }
     .p-t#{$sz}, .pad-t#{$sz} { padding-top: $offset !important; }
     .p-b#{$sz}, .pad-b#{$sz} { padding-bottom: $offset !important; }
-    .p-v#{$sz}, .pad-v#{$sz} { padding-top: $offset; padding-bottom: $offset !important; }
-    .p-h#{$sz}, .pad-h#{$sz} { padding-left: $offset; padding-right: $offset !important; }
+    .p-v#{$sz}, .pad-v#{$sz} { padding-top: $offset !important; padding-bottom: $offset !important; }
+    .p-h#{$sz}, .pad-h#{$sz} { padding-left: $offset !important; padding-right: $offset !important; }
     .p#{$sz}, .pad#{$sz} { padding: $offset !important; }
 
     .m-r#{$sz}, .marg-r#{$sz} { margin-right: $offset !important; }
     .m-l#{$sz}, .marg-l#{$sz} { margin-left: $offset !important; }
     .m-t#{$sz} , .marg-t#{$sz} { margin-top: $offset !important; }
     .m-b#{$sz} , .marg-b#{$sz} { margin-bottom: $offset !important; }
-    .m-v#{$sz}, .marg-v#{$sz} { margin-top: $offset; margin-bottom: $offset !important; }
-    .m-h#{$sz}, .marg-h#{$sz} { margin-right: $offset; margin-left: $offset !important; }
+    .m-v#{$sz}, .marg-v#{$sz} { margin-top: $offset !important; margin-bottom: $offset !important; }
+    .m-h#{$sz}, .marg-h#{$sz} { margin-right: $offset !important; margin-left: $offset !important; }
 
     .m-r-#{$sz}, .marg-r-#{$sz} { margin-right: -$offset !important; }
     .m-l-#{$sz}, .marg-l-#{$sz} { margin-left: -$offset !important; }
     .m-t-#{$sz}, .marg-t-#{$sz} { margin-top: -$offset !important; }
     .m-b-#{$sz}, .marg-b-#{$sz} { margin-bottom: -$offset !important; }
-    .m-v-#{$sz}, .marg-v-#{$sz} { margin-top: $offset; margin-bottom: -$offset !important; }
-    .m-h-#{$sz}, .marg-h-#{$sz} { margin-right: $offset; margin-left: -$offset !important; }
+    .m-v-#{$sz}, .marg-v-#{$sz} { margin-top: -$offset !important; margin-bottom: -$offset !important; }
+    .m-h-#{$sz}, .marg-h-#{$sz} { margin-right: -$offset !important; margin-left: -$offset !important; }
 
     .m#{$sz}, .marg#{$sz} { margin: $offset !important; }
   }

@@ -29,7 +29,8 @@ class PkFormBuilder extends FormBuilder {
 
     public function open(array $options = []) {
       if (array_key_exists('model', $options)) {
-        static::setModel($options['model']);
+        //static::setModel($options['model']);
+        $this->setModel($options['model']);
         unset($options['model']);
       }
     return parent::open($options);
