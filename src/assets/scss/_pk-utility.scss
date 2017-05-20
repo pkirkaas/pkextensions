@@ -64,7 +64,7 @@ $inner-border-spread: 1px !default;
 
 .border5, .border-5 { border-width: 5px ! important; border-style: solid;}
 
-.border-radius-5, .border-radius5 {border-radius: 5px ! important}
+.border-radius-5, .border-radius5, .br-5, .b-r-5 {border-radius: 5px ! important}
 
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
@@ -74,6 +74,8 @@ $inner-border-spread: 1px !default;
 
 .width-90, .width90, .most-width, .mostwidth { width: 90% !important; }
 .width-80, .width80 { width: 80% !important; }
+
+.w-a {width: auto !important; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
 

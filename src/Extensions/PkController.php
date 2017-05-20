@@ -443,7 +443,7 @@ class PkController extends Controller {
   if ($symlink) {
     $path = base_path("/public/storage/$filename");
   } else {
-    $path = storage_path($filename);
+    $path = storage_path("app/public/$filename");
   }
   if (file_exists($path)) return $path;
   return false;

@@ -579,6 +579,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     if (is_array($rowdatas)) {
       $rows = PkRenderer::noop();
       foreach ($rowdatas as $rowdata) {
+        pkdebug("RowData line:",$rowdata);
         if (is_array($rowdata[0])) {
           $tds=$rowdata[0];
           $tdatts = keyVal(1,$rowdata);
@@ -604,7 +605,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
    */
   public function mkTblRow(array $tds, array $tdatts = [], $rowatts = null) {
     $rowatts = $this->cleanAttributes($rowatts);
-    $tdatts = $this->cleanAttributes($tdatts);
+    //$tdatts = $this->cleanAttributes($tdatts);
     $tdrend = new PkHtmlRenderer();
     foreach ($tds as $idx => $td) {
       $tdattarr = $this->cleanAttributes(keyVal($idx, $tdatts));

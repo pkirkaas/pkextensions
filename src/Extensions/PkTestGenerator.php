@@ -506,7 +506,7 @@ class PkTestGenerator {
    * @throws \Exception
    */
   public static function copyAllFiles($fromDir, $toDir=null) {
-    if (!$toDir) $toDir = storage_path();
+    if (!$toDir) $toDir = storage_path("app/public");
     if (!is_dir($fromDir)) throw new \Exception("FromDir [$fromDir] not found");
     if (!is_dir($toDir)) throw new \Exception("ToDir [$toDir] not found");
     $entries = scandir($fromDir);
@@ -523,15 +523,16 @@ class PkTestGenerator {
    * @param string $dirName - directory name - defaults to storage dir
    */
   public static function getFilenamesInDir($dirName=null) {
-    if (!$dirName) $dirName = storage_path();
+    if (!$dirName) $dirName = storage_path("app/public");
     if (!is_dir($dirName)) throw new \Exception("Src dir [$dirName] not found");
+    pkdebug("DirName: [$dirName]");
     $entries = scandir($dirName);
     $fileNames = [];
     foreach ($entries as $entry) {
       if (($entry === '.') || ($entry === '..')) continue;
       $fromPath = "$dirName/$entry";
       if (!file_exists($fromPath)) throw new \Exception("FromPath [$fromPath] not found");
-      $fileNames[] = $entry;
+      if (is_file($fromPath)) $fileNames[] = $entry;
     }
     return $fileNames;
   }

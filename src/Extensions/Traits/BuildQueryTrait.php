@@ -112,6 +112,8 @@ trait BuildQueryTrait {
         return true;
     if ((!$type || ($type === 'between')) && in_array($crit, array_keys(static::$betweenQueryCrit)))
         return true;
+    if ((!$type || ($type === 'boolean')) && in_array($crit, array_keys(static::$booleanQueryCrit)))
+        return true;
     return false;
   }
 
@@ -154,6 +156,12 @@ trait BuildQueryTrait {
       'BETWEEN' => 'Between',
   ];
 
+  #What's the best way to do boolean?
+  public static $booleanQueryCrit = [
+      '0' => "Don't Care",
+      'IS' => 'Required',
+  ];
+
   /** Uses the above static $withinQueryCrit for now, until phased out
    * 
    * @param string|null $type - query type - 'within', 'string', etc. If null, all 
@@ -167,6 +175,7 @@ trait BuildQueryTrait {
           'string' => static::$stringQueryCrit,
           'numeric' => static::$numericQueryCrit,
           'between' => static::$betweenQueryCrit,
+          'boolean' => static::$booleanQueryCrit,
       ];
       if (!$type) return $queryCrit;
       if (in_array($type, array_keys($queryCrit))) return $queryCrit[$type];
@@ -324,6 +333,22 @@ trait BuildQueryTrait {
       
     }
 
+
+  }
+
+
+  public static function buildQueryFieldsBoolean($baseName, $def = null) {
+    $valType = keyVal('fieldtype', $def, 'boolean');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
 
   }
 
@@ -541,7 +566,11 @@ trait BuildQueryTrait {
           }
         }
         //pkdebug("QT: ".typeOf($query)."..");
-        $query = $query->where($root, $critset['crit'], $critset['val']);
+        if ($critset['crit'] === 'IS') {
+          $query = $query->where($root, true);
+        } else {
+          $query = $query->where($root, $critset['crit'], $critset['val']);
+        }
       } else if (method_exists($this, 'customQuery' . $root)) {
         $customQueryMethod = 'customQuery' . $root;
         $query = $this->$customQueryMethod($query, $critset['crit'], $critset['val'], $critset['param']);

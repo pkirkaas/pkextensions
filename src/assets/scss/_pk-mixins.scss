@@ -232,6 +232,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-weights {
   @for $i from 1 through 9 {
     $weight: 100 * $i;
+    .fw-#{$i},
+    .f-w-#{$i},
     .fw#{$i},
     .f-w#{$i} {
         font-weight: $weight !important;
@@ -260,7 +262,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
   $defaults: (
     boxshadow:true,
     border:#aaa,
-    background:rgba(230,240,250,.3),
+    background: rgba(230,240,250,.3),
     v-padding: 1em,
     v-margin: 1em,
     border-radius: 5px,
