@@ -8,16 +8,16 @@ var repository = {};
 
 /** If need to do something on element create */
 /*
-$('body').on('DOMNodeInserted',  function (e) {
-  if ($(e.target).is(selector)) {
-    //Do Something
-  }
-  var dpel = $(e.target).find(selector);
-  if (dpel.length) {
-    //Do Something
-  }
-});
-*/
+ $('body').on('DOMNodeInserted',  function (e) {
+ if ($(e.target).is(selector)) {
+ //Do Something
+ }
+ var dpel = $(e.target).find(selector);
+ if (dpel.length) {
+ //Do Something
+ }
+ });
+ */
 
 
 $(function () {
@@ -70,6 +70,41 @@ $(function () {
     $(event.target).closest('div.deletable-data-set').remove();
   });
 
+  /*
+   <div class='pkmvc-button js-general-ajax btn {{$class}}' title='Mark Message as Read?' 
+   data-param-action='mark_read' data-param-message_id='{{$message->id}}'>{{$label}}</div>
+   */
+
+
+  /** This POSTs to the URL '/ajax', with the arguments specified by the 'data-param-xxx'
+   * attributes. So we don't have to create new JS Functions, or AJAX routes - just add
+   * action handling to the basic AJAX route - for really simple ajax handling
+   */
+  $('body').on('click', '.btn.js-general-ajax', function (event) {
+    var data = $(event.target).data();
+    console.log("Data", data);
+    var ajaxParams = {};
+    for (var propName in data) {
+      if (data.hasOwnProperty(propName) && propName.startsWith('param')) {
+        var paramName = propName.slice(5).toLowerCase();
+        ajaxParams[paramName] = data[propName];
+      }
+    }
+    console.log("AjaxParams:", ajaxParams);
+    var res = $.ajax({
+      url: '/ajax',
+      data: ajaxParams,
+      method: 'POST'
+    }).done(function (data) {
+      console.log("Returned from General Ajax w. data:", data);
+      if (data.refresh === true) {
+        window.location.reload(true);
+      }
+
+    });
+  });
+
+
   /** This serves both creating multiple new instances before submitting when
    * itemcount is implemented, AND, just creating a single new instance from the
    * template and hiding the NEW/CREATE button when it is created.
@@ -95,16 +130,16 @@ $(function () {
     $(event.target).before(newstr);
   });
 
-/** As above, except the template is encoded in the create button itself, in
- * the data-template attribute
- */
+  /** As above, except the template is encoded in the create button itself, in
+   * the data-template attribute
+   */
   $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
     //Get a copy of the template element
     //var tpl = $(event.target).closest('div.templatable-data-sets').find('.template-container').first().html();
-    var tpl=htmlDecode($(event.target).attr("data-template"));
+    var tpl = htmlDecode($(event.target).attr("data-template"));
     //var tpl=$(event.target).attr("data-template");
     //var tpl = $('<div />').html(encodedtpl).text();
-    console.log("New TPL: ",tpl);
+    console.log("New TPL: ", tpl);
 
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
@@ -152,17 +187,17 @@ $('body').on('click', '.hide-toggler', function (event) {
 
 
 $(function () {
-    var tpl_sels = $('.templatable-data-sets select');
-    tpl_sels.each(function(idx, sel_el) {
-      var jqSelEl = $(sel_el);
-      var selected = jqSelEl.attr('selected');
-      var data_selected = jqSelEl.attr('data-selected');
-      //Using attr('selected') On Purpose, since built by templater that way
-      if ((typeof data_selected) !== 'undefined') {
-    //    console.log('SETTING Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
-        jqSelEl.val(data_selected);
-      }
-    });
+  var tpl_sels = $('.templatable-data-sets select');
+  tpl_sels.each(function (idx, sel_el) {
+    var jqSelEl = $(sel_el);
+    var selected = jqSelEl.attr('selected');
+    var data_selected = jqSelEl.attr('data-selected');
+    //Using attr('selected') On Purpose, since built by templater that way
+    if ((typeof data_selected) !== 'undefined') {
+      //    console.log('SETTING Selected',selected,'data-selected',data_selected,'sel_el',sel_el);
+      jqSelEl.val(data_selected);
+    }
+  });
 
 
 });
@@ -170,15 +205,15 @@ $(function () {
 /**
  * In CSS, do:
  * 
-
-@media print {
-  .print-button { display: none; }
-  .no-print { display: none; }
-}
+ 
+ @media print {
+ .print-button { display: none; }
+ .no-print { display: none; }
+ }
  */
-  $('body').on('click', '.print-button', function (event) {
-    window.print();
-  });
+$('body').on('click', '.print-button', function (event) {
+  window.print();
+});
 
 
 $(function () {
@@ -247,19 +282,19 @@ $(function () {
     var attr_target = target.attr('data-attr-target');
     var func_target = target.attr('data-func-target');
 
-/*
-    console.log('ajax_url: ', ajax_url, ' -- ajax_params: ', ajax_params, ' -- ajax_data: ', ajax_data,
-            '-func_arg: ', func_arg, ' Type FA:', typeof (func_arg), '-func_target: ', func_target,
-            '-selector_arg: ', selector_arg, ' Type SA:', typeof (selector_arg), '-selector_target: ', selector_target,
-            '-attr_arg: ', attr_arg, ' Type AA:', typeof (attr_arg), '-attr_target: ', attr_target
-            );
-    */
+    /*
+     console.log('ajax_url: ', ajax_url, ' -- ajax_params: ', ajax_params, ' -- ajax_data: ', ajax_data,
+     '-func_arg: ', func_arg, ' Type FA:', typeof (func_arg), '-func_target: ', func_target,
+     '-selector_arg: ', selector_arg, ' Type SA:', typeof (selector_arg), '-selector_target: ', selector_target,
+     '-attr_arg: ', attr_arg, ' Type AA:', typeof (attr_arg), '-attr_target: ', attr_target
+     );
+     */
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,
       method: 'POST'
     }).done(function (data) {
-      if (func_target && (typeof(window[func_target]) === 'function') ) {
+      if (func_target && (typeof (window[func_target]) === 'function')) {
         window[func_target](target, data, func_arg);
       }
       if (attr_target) {
@@ -315,16 +350,17 @@ jQuery.fn.extend({
   htmlFormatted: function (content) {
     //console.log("Formatters:", this.formatters);
     for (var formatter in this.formatters) {
-      if (this.formatters[formatter](this,content)) return true;
+      if (this.formatters[formatter](this, content))
+        return true;
     }
     this.html(content);
-    },
+  },
   formatters: {
-    currency: function(jqobj,content) {
+    currency: function (jqobj, content) {
       if (jqobj.hasClass('jq-format-currency')) {
         var num = toNumber(content);
         if (isNaN(num)) {
-          console.error('Invalid Number: ',content);
+          console.error('Invalid Number: ', content);
           jqobj.html('');
         }
         var wrap_class = jqobj.attr('data-wrap-class');
@@ -340,14 +376,14 @@ jQuery.fn.extend({
           num = -num;
           sign = '-';
         }
-        var currency =sign+'$'+num.toLocaleString("en"); 
+        var currency = sign + '$' + num.toLocaleString("en");
         jqobj.html(currency);
         return true;
       }
       return false;
     }
   },
-  addFormatter: function(name, formatter) {
+  addFormatter: function (name, formatter) {
     jQuery.formatters[name] = formatter;
   }
 });
@@ -436,7 +472,7 @@ function getCousins(parentSelector, cousinSelector, me, first) {
  */
 function jQuerify(arg) {
   if (isjQuery(arg)) {
-  //if (arg instanceof jQuery) {
+    //if (arg instanceof jQuery) {
     return arg;
   }
   return jQuery(arg);
@@ -539,13 +575,13 @@ function resetFormElement(e) {
  */
 
 /*
-$('body').on('click', 'img.avatar', function (event) {
-  //console.log("Clicking..");
-});
-$('body').on('hover', 'img.avatar', function (event) {
-  //console.log("Hovering..");
-});
-*/
+ $('body').on('click', 'img.avatar', function (event) {
+ //console.log("Clicking..");
+ });
+ $('body').on('hover', 'img.avatar', function (event) {
+ //console.log("Hovering..");
+ });
+ */
 
 $(function () {
   var dlgonload = $('.dialog-on-load');
@@ -611,18 +647,18 @@ $(function () {
  * OR -- BETTER - if the button/popper has a data-dialog-encoded attribute,
  * builds it from that! BUT!! Has to be encoded within a single DIV, & put all
  * the options in there. EX.
-    $encdlg = html_encode(PkRenderer::div($this->mkJsUpdateDiagForm($oldclients), [
-        'class' => 'diag-edit-js', 
-        'data-ajaxurl' => URL::route('ajax_edit_diagnosis'),
-        'data-title' => "Warning!  These Clients have Diagnoses older than 3 months",
-        'data-minWidth' => 800, 'data-closetext' => "Remind me Later",
-        'data-dialogClass' => 'pk-warn-dlg']));
-    return PkRenderer::div('Open', [
-        'data-tootik' => "Manage & Review Old Diagnoses",
-        'data-dialog-encoded' => $encdlg,
-        'class' => 'pkmvc-button inline js-dialog-button',
-    ]);
-
+ $encdlg = html_encode(PkRenderer::div($this->mkJsUpdateDiagForm($oldclients), [
+ 'class' => 'diag-edit-js', 
+ 'data-ajaxurl' => URL::route('ajax_edit_diagnosis'),
+ 'data-title' => "Warning!  These Clients have Diagnoses older than 3 months",
+ 'data-minWidth' => 800, 'data-closetext' => "Remind me Later",
+ 'data-dialogClass' => 'pk-warn-dlg']));
+ return PkRenderer::div('Open', [
+ 'data-tootik' => "Manage & Review Old Diagnoses",
+ 'data-dialog-encoded' => $encdlg,
+ 'class' => 'pkmvc-button inline js-dialog-button',
+ ]);
+ 
  * 
  * js-dialog-button can be any type of element (like img), and multiple per page.
  * Options / data-params for js-dialog-button:
@@ -647,8 +683,8 @@ $(function () {
  * 
  * Optionally, any of the following options to jQuery dialog, preceded
  * by data- (eg, data-modal='true')
-   jQuery Dlg Options: 'modal', 'autoOpen', 'buttons', 'closeOnEscape',
-    'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height';
+ jQuery Dlg Options: 'modal', 'autoOpen', 'buttons', 'closeOnEscape',
+ 'dialogClass', 'title', 'minHeight', 'minWidth', 'width', 'height';
  * 
  * Example: Button/Clickable:
  * 
@@ -670,9 +706,11 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
   if (!dlgHtml) {
     var src = $(event.target).attr('data-dialog');
-    if (!src) return;
+    if (!src)
+      return;
     var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
-    if (dlg.length === 0) return;
+    if (dlg.length === 0)
+      return;
     var dlgHtml = dlg.prop('outerHTML');
   }
   var param1 = htmlDecode($(event.target).attr('data-param1')) || '';
@@ -687,8 +725,10 @@ $('body').on('click', '.js-dialog-button', function (event) {
   dlg = $(dlgHtml);
   //opts.title = dlg.attr('data-title');
   var closeText = $(event.target).attr('data-closetext');
-  if (!closeText) closeText = dlg.attr('data-closetext');
-  if (!closeText) closeText = 'Okay';
+  if (!closeText)
+    closeText = dlg.attr('data-closetext');
+  if (!closeText)
+    closeText = 'Okay';
   var dialogDefaults = {
     modal: true,
     autoOpen: false,
@@ -735,7 +775,8 @@ $('body').on('click', '.js-dialog-button', function (event) {
 //Do similar for Bootstrap 4 Modals/Dialogs
 $('body').on('click', '.bs4-dialog-button', function (event) {
   var src = $(event.target).attr('data-bs4-dialog');
-  if (!src) return;
+  if (!src)
+    return;
   var param1 = $(event.target).attr('data-param1') || '';
   var param2 = $(event.target).attr('data-param2') || '';
   var param3 = $(event.target).attr('data-param3') || '';
@@ -834,10 +875,11 @@ function makeDialog(selector, opts) {
 $(function () {
 
   var dbx = $('.jqui-dlg-pop-load');
-  if(!dbx.length) return;
+  if (!dbx.length)
+    return;
   closeText = dbx.attr('data-closetext');
-  var title = dbx.attr('data-title'); 
-  var dialogClass = dbx.attr('data-dialogClass'); 
+  var title = dbx.attr('data-title');
+  var dialogClass = dbx.attr('data-dialogClass');
   var dialogDefaults = {
     modal: true,
     autoOpen: true,
@@ -865,15 +907,17 @@ $(function () {
  */
 $(function () {
   var $dlgwrap = $('.jqui-dlg-pop-load-wrapper');
-  if (!$dlgwrap.length) return;
+  if (!$dlgwrap.length)
+    return;
   $dlgwrap.hide();
   console.log("Wrapper found & hidden - looking for first child...");
   //var $dbx = $dlgwrap.find(':first-child');
   var $dbx = $dlgwrap.find('div').first();
-  console.log("First Child:",$dbx[0],'Size:',$dbx.length);
-  if(!$dbx.length) return;
-  closeText = $dbx.attr('data-closetext') ? $dbx.attr('data-closetext')  : 'Close';
-  var title = $dbx.attr('data-title'); 
+  console.log("First Child:", $dbx[0], 'Size:', $dbx.length);
+  if (!$dbx.length)
+    return;
+  closeText = $dbx.attr('data-closetext') ? $dbx.attr('data-closetext') : 'Close';
+  var title = $dbx.attr('data-title');
   var dialogClass = $dbx.attr('data-dialogClass');
   var dialogDefaults = {
     modal: true,
@@ -1057,36 +1101,36 @@ function getArrToStr(getArr) {
   return retstr;
 }
 
-	 
-  /** This section intended to highlight a searchterm and scroll down to it
-   * if GET param 'search_term=search term' exists in URL.
-   * Not sure if this is the best way/place to do it?
-   */	
-  var gets = getGets();
-  if (gets.search_term && (typeof gets.search_term === 'string') && gets.search_term.length) {
-    //We have a search term - do we have a dom '.entry-wrapper' element?
-    var search_in = $('.entry-wrapper');
-    var search_term = decodeURIComponent(gets.search_term);
-    if (search_term && (typeof search_term === 'string') && search_in.length) {
-      var spanClass = 'highlight-matched-searchterm';
-      var spanSelector = '.'+spanClass;
-      //console.log('SI Exists & Search Term: ', search_term, 'SI:', search_in);
-      var starr = safeSplitString(search_term);
-      //console.log('Search Term Array: ', starr);
-      var bodyHtml = search_in.html();
-      for (var ix = 0 ; ix < starr.length ; ix++) {
-        var cmpstr = starr[ix];
-        cmpRE = new RegExp(cmpstr,'ig');
-        bodyHtml = bodyHtml.replace(cmpRE,'<span class="'+spanClass+'">$&</span>');
-      }
-      search_in.html(bodyHtml);
-      if ($(spanSelector).length) {
-        var topOffset =  $(spanSelector).offset().top - 120; 
-        //console.log("TopOffset:", topOffset);
-        window.scrollTo(0, topOffset);
-      }
+
+/** This section intended to highlight a searchterm and scroll down to it
+ * if GET param 'search_term=search term' exists in URL.
+ * Not sure if this is the best way/place to do it?
+ */
+var gets = getGets();
+if (gets.search_term && (typeof gets.search_term === 'string') && gets.search_term.length) {
+  //We have a search term - do we have a dom '.entry-wrapper' element?
+  var search_in = $('.entry-wrapper');
+  var search_term = decodeURIComponent(gets.search_term);
+  if (search_term && (typeof search_term === 'string') && search_in.length) {
+    var spanClass = 'highlight-matched-searchterm';
+    var spanSelector = '.' + spanClass;
+    //console.log('SI Exists & Search Term: ', search_term, 'SI:', search_in);
+    var starr = safeSplitString(search_term);
+    //console.log('Search Term Array: ', starr);
+    var bodyHtml = search_in.html();
+    for (var ix = 0; ix < starr.length; ix++) {
+      var cmpstr = starr[ix];
+      cmpRE = new RegExp(cmpstr, 'ig');
+      bodyHtml = bodyHtml.replace(cmpRE, '<span class="' + spanClass + '">$&</span>');
     }
-  }	
+    search_in.html(bodyHtml);
+    if ($(spanSelector).length) {
+      var topOffset = $(spanSelector).offset().top - 120;
+      //console.log("TopOffset:", topOffset);
+      window.scrollTo(0, topOffset);
+    }
+  }
+}
 
 //////// Supporting Functions to be made more robust ///////
 
@@ -1097,7 +1141,7 @@ function getArrToStr(getArr) {
  * @param string splitchar - default ' '
  * @returns Array - of hopefully safe string components
  */
-function safeSplitString(thestring,splitchar) {
+function safeSplitString(thestring, splitchar) {
 // Is this really safe? At least a sinlge place to fix... 
   if (!thestring || !(typeof thestring === 'string') || !thestring.length) {
     return [];
@@ -1105,7 +1149,7 @@ function safeSplitString(thestring,splitchar) {
   splitchar = splitchar || ' ';
   var rawSplitArr = thestring.split(splitchar);
   var retArr = [];
-  for (var i = 0 ; i < rawSplitArr.length ; i ++) {
+  for (var i = 0; i < rawSplitArr.length; i++) {
     retArr[i] = encodeURIComponent(rawSplitArr[i]);
   }
   return retArr;
@@ -1118,34 +1162,34 @@ function safeSplitString(thestring,splitchar) {
  */
 //Don't want to make this default for ALL forms!
 /**
-$(function () {
-  $('body').on('change', 'form', function (event) {
-    $(window).on('beforeunload', function (event) { 
-      var confirmationMessage = "Unsaved Changes";
-      event.preventDefault();
-      event.returnValue = confirmationMessage; 
-      return confirmationMessage;
-    });
-  });
-  $('form').submit (function (event) {
-    console.log("Got in onload - trying 'off' ...");
-    $(window).off('beforeunload');
-  });
-});
-*/
+ $(function () {
+ $('body').on('change', 'form', function (event) {
+ $(window).on('beforeunload', function (event) { 
+ var confirmationMessage = "Unsaved Changes";
+ event.preventDefault();
+ event.returnValue = confirmationMessage; 
+ return confirmationMessage;
+ });
+ });
+ $('form').submit (function (event) {
+ console.log("Got in onload - trying 'off' ...");
+ $(window).off('beforeunload');
+ });
+ });
+ */
 //Just forms with class '.chck-frm'
 /*
-*/
+ */
 $(function () {
   $('body').on('change', 'form.chck-frm', function (event) {
-    $(window).on('beforeunload', function (event) { 
+    $(window).on('beforeunload', function (event) {
       var confirmationMessage = "Unsaved Changes";
       event.preventDefault();
-      event.returnValue = confirmationMessage; 
+      event.returnValue = confirmationMessage;
       return confirmationMessage;
     });
   });
-  $('form.chck-frm').submit (function (event) {
+  $('form.chck-frm').submit(function (event) {
     //console.log("Got in onload - trying 'off' ...");
     $(window).off('beforeunload');
   });
@@ -1175,18 +1219,18 @@ function isjQuery(obj) {
 function maxHeight(avar) {
   var els = jQuerify(avar);
   var lmaxHeight = 0;
-  els.each(function() {
+  els.each(function () {
     if ($(this).outerHeight() > lmaxHeight) {
-        lmaxHeight = $(this).outerHeight();
+      lmaxHeight = $(this).outerHeight();
     }
   });
   return lmaxHeight;
 }
 /*
-function isjQuery(avar) {
-  return isObject(avar) && (avar instanceof jQuery);
-}
-*/
+ function isjQuery(avar) {
+ return isObject(avar) && (avar instanceof jQuery);
+ }
+ */
 
 /**
  * Is the argument an integer or string convertable to an int?
@@ -1204,26 +1248,27 @@ function isIntish(value) {
 
 /** Returns a number if that's reasonable, else NaN. */
 function toNumber(aval) {
-  if (!isNumeric(aval)) return NaN;
+  if (!isNumeric(aval))
+    return NaN;
   return Number(aval);
 }
 
 /**
  * For values:
-   '7' => true
-   7.9 => true
-   false => false
-   true => false
-   null => false
-   [6] => false
-   ['7'] => false
-   '7 8 9' => false
-   {0:17} => false 
+ '7' => true
+ 7.9 => true
+ false => false
+ true => false
+ null => false
+ [6] => false
+ ['7'] => false
+ '7 8 9' => false
+ {0:17} => false 
  * @param mixed aval
  * @returns boolean - true if reasonably numeric, else false (as above)
  */
 function isNumeric(aval) {
-  return (! (aval instanceof Array)) && (Number(aval)===parseFloat(aval)); 
+  return (!(aval instanceof Array)) && (Number(aval) === parseFloat(aval));
 }
 
 function isArray(aval) {
@@ -1246,5 +1291,5 @@ function setGets(getArr) {
  * @returns Date
  */
 function DateFromSql(sqlDT) {
-  return new Date(Date.parse(sqlDT.replace('-','/','g')));
+  return new Date(Date.parse(sqlDT.replace('-', '/', 'g')));
 }
