@@ -195,11 +195,11 @@ $grid-gutter-width:          1.875rem !default; // 30px
     } 
     //Heights & widths
     .height#{$sz} {height: $offset !important;}
-    .min-height#{$sz} {min-height: $offset !important;}
-    .max-height#{$sz} {max-height: $offset !important;}
+    .minh#{$sz}, .minh-#{$sz},  .min-height#{$sz} {min-height: $offset !important;}
+    .maxh#{$sz}, .maxh-#{$sz},   .max-height#{$sz} {max-height: $offset !important;}
     .width#{$sz} {width: $offset !important;}
-    .min-width#{$sz} {min-width: $offset !important;}
-    .max-width#{$sz} {max-width: $offset !important;}
+    .minw#{$sz}, .minw-#{$sz}, .min-width#{$sz} {min-width: $offset !important;}
+    .maxw#{$sz}, .maxw-#{$sz}, .max-width#{$sz} {max-width: $offset !important;}
     //Paddings
     .p-r#{$sz}, .pad-r#{$sz} { padding-right: $offset !important; }
     .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }

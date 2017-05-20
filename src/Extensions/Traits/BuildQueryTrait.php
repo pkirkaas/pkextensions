@@ -162,6 +162,16 @@ trait BuildQueryTrait {
       'IS' => 'Required',
   ];
 
+  #To use a Boolean query control, do something like this in view form:
+  /*
+        <label>{{$label}}
+        {!!PkForm::select($basename.'_crit',BuildQueryTrait::$booleanQueryCrit,
+        null,['class'=>'form-control search-crit'])!!}
+        {!!PkForm::hidden($basename.'_val',1) !!}
+      </label>
+   * 
+   */
+
   /** Uses the above static $withinQueryCrit for now, until phased out
    * 
    * @param string|null $type - query type - 'within', 'string', etc. If null, all 

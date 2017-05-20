@@ -579,7 +579,6 @@ class PkHtmlPainter extends PkHtmlRenderer {
     if (is_array($rowdatas)) {
       $rows = PkRenderer::noop();
       foreach ($rowdatas as $rowdata) {
-        pkdebug("RowData line:",$rowdata);
         if (is_array($rowdata[0])) {
           $tds=$rowdata[0];
           $tdatts = keyVal(1,$rowdata);
