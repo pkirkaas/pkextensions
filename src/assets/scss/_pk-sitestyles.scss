@@ -210,3 +210,65 @@ $avatar-desc-bg: #eee !default;
   display: inline-block;
   background: $avatar-desc-bg;
 }
+
+
+.new-msg-cnt {
+  font-weight: 600;
+  color: #a00;
+}
+
+.num-items, .item-desc {
+  display: inline-block;
+}
+
+.template-heading {
+  font-size: large;
+  text-align: center;
+  color: #33a;
+  margin-bottom: .5em;
+}
+
+div.msg.row.from.first-view  {
+  border: solid red 1px;
+}
+div.row.first-view .msg-content {
+  margin-top: 2em;
+}
+div.row.first-view .msg-content::before {
+    position: relative;
+    text-align: center;
+    //top: -3em;
+    content: "New";
+    font-weight: bold;
+    color: red;
+    display: inline-block;
+    width: 100%;
+}
+
+div.msg.row {
+  border: solid #aaa 1px;
+  background-color: rgba(200, 200, 255, .6);
+  border-radius: .5em;
+  margin-top: .5em;
+  margin-bottom: .5em;
+  padding-bottom: .5em;
+}
+
+
+.msg-content {
+    background-color: rgba(255, 255, 220, 0.6);
+    margin-top: 1em;
+    padding: 1em;
+    min-height: 6em;
+    position: relative;
+}
+
+
+
+
+
+
+
+
+
+
