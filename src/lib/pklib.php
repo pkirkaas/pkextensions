@@ -3140,7 +3140,8 @@ function normalizeConfigArray(array $arr = [], $struct = null) {
  * 
  * @param stringish|array $arg - The argument to make into an ass arr if it isn't
  * @param string $key - the key for the primary argument, if the value is a string
- * @param array $defaults - the defaults for the argument array
+ * @param array|string $defaults - the defaults for the argument array
+ *   If string, make it an array w. the same key as arg
  * @param array $addons - values to add to the argument array, if any
  * @param array $replace - if you want you just totally replace any key values
  * 
@@ -3151,8 +3152,9 @@ function normalizeConfigArray(array $arr = [], $struct = null) {
  * returns ['value'=>'Name', 'tag'=>'div]
  */
 function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
+  if (is_stringish($defaults) || ($defaults===null)) $defaults = [$key=>$defaults];
   $retarr = [];
-  if (is_stringish($arg) || ($arg === null)) {
+  if (is_stringish($arg)) {
      $retarr = [$key => $arg];
   } else if (is_array_assoc($arg)) {
     $retarr = $arg;
@@ -3168,8 +3170,20 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
  // pkdebug("RetArr now:", $retarr, 'orig arg',$arg,'key',$key);
 //  return ['class'=>'yesterday'];
 
-  if ($defaults && is_array($defaults))
-      $retarr = array_merge($defaults, $retarr);
+  if ($defaults && is_array($defaults)) {
+      //$retarr = array_merge($defaults, $retarr);
+    foreach ($defaults as $ddkey => $ddval) {
+      if (!keyVal($ddkey,$retarr)) {
+        $retarr[$ddkey] = $ddval;
+      }
+    }
+  }
+  /*
+  if (!array_key_exists($key,$retarr)) {
+    $retarr[$key] = $arg;
+  }
+   * 
+   */
   if ($replace && is_array_assoc($replace)) {
     foreach ($replace as $rkey => $rval) {
       $retarr[$rkey] = $rval;

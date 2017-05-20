@@ -1106,29 +1106,52 @@ class PkHtmlRenderer extends PartialSet {
   /** Uses the above function to return many nearly identical wrapped input
    * rows. Only input[name] & label[value] differ. They are mapped by
    * @param string $type  - boolean or textarea or...
-   * @param array $map = [$ctlName1=>lblVal1,$ctlName2=>$lblVal2,....
+   * @param array $map: TWO FORMS:
+   *    Assoc array inpnames=>lblText: = [$ctlName1=>lblVal1,$ctlName2=>$lblVal2,....
+   *   OR INDEXED ARRAY of arrays - gives more configurability: Array of:
+   *   ['inp'=>$iprops, 'val'=>$vprops, 'lbl'=>$lprops, 'wrap'=>$wprops']
+  *   WHERE
+   *   $iprops EITHER assoc array of atts, or string ctl name: $iprops = ['name'=>$iprops]
+   *   $vprops EITHER assoc array of atts, or string class name: $vprops = ['class'=>$vprops]
+   *   $lprops EITHER assoc array of atts, or string label value name: $lprops = ['value'=>$lprops]
+   *   $wprops EITHER assoc array of atts, or string class  name: $wprops = ['class'=>$wprops]
+   * 
    * @param array $inputTpl : substitute the ctl name here - $inputTpl['name'] ...
    * @param mixed $inpWrapProps - just pass it along directly
    * @param array $lblTpl : substitute the label value name here - $lblTpl['value'] ...
    * @param mixed $wrapWrapProps - just pass it along directly
    */
 
-  //public function handleInputWrap($formel, $args) {
-  public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $inpWrpProps=[], $lblTpl=[], $wrpWrpProps=[]) {
+  public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $valTpl=[], $lblTpl=[], $wrapTpl=[]) {
     //pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
-    $ret = new PkHtmlRenderer();
+    $ret = new static();
     if (!is_array($map) || !count($map)) return $ret;
     if (is_string($inpTpl) || ($inpTpl === null)) $inpTpl = ['class'=>$inpTpl];
+    if (is_string($valTpl) || ($valTpl == null))  $valTpl = ['class'=>$valTpl];
     if (is_string($lblTpl) || ($lblTpl == null))  $lblTpl = ['class'=>$lblTpl];
+    if (is_string($wrapTpl) || ($wrapTpl == null))  $wrapTpl = ['class'=>$wrapTpl];
     if (!is_array($inpTpl) || !is_array($lblTpl)) {
       throw new PkException(['Bad values for the TPLs: inpTpl:', $inpTpl, 'lblTpl', $lblTpl]);
     }
-    //pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
-    foreach ($map as $name=>$value) {
-      $inpTpl['name'] = $name;
-      $lblTpl['value'] = $value;
-      $argarr = [$inpTpl, $inpWrpProps, $lblTpl, $wrpWrpProps];
-      $ret[] = $ret->handleInputWrap($type,$argarr);
+    if (is_array_indexed($map)) { #New, more configurable map
+      pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
+ //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
+      foreach ($map as $proparr) {
+        if (!is_array($proparr)) throw new PkExceptions(['Invalid proparr, MAP:', $map]);
+        $inpprops = arrayifyArg(keyVal('inp',$proparr),'name',$inpTpl);
+        $valprops = arrayifyArg(keyVal('val',$proparr),'class',$valTpl);
+        pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
+        $lblprops = arrayifyArg(keyVal('lbl',$proparr),'value',$lblTpl);
+        $wrapprops = arrayifyArg(keyVal('wrap',$proparr),'class',$wrapTpl);
+        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        $ret[] = $ret->inputWrap($type,$inpprops, $valprops, $lblprops, $wrapprops);
+      }
+    } else {
+      foreach ($map as $name=>$value) {
+        $inpTpl['name'] = $name;
+        $lblTpl['value'] = $value;
+        $ret[] = $ret->inputWrap($type,$inpTpl, $valTpl, $lblTpl, $wrapTpl);
+      }
     }
     return $ret;
   }
