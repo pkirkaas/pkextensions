@@ -69,11 +69,14 @@ $inner-border-spread: 1px !default;
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
 
-.height-90, .height90, .most-height, .mostheight { height: 90% !important; }
-.height-80, .height80 { height: 80% !important; }
+.height-90pc, .height90pc, .most-height, .mostheight { height: 90% !important; }
+.height-80pc, .height80pc { height: 80% !important; }
+.height-70pc, .height70pc { height: 70% !important; }
+.height-60pc, .height60pc { height: 60% !important; }
+.height-50pc, .height50pc, .halfheight { height: 60% !important; }
 
-.width-90, .width90, .most-width, .mostwidth { width: 90% !important; }
-.width-80, .width80 { width: 80% !important; }
+.width-90pc, .width90pc, .most-width, .mostwidth { width: 90% !important; }
+.width-80pc, .width80pc { width: 80% !important; }
 
 .w-a {width: auto !important; }
 

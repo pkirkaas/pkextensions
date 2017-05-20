@@ -276,7 +276,29 @@ div.msg.row {
     position: relative;
 }
 
+//The base 'site header' - combine with other classes to make custom headers
+.sh {
+  border-radius: .5em;
+  padding: .3em;
+  margin: .3em;
+}
 
+.inverse-060 {
+  color: white;
+  background-color: #060;
+}
+
+
+.inverse-006 {
+  color: white;
+  background-color: #006;
+}
+
+
+.inverse-600 {
+  color: white;
+  background-color: #600;
+}
 
 
 
