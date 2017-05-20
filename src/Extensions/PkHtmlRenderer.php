@@ -994,6 +994,20 @@ class PkHtmlRenderer extends PartialSet {
     return $this;
   }
 
+  /** Calls the _call method handleInputWraps below, but with the args individually
+   * specified, rather than in an $args array
+   * @param string $formel
+   * @param array $inputprops
+   * @param array $valprops
+   * @param array $lblprops
+   * @param array $wrapprops
+   * @return \static
+   * @throws PkException
+   */
+  public function inputWrap($formel, $inputprops=null, $valprops=null, $lblprops=null, $wrapprops=null) {
+    $argarr = [$inputprops,$valprops,$lblprops,$wrapprops];
+    return $this->handleInputWrap($formel, $argarr);
+  }
   /** Wraps form elements/controls in a couple of divs, w. a label
    * 
    * @param string $formel - the name of a handleable form control
@@ -1008,66 +1022,63 @@ class PkHtmlRenderer extends PartialSet {
    *       including "value" & "tag"
    *    $args[1]['wrapprops'] - assoc array of props for the enclosing element
    * But actually:
-   * $valprops=$arg[1],
+   * $inputprops = $args[0] #Most important: name
+   * $valprops=$args[1],
+   * $lblprops = $args[2]
+   * $wrapprops = $args[3]
    * 
-   * $lblprops arg2
-   * 
-   * wrap 3
-   * 
-   * return $this, beautifully wrapped, with nice defaults
+   * return new static, beautifully wrapped, with nice defaults
    * 
    */
 
  //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
 
-  public function handleInputWrap($formel, $args) {
-    $inputpars = keyVal(0,$args);
-    //$pararr = keyVal(1,$args,[]);
-    //if (!is_array($pararr)) throw new PkException(['Unexpecte Args:', $args]);
+  public function handleInputWrap($formel, Array $args=[]){
     /*
+    $pararr = keyVal(1,$args,[]);
+    if (!is_array($pararr)) throw new PkException(['Unexpecte Args:', $args]);
     if (is_array_assoc($pararr)) {
       $valprops = arrayifyArg(keyVal('valprops', $pararr), 'class',['class'=>'pk-inp-wrap']);
       $lblprops = arrayifyArg(keyVal('lblprops', $pararr),'value',['class'=>'pk-lbl']);
       $wrapprops  = arrayifyArg(keyVal('wrapprops', $pararr),'class',['class'=>'pk-lbl']);
-    } else {
-     * 
+    }
      */
-      $valprops = arrayifyArg(keyVal(1, $args), 'class',['class'=>'pk-inp-wrap']);
-      $lblprops = arrayifyArg(keyVal(2, $args),'value',['class'=>'pk-lbl']);
-      $wrapprops  = arrayifyArg(keyVal(3, $args),'class',['class'=>'pk-wrapper']);
+    $inputprops = keyVal(0,$args);
+    $valprops = arrayifyArg(keyVal(1, $args), 'class',['class'=>'pk-inp-wrap']);
+    $lblprops = arrayifyArg(keyVal(2, $args),'value',['class'=>'pk-lbl']);
+    $wrapprops  = arrayifyArg(keyVal(3, $args),'class',['class'=>'pk-wrapper']);
 
-    //pkdebug("The Args:",$args,'valprops',$valprops,'lblprops',$lblprops,'wrapprops', $wrapprops);
     if (in_array($formel, static::$input_types,true)) {
-      $inputpars['type'] = $formel;
+      $inputprops['type'] = $formel;
       $formel = 'input';
     }
     if ($formel === 'input') {
-      $bkup = $inputpars;
-      $value = unsetret($inputpars,'value');
-      $name = unsetret($inputpars, 'name');
-      $type = unsetret($inputpars,'type');
-      //pkdebug("Before unsetting inpars:", $bkup, "After:", $inputpars);
-      $frm_ctl = static::clonedInput($type,$name, $value, $inputpars);
-      //$frm_ctl = static::pureinput($inputpars);
+      $bkup = $inputprops;
+      $value = unsetret($inputprops,'value');
+      $name = unsetret($inputprops, 'name');
+      $type = unsetret($inputprops,'type');
+      //pkdebug("Before unsetting inpars:", $bkup, "After:", $inputprops);
+      $frm_ctl = static::clonedInput($type,$name, $value, $inputprops);
+      //$frm_ctl = static::pureinput($inputprops);
 
          // clonedInput($type, $name, $value = null, $options = []) {
     } else if ($formel === 'textarea') {
-      //pkdebug("Before unsetret, TA inputpars:", $inputpars);
-      $name = unsetret($inputpars,'name');
-      $value = unsetret($inputpars,'value');
-      //pkdebug("After unsetret, name: $name, value: ",$value,"arrp",$inputpars);
-      $frm_ctl = static::textarea($name, $value, $inputpars);
+      //pkdebug("Before unsetret, TA inputprops:", $inputprops);
+      $name = unsetret($inputprops,'name');
+      $value = unsetret($inputprops,'value');
+      //pkdebug("After unsetret, name: $name, value: ",$value,"arrp",$inputprops);
+      $frm_ctl = static::textarea($name, $value, $inputprops);
     } else if ($formel === 'boolean') {
 
       // function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
-      $checked = unsetret($inputpars,'checked');
-      $name = unsetret($inputpars,'name');
-      $value = unsetret($inputpars,'value',1);
+      $checked = unsetret($inputprops,'checked');
+      $name = unsetret($inputprops,'name');
+      $value = unsetret($inputprops,'value',1);
       if ($value === null) $value = '1';
-      $unset = unsetret($inputpars,'unset','0');
+      $unset = unsetret($inputprops,'unset','0');
       $frm_ctl = new static();
-      //$frm_ctl->boolean($name,$checked,$inputpars,$unset,$value);
-      $frm_ctl->boolean($name,$checked,$inputpars,$unset,$value);
+      //$frm_ctl->boolean($name,$checked,$inputprops,$unset,$value);
+      $frm_ctl->boolean($name,$checked,$inputprops,$unset,$value);
     } else {
       throw new PkException("Unhandled Wrap Method: [$formel]");
     }
@@ -1117,7 +1128,6 @@ class PkHtmlRenderer extends PartialSet {
       $inpTpl['name'] = $name;
       $lblTpl['value'] = $value;
       $argarr = [$inpTpl, $inpWrpProps, $lblTpl, $wrpWrpProps];
-      //$ret[] = $ret->handleInputWrap($type,$inpTpl, $inpWrpProps,$lblTpl, $wrpWrpProps);
       $ret[] = $ret->handleInputWrap($type,$argarr);
     }
     return $ret;
