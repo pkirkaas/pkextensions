@@ -215,6 +215,30 @@ $('body').on('click', '.print-button', function (event) {
   window.print();
 });
 
+// To customize file input
+/*
+$('body').on('click', 'input.custom-file-input.pkcfi', function (event) {
+  var fp = $(event.target).val();
+  console.log("The file input got clicked:", fp);
+});
+*/
+
+// To customize file input
+$('body').on('change', 'input.custom-file-input.pkcfi', function (event) {
+//$('body').on('change', 'input', function (event) {
+  var fp = $(event.target).val();
+  if (fp) {
+    fp = basename(fp);
+  } else {
+    fp = "No File Selected";
+  }
+  console.log("The file input changed to:", fp);
+  var descel = getCousin('label', '.custom-file-control', event.target);
+  descel.attr('data-filename',fp);
+  var data_filename = descel.attr('data-filename');
+  console.log("data-filename:", data_filename);
+});
+
 
 $(function () {
   $('.js-fade-out').fadeOut(8400, function () {
@@ -1300,3 +1324,18 @@ function setGets(getArr) {
 function DateFromSql(sqlDT) {
   return new Date(Date.parse(sqlDT.replace('-', '/', 'g')));
 }
+
+//Copied from the web - returns 'basename' of a path or URL
+function basename(path) {
+    return path.replace(/\\/g,'/').replace( /.*\//, '' );
+}
+ 
+function dirname(path) {
+    return path.replace(/\\/g,'/').replace(/\/[^\/]*$/, '');;
+}
+
+
+
+
+
+
