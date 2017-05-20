@@ -378,56 +378,6 @@ form.inline-login.form-inline {
     background-color: rgba(100,100,255,.8);
   }
 }
-
-/** Basis for avatar handling, also pup up ajax dialogs */
-$img-avatar-max-width: 15rem !default;
-$img-avatar-max-height: 15rem !default;
-
-img.avatar {
-  max-width: $img-avatar-max-width;
-  max-height: $img-avatar-max-height;
-  padding: 0;
-  margin: 0;
-  border: none;
-  /*
-  padding: 5px;
-  border: 1px;
-  margin: 5px;
-  border-radius: 5px;
-  */
-}
-
-
-.avatar-frame {
-  margin-left: 2px;
-  margin-right: 2px;
-  display: inline-block;
-  width: $img-avatar-max-width;
-  height:  $img-avatar-max-height;
-  border: solid #888 1px;
-  text-align: center;
-  position: relative;
-  background-color: black;
-}
-
-
-
-
-
-$avatar-desc-width: $img-avatar-max-width !default;
-$avatar-desc-padding: .5rem !default;
-$avatar-desc-margin: .5rem !default;
-$avatar-desc-bg: #eee !default;
-.avatar-desc {
-  width: $avatar-desc-width;
-  padding: $avatar-desc-padding;
-  border: 1px;
-  margin: $avatar-desc-margin;
-  display: inline-block;
-  background: $avatar-desc-bg;
-
-}
-
 img.big-picture-dialog {
   max-width: 70rem;
   max-height: 70rem;

@@ -19,6 +19,7 @@ use \Exception;
 use \Closure;
 
 class PkController extends Controller {
+
   public static $errorMsgBag; #The error messages, if any. Try static first
   public static $viewErrorBag; #The error messages, if any. Try static first
 
@@ -27,24 +28,25 @@ class PkController extends Controller {
    * layout (or wherever). Can be called from any controller method.
    * @param string $msg
    */
+
   public static function addErrorMsg($msg) {
     if (!static::$errorMsgBag instanceOf MessageBag) {
       static::$errorMsgBag = new MessageBag();
     }
-    static::$errorMsgBag->add('error',$msg);
+    static::$errorMsgBag->add('error', $msg);
     //session()->forget('errorBag');
     //session(['errorBag'=>static::$errorMsgBag]);
     $viewErrorBag = session('errors');
-    if (! ($viewErrorBag instanceOf ViewErrorBag)) {
+    if (!($viewErrorBag instanceOf ViewErrorBag)) {
       $viewErrorBag = new ViewErrorBag();
-      session()->flash('errors',static::$viewErrorBag);
+      session()->flash('errors', static::$viewErrorBag);
     }
     $viewErrorBag->put('PkControllerErrors', static::$errorMsgBag);
-    session()->flash('errors',static::$errorMsgBag);
+    session()->flash('errors', static::$errorMsgBag);
   }
 
   /**
-  #Validation for ProcessSubmit()
+    #Validation for ProcessSubmit()
    * Since we provide processSubmit() for most simple Form->DB saves, can be
    * used by several methods in same controller. If a method wants to validate,
    * just set <tt>$this->validationrules=['zip'=>'required'];</tt> (and optionally
@@ -103,11 +105,8 @@ class PkController extends Controller {
 //public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
   public function processSubmit($opts = null, $inits = null) {
     if (!$this->ShouldProcessSubmit($opts)) return null;
-    if ($this->validationrules)  { #Perform validation
-      $this->validate(request(),
-          $this->validationrules,
-          $this->validationmessages,
-          $this->validationcustomattributes);
+    if ($this->validationrules) { #Perform validation
+      $this->validate(request(), $this->validationrules, $this->validationmessages, $this->validationcustomattributes);
     }
     if ($this->validator) {
       if ($this->validator->fails()) {
@@ -222,14 +221,13 @@ class PkController extends Controller {
     return view('showmessage', ['message' => $message]);
   }
 
-
   /** Returns just the controller name, without ending in 'Controller'.
    * @param boolean - $lc - Return the name in lower case? Default true
    * @return string - the base controller name
    */
   public static function getControllerName($lc = true) {
     $shortname = (new \ReflectionClass($this))->getShortName();
-    $controllerName = removeEndStr($shortname,'Controller');
+    $controllerName = removeEndStr($shortname, 'Controller');
     if ($lc) return to_lower($controllerName);
     return $controllerName;
   }
@@ -237,19 +235,20 @@ class PkController extends Controller {
   public function ajax_header($args = null) {
     header('content-type: application/json');
   }
+
   /**
    * Directly renders data into a PHTML template
    * Uses the same view paths as Blade, but assumes PHTML
    * @param str $view
    * @param array $data
    */
-  public function render($view, $data=[]) {
+  public function render($view, $data = []) {
     if (!$view || !is_string($view)) return '';
-    $relview = str_replace('.','/', $view);
+    $relview = str_replace('.', '/', $view);
     $viewroots = \Config::get('view.paths');
     $viewfile = null;
-    foreach ($viewroots as $viewroot ) {
-      $testpath = $viewroot.'/'.$relview.'.phtml';
+    foreach ($viewroots as $viewroot) {
+      $testpath = $viewroot . '/' . $relview . '.phtml';
       if (file_exists($testpath)) {
         $viewfile = $testpath;
         continue;
@@ -271,13 +270,13 @@ class PkController extends Controller {
     return $___PKMVC_RENDERER_OUT;
   }
 
-  public static function staticRender($view, $data=[]) {
+  public static function staticRender($view, $data = []) {
     if (!$view || !is_string($view)) return '';
-    $relview = str_replace('.','/', $view);
+    $relview = str_replace('.', '/', $view);
     $viewroots = \Config::get('view.paths');
     $viewfile = null;
-    foreach ($viewroots as $viewroot ) {
-      $testpath = $viewroot.'/'.$relview.'.phtml';
+    foreach ($viewroots as $viewroot) {
+      $testpath = $viewroot . '/' . $relview . '.phtml';
       if (file_exists($testpath)) {
         $viewfile = $testpath;
         continue;
@@ -297,7 +296,6 @@ class PkController extends Controller {
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
     return $___PKMVC_RENDERER_OUT;
-
   }
 
   /**
@@ -341,26 +339,25 @@ class PkController extends Controller {
    * @param string $fileName - The file to try and import
    * @return array of arrays (rows) - or else an error
    */
-
   function importCsv($fileName) {
     if (!$fileName || !is_string($fileName)) return false;
     $csvMimeTypes = [
-      'text/plain', 
-      'text/csv', 
-      'text/x-csv',
-      'application/csv',
-      'text/comma-separated-values',
-      'application/x-csv',      
+        'text/plain',
+        'text/csv',
+        'text/x-csv',
+        'application/csv',
+        'text/comma-separated-values',
+        'application/x-csv',
     ];
     $fmt = getFileMimeType($fileName);
-    if (!$fmt || !in_array($fmt,$csvMimeTypes,1)) {
+    if (!$fmt || !in_array($fmt, $csvMimeTypes, 1)) {
       throw new \Exception("Importinc CSV file: [$fileName], reported MimeType: [$fmt]");
     }
     $handle = fopen($fileName, "r");
     if ($handle === false) return false;
     $retarr = [];
     while (($data = fgetcsv($handle)) !== FALSE) {
-      if (!is_array($data) || ((sizeOf($data) ===1 ) && ($data[0]===null))) {
+      if (!is_array($data) || ((sizeOf($data) === 1 ) && ($data[0] === null))) {
         continue;
       }
       $retarr[] = $data;
@@ -376,11 +373,10 @@ class PkController extends Controller {
    *   will output them first as column headers for the CSV file.
    * @return - 
    */
-
   public function exportCsv($fileName, Array $output_arr = [], $columnHeaders = null) {
     $this->setExportHeaders($fileName);
     $output = fopen("php://output", "w");
-    if ($columnHeaders && is_array($columnHeaders) && sizeOf ($columnHeaders)){
+    if ($columnHeaders && is_array($columnHeaders) && sizeOf($columnHeaders)) {
       fputcsv($output, $columnHeaders);
     }
     foreach ($output_arr as $output_line) {
@@ -413,9 +409,45 @@ class PkController extends Controller {
   }
 
   #Managing uploaded files
-  public static function getUrlFromUploadedFilename($fileName) {
-    $fileName = basename($fileName);
-    return url("/storage/$fileName");
+  /**
+   * Returns a URL based on the filename and Laravel default public upload dir
+   * Override in site specific controllers to make a default, eg,
+   * <pre>
+   * public static function getUrlFromUploadedFilename($filename, $default = '/gulped/img/default-avatar.png') {
+   *   return parent::getUrlFromUploadedFilename($filename, $default);
+   * }
+   * </pre>
+   * @param string/UploadedFile $filename - the base uploaded filename, or path relative to doc root/storage.
+   * @param string $default - the relative URL from root of a default URL if no file
+   * @return string URL
+
+
+   */
+
+  public static function getUrlFromUploadedFilename($filename, $default = null) {
+    if (!$filename) $filename = $default;
+    else $filename = "storage/$filename";
+    //$baseName = basename($filename);
+    $url = url($filename);
+    return $url;
   }
+/** Given a filename, returns the default upload path
+ * 
+ * @param string $filename - the uploaded filename or path, AFTER storage & rename
+ * @param boolean $symlink - return the hard path, or the path in the symlink directory
+ * default: false; the hard path
+ * @return string - the filesystem path, or false if not found.
+ */
+  public static function getPathFromUploadedFilename($filename, $symlink = false) {
+  if (!$filename) return false;
+  if ($symlink) {
+    $path = base_path("/public/storage/$filename");
+  } else {
+    $path = storage_path($filename);
+  }
+  if (file_exists($path)) return $path;
+  return false;
+
+}
 
 }

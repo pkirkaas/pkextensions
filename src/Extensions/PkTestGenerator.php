@@ -497,6 +497,45 @@ class PkTestGenerator {
         $location['zip'];
   }
 
+#############  To pre-populate supposed user upload files ############
+
+  /**
+   * 
+   * @param string $fromDir - directory to copy from - usu. in the 'seeds' dir
+   * @param string $toDir - the directory to copy to - default is the storage dir
+   * @throws \Exception
+   */
+  public static function copyAllFiles($fromDir, $toDir=null) {
+    if (!$toDir) $toDir = storage_path();
+    if (!is_dir($fromDir)) throw new \Exception("FromDir [$fromDir] not found");
+    if (!is_dir($toDir)) throw new \Exception("ToDir [$toDir] not found");
+    $entries = scandir($fromDir);
+    foreach ($entries as $entry) {
+      if (($entry === '.') || ($entry === '..')) continue;
+      $fromPath = "$fromDir/$entry";
+      if (!file_exists($fromPath)) throw new \Exception("FromPath [$fromPath] not found");
+      if (!copy($fromPath,"$toDir/$entry"))  throw new \Exception("Couldn't copy to [$toDir/$entry]");
+    }
+  }
+
+  /**
+   * Get an array of all file names in a directory
+   * @param string $dirName - directory name - defaults to storage dir
+   */
+  public static function getFilenamesInDir($dirName=null) {
+    if (!$dirName) $dirName = storage_path();
+    if (!is_dir($dirName)) throw new \Exception("Src dir [$dirName] not found");
+    $entries = scandir($dirName);
+    $fileNames = [];
+    foreach ($entries as $entry) {
+      if (($entry === '.') || ($entry === '..')) continue;
+      $fromPath = "$dirName/$entry";
+      if (!file_exists($fromPath)) throw new \Exception("FromPath [$fromPath] not found");
+      $fileNames[] = $entry;
+    }
+    return $fileNames;
+  }
+
 
 
 
