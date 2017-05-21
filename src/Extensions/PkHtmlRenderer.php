@@ -1134,16 +1134,16 @@ class PkHtmlRenderer extends PartialSet {
       throw new PkException(['Bad values for the TPLs: inpTpl:', $inpTpl, 'lblTpl', $lblTpl]);
     }
     if (is_array_indexed($map)) { #New, more configurable map
-      pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
+      //pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
  //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
       foreach ($map as $proparr) {
         if (!is_array($proparr)) throw new PkExceptions(['Invalid proparr, MAP:', $map]);
         $inpprops = arrayifyArg(keyVal('inp',$proparr),'name',$inpTpl);
         $valprops = arrayifyArg(keyVal('val',$proparr),'class',$valTpl);
-        pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
+        //pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
         $lblprops = arrayifyArg(keyVal('lbl',$proparr),'value',$lblTpl);
         $wrapprops = arrayifyArg(keyVal('wrap',$proparr),'class',$wrapTpl);
-        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        //pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
         $ret[] = $ret->inputWrap($type,$inpprops, $valprops, $lblprops, $wrapprops);
       }
     } else {

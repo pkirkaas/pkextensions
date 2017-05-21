@@ -197,6 +197,29 @@ function yesnonull($arg) {
 }
 
 
+#########  For . separated view names, look for a real file
+function getPossibleViewFiles($name) {
+  return array_map(function ($extension) use ($name) {
+      return str_replace('.', '/', $name).'.'.$extension;
+  }, ['phtml','php', 'blade.php']);
+}
+
+# So we can do like: 
+# include(view_path('shared.edit-profile-components'));
+function view_path($name) {
+  $paths = config('view.paths');
+  pkdebug("View Paths:", $paths);
+  foreach ((array) $paths as $path) {
+    foreach (getPossibleViewFiles($name) as $file) {
+      if (file_exists($viewPath = $path.'/'.$file)) {
+        return $viewPath;
+      }
+    }
+  }
+  throw new \Exception("View [$name] not found.");
+}
+
+
 
 ###########   For uploaded files, get paths, URLs, defaults, etc
 
