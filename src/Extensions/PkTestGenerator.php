@@ -503,6 +503,7 @@ class PkTestGenerator {
    * 
    * @param string $fromDir - directory to copy from - usu. in the 'seeds' dir
    * @param string $toDir - the directory to copy to - default is the storage dir
+   * @return array - all the filenames successfully copied
    * @throws \Exception
    */
   public static function copyAllFiles($fromDir, $toDir=null) {
@@ -510,12 +511,15 @@ class PkTestGenerator {
     if (!is_dir($fromDir)) throw new \Exception("FromDir [$fromDir] not found");
     if (!is_dir($toDir)) throw new \Exception("ToDir [$toDir] not found");
     $entries = scandir($fromDir);
+    $filenames=[];
     foreach ($entries as $entry) {
       if (($entry === '.') || ($entry === '..')) continue;
       $fromPath = "$fromDir/$entry";
       if (!file_exists($fromPath)) throw new \Exception("FromPath [$fromPath] not found");
       if (!copy($fromPath,"$toDir/$entry"))  throw new \Exception("Couldn't copy to [$toDir/$entry]");
+      $filenames[] = $entry;
     }
+    return $filenames;
   }
 
   /**
