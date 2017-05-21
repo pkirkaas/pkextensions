@@ -799,6 +799,34 @@ $('body').on('click', '.js-dialog-button', function (event) {
   return dlg;
 });
 
+/** Custom 'big-picture' pop-ups - expected the class is on an img element */
+$('body').on('click', 'img.js-big-picture-button', function (event) {
+  //console.log("Clicked on Big Picture");
+  var src = $(event.target).attr('src');
+  if (!src) return;
+  var dlgHtml = "<div class='big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
+  console.log('dltHtml', dlgHtml);
+  var dlg = $(dlgHtml);
+  var dialogDefaults = {
+    modal: true,
+    autoOpen: false,
+    //width: defaultWidth,
+    //maxWidth: $(window).width(),
+    width: 550,
+    position: {my: 'center top', at: 'center top', of: window},
+    buttons: [{
+        text: 'Close',
+        click: function () {
+          $(this).dialog('close');
+        }
+      }
+    ]
+  };
+  dlg.dialog(dialogDefaults);
+  dlg.dialog('open');
+  return dlg;
+
+});
 
 //Do similar for Bootstrap 4 Modals/Dialogs
 $('body').on('click', '.bs4-dialog-button', function (event) {
