@@ -96,6 +96,9 @@ $site-negative-value-color: #a22 !default;
   border: solid blue 1px;
 }
 
+div input[type=checkbox].pk-inp {
+  width: auto;
+}
 
 select.pk-inp,
 textarea.pk-inp,

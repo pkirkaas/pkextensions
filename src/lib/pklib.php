@@ -590,15 +590,22 @@ function pkdebugOut($str, $logpath = null) {
       fclose($fp);
     }
     if ($first && $reset) {
-      $first = false;
+      //$first = false;
       $fp = fopen($logpath, 'w+');
     } else {
       $fp = fopen($logpath, 'a+');
     }
-    if (!$fp)
+    if (!$fp) {
         throw new Exception("Failed to open DebugLog [$logpath] for writing");
+    }
+    if ($first) {
+        $v = " \n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n";
+        $h = "=================================";
+      fwrite($fp,$v.$h.$h.$v );
+    }
     fwrite($fp, $str);
     fclose($fp);
+    $first = false;
   } catch (Exception $e) {
     error_log("Error Writing to Debug Log: " . $e);
     return false;

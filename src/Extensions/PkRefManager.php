@@ -29,7 +29,9 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return static::$labels;
   }
 
-  /** Used to return a simple array - still does for pre-existing ref classes-
+  /** Used to return a simple array - for use in Laravel Form Select boxes, etc.
+   * And to use in PkModel methods '->getDisplayValue()
+   * still does for pre-existing ref classes-
    * but for complex ref classes, returns the complex array. To guarantee
    * always getting a simple array of key=>value, use static::getKeyValArr()
    * instead

@@ -371,6 +371,34 @@ class PkHtmlRenderer extends PartialSet {
    */
   //NOTE: I inserted a newline after every open tag for readability, but that's 
   // just wrong. 
+  ## SOME SPECIAL EXPERIMENTAL STUFF STARTING HERE with nesting - 5/17
+  /** For years, I used the convention if $content === true (RENDEROPEN),
+   * used that as an flag to  Open the content element tag, and not close it until
+   *  be closed later by an explicit $this->RENDERCLOSE();, which also added the
+   * matching closing tag. Now considering if $content === NULL or FALSE. Normally
+   * a content tag call adds the content to the next cell in the array, with the
+   * tag/attribute stack, then retuns {$this} to continiue the un-nested linear chain/array.
+   * 
+   * What if, if $content === null or false, this creates a new static instance, stores
+   * it as usual in the next array position, BUT RETURNS THE NEW CHILD!. Then you could
+   * chain method calls, and they would apply to the child, so nested/embedded
+   *  within the the parent. You could go as deep as you want; the first terminating
+   * ';' would end it. I can see that allowing both deeply nested elements AND
+   * sequential elements.  But how you would go back a few steps down & then
+   * continue from that base without rewinding all the way or using clumsy
+   * temporary variables, I'm not clear on.
+   * 
+   * I suppose there could be a method that accepts a number and returns it's 
+   * parent n generations back...
+   * 
+ 
+   * the 
+   * @param type $tag
+   * @param type $content
+   * @param type $attributes
+   * @param type $raw
+   * @return $this
+   */
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
@@ -402,6 +430,7 @@ class PkHtmlRenderer extends PartialSet {
     }
   }
 
+  /** This called for no-content element tags, like img, br, hr, input, etc */
   public function nocontent($tag, $attributes=null) {
     $attributes = $this->cleanAttributes($attributes);
     //pkdebug("TAG: [$tag], atts:",$attributes);
@@ -411,7 +440,7 @@ class PkHtmlRenderer extends PartialSet {
 
 
   //Inputs  & Forms
-
+### Don't think this works well
   public function form($content, $options = []) {
     $options = $this->cleanAttributes($options);
     //return $this->rawcontent(PkForm::open($options) . $content . PkForm::close());
@@ -546,6 +575,7 @@ class PkHtmlRenderer extends PartialSet {
     return $this->nocontent('input', $atts);
   }
 
+  /** Just makes a fesh, standalone instance of static */
   public function clonedInput($type, $name, $value = null, $options = []) {
     $inp = new static();
     $inp->input($type, $name, $value, $options);
@@ -1050,6 +1080,7 @@ class PkHtmlRenderer extends PartialSet {
     $valprops = arrayifyArg(keyVal(1, $args), 'class',['class'=>'pk-inp-wrap']);
     $lblprops = arrayifyArg(keyVal(2, $args),'value',['class'=>'pk-lbl']);
     $wrapprops  = arrayifyArg(keyVal(3, $args),'class',['class'=>'pk-wrapper']);
+    $frm_ctl = new static();
 
     if (in_array($formel, static::$input_types,true)) {
       $inputprops['type'] = $formel;
@@ -1060,29 +1091,28 @@ class PkHtmlRenderer extends PartialSet {
       $value = unsetret($inputprops,'value');
       $name = unsetret($inputprops, 'name');
       $type = unsetret($inputprops,'type');
-      //pkdebug("Before unsetting inpars:", $bkup, "After:", $inputprops);
-      $frm_ctl = static::clonedInput($type,$name, $value, $inputprops);
+      $frm_ctl->clonedInput($type,$name, $value, $inputprops);
       //$frm_ctl = static::pureinput($inputprops);
-
-         // clonedInput($type, $name, $value = null, $options = []) {
     } else if ($formel === 'textarea') {
-      //pkdebug("Before unsetret, TA inputprops:", $inputprops);
       $name = unsetret($inputprops,'name');
       $value = unsetret($inputprops,'value');
-      //pkdebug("After unsetret, name: $name, value: ",$value,"arrp",$inputprops);
-      $frm_ctl = static::textarea($name, $value, $inputprops);
+      $frm_ctl->textarea($name, $value, $inputprops);
     } else if ($formel === 'boolean') {
-
-      // function boolean($name,  $checked = null, $options = [], $unset = '0', $value = 1) {
       $checked = unsetret($inputprops,'checked');
       $name = unsetret($inputprops,'name');
       $value = unsetret($inputprops,'value',1);
       if ($value === null) $value = '1';
       $unset = unsetret($inputprops,'unset','0');
-      $frm_ctl = new static();
-      //$frm_ctl->boolean($name,$checked,$inputprops,$unset,$value);
       $frm_ctl->boolean($name,$checked,$inputprops,$unset,$value);
-    } else {
+    } else if ($formel === 'select') {
+      $list = unsetret($inputprops,'list');
+      if (!$list) { #Don't throw exception, but return empty row & report
+        pkdebug("There were no choices for the select; args were:", $args);
+      }
+      $name = unsetret($inputprops,'name');
+      $selected = unsetret($inputprops, 'selected');
+      $frm_ctl->select($name, $list, $selected, $inputprops);
+    } else { #Didn't hind an input type we handle yet
       throw new PkException("Unhandled Wrap Method: [$formel]");
     }
     //pkdebug('Args:',$args,'valprops:',$valprops,'lblprops', $lblprops,'wrapprops',$wrapprops,"frmctl:\n\n$frm_ctl");
@@ -1148,13 +1178,13 @@ class PkHtmlRenderer extends PartialSet {
     if (is_array_indexed($map)) { #New, more configurable map
     #Could even have a different 'input type' in each map row, so can mix different inputs
     #in same array of rows.
-      pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
+     // pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
  //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
       foreach ($map as $proparr) {
         if (!is_array($proparr)) throw new PkExceptions(['Invalid proparr, MAP:', $map]);
         $inpprops = arrayifyArg(keyVal('inp',$proparr),'name',$inpTpl);
         $valprops = arrayifyArg(keyVal('val',$proparr),'class',$valTpl);
-        pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
+        //pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
         $lblprops = arrayifyArg(keyVal('lbl',$proparr),'value',$lblTpl);
         $wrapprops = arrayifyArg(keyVal('wrap',$proparr),'class',$wrapTpl);
         if (is_array($inpprops) && keyVal('type', $inpprops)) {
@@ -1162,7 +1192,7 @@ class PkHtmlRenderer extends PartialSet {
         } else {
           $rowtype = $type;
         }
-        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        //pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
         $ret[] = $ret->inputWrap($rowtype,$inpprops, $valprops, $lblprops, $wrapprops);
       }
     } else {
@@ -1320,6 +1350,10 @@ class PkHtmlRenderer extends PartialSet {
      //return $this;
      return $this->rawcontent(PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts));
   }
+
+
+
+
 
 
 
