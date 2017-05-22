@@ -208,7 +208,7 @@ function getPossibleViewFiles($name) {
 # include(view_path('shared.edit-profile-components'));
 function view_path($name) {
   $paths = config('view.paths');
-  pkdebug("View Paths:", $paths);
+  //pkdebug("View Paths:", $paths);
   foreach ((array) $paths as $path) {
     foreach (getPossibleViewFiles($name) as $file) {
       if (file_exists($viewPath = $path.'/'.$file)) {

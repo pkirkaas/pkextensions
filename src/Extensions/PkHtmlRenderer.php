@@ -978,6 +978,7 @@ class PkHtmlRenderer extends PartialSet {
    *  $attributes: An associative array of attributes/args for $method
    * @return PkHtmlRenderer representation of the tree
    */
+  /*
   public function buildFromArray($args=[]) {
     $method = keyVal(0,$args); #Must be string method name
     $methodargs = keyVal(1,$args,[]); #Must be array
@@ -993,6 +994,8 @@ class PkHtmlRenderer extends PartialSet {
     }
     return $this;
   }
+   * 
+   */
 
   /** Calls the _call method handleInputWraps below, but with the args individually
    * specified, rather than in an $args array
@@ -1105,7 +1108,16 @@ class PkHtmlRenderer extends PartialSet {
   
   /** Uses the above function to return many nearly identical wrapped input
    * rows. Only input[name] & label[value] differ. They are mapped by
-   * @param string $type  - boolean or textarea or...
+   * @param string|null $type  - the default input/control type for the set of rows:
+   *    boolean, text, textarea or... CAN BE NULL, if 'type' is a key in the $map
+   *    array elements. If both $type & $inp[type] exist, the value of $inp['type'] 
+   *   will be type used for that row - but the next map row might not HAVE a type
+   *   key, so the default '$type" will be used. So you  can pass a $map of several
+   *   similar but different input types and return them all as similarly formatted rows.
+   * 
+   *   Id 'type' exists both as a non-empty argument, AND $map[m][inp][type] is set,
+   *   the  $map[m][inp][type] value will be used to override the default $type, ONLY
+   *   FOR THAT ROW. The default $type will be used for the rest.
    * @param array $map: TWO FORMS:
    *    Assoc array inpnames=>lblText: = [$ctlName1=>lblVal1,$ctlName2=>$lblVal2,....
    *   OR INDEXED ARRAY of arrays - gives more configurability: Array of:
@@ -1122,7 +1134,7 @@ class PkHtmlRenderer extends PartialSet {
    * @param mixed $wrapWrapProps - just pass it along directly
    */
 
-  public function mkWrappedInputSet($type, $map = [], $inpTpl=[], $valTpl=[], $lblTpl=[], $wrapTpl=[]) {
+  public function mkWrappedInputSet($type=null, $map = [], $inpTpl=[], $valTpl=[], $lblTpl=[], $wrapTpl=[]) {
     //pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
     $ret = new static();
     if (!is_array($map) || !count($map)) return $ret;
@@ -1134,17 +1146,24 @@ class PkHtmlRenderer extends PartialSet {
       throw new PkException(['Bad values for the TPLs: inpTpl:', $inpTpl, 'lblTpl', $lblTpl]);
     }
     if (is_array_indexed($map)) { #New, more configurable map
-      //pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
+    #Could even have a different 'input type' in each map row, so can mix different inputs
+    #in same array of rows.
+      pkdebug("After Processing: Type: $type, Map:",$map, 'inpTpl:', $inpTpl, 'valTpl', $valTpl, 'lblTpl', $lblTpl, 'wrapTpl', $wrapTpl);
  //arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
       foreach ($map as $proparr) {
         if (!is_array($proparr)) throw new PkExceptions(['Invalid proparr, MAP:', $map]);
         $inpprops = arrayifyArg(keyVal('inp',$proparr),'name',$inpTpl);
         $valprops = arrayifyArg(keyVal('val',$proparr),'class',$valTpl);
-        //pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
+        pkdebug("\n\n\nvalprops:",$valprops,'valTpl', $valTpl,"\n\n\n");
         $lblprops = arrayifyArg(keyVal('lbl',$proparr),'value',$lblTpl);
         $wrapprops = arrayifyArg(keyVal('wrap',$proparr),'class',$wrapTpl);
-        //pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
-        $ret[] = $ret->inputWrap($type,$inpprops, $valprops, $lblprops, $wrapprops);
+        if (is_array($inpprops) && keyVal('type', $inpprops)) {
+          $rowtype = $inpprops['type'];
+        } else {
+          $rowtype = $type;
+        }
+        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        $ret[] = $ret->inputWrap($rowtype,$inpprops, $valprops, $lblprops, $wrapprops);
       }
     } else {
       foreach ($map as $name=>$value) {
