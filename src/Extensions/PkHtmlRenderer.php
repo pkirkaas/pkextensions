@@ -404,19 +404,30 @@ class PkHtmlRenderer extends PartialSet {
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
+      #We don't know when the balanced close is going to happen, so cant automate it,
+      #so we just use the open tag wait for "RENDERCLOSE() to add the closing tag.
+      #just have to be told by 
       $spaces = $this->spaceDepth();
       $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
       return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">");
     } else if (($content === false)) {
                                 ##Nest the elements
+      #Don't remember what I meant by nest the elements, but I guess that means
+      #don't expect this cell to enclose anything else.
       $spaces = $this->spaceDepth();
       $size = $this->addDepthTagStack($tag);
+      #Add the tag & attributes. This is a contentless, self-closing tag, like IMG, so shouldn't
+      #contain anything more.
       return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">");
     } else {
-      #Trust that text already wrapped in PhHtmlRenderer has already been filtered
+      #Trust if text has ALREADY  been wrapped in PhHtmlRenderer has already been filtered
 
 //if (!$raw && !static::getRawCount() && !($content instanceOf PkHtmlRenderer)) {
       //$this[]=$this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">
+      #This tag CAN contain content in addition to what we already added, so return a refeference
+      #this point in the array, so anyone who adds to this point adds next to it, inside
+      #us. We DO close after we insert this content, but her position is secure
+      # and everyone who joins her is save in the same position.
       $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">");
       if (is_array($content)){
         foreach ($content as $citem) {
