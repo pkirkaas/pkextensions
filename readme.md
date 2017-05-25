@@ -18,7 +18,7 @@
 <span class="header-section-number">1</span> What are PkExtensions?
 ===================================================================
 
-PkExtensions consist of multiple components, some very Laravel specific, others more generally applicable with PHP/JavaScript/CSS.
+PkExtensions consist of multiple components, some very Laravel specific, others more generally applicable with PHP/JavaScript/CSS. This is the 'experimental' branch, NOT stable. 
 
 The guiding principal is to provide a lot of reusable functionality for things developers do all the time - so you don't have to re-implement similar functionality every time. For example, enhanced form inputs (like, multi-select check boxes), bound by specific CSS class names to JavaScript/jQuery event handlers. Which support binding complex, nested, one to many to many forms with hidden templates and deletable data sets - so almost the only code you need to write to implement complex form to abstract DB data structures are the PHP/HTML templates.
 
