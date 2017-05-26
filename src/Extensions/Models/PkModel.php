@@ -29,6 +29,16 @@
  * create/update/delete the one-to-many relationships; like a Cart with Items.
  * Use in conjunction with PkController->processPost, & pklib.js templates.
  * 
+ * If your model defines the static array: $display_value_fields, ex:
+ * <pre>
+ *   public static $display_value_fields = [
+ *       'location_id' => 'App\References\LocationRef',
+ * ];
+ * </pre>
+ * <tt>$model->location_id</tt> will return the location ID; but 
+ * <tt>$model->location_id_DV</tt> will return the look-up "DisplayValue" from
+ * <tt>'App\References\LocationRef'</tt>
+ * 
  * In the default, all auths are true - if you want to default to false, sublcass
  * this and set them to false.
  */
@@ -83,7 +93,7 @@ abstract class PkModel extends Model {
 
 
 //Display Value Fields
-  public static $displayValueSuffix = "_DV"; // Let's try that...
+  public static $displayValueSuffix = "_DV"; #Can override in extended models
 
 
   /* Fields of this model that can display more meaningful info with
