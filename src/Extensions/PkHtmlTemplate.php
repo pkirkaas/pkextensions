@@ -2,6 +2,8 @@
 namespace PkExtensions;
 /**
  * A keyed Html template, that substitutes keyed values & defaults
+ * Can construct once with $tplStr & $defaults, & re-use by resetting
+ * $values.
  */
 class PkHtmlTemplate extends PkHtmlRenderer {
   /**
@@ -16,7 +18,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   /**
    * @var array 
    * Associative array of values to substitute into the $tplStr, like:
-   * ['input'=>$input]
+   * ['input'=>PkForm::text('zip'), 'lblVal'=>'ZIP']
    */
   public $values = [];
   /**
@@ -53,12 +55,19 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     $this->tplStr = $tplStr;
     $this->values = $values;
     $this->defaults = $defaults;
-    $this->substituteAll();
+    $this->template();
   }
 
-  public function substituteAll() {
+  /** Execute/template the template. 
+   * 
+   * @param null|array $values - if null, uses $this->values, else an assoc array 
+   * of values to substitute
+   * @return string - the substituted/rendered template
+   */
+  public function template($values = null) {
+    if (!$values) $values = $this->values;
     $this->substituted = $this->tplStr;
-    $this->substituted = $this->substitute($this->values);
+    $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($this->defaults);
     //$this->substituted = $this->substitute();
     return $this->substituted;
