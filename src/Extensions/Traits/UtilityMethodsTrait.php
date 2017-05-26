@@ -36,7 +36,7 @@ trait UtilityMethodsTrait {
    */
   public static $stopAccensionFlag = false;
   /**
-   * Recurse up through inheretence hierarchy and merge static arrays of
+   * Recurse up through inheritance hierarchy and merge static arrays of
    * the given arrayName name.
    *
    * This static function is used by the various "getPossessionXXX()" functions, and
@@ -49,7 +49,6 @@ trait UtilityMethodsTrait {
    * @return Array: Merged array of hierarchy
    */
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
-    //$thisClass = $class = get_called_class();
     $thisClass = $class = static::class;
     #All static, so cache results...
     static $fullRetArr = [];
@@ -64,7 +63,6 @@ trait UtilityMethodsTrait {
     }
     //$fullRetArr[$class] = null;
     #First, build array of arrays....
-    $retArr = [];
     $retArr[] = $class::$$arrayName; #Deliberate double $$
     while ($par = get_parent_class($class)) {
       if (!property_exists($par, $arrayName) ||

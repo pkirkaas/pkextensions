@@ -34,8 +34,6 @@ class PkController extends Controller {
       static::$errorMsgBag = new MessageBag();
     }
     static::$errorMsgBag->add('error', $msg);
-    //session()->forget('errorBag');
-    //session(['errorBag'=>static::$errorMsgBag]);
     $viewErrorBag = session('errors');
     if (!($viewErrorBag instanceOf ViewErrorBag)) {
       $viewErrorBag = new ViewErrorBag();
@@ -102,7 +100,6 @@ class PkController extends Controller {
    * @param type $modelkey
    * @return boolean|null - null if shouldn't processSubmit, true if succeds, else false
    */
-//public function processSubmit( $pkmodel, Array $inits = [], $modelkey = null) {
   public function processSubmit($opts = null, $inits = null) {
     if (!$this->ShouldProcessSubmit($opts)) return null;
     if ($this->validationrules) { #Perform validation
@@ -117,7 +114,7 @@ class PkController extends Controller {
     if ($opts instanceOf PkModel) {
       $pkmodel = $opts;
     } else if (is_arrayish($opts)) {
-#We are processing a submission
+      #We are processing a form submission
       $customProccessor = keyVal('customProccessor', $opts);
       if (is_callable($customProccessor)) $customProccessor($opts, $inits);
       $pkmodel = keyVal('pkmodel', $opts);
@@ -128,14 +125,11 @@ class PkController extends Controller {
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)
-      && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { #It's a PkModel name
-      #So what do we do with that?
+      && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { 
+       #It's a PkModel name - process
       }
      */
     $data = Request::all();
-    //pkdebug("POST Data:",$data);
-    //$tpkm = typeOf($pkmodel);
-//if (!$pkmodel) return false;
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))
           foreach ($inits as $key => $val) {
@@ -143,30 +137,37 @@ class PkController extends Controller {
         }
       $result = $pkmodel->saveRelations($data);
       return $result;
-############  Okay, after here is insanity ..... but I had something in mind .....
+      #TODO: Future Enhancement if multiple models
 
 
+
+      /*
       if (!$pkmodels || !is_arrayish($pkmodels)) {
         if (is_arrayish($pkmodel)) $pkmodels = $pkmodel;
         else $pkmodels = $opts;
       }
       if ($modelName = $this->isModelSetSubmit()) {
-#Then we look for a key of 'modelset' in the $data array, which
-#should have the value of a full model name 'App\Models\Item'
-#THEN we look for the Model Name Key in the $data - name the
-#controls by name='App\Models\Item[$idx][id]', etc
+        #Then we look for a key of 'modelset' in the $data array, which
+        #should have the value of a full model name 'App\Models\Item'
+        #THEN we look for the Model Name Key in the $data - name the
+        #controls by name='App\Models\Item[$idx][id]', etc
         $modelDataArray = keyValOrDefault($modelName, $data, false);
         if ($modelDataArray === false) return false;
         if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) &&
             !count($pkmodels)) return false;
         if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel'))
             throw new Exception("[$modelName] does not extend PkModel");
-#We assume $pkmodels is a collection of the original models, and $modelDataArray
-#contains whatever changes/additions/deletions. We hand off to the Model
-#class to manage.
+        #We assume $pkmodels is a collection of the original models, and $modelDataArray
+        #contains whatever changes/additions/deletions. We hand off to the Model
+        #class to manage.
         return $modelName::updateModels($pkmodels, $modelDataArray);
       }
       throw new \Exception("Don't know what to do with pkmodels: " . print_r($pkmodels, 1));
+       * 
+       */
+
+    } else {
+      pkdebug("No pkmodel");
     }
   }
 
@@ -194,7 +195,6 @@ class PkController extends Controller {
   }
 
   /** Ideally, the error will NOT be in the URL, but in the flashed message bag
-   * 
    * @param type $error
    * @return Redirected to the error page with appropriate error msg.
    */
@@ -260,7 +260,7 @@ class PkController extends Controller {
     }
     if (is_array($data)) {
       ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
-      ###########  $out, for example, was a terrible choice!
+      ###########  $out, for example, is a terrible choice!
       extract($data);
     }
     ob_start();
@@ -288,7 +288,7 @@ class PkController extends Controller {
     }
     if (is_array($data)) {
       ############# BE VERY CAREFUL ABOUT VARIABLE NAMES USED AFTER EXTRACT!!!
-      ###########  $out, for example, was a terrible choice!
+      ###########  $out, for example, is a terrible choice!
       extract($data);
     }
     ob_start();
@@ -320,7 +320,7 @@ class PkController extends Controller {
       die();
     }
     $mimeType = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $assetfilepath);
-#Hack for CSS since PHP can't detect that...
+    #Hack for CSS since PHP can't detect that...
     if ($mimeType === 'text/plain') {
       $ext = pathinfo($assetfilepath, PATHINFO_EXTENSION);
       $ext = strtolower($ext);
@@ -331,7 +331,6 @@ class PkController extends Controller {
     header('Content-Length: ' . filesize($assetfilepath));
     readfile($assetfilepath);
     die();
-//return "This is an asset request with path: ".print_r($assetpath,1);
   }
 
   /** Imports a CSV file as an array. Tries to recover from errors and return
@@ -420,8 +419,6 @@ class PkController extends Controller {
    * @param string/UploadedFile $filename - the base uploaded filename, or path relative to doc root/storage.
    * @param string $default - the relative URL from root of a default URL if no file
    * @return string URL
-
-
    */
 
   public static function getUrlFromUploadedFilename($filename, $default = null) {

@@ -1,6 +1,7 @@
 -   [<span class="toc-section-number">1</span> What are PkExtensions?](#what-are-pkextensions)
     -   [<span class="toc-section-number">1.1</span> What do PkExtensions consist of?](#what-do-pkextensions-consist-of)
     -   [<span class="toc-section-number">1.2</span> What is the current status/version?](#what-is-the-current-statusversion)
+    -   [<span class="toc-section-number">1.3</span> The Artisan Commands](#artisan-commands)
 -   [<span class="toc-section-number">2</span> Extensions to existing Laravel Classes](#extensions-to-existing-laravel-classes)
     -   [<span class="toc-section-number">2.1</span> PkModel](#pkmodel)
         -   [<span class="toc-section-number">2.1.1</span> public function saveRelations(Array $array = \[\])](#public-function-saverelationsarray-array)
@@ -35,10 +36,11 @@ They consist of:
 
 **Supporting JavaScript, jQuery, CSS and SCSS Libraries**: I do lots of things where PHP and JS have to co-operate. These libraries help in a very generic way - like automatically building dialog boxes from PHP, just based on CSS class names and 'data-xxx' attribute names and values. Assumes jQuery & jQuery UI.
 
-**Artisan helper scripts**: Just a couple of commands to:
+**Artisan helper scripts**:  Commands to:
 
--   Generate migration files from PkModel class definitions
--   Clear all caches, autoloads, everything in a single command
+-   make:migration [model]: Generate migration files from PkModel class definitions
+-   destroy:tables: Destroy all migration files & tables that were generated from PkModel class definitions
+-   wipe: Clear all caches, autoloads, everything in a single command
 
 <span class="header-section-number">1.2</span> What is the current status/version?
 ----------------------------------------------------------------------------------
@@ -46,6 +48,38 @@ They consist of:
 Very much Alpha - continually evolving, quite a bit of commented out code and experiments - but what works works pretty well and hopefully could be very useful to other developers.
 
 See below for highlights of some of the more interesting features.
+
+<span class="header-section-number">1.3</span> The Artisan Commands
+----------------------------------------------------------------------------------
+
+To enable the Artisan commands, edit app/Console/Kernal.php and add:
+<pre>
+use PkExtensions\Console\Commands\ClearAll;
+use PkExtensions\Console\Commands\DestroyTables;
+use PkExtensions\Console\Commands\GenerateMigrations;
+class Kernel extends ConsoleKernel {
+    protected $commands = [
+       GenerateMigrations::class,
+       ClearAll::class,
+       DestroyTables::class,
+    ];
+}
+</pre>
+
+For GenerateMigrations & DestroyTables, the PkModel extensions must be declared
+in config/app.php, like:
+<pre>
+return [
+    'buildmodels' => [
+        '\\App\\Models\\Admin',
+        '\\App\\Models\\User',
+   ],
+   # Rest of your app.php config here
+
+</pre>
+
+
+----------------------------------------------------------------------------------
 
 <span class="header-section-number">2</span> Extensions to existing Laravel Classes
 ===================================================================================
