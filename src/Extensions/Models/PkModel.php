@@ -1,6 +1,34 @@
 <?php
-
-/** Adds functionality to base model, including authorization checks. 
+/** Adds functionality to base Eloquent\Model
+ * Highlights:
+ * If your model defines the static variable $table_field_defs, ex:
+ * <pre>
+ *   public static $table_field_defs = [
+      'institution_id'=>['type'=>'integer','methods'=>'nullable'],
+      'name'=>['type'=>'string','methods'=>'nullable'],
+      'looking_b'=>['type'=>'boolean','methods'=>['nullable','default'=>1]],
+      'address' => ['type' => 'string', 'methods' => 'nullable'],
+ ]; 
+ * </pre>
+ * your model (both static & instance) knows its attributes, AND can generate
+ * Migration create & update files for the DB. Extended PkModel classes inherit
+ * their ancestor $table_field_defs; example: 
+ * <pre>
+ * PkModel::$table_field_defs = [ 'id' => 'increments',];
+ * </pre>
+ * ... so any model that extends PkModel will already have default ID defined.
+ * 
+ * If your model defines the static variable: $load_relations, ex:
+ * <pre>
+ *   public static $load_relations = [
+      'appointments' => 'App\\Models\\Appointment',
+      'diagnoses' => 'App\\Models\\Diagnosis',
+  ];
+ * </pre>
+ * the method <tt>->saveRelations()</tt> will save the model attributes AND
+ * create/update/delete the one-to-many relationships; like a Cart with Items.
+ * Use in conjunction with PkController->processPost, & pklib.js templates.
+ * 
  * In the default, all auths are true - if you want to default to false, sublcass
  * this and set them to false.
  */
@@ -10,8 +38,8 @@ namespace PkExtensions\Models;
 use PkExtensions\Traits\UtilityMethodsTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
-use App\Models\User;
-use \Auth;
+//use App\Models\User;
+//use \Auth;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
@@ -448,11 +476,11 @@ class $createclassname extends Migration {
    * @param \App\Models\PkModel $parent
    * @param array $attributes
    * @param string $foreignKey
-   * @param User $user
+   * @param Model $user - Should be a 'User' instance, but no default 'User' model
    * @return \static|boolean
    * @throws Exception
    */
-  public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null, User $user = null) {
+  public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null, Model $user = null) {
     if (!static::authCreate($parent, $user)) return false;
     if ($parent) {
       if (!$parent->id) throw new Exception("Parent has no ID");
@@ -577,18 +605,18 @@ class $createclassname extends Migration {
    * some safe defaults are provided.
    * @return boolean
    */
-  public function authDelete() {
+  public function authDelete(Model $user = null) {
     if (isCli()) return true;
-    return $this->authUpdate();
+    return $this->authUpdate($user);
   }
 
-  public function authRead() {
+  public function authRead(Model $user = null) {
     if (isCli()) return true;
-    return $this->authUpdate();
+    return $this->authUpdate($user);
   }
 
   /** The extended model should over-ride this */
-  public function authUpdate() {
+  public function authUpdate(Model $user = null) {
     if (isCli()) return true;
     return true;
   }
@@ -651,7 +679,7 @@ class $createclassname extends Migration {
    * Top level objects which have no "owners" (like, "User" or "Project"
    * should override this method without requiring a "owner" or "parent"
    */
-  public static function authCreate(PkModel $parent = null, User $user = null) {
+  public static function authCreate(PkModel $parent = null, Model $user = null) {
     if (isCli()) return true;
     if ($parent && ($parent instanceOf PkModel)) {
       return $parent->authUpdate($user);
@@ -712,6 +740,7 @@ class $createclassname extends Migration {
     return array_keys($this->getAttributeDefs());
   }
 
+  /** For generating backup SQL files for the model */
   public static function sqlToBuildRelationTables($self = true) {
     $relClasses = static::getRelationClasses();
     if ($self) {
@@ -735,7 +764,9 @@ class $createclassname extends Migration {
     $uv = array_unique($relClasses);
     return $uv;
   }
-  /** Gets the inserts for the current instance, then recursively for all its
+  /**
+   * For generating backup SQL files of the current instance.
+   *  Gets the inserts for the current instance, then recursively for all its
    * one-to-many relationship inserts. Have to be clever to avoid cycles
    */
   public function getSqlInserts() {
@@ -798,6 +829,7 @@ class $createclassname extends Migration {
     return "$sqlCreateTbls\n\n$sqlInsAtts";
   }
 
+  /** For generating backup SQL files */
   public function sqlInsertAttributes() {
     $tableName = $this->getTable();
     $myAttributes = $this->getAttributes();
@@ -812,10 +844,9 @@ class $createclassname extends Migration {
     
 
   }
-  //public function sqlInsertAttribute($name)
   
 
-  /** Minimal, to build backup SQL
+  /** Minimal, to build backup SQL files
    * 
    */
   public static function sqlToBuildTable() {
@@ -1494,6 +1525,12 @@ class $createclassname extends Migration {
     return $resarr;
   }
 
+  /**
+   * HTML & JSON Encode this model attributes for inclusion in an HTML data-XXX
+   * attribute, so we can use JS to display on hover or whatever.
+   * @param type $args
+   * @return type
+   */
   public function getEncodedCustomAttributes($args=null) {
     $ca = $this->getCustomAttributes($args);
     $jsenc = json_encode($ca, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
@@ -1551,7 +1588,7 @@ class $createclassname extends Migration {
     if ($num === 0) return [];
     $instances = static::all();
     $numinst = count($instances);
-    if (!$numinst) {
+    if (!$numinst || !class_exists('PkTestGenerator',1)) {
       if ($num === -1) return null;
       return [];
     }
