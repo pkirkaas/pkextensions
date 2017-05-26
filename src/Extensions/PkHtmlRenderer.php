@@ -112,7 +112,7 @@ class PkHtmlRenderer extends PartialSet {
     if(!$raw && !($content instanceOf self) && !($content instanceOf PkTree)) {
       $content = hpure($content);
     }
-    $this[] = new self([$content]);
+    $this[] = new static([$content]);
     return $this;
   }
   public function rawcontent($content='') {
@@ -586,13 +586,17 @@ class PkHtmlRenderer extends PartialSet {
     return $this->nocontent('input', $atts);
   }
 
-  /** Just makes a fesh, standalone instance of static */
+  /** Just makes a fresh, standalone instance of static */
+  /*
   public function clonedInput($type, $name, $value = null, $options = []) {
     $inp = new static();
-    $inp->input($type, $name, $value, $options);
-    return $inp;
-
+    $ret = $inp->input($type, $name, $value, $options);
+    pkdebug("CLONED-INPUT:",$inp, "RET: [$ret]:", $ret);
+    return $ret;
+    //return $inp;
   }
+   * 
+   */
 
   public function input($type, $name, $value = null, $options = []) {
     if (!is_stringish($name) && is_arrayish($name)) {
@@ -606,7 +610,10 @@ class PkHtmlRenderer extends PartialSet {
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
     //$this[] = PkForm::input($type, $name, $value, $options);
-    return $this->rawcontent(PkForm::input($type, $name, $value, $options));
+    $input = PkForm::input($type, $name, $value, $options);
+    pkdebug("INPUT: [$input]");
+    return $this->rawcontent($input);
+    //return $this->rawcontent(PkForm::input($type, $name, $value, $options));
   }
 
   /** Don't just default to 'tagged', cuz it's input
@@ -1102,7 +1109,9 @@ class PkHtmlRenderer extends PartialSet {
       $value = unsetret($inputprops,'value');
       $name = unsetret($inputprops, 'name');
       $type = unsetret($inputprops,'type');
-      $frm_ctl->clonedInput($type,$name, $value, $inputprops);
+      //$frm_ctl->clonedInput($type,$name, $value, $inputprops);
+      $frm_ctl->input($type,$name, $value, $inputprops);
+      //pkdebug("MkClonedInput: type: [$type], name: [$name], value: [$value], inputprops:", $inputprops, "Cloned Input Ctl: [$frm_ctl]");
       //$frm_ctl = static::pureinput($inputprops);
     } else if ($formel === 'textarea') {
       $name = unsetret($inputprops,'name');
@@ -1149,14 +1158,16 @@ class PkHtmlRenderer extends PartialSet {
   
   /** Uses the above function to return many nearly identical wrapped input
    * rows. Only input[name] & label[value] differ. They are mapped by
-   * @param string|null $type  - the default input/control type for the set of rows:
+   * @param string|null|array $type  - the default input/control type for the set of rows:
    *    boolean, text, textarea or... CAN BE NULL, if 'type' is a key in the $map
    *    array elements. If both $type & $inp[type] exist, the value of $inp['type'] 
    *   will be type used for that row - but the next map row might not HAVE a type
    *   key, so the default '$type" will be used. So you  can pass a $map of several
    *   similar but different input types and return them all as similarly formatted rows.
    * 
-   *   Id 'type' exists both as a non-empty argument, AND $map[m][inp][type] is set,
+   *  BUT if is_array($type), assume assoc array with keys as argument names
+   * 
+   *   If 'type' exists both as a non-empty argument, AND $map[m][inp][type] is set,
    *   the  $map[m][inp][type] value will be used to override the default $type, ONLY
    *   FOR THAT ROW. The default $type will be used for the rest.
    * @param array $map: TWO FORMS:
@@ -1177,6 +1188,14 @@ class PkHtmlRenderer extends PartialSet {
 
   public function mkWrappedInputSet($type=null, $map = [], $inpTpl=[], $valTpl=[], $lblTpl=[], $wrapTpl=[]) {
     //pkdebug("Coming In: Type: $type, Map:",$map, 'inpTpl:', $inpTpl);
+    if (is_array_assoc($type)) {
+      $map = keyVal('map',$type,[]);
+      $inpTpl = keyVal('inpTpl', $type, []);
+      $valTpl = keyVal('valTpl', $type,[]);
+      $lblTpl = keyVal('lblTpl', $type,[]);
+      $wrapTpl = keyVal('wrapTpl',$type,[]);
+      $type = keyVal('type',$type);
+    }
     $ret = new static();
     if (!is_array($map) || !count($map)) return $ret;
     if (is_string($inpTpl) || ($inpTpl === null)) $inpTpl = ['class'=>$inpTpl];
@@ -1203,7 +1222,7 @@ class PkHtmlRenderer extends PartialSet {
         } else {
           $rowtype = $type;
         }
-        //pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
         $ret[] = $ret->inputWrap($rowtype,$inpprops, $valprops, $lblprops, $wrapprops);
       }
     } else {
