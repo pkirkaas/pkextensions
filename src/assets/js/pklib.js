@@ -70,13 +70,8 @@ $(function () {
     $(event.target).closest('div.deletable-data-set').remove();
   });
 
-  /*
-   <div class='pkmvc-button js-general-ajax btn {{$class}}' title='Mark Message as Read?' 
-   data-param-action='mark_read' data-param-message_id='{{$message->id}}'>{{$label}}</div>
-   */
-
-
-  /** This POSTs to the URL '/ajax', with the arguments specified by the 'data-param-xxx'
+  /** For all elements of class '.btn.js-general-ajax', POSTs to the URL
+   * '/ajax', with the arguments specified by the 'data-param-xxx'
    * attributes. So we don't have to create new JS Functions, or AJAX routes - just add
    * action handling to the basic AJAX route - for really simple ajax handling
    */
@@ -100,7 +95,6 @@ $(function () {
       if (data.refresh === true) {
         window.location.reload(true);
       }
-
     });
   });
 
@@ -135,15 +129,10 @@ $(function () {
    */
   $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
     //Get a copy of the template element
-    //var tpl = $(event.target).closest('div.templatable-data-sets').find('.template-container').first().html();
     var tpl = htmlDecode($(event.target).attr("data-template"));
-    //var tpl=$(event.target).attr("data-template");
-    //var tpl = $('<div />').html(encodedtpl).text();
-    console.log("New TPL: ", tpl);
-
+    //console.log("New TPL: ", tpl);
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
-    //var newstr = tpl;
     var newstr = $('<div />').html(tpl).text();
     if (cnt === 'single') {
       $(event.target).css('display', 'none');
@@ -172,12 +161,11 @@ $('body').on('click', '.enable-toggler', function (event) {
   toggled.prop('disabled', !disabled);
 });
 
-/* Toggle show/hide - Toggler class: 'hide-toggler', target class: 'hide-toggled', wrapper: 'hide-toggle-set'
- * 
+/* Toggle show/hide - Toggler class: 'hide-toggler',
+ * target class: 'hide-toggled', wrapper: 'hide-toggle-set'
  */
 $('body').on('click', '.hide-toggler', function (event) {
   var toggled = $(event.target).closest('.hide-toggle-set, body').find('.hide-toggled');
-  //console.log("enable-toggled:",toggled[0]);
   var disabled = toggled.prop('disabled');
   toggled.prop('disabled', !disabled);
 });
@@ -198,14 +186,10 @@ $(function () {
       jqSelEl.val(data_selected);
     }
   });
-
-
 });
 
 /**
- * In CSS, do:
- * 
- 
+ * In CSS, define:
  @media print {
  .print-button { display: none; }
  .no-print { display: none; }
@@ -215,17 +199,9 @@ $('body').on('click', '.print-button', function (event) {
   window.print();
 });
 
-// To customize file input
-/*
-$('body').on('click', 'input.custom-file-input.pkcfi', function (event) {
-  var fp = $(event.target).val();
-  console.log("The file input got clicked:", fp);
-});
-*/
 
-// To customize file input
+// To customize file input control
 $('body').on('change', 'input.custom-file-input.pkcfi', function (event) {
-//$('body').on('change', 'input', function (event) {
   var fp = $(event.target).val();
   if (fp) {
     fp = basename(fp);
@@ -262,9 +238,6 @@ function showHelpDialog() {
   helpDialog.dialog('open');
 }
 
-
-
-
 /** Generic attachment of AJAX call to DOM element (button?)
  * Attaches to any DOM element with CSS data attribute of 'data-pk-ajax-element'.
  * The 'data-pk-ajax-element' has one required data-attribute: 'data-ajax-url'.
@@ -284,14 +257,6 @@ function showHelpDialog() {
  * @returns {undefined}
  */
 
-/*
- $(function () {
- $('body').on('click', '[data-pk-ajax-element]', function (event) {
- alert("Jesus God!");
- });
- });
- */
-
 $(function () {
   $('body').on('click', '[data-pk-ajax-element]', function (event) {
     var target = $(event.target);
@@ -299,21 +264,12 @@ $(function () {
     var ajax_params = htmlDecode(target.attr('data-ajax-params'));
     var ajax_data = parseStr(ajax_params);
     //console.log('raw target args:', target.attr('data-response-target-arg'));
-
     var func_arg = JSON.parse(target.attr('data-func-arg'));
     var attr_arg = JSON.parse(target.attr('data-attr-arg'));
     var selector_arg = JSON.parse(target.attr('data-selector-arg'));
     var selector_target = target.attr('data-selector-target');
     var attr_target = target.attr('data-attr-target');
     var func_target = target.attr('data-func-target');
-
-    /*
-     console.log('ajax_url: ', ajax_url, ' -- ajax_params: ', ajax_params, ' -- ajax_data: ', ajax_data,
-     '-func_arg: ', func_arg, ' Type FA:', typeof (func_arg), '-func_target: ', func_target,
-     '-selector_arg: ', selector_arg, ' Type SA:', typeof (selector_arg), '-selector_target: ', selector_target,
-     '-attr_arg: ', attr_arg, ' Type AA:', typeof (attr_arg), '-attr_target: ', attr_target
-     );
-     */
     var res = $.ajax({
       url: ajax_url,
       data: ajax_data,
@@ -371,6 +327,9 @@ $(function () {
 });
 
 
+/**
+ * Add some formatters to jQuery
+ */
 jQuery.fn.extend({
   htmlFormatted: function (content) {
     //console.log("Formatters:", this.formatters);
@@ -412,10 +371,6 @@ jQuery.fn.extend({
     jQuery.formatters[name] = formatter;
   }
 });
-
-function demoResponseTarget(target, data, arg) {
-  //console.log("DemoResponseTarget ARGS: ", data, arg, 'target: ', target);
-}
 
 
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
@@ -497,7 +452,6 @@ function getCousins(parentSelector, cousinSelector, me, first) {
  */
 function jQuerify(arg) {
   if (isjQuery(arg)) {
-    //if (arg instanceof jQuery) {
     return arg;
   }
   return jQuery(arg);
@@ -512,18 +466,11 @@ function jQuerify(arg) {
  * @returns the object
  */
 function addClassAndClear(classToAdd, classesToRemove, obj) {
-  //var possibleStates = array['pass', 'fail', 'unknown'];
   //Check for state in array of possibleStates
   var idx = classesToRemove.indexOf(classToAdd);
   if (idx == -1) { //Something is wrong, bail
     return;
   }
-  /*
-   classesToRemove.splice(idx, 1);
-   if (obj == undefined) {
-   obj = this;
-   }
-   */
   obj = jQuerify(obj);
   for (var idx in classesToRemove) {
     obj.removeClass(classesToRemove[idx]);
@@ -546,7 +493,6 @@ function FormattedHtml(element, content) {
  */
 function maxNdecimals(val, N) {
   N = N || 2;
-  //return val.toFixed(2).replace(/0{0,2}$/, "");
   var regexstr = "0{0," + N + "}$";
   //console.log("RegExStr:", regexstr);
   var regex = new RegExp(regexstr);
@@ -583,6 +529,7 @@ function resetFormElement(e) {
  }
  */
 
+////// Dialog Functions 
 /** Pop up quick jQuery Dialog Boxes. See below for better
  *  - this one is even quicker and dirtier
  *  A dialog to be initially hidden then displayed at the click of a button
@@ -599,30 +546,10 @@ function resetFormElement(e) {
  * @returns {makeDialog.dlg|$}
  */
 
-/*
- $('body').on('click', 'img.avatar', function (event) {
- //console.log("Clicking..");
- });
- $('body').on('hover', 'img.avatar', function (event) {
- //console.log("Hovering..");
- });
- */
-
+/** For dialogs that should be displayed immediately on page load */
 $(function () {
   var dlgonload = $('.dialog-on-load');
-  //console.log("Loaded...");
   if (dlgonload && dlgonload.hasClass('js-dialog-content')) {
-    //console.log("We found a dialog on load!");
-
-    //Let's make a dialog box right away!
-    /*
-     var param1 = dlgonload.attr('data-param1');
-     var param2 = dlgonload.attr('data-param2');
-     var param3 = dlgonload.attr('data-param3');
-     var src = dlgonload.attr('data-dialog');
-     var clone = dlgonload.attr('data-clone');
-     */
-    //var dlgHtml = dlgonload.prop('outerHTML');
     var closeText = dlgonload.attr('data-closetext');
     if (!closeText)
       closeText = 'Okay';
@@ -638,13 +565,6 @@ $(function () {
           click: function () {
             $(this).dialog('close');
           }
-
-          //Cancel : function () { $(this).dialog('destroy'); }
-          /*
-           Okay: function () {
-           $(this).dialog('close');
-           }
-           */
         }]
     };
     var dialogOptions = dialogDefaults;
@@ -745,8 +665,6 @@ $('body').on('click', '.js-dialog-button', function (event) {
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
-  //console.log("dlgHtml:", dlgHtml);
-  //return;
   //console.log("After all the replacements, dlgHtml:",dlgHtml);
   dlg = $(dlgHtml);
   //opts.title = dlg.attr('data-title');
@@ -777,7 +695,6 @@ $('body').on('click', '.js-dialog-button', function (event) {
   var optName = optVal = null;
   for (var key in overridableOptions) {
     optName = overridableOptions[key];
-
     optVal = $(event.target).attr('data-' + optName);
     if (!optVal)
       optVal = dlg.attr('data-' + optName);
@@ -801,7 +718,6 @@ $('body').on('click', '.js-dialog-button', function (event) {
 
 /** Custom 'big-picture' pop-ups - expected the class is on an img element */
 $('body').on('click', 'img.js-big-picture-button', function (event) {
-  //console.log("Clicked on Big Picture");
   var src = $(event.target).attr('src');
   if (!src) return;
   var dlgHtml = "<div class='big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
@@ -930,7 +846,6 @@ function makeDialog(selector, opts) {
 
 /** To Pop Up a dialog box on Window Load, if it exists (Version 1. V2 below) */
 $(function () {
-
   var dbx = $('.jqui-dlg-pop-load');
   if (!dbx.length)
     return;
@@ -968,10 +883,9 @@ $(function () {
   if (!$dlgwrap.length)
     return;
   $dlgwrap.hide();
-  console.log("Wrapper found & hidden - looking for first child...");
-  //var $dbx = $dlgwrap.find(':first-child');
+  //console.log("Wrapper found & hidden - looking for first child...");
   var $dbx = $dlgwrap.find('div').first();
-  console.log("First Child:", $dbx[0], 'Size:', $dbx.length);
+  //console.log("First Child:", $dbx[0], 'Size:', $dbx.length);
   if (!$dbx.length)
     return;
   closeText = $dbx.attr('data-closetext') ? $dbx.attr('data-closetext') : 'Close';
@@ -1014,9 +928,8 @@ function containsSubstr(theVar, subStr) {
   return false;
 }
 
-/***************   Starts of useful functions - not robust yet ********/
+/***************   Utility functions  ********/
 /** Generates an almost certainly unique id for local purposes
- * 
  * @returns {String}
  */
 function generateUUID() {
@@ -1191,9 +1104,6 @@ if (gets.search_term && (typeof gets.search_term === 'string') && gets.search_te
   }
 }
 
-//////// Supporting Functions to be made more robust ///////
-
-
 /**
  * Split a string into an array of SAFE string components
  * @param string thestring
@@ -1217,27 +1127,8 @@ function safeSplitString(thestring, splitchar) {
 
 /** If a form is modified, makes user confirm to leave, unless action is
  * to submit
+ * Just forms with class '.chck-frm'
  * @returns {undefined}
- */
-//Don't want to make this default for ALL forms!
-/**
- $(function () {
- $('body').on('change', 'form', function (event) {
- $(window).on('beforeunload', function (event) { 
- var confirmationMessage = "Unsaved Changes";
- event.preventDefault();
- event.returnValue = confirmationMessage; 
- return confirmationMessage;
- });
- });
- $('form').submit (function (event) {
- console.log("Got in onload - trying 'off' ...");
- $(window).off('beforeunload');
- });
- });
- */
-//Just forms with class '.chck-frm'
-/*
  */
 $(function () {
   $('body').on('change', 'form.chck-frm', function (event) {
@@ -1285,11 +1176,6 @@ function maxHeight(avar) {
   });
   return lmaxHeight;
 }
-/*
- function isjQuery(avar) {
- return isObject(avar) && (avar instanceof jQuery);
- }
- */
 
 /**
  * Is the argument an integer or string convertable to an int?
@@ -1335,15 +1221,6 @@ function isArray(aval) {
 }
 
 
-/** 
- * Takes an associative array of key/value pairs and returns a GET param str
- * TODO: URL encode? But what if existing param values are already URLencoded?
- * @param Array getArr: array of key/value pairs
- * @returns String query get parameter string
- */
-function setGets(getArr) {
-}
-
 /** Try to make a JS Date object from an SQL Date or DateTime field -
  *  !! PROBABLY BROWSER DEPENDENT
  * @param string sqlDT
@@ -1361,7 +1238,6 @@ function basename(path) {
 function dirname(path) {
     return path.replace(/\\/g,'/').replace(/\/[^\/]*$/, '');;
 }
-
 
 
 
