@@ -62,13 +62,17 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    * 
    * @param null|array $values - if null, uses $this->values, else an assoc array 
    * of values to substitute
+   * @param null|array $defaults - if null, uses $this->defaults, else an assoc array 
+   * of defaults to substitute - so can temporarilly substitute defaults for one
+   * rendering, then return to the base defaults for the next templating
    * @return string - the substituted/rendered template
    */
-  public function template($values = null) {
+  public function template($values = null, $defaults=null) {
     if (!$values) $values = $this->values;
+    if (!$defaults) $defaults = $this->defaults;
     $this->substituted = $this->tplStr;
     $this->substituted = $this->substitute($values);
-    $this->substituted = $this->substitute($this->defaults);
+    $this->substituted = $this->substitute($defaults);
     //$this->substituted = $this->substitute();
     return $this->substituted;
   }
