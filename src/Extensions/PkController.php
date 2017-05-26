@@ -1,8 +1,16 @@
 <?php
-
 /**
- * PkController - Base Controller that provides some common
- * methods
+ * PkController - Extends & adds functionality to default/base Laravel
+ * <tt>app\Http\Controllers\Controller</tt>, in conjuction with PkModel &
+ * the JS library pklib.js.
+ * 
+ * Highlights:
+ * <tt>->processSubmit($pkmodel)</tt>: Checks if request type is "POST", if so,
+ * maps the POSTed fields to $pkmodel attributes & updates them, then checks the
+ * $pkmodel->load_relations array (which maps one-to-many relationships) and 
+ * creates/updates/deletes the "many" sides as well. So if $pkmodel is a "Cart"
+ * with many "Items", will update the cart and its $items.
+ * 
  *
  * @author Paul.Kirkaas@gmail.com
  */
