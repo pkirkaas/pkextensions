@@ -40,7 +40,7 @@
  * <tt>'App\References\LocationRef'</tt>
  * 
  * In the default, all auths are true - if you want to default to false, sublcass
- * this and set them to false.
+ * this and set them to false. Individual models will do a test on user permissions.
  */
 
 namespace PkExtensions\Models;
@@ -490,8 +490,10 @@ class $createclassname extends Migration {
    * @return \static|boolean
    * @throws Exception
    */
-  public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null, Model $user = null) {
-    if (!static::authCreate($parent, $user)) return false;
+  //public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null, Model $user = null) {
+  public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null) {
+    //if (!static::authCreate($parent, $user)) return false;
+    if (!static::authCreate($parent)) return false;
     if ($parent) {
       if (!$parent->id) throw new Exception("Parent has no ID");
       if ($foreignKey === null)
@@ -615,18 +617,23 @@ class $createclassname extends Migration {
    * some safe defaults are provided.
    * @return boolean
    */
-  public function authDelete(Model $user = null) {
+  //public function authDelete(Model $user = null) {
+  public function authDelete() {
     if (isCli()) return true;
-    return $this->authUpdate($user);
+    //return $this->authUpdate($user);
+    return $this->authUpdate();
   }
 
-  public function authRead(Model $user = null) {
+  //public function authRead(Model $user = null) {
+  public function authRead() {
     if (isCli()) return true;
-    return $this->authUpdate($user);
+    //return $this->authUpdate($user);
+    return $this->authUpdate();
   }
 
   /** The extended model should over-ride this */
-  public function authUpdate(Model $user = null) {
+  //public function authUpdate(Model $user = null) {
+  public function authUpdate() {
     if (isCli()) return true;
     return true;
   }
@@ -689,10 +696,12 @@ class $createclassname extends Migration {
    * Top level objects which have no "owners" (like, "User" or "Project"
    * should override this method without requiring a "owner" or "parent"
    */
-  public static function authCreate(PkModel $parent = null, Model $user = null) {
+  //public static function authCreate(PkModel $parent = null, Model $user = null) {
+  public static function authCreate(PkModel $parent = null) {
     if (isCli()) return true;
     if ($parent && ($parent instanceOf PkModel)) {
-      return $parent->authUpdate($user);
+      //return $parent->authUpdate($user);
+      return $parent->authUpdate();
     }
     return true;
   }
