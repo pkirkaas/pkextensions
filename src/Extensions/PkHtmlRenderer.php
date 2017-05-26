@@ -263,7 +263,7 @@ class PkHtmlRenderer extends PartialSet {
    * @param assoc $arr: The key/values to insert in the template - OR, if not
    *   an array, a "stringish" value (could be a PartialSet) inserted into
    *   $tpl at default "content":  <tt>$tpl['content']=$arr;</tt>
-   * @param PartialSet|null: $tpl: A PartialSet/Renderer with indices matching
+   * @param PartialSet|Array|null: $tpl: A PartialSet/Renderer with indices matching
    * the value keys of the input array
    * @param array $rawkeys - alternate method for specifying a "raw" input
    * 
@@ -276,6 +276,8 @@ class PkHtmlRenderer extends PartialSet {
     }
     if ($tpl instanceOf PartialSet) {
       $tpl = $tpl->copy();
+    } else if (is_array($tpl)) {
+      $tpl = new PartialSet($tpl);
     } else {
       $tpl = new PkHtmlRenderer();
     }
@@ -611,7 +613,6 @@ class PkHtmlRenderer extends PartialSet {
     $options['name']=keyVal('name',$options,$name);
     //$this[] = PkForm::input($type, $name, $value, $options);
     $input = PkForm::input($type, $name, $value, $options);
-    pkdebug("INPUT: [$input]");
     return $this->rawcontent($input);
     //return $this->rawcontent(PkForm::input($type, $name, $value, $options));
   }
@@ -1222,7 +1223,8 @@ class PkHtmlRenderer extends PartialSet {
         } else {
           $rowtype = $type;
         }
-        pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+        //pkdebug("About to wrap:",$type,$inpprops, $valprops, $lblprops, $wrapprops);
+
         $ret[] = $ret->inputWrap($rowtype,$inpprops, $valprops, $lblprops, $wrapprops);
       }
     } else {
