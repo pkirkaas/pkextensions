@@ -31,7 +31,8 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   /**
    * Takes a single associative array arg, $tplStr, as:
    * ['tplStr'=>$tplStr, 'values'=>$values, 'defaults'=>$defaults], or 3 args as
-   * below.
+   * below. The keys of $values & $defaults should be scalar, but the values can
+   * be stringable - eg, PartialSets or PkHtmlRenderer instances
    * @param string|array $tplStr
    * @param array|PartialSet $values
    * @param array|PartialSet $defaults
@@ -63,14 +64,18 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    * @param null|array $values - if null, uses $this->values, else an assoc array 
    * of values to substitute
    * @param null|array $defaults - if null, uses $this->defaults, else an assoc array 
-   * of defaults to substitute - so can temporarilly substitute defaults for one
+   * of defaults to substitute - so can temporarily substitute defaults for one
    * rendering, then return to the base defaults for the next templating
+   * @param null|stringish $tplStr - if null, uses $this->defaults, else just
+   *   in this templating action, temporarilly use the passed $tplStr,
+   *   return to original next time.
    * @return string - the substituted/rendered template
    */
-  public function template($values = null, $defaults=null) {
+  public function template($values = null, $defaults=null, $tplStr = null) {
     if (!$values) $values = $this->values;
     if (!$defaults) $defaults = $this->defaults;
-    $this->substituted = $this->tplStr;
+    if (!$tplStr) $tplStr = $this->tplStr;
+    $this->substituted = $tplStr;
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
     //$this->substituted = $this->substitute();
