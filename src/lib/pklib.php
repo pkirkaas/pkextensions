@@ -1,8 +1,5 @@
 <?php
-
-/*
-
-  /**
+/**
  * PKMVC Framework 
  *
  * @author    Paul Kirkaas
@@ -22,13 +19,10 @@ define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 class PkLibConfig {
-
   static $suppressPkDebug = false;
-
   public static function getSuppressPkDebug() {
     return static::$suppressPkDebug;
   }
-
   public static function setSuppressPkDebug($suppress = true) {
     static::$suppressPkDebug = $suppress;
   }
@@ -36,19 +30,11 @@ class PkLibConfig {
   static $warnLogName = 'app.warn.log';
   static $warnLogDir; #Defaults to same dir as debug app log
   static $isWarning = 0; #Toggled by pkwarn to 1, then pkdebugOut, then back to 0
-
 }
 
 Class Undefined {
-
-  public function __get($x) {
-    return null;
-  }
-
-  public function __set($x, $y) {
-    
-  }
-
+  public function __get($x) { return null; }
+  public function __set($x, $y) { }
 }
 
 function isCli() {

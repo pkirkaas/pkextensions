@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PkController - Extends & adds functionality to default/base Laravel
  * <tt>app\Http\Controllers\Controller</tt>, in conjuction with PkModel &
@@ -11,7 +12,12 @@
  * creates/updates/deletes the "many" sides as well. So if $pkmodel is a "Cart"
  * with many "Items", will update the cart and its $items.
  * 
- *
+ * Basic support for importing/exporting CSV
+ * 
+ * Basic support for default uploading
+ * 
+ * Basic support for flash messaging & error display
+ * 
  * @author Paul.Kirkaas@gmail.com
  */
 
@@ -133,8 +139,8 @@ class PkController extends Controller {
     /*
       #Processing a POST - what to do? Look at args:
       if (is_string($pkmodel) && class_exists($pkmodel,1)
-      && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) { 
-       #It's a PkModel name - process
+      && is_subclass_of($pkmodel, 'PkExtensions\\Models\\PkModel')) {
+      #It's a PkModel name - process
       }
      */
     $data = Request::all();
@@ -150,11 +156,11 @@ class PkController extends Controller {
 
 
       /*
-      if (!$pkmodels || !is_arrayish($pkmodels)) {
+        if (!$pkmodels || !is_arrayish($pkmodels)) {
         if (is_arrayish($pkmodel)) $pkmodels = $pkmodel;
         else $pkmodels = $opts;
-      }
-      if ($modelName = $this->isModelSetSubmit()) {
+        }
+        if ($modelName = $this->isModelSetSubmit()) {
         #Then we look for a key of 'modelset' in the $data array, which
         #should have the value of a full model name 'App\Models\Item'
         #THEN we look for the Model Name Key in the $data - name the
@@ -162,18 +168,17 @@ class PkController extends Controller {
         $modelDataArray = keyValOrDefault($modelName, $data, false);
         if ($modelDataArray === false) return false;
         if ((!is_arrayish($modelDataArray) || !count($modelDataArray)) &&
-            !count($pkmodels)) return false;
+        !count($pkmodels)) return false;
         if (!is_subclass_of($modelName, 'PkExtensions\Models\PkModel'))
-            throw new Exception("[$modelName] does not extend PkModel");
+        throw new Exception("[$modelName] does not extend PkModel");
         #We assume $pkmodels is a collection of the original models, and $modelDataArray
         #contains whatever changes/additions/deletions. We hand off to the Model
         #class to manage.
         return $modelName::updateModels($pkmodels, $modelDataArray);
-      }
-      throw new \Exception("Don't know what to do with pkmodels: " . print_r($pkmodels, 1));
+        }
+        throw new \Exception("Don't know what to do with pkmodels: " . print_r($pkmodels, 1));
        * 
        */
-
     } else {
       pkdebug("No pkmodel");
     }
@@ -436,23 +441,23 @@ class PkController extends Controller {
     $url = url($filename);
     return $url;
   }
-/** Given a filename, returns the default upload path
- * 
- * @param string $filename - the uploaded filename or path, AFTER storage & rename
- * @param boolean $symlink - return the hard path, or the path in the symlink directory
- * default: false; the hard path
- * @return string - the filesystem path, or false if not found.
- */
-  public static function getPathFromUploadedFilename($filename, $symlink = false) {
-  if (!$filename) return false;
-  if ($symlink) {
-    $path = base_path("/public/storage/$filename");
-  } else {
-    $path = storage_path("app/public/$filename");
-  }
-  if (file_exists($path)) return $path;
-  return false;
 
-}
+  /** Given a filename, returns the default upload path
+   * 
+   * @param string $filename - the uploaded filename or path, AFTER storage & rename
+   * @param boolean $symlink - return the hard path, or the path in the symlink directory
+   * default: false; the hard path
+   * @return string - the filesystem path, or false if not found.
+   */
+  public static function getPathFromUploadedFilename($filename, $symlink = false) {
+    if (!$filename) return false;
+    if ($symlink) {
+      $path = base_path("/public/storage/$filename");
+    } else {
+      $path = storage_path("app/public/$filename");
+    }
+    if (file_exists($path)) return $path;
+    return false;
+  }
 
 }
