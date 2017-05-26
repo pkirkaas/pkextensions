@@ -43,7 +43,7 @@ function isCli() {
 
 /** UnCamelCases a string, or, recursively, an array 
  * 
- * @param mixe $arg: String or array of possibly camel cased values
+ * @param mixed $arg: String or array of possibly camel cased values
  * @return mixed: The un_camel_cased result, string or array
  * @throws Exception
  */
@@ -63,7 +63,7 @@ function unCamelCase($arg) {
   }
   // pkdebug("Unexpected arg to unCamelCase:", $arg);
   // pkstack();
-  throw new PKMVCException("Unexpected arg to unCamelCase: [" . print_r($arg, true) . "]");
+  throw new \Exception("Unexpected arg to unCamelCase: [" . print_r($arg, true) . "]");
 }
 
 function unCamelCaseString($string) {
@@ -2388,7 +2388,7 @@ function arrays_equal_to_depth_of_first($arr1, $arr2) {
     $arr2 = [$arr2];
   }
   if (!is_array($arr1) || !is_array($arr2)) {
-    throw new PKMVCException("Invalid Args: arr1: ["
+    throw new \Exception("Invalid Args: arr1: ["
     . print_r($arr1, 1) . "]; arr2: [" . print_r($arr2, 1) . "]");
   }
   $i = 0;
@@ -2402,18 +2402,15 @@ function arrays_equal_to_depth_of_first($arr1, $arr2) {
 }
 
 /**
- * Creates a presumably really Globally unique file name. Probably.
+ * Creates a presumably really Globally unique file name.
  * @param string $suffix: Optional file name suffix, if important...
  * @return string: Unique file name, no Dir, optionally w. suffix
  */
 function uniqueName($suffix = '') {
-  /*
-    return base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)).'_'.
-    uniqid();
-   * 
-   */
-  //.'.'.$suffix;
-  return uniqid('upld', 1) . '_' . uniqid();
+  if ($suffix) {
+    $suffix = ".$suffix";
+  }
+  return uniqid('upld', 1) . '_' . uniqid().$suffix;
 }
 
 /**
@@ -3159,24 +3156,13 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
   }
   else if (!$arg && !$key) $retarr = [];
   else throw new Exception("Invalid arg: " . print_r($arg, 1));
-
- // pkdebug("RetArr now:", $retarr, 'orig arg',$arg,'key',$key);
-//  return ['class'=>'yesterday'];
-
   if ($defaults && is_array($defaults)) {
-      //$retarr = array_merge($defaults, $retarr);
     foreach ($defaults as $ddkey => $ddval) {
       if (!keyVal($ddkey,$retarr)) {
         $retarr[$ddkey] = $ddval;
       }
     }
   }
-  /*
-  if (!array_key_exists($key,$retarr)) {
-    $retarr[$key] = $arg;
-  }
-   * 
-   */
   if ($replace && is_array_assoc($replace)) {
     foreach ($replace as $rkey => $rval) {
       $retarr[$rkey] = $rval;
@@ -3211,11 +3197,11 @@ function getParamsOrDefault($params = [], $defaults = []) {
   return array_merge($defaults, $params);
 }
 
-/** Takes a scaler as first arg, and unlimited other args (presumably
- * arrays) and returns the first non-empty value for that key.
- * @param type $key
- * @param type $arg1
- * @param type $argx
+/** Takes a scalar as first arg, and unlimited other args 
+ * (arrays or objects) and returns the first non-empty value for that key.
+ * @param scalar $key
+ * @param arrayish $arg1
+ * @param arrayish $argx
  */
 function firstKeyVal($key, $arg1 = null, $argx = null) {
   $args = func_get_args();
@@ -3236,13 +3222,9 @@ function firstKeyVal($key, $arg1 = null, $argx = null) {
  * @param boolean $nullorfalse - Should null/false/'' be considered intish?
  * @return boolean
  */
-//function intish($value, $nullorfalse = false) {
-//  return is_intish($value, $nullorfalse);
-//}
-
 function is_intish($value, $nullorfalse = false) {
   #Objects and arrays never
-  if (!is_scalar($value) && !($value === null)) return false;
+  if (!is_scalar($value) && ($value !== null)) return false;
   if ($nullorfalse && !$value) return true;#Zeroish
   if (!is_numeric($value) && !is_bool($value)) return false;
   $intval = (int) $value;
@@ -3293,10 +3275,16 @@ function setInstanceAtts($obj, array $atts = []) {
   return $atts;
 }
 
+/**
+ * Like PHP unset($array[$key]), but returns the value, or $default if key not set.
+ * @param array $arr
+ * @param scalar $key
+ * @param mixed $default
+ * @return mixed
+ */
 function unsetret(&$arr, $key=null, $default = null) {
   if (($key === null) || !is_array($arr)) {
     pkdebug("Odd - not quite an array op: key:, arr:",$key,$arr);
-
     $ret = $arr;
     unset ($arr);
     return $ret;
