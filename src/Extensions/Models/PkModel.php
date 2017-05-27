@@ -120,20 +120,21 @@ abstract class PkModel extends Model {
    * PkRef classes
    */
   public static function getDisplayValueFields($onlyrefs = false) {
+    $display_value_fields = static::getAncestorArraysMerged('display_value_fields');
     if ($onlyrefs) {
       $refarr = [];
-      foreach (static::$display_value_fields as $key => $value) {
+      foreach ($display_value_fields as $key => $value) {
         if (is_string ($key) && $value) {
           $refarr[$key] = $value;
         }
       }
       return $refarr;
     }
-    if (!static::$display_value_fields ||
-        !count(static::$display_value_fields)) {
+    if (!$display_value_fields ||
+        !count($display_value_fields)) {
       return [];
     }
-    $normalized = normalizeConfigArray(static::$display_value_fields);
+    $normalized = normalizeConfigArray($display_value_fields);
     if (is_array($normalized)) return array_keys($normalized);
     return [];
   }

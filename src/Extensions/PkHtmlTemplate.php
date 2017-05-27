@@ -29,6 +29,29 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   public $defaults = [];
 
   /**
+   * 
+   * @var type 
+   */
+  public $defaultdefaults = [
+  ];
+  public $presetKey;
+  public $presets =[
+    'wrapinp' =>['tplStr'=>"
+      <div class='{{wrapClass}}' data-tootik-conf='multiline' {{wrapAtts}}>
+        <div class='{{lblWrap}}'>{{label}}</div>
+        <div class='{{inpWrap}}'>{!!input!!}</div>
+      </div>\n",'defaults'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>'']],
+
+    'wrapval' =>['tplStr'=>"
+      <div class='{{wrapClass}} data-tootik-conf='multiline' {{wrapAtts}}>
+        <div class='{{lblWrap}}'>{{label}}</div>
+        <div class='{{valWrap}}'>{{value}}</div>
+      </div>\n",'defaults'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val']],
+  ];
+
+  public $presetdefaults = [];
+
+  /**
    * Takes a single associative array arg, $tplStr, as:
    * ['tplStr'=>$tplStr, 'values'=>$values, 'defaults'=>$defaults], or 3 args as
    * below. The keys of $values & $defaults should be scalar, but the values can
@@ -72,21 +95,50 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    * @return string - the substituted/rendered template
    */
   public function template($values = null, $defaults=null, $tplStr = null) {
+    $usepredefs = $tplStr?false:true;
     if (!$values) $values = $this->values;
     if (!$defaults) $defaults = $this->defaults;
     if (!$tplStr) $tplStr = $this->tplStr;
     $this->substituted = $tplStr;
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
-    //$this->substituted = $this->substitute();
+    if ($usepredefs) {
+      $this->substituted = $this->substitute($this->presetdefaults);
+    }
+    $this->substituted = $this->substitute();
+    //return new PkHtmlRenderer([$this->substituted]);
     return $this->substituted;
   }
+
+  public function preset($key = null) {
+    if (!$key) { #Clear preset
+      $this->presetkey = null;
+      $this->presetdefaults = [];
+    } else if (array_key_exists($key, $this->presets)) {
+      $this->presetkey = $key;
+      $this->tplStr = $this->presets[$key]['tplStr'];
+      $this->presetdefaults = keyVal('defaults', $this->presets[$key],[]);
+    } else {
+      throw new PkException("Preset key [$key] not found");
+    }
+    return $this->tplStr;
+  }
+
   public function substitute($arr = null) {
     if (is_arrayish($arr)) {
       foreach ($arr as $tkey => $tval) {
-        $this->substituted = str_replace('{{'.$tkey.'}}', $tval, $this->substituted);
+        $this->substituted = str_replace('{{'.$tkey.'}}', hpure($tval), $this->substituted);
+        $this->substituted = str_replace('{!!'.$tkey.'!!}', $tval, $this->substituted);
       }
     } else { #TODO: do preg_replace to remove tplStr keys without values
+      #Might want to partially fill a template, & re-use it again with other params
+      /**
+      if ((strpos($this->substituted,'{{') !== false) ||
+          (strpos($this->substituted,'{!!')!==false)) {
+        throw new PkException("Missing param key for: [{$this->substitued}]");
+      }
+       * 
+       */
     }
     return $this->substituted;
   }

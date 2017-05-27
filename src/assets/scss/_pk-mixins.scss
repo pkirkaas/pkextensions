@@ -392,7 +392,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
           color: unquote('#')+$c1+$c2+$c3 !important;
         }
         .bc-#{$c1}#{$c2}#{$c3} {
-          border-color: unquote('#')+$c1+$c2+$c3 !important;
+          //border-color: unquote('#')+$c1+$c2+$c3 !important;
+          border: solid 1px  unquote('#')+$c1+$c2+$c3 !important;
         }
       }
     }
