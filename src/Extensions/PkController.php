@@ -435,11 +435,7 @@ class PkController extends Controller {
    */
 
   public static function getUrlFromUploadedFilename($filename, $default = null) {
-    if (!$filename) $filename = $default;
-    else $filename = "storage/$filename";
-    //$baseName = basename($filename);
-    $url = url($filename);
-    return $url;
+    return urlFromUploadedFilename($filename, $default);
   }
 
   /** Given a filename, returns the default upload path

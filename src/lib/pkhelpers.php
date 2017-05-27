@@ -228,10 +228,30 @@ function view_path($name) {
  * @param string/UploadedFile $filename - the base uploaded filename, or path relative to doc root/storage.
  * @param string $default - the relative URL from root of a default URL if no file
  */
+
+
+
+
+
 // Move to static PkController method, so can be over-ridden in site specific controllers
+function urlFromUploadedFilename($filename, $default = null) {
+  if (!$filename) {
+    if ($default) {
+      $filename = $default;
+    } else {
+      return null;
+    }
+  } else {
+    $filename = "storage/$filename";
+  }
+  //$baseName = basename($filename);
+  $url = url($filename);
+  return $url;
+}
 /*
 function pkl_uploaded_url($filename, $default=null) {
   if (!$filename) $filename = $default;
+    if (!$filename) return null;
   //$baseName = basename($filename);
   $url = url("storage/$filename");
   return $url;
