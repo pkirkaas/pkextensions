@@ -146,4 +146,8 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     }
     return $this->substituted;
   }
+
+  public function __toString() {
+    return $this->template();
+  }
 }
