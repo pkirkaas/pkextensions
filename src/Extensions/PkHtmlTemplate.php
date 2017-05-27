@@ -32,7 +32,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    * 
    * @var type 
    */
-  public $defaultdefaults = [
+  public $defaultdefaults = ['tootik'=>'',
   ];
   public $presetKey;
   public $presets =[
@@ -73,6 +73,9 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       $defaults = keyVal('defaults',$tplStr,[]);
       $tplStr = keyVal('tplStr',$tplStr,'');
     }
+    if (!$values) $values = [];
+    if (!$defaults) $defaults = [];
+    if (!$tplStr) $tplStr = '';
     if (!is_stringish($tplStr) || !is_arrayish($values) || !is_arrayish($defaults)) {
       throw new PKException(["Invalid constructor Arg:",$tplStr,$values,$defaults]);
     }
@@ -99,15 +102,16 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     if (!$values) $values = $this->values;
     if (!$defaults) $defaults = $this->defaults;
     if (!$tplStr) $tplStr = $this->tplStr;
-    $this->substituted = $tplStr;
+    $this->substituted = $tplStr.'';
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
     if ($usepredefs) {
       $this->substituted = $this->substitute($this->presetdefaults);
     }
-    $this->substituted = $this->substitute();
+    $this->substituted = $this->substitute($this->defaultdefaults);
+    //$this->substituted = $this->substitute();
     //return new PkHtmlRenderer([$this->substituted]);
-    return $this->substituted;
+    return new PkHtmlRenderer([$this->substituted]);
   }
 
   public function preset($key = null) {

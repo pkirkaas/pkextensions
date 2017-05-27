@@ -720,7 +720,7 @@ $('body').on('click', '.js-dialog-button', function (event) {
 $('body').on('click', 'img.js-big-picture-button', function (event) {
   var src = $(event.target).attr('src');
   if (!src) return;
-  var dlgHtml = "<div class='big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
+  var dlgHtml = "<div class='tac  big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
   console.log('dltHtml', dlgHtml);
   var dlg = $(dlgHtml);
   var dialogDefaults = {
