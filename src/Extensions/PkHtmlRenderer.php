@@ -26,6 +26,37 @@ $descPair = PkRenderer::div([
     'section bg-ccc flex-col height-90');
  */
 class PkHtmlRenderer extends PartialSet {
+  ##############  Start testing nested 5/2017 
+  public $myid = 0;
+  public $mykids = null;
+  public static $total = 0;
+  public static $alltostrings=0;
+  public static $totalops = 0;
+  public $mytostrings = 0;
+  public $parent = null;
+  public $depth = 0;
+  public $myops = 0;
+
+  public function makeChild() {
+    $child = new static();
+    static::$total++;
+    $child->myid = static::$total;
+    if (! $this->mykids instanceOf PartialSet ) {
+        $this->mykids =  new PartialSet();
+    }
+    $this->mykids[] = $child;
+    $child->parent = $this;
+    $child->depth = $this->depth + 1;
+
+    /*
+    $this->announce($this->myid." spawned:".
+        count($this->mykids));
+     * 
+     */
+     return $child;
+    }
+  ##############  End testing nested 5/2017 
+
   public static $raw_depth = 0; #See if we can use this to keep track of raw depth....
   public static $raw_threshold = 0; #See if we can use this to keep track of raw depth....
   #These are called with $this->nocontent($tagname, $attributes)
@@ -115,6 +146,8 @@ class PkHtmlRenderer extends PartialSet {
     $this[] = new static([$content]);
     return $this;
   }
+
+  
   public function rawcontent($content='') {
     //$this[] = $content;
     return $this->content($content,true);
@@ -401,6 +434,8 @@ class PkHtmlRenderer extends PartialSet {
    * @param type $raw
    * @return $this
    */
+
+  ######!!!! TODO!!! See PkRendEx.php for testing of nested children
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
@@ -417,10 +452,10 @@ class PkHtmlRenderer extends PartialSet {
       #Don't remember what I meant by nest the elements, but I guess that means
       #don't expect this cell to enclose anything else.
       $spaces = $this->spaceDepth();
-      $size = $this->addDepthTagStack($tag);
+      $size = $this->addTagStack([$tag=>['raw'=>$raw]]);
       #Add the tag & attributes. This is a contentless, self-closing tag, like IMG, so shouldn't
       #contain anything more.
-      return $this->rawcontent("$spaces<$tag ".$this->attributes($attributes).">");
+      return $this->rawcontent("$spaces<$tag ".PkHtml::attributes($attributes).">");
     } else {
       #Trust if text has ALREADY  been wrapped in PhHtmlRenderer has already been filtered
 
@@ -430,7 +465,10 @@ class PkHtmlRenderer extends PartialSet {
       #this point in the array, so anyone who adds to this point adds next to it, inside
       #us. We DO close after we insert this content, but her position is secure
       # and everyone who joins her is save in the same position.
+
       $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">");
+
+      #############  ORIG ##############
       if (is_array($content)){
         foreach ($content as $citem) {
           $this->content($citem,$raw);
@@ -440,7 +478,27 @@ class PkHtmlRenderer extends PartialSet {
       }
       $this->rawcontent($this->spaceDepth()."</$tag>\n");
       return $this;
+
+
+      #############  Trying to Nest May 2017 ##############
+      /*
+      $child = $this->makeChild();
+      if (is_array($content)){
+        foreach ($content as $citem) {
+          $child->content($citem,$raw);
+        }
+      } else {
+        $child->content($content,$raw);
+      }
+      $this->content($child);
+      $this->rawcontent($this->spaceDepth()."</$tag>\n");
+      return $child;
+       */
+
+
     }
+
+    
   }
 
   /** This called for no-content element tags, like img, br, hr, input, etc */

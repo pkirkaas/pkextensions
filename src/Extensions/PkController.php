@@ -28,6 +28,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use Illuminate\Validation\ValidationException;
 use PkExtensions\Models\PkModel;
+use Illuminate\Http\UploadedFile;
 use Request;
 use \Exception;
 use \Closure;
@@ -181,6 +182,20 @@ class PkController extends Controller {
        */
     } else {
       pkdebug("No pkmodel");
+    }
+  }
+
+  public function processFileUploads($pkmodel,$ctlName,$attName) {
+    if (!$this->shouldProcessSubmit()) return;
+    $request = request();
+    $uploadedFile = $request->file($ctlName);
+    if ($uploadedFile instanceOf UploadedFile) {
+      $path = $uploadedFile->store('public');
+      $baseName = basename($path);
+      $pkmodel->$attName = $baseName;
+    } else {
+      pkdebug("No file uploaded to ".get_class($pkmodel).
+          " for att: [$attName] with ctlName: [$ctlName]");
     }
   }
 
