@@ -98,6 +98,25 @@ nav.navbar {
   text-shadow:0 0 1px #400;
 }
 
+//  Sub-menu
+
+  nav.navbar.pk-nav {
+    flex-direction: row;
+    background: red;
+    .nav-link {
+      color: #ccf;
+      font-size: 1.1rem;
+      &:hover {
+        color: white;
+        text-shadow:0 0 1px white;
+      }
+    }
+    .nav-item + .nav-item {
+      margin-left: 2rem;
+
+    }
+  } 
+
 
 
 //Tootik Override - add 'center' config
@@ -127,6 +146,7 @@ nav.navbar {
 
 //Try making multi-line default
 [data-tootik]:after {
+  z-index: 1999999;
   min-width: 180px;
   text-overflow: clip;
   white-space: normal;
