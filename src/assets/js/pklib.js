@@ -130,10 +130,11 @@ $(function () {
   $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
     //Get a copy of the template element
     var tpl = htmlDecode($(event.target).attr("data-template"));
-    //console.log("New TPL: ", tpl);
+    console.log("New TPL: ", tpl);
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
     var newstr = $('<div />').html(tpl).text();
+    console.log("New str: ", newstr);
     if (cnt === 'single') {
       $(event.target).css('display', 'none');
     } else {
@@ -143,6 +144,10 @@ $(function () {
     }
     $(event.target).before(newstr);
   });
+
+
+
+//Show help
   $('body').on('click', '.pkmvc-button.showHelp', function (event) {
     showHelpDialog();
   });
@@ -966,6 +971,9 @@ function htmlEncode(value) {
 
 function htmlDecode(value) {
   if (value) {
+    console.log("In htmlDecode, value:",value);
+    return value;
+   // return $('<div />').html(value).text();
     return $('<div />').html(value).text();
   } else {
     return '';
