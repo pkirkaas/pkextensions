@@ -206,7 +206,7 @@ class PkTree extends PartialSet {
  // public function
 
   public function unwind() {
-    pkDebugOut($this->debugInfoStr());
+    //pkDebugOut($this->debugInfoStr());
     $ps = new PartialSet();
     $this->getIterator()->rewind();
     $ps[] = $this->renderOpener();
@@ -214,7 +214,7 @@ class PkTree extends PartialSet {
       $ps[]=$child->unwind();
     }
     foreach ($this as $key => $value) {
-      pkDebugOut("The Key is: ".print_r($key,1));
+      //pkDebugOut("The Key is: ".print_r($key,1));
       if ($value instanceOf self) {
         $ps[] = "  " . $value->unwind();
       } else {
