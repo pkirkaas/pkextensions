@@ -162,8 +162,12 @@ a.in-text {
 $headline-margin-bottom: .5em !default;
 .head-line {
   display: block;
-  margin-bottom: $headline-margin-bottom;
+ // margin-bottom: $headline-margin-bottom;
   font-weight: bolder;
+}
+
+.page-template p {
+  margin-bottom: .5em;
 }
 
 //Used in spans to emphasize the site name in text or title
