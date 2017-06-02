@@ -185,7 +185,7 @@ class PkController extends Controller {
     }
   }
 
-  public function processFileUploads($pkmodel,$ctlName,$attName) {
+  public function processFileUploads($pkmodel,$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
     $request = request();
     $uploadedFile = $request->file($ctlName);
