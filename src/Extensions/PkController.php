@@ -189,6 +189,9 @@ class PkController extends Controller {
     if (!$this->shouldProcessSubmit()) return;
     $request = request();
     $uploadedFile = $request->file($ctlName);
+    if ($validationStr) {
+      $this->validate($request,[$ctlName=>$validationStr]);
+    }
     if ($uploadedFile instanceOf UploadedFile) {
       $path = $uploadedFile->store('public');
       $baseName = basename($path);
