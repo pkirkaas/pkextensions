@@ -185,6 +185,16 @@ class PkController extends Controller {
     }
   }
 
+  /** Can be called multiple times in a form submission - once for each file upload.
+   * The file input name ($ctlName) should be different from the actual model attribute
+   * name. Convention is: $ctlName = 'XXX_file', $attName='XXX_filename'. If passes validation,
+   * the base uploaded filename will be saved in 'XXX_filename'/$attName. 
+   * @param PkModel $pkmodel - the PkModel instance
+   * @param string $ctlName - The name of the file input ctl on the form
+   * @param string $attName - The attribute name to store the base file uploade name
+   * @param string $validationStr - The validation string to use for validation
+   * @return type
+   */
   public function processFileUploads($pkmodel,$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
     $request = request();
@@ -196,6 +206,7 @@ class PkController extends Controller {
       $path = $uploadedFile->store('public');
       $baseName = basename($path);
       $pkmodel->$attName = $baseName;
+      $pkmodel->save();
     } else {
       pkdebug("No file uploaded to ".get_class($pkmodel).
           " for att: [$attName] with ctlName: [$ctlName]");
