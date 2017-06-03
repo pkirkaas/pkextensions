@@ -94,6 +94,18 @@ function makeTableRow(array $tds, array $tdclasses=[], $rowclass=null) {
   return $ret;
 }
 
+// Simple AJAX JSON Return helpers
+function ajaxerror($msg) {
+  die(json_encode(['error'=>$msg]));
+} 
+
+function ajaxsuccess($msg) {
+  if (!is_array($msg)) {
+    $msg = ['value'=>$msg];
+  }
+  die(json_encode($msg));
+}
+
 
 /** Returns HTML of the items in a grid
  * 

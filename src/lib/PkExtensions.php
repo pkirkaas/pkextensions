@@ -25,7 +25,10 @@ class DollarFormat implements PkDisplayValueInterface {
    * @param int|boolean|array|string $wrap_class
    * @return string dollar format
    */
-  public static function displayValue($value = null, $wrap_class = null) {
+  public static function displayValue($value = null, $wrap_class = null, $ifempty=null) {
+    if (!$value) {
+      return $ifempty;
+    }
     return dollar_format($value, $wrap_class);
   }
 }
@@ -38,9 +41,12 @@ class PercentFormat implements PkDisplayValueInterface {
 }
 
 class DateFormat implements PkDisplayValueInterface {
-  public static function displayValue($value = null, $fmt = null) {
+  public static function displayValue($value = null, $fmt = null,$ifempty='') {
     //if (!$fmt) $fmt = 'M j, Y';
     if (!$fmt) $fmt = 'y M j';
+    if (!$value) {
+      return $ifempty;
+    }
     return friendlyCarbonDate($value, $fmt);
   }
 }

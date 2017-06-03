@@ -377,6 +377,25 @@ jQuery.fn.extend({
   }
 });
 
+// Some jQuery extensions
+(function( $ ) {
+//Add 'cousin' selector extension to jQuery. Changes the arg order of getCousins
+/**
+ * @param cousinSelector is the required selector for the cousin. 
+ * @param ancestorSelector is optional - defaults to 'cousin-root'
+ * @param first - optional - if maybe several cousins, just the first
+ */
+  $.fn.cousin = function (cousinSelector, ancestorSelector, first) {
+    ancestorSelector = ancestorSelector || '.cousin-root'; //Default
+    console.log("cousinSelector: "+cousinSelector+"; ancestorSelector: "+ancestorSelector);
+    var cousins = this.closest(ancestorSelector).find(cousinSelector);
+    if (first) {
+      cousins = cousins.first();
+    }
+    return cousins;
+  };
+}( jQuery ));
+
 
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
  * body padding-top to adjust to the height of the menu on window resize and init  */

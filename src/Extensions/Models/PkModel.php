@@ -1343,21 +1343,36 @@ class $createclassname extends Migration {
   public function displayValue($fieldName, $value = null) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
+    #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
     foreach ($refmaps as $fn => $rc) {
       #$rc can be a String classname that implements PkDisplayValueInterface, OR
-      #an array of [$className,$args] where $args= date format, or $ precision, whatever
-      $args = null;
-      if (is_array($rc)) {
-        $args = $rc[1];
+      #an array of [$className,$arg1, $arg2,..] where $args = date format, or $ precision,
+      # default value, whatever
+      $args = [];
+      if (is_array($rc)) { #First el is method, remainder are optional args
+        $dv_method = array_shift($rc);
+        $args = $rc;
+        /*
+        if (is_array($rc) && count($rc)) {
+          $args = $rc;
+        }
+        $arg1 = $rc[1];
         $rc = $rc[0];
-      } 
-      if (!ne_string($fn) || !ne_string($rc) || !class_exists($rc) || 
-          !in_array('PkExtensions\PkDisplayValueInterface', class_implements($rc))) {
+         * 
+         */
+      } else {
+        $dv_method = $rc;
+      }
+      if (!ne_string($fn) || !ne_string($dv_method) || !class_exists($dv_method) || 
+          !in_array('PkExtensions\PkDisplayValueInterface', class_implements($dv_method))) {
         continue;
       }
       if ($fn === $fieldName) {
         $fldVal = $this->$fieldName;
-        return $rc::displayValue($this->$fieldName,$args);
+        array_unshift($args, $this->$fieldName);
+        return call_user_func_array([$dv_method,'displayValue'],$args);
+        //return $rc::displayValue($this->$fieldName,$args);
+        //return $rc::displayValue($this->$fieldName,$args);
       }
     }
     if ($value === null) return $this->$fieldName;

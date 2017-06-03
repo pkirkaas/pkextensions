@@ -97,6 +97,9 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    *   return to original next time.
    * @return string - the substituted/rendered template
    */
+  public function tpl($values = null, $defaults=null, $tplStr = null) {
+    return $this->template($values, $defaults, $tplStr);
+  }
   public function template($values = null, $defaults=null, $tplStr = null) {
     $usepredefs = $tplStr?false:true;
     if (!$values) $values = $this->values;
