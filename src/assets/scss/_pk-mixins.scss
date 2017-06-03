@@ -225,6 +225,14 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
     .m#{$sz}, .marg#{$sz} { margin: $offset !important; }
   }
+
+  .ma, .m-a {margin: auto !important;}
+  .mva, .m-v-a {margin-top: auto !important; margin-bottom: auto !important;}
+  .mha, .m-h-a {margin-left: auto !important; margin-right: auto !important;}
+  .mta, .m-t-a {margin-top: auto !important;}
+  .mba, .m-b-a {margin-bottom: auto !important;}
+  .mla, .m-l-a {margin-left: auto !important;}
+  .mra, .m-r-a {margin-right: auto !important;}
 }
 
 
@@ -401,23 +409,66 @@ $grid-gutter-width:          1.875rem !default; // 30px
 }
 
 @include mk-colors;
+$base-header-padding: .3rem !default;
+$base-header-margin: .3rem !default;
+$base-header-font-size: 1rem !default;
+$base-header-color: #400 !default;
+$base-header-ib: #004 !default;
+$base-header-ir: #400 !default;
 
-
-.generic-base-header {
-  font-family: verdana;
-  color: #000;
+.sh, .shb, .shib, .shir {
+  font-size: $base-header-font-size;
+  @extend .montserrat;
+  //font-family: verdana;
+  color: $base-header-color;
   font-weight: bold;
+  border-radius: .3em;
+  padding: $base-header-padding;// 20 * $base-header-padding;
+  margin: $base-header-margin; 
+}
+.shb {
+  color: $base-header-ib;
+}
+.shib, .shir {
+  padding: $base-header-padding 0;
+  text-align: center;
+  color: #fff;
 }
 
-@mixin mk-site-headers($base-header: generic-base-header, $name:sh) {
+.shib {
+  background-color: $base-header-ib;
+}
+.shir {
+  background-color: $base-header-ir;
+}
+
+@mixin mk-site-headers($base-header: sh) {
+  $ib:ib;
   @for $i from 1 through 20 {
-    .#{$name}#{$i} {
-      font-size: $i/5 + 1rem;
+     $font-size: $i/5 + $base-header-font-size;
+    .#{$base-header}#{$i}, .#{$base-header}b#{$i} {
+      font-size: $font-size;
       @extend  .#{$base-header};
-      @include v-margin($i/10 + .5rem);
+    }
+    .#{$base-header}b#{$i} {
+      color: $base-header-ib;
+    }
+    .#{$base-header}ib#{$i}, .#{$base-header}ir#{$i} {
+      //font-size: $i/5 + $base-header-font-size;
+      font-size: $font-size;
+      @extend  .#{$base-header};
+      padding: $base-header-padding 0;
+      text-align: center;
+      color: #fff;
+      background: $base-header-ib;
+    }
+    .#{$base-header}ir#{$i} {
+      background: $base-header-ir;
     }
   }
 }
+
+@include mk-site-headers;
 
 
 /** Some button styling, also for divs, and menus? */

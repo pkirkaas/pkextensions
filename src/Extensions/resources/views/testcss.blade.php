@@ -1,6 +1,8 @@
 <?php
 /** Test CSS Template */
-$fontstr="The Quick Brown Fox Jumped Over The Lazy Dogs. And then <em>kept on running</em> for hours and miles!";
+$fontstr="The Quick Brown Fox Jumped Over The Lazy Dogs. And then <em>kept on running</em> <b>for hours and miles!</b>";
+
+$fsclass = 'fs-6';
 ?>
 <style>
   .big-space {
@@ -39,29 +41,48 @@ width: 5em;
     <option value="8">8</option>
     <option value="9">The Big Nine</option>
   </select>
-
-
-
-
-
-
-
-
 </div>
+<h2>Testing various site-header types</h2>
+  <div class="sh bg-ff8 tac">SH bg-ff8 tac</div>
+  <div class="sh1 bg-8ff tac">SH1 bg-8ff tac</div>
+  <div class="sh5 bg-cff tac">SH5 bg-f8f tac</div>
+  <div class="sh10 bg-ffc tac">SH10 bg-f8f tac</div>
+  <div class="shb bb">SHb</div>
+  <div class="shb1 bb">SHb1</div>
+  <div class="shb5 bb">SHb5</div>
+  <div class="shb10">SHb10</div>
+  <div class="sh">SH</div>
+  <div class="sh1">SH1</div>
+  <div class="sh5">SH5</div>
+  <div class="sh10">SH10</div>
+  <div class="shib">SHib</div>
+  <div class="shib1">SHib1</div>
+  <div class="shib5">SHib5</div>
+  <div class="shib10">SHib10</div>
+  <div class="shir">SHir</div>
+  <div class="shir1">SHir1</div>
+  <div class="shir5">SHir5</div>
+  <div class="shir10">SHir10</div>
+  <div class="shir table m-h-a">SHir table m-h-a</div>
+  <div class='section'>
+    <div class="shir1 table m-h-a">SHir1 table m-h-a</div>
+  </div>
+  <div class="shir5 table m-h-a">SHir5 table m-h-a</div>
+  <div class="shir10 table m-h-a">SHir10 table m-h-a</div>
 <div class='page-template type'>
   <div class='page-title'>This demos various site CSS:  .page-template .page-title</div>
   <div class='page-title inverse'>.page-template .page-title.inverse</div>
   <div class='page-subtitle'>Fonts:  .page-template .page-subtitle</div>
 
 
-  <div class='verdana'><b>Verdana:</b> <?=$fontstr?> </div>
-  <div class='oswald'><b>Oswald:</b> <?=$fontstr?> </div>
-  <div class='lato'><b>Lato:</b> <?=$fontstr?> </div>
-  <div class='roboto'><b>Roboto:</b> <?=$fontstr?> </div>
-  <div class='open-sans'><b>Open Sans:</b> <?=$fontstr?> </div>
-  <div class='montserrat'><b>Montserrat:</b> <?=$fontstr?> </div>
-  <div class='raleway'><b>Raleway:</b> <?=$fontstr?> </div>
-  <div class='droid-sans'><b>Droid Sans:</b> <?=$fontstr?> </div>
+  <div class="verdana <?=$fsclass?>"><b>Verdana:</b> <?=$fontstr?> </div>
+  <div class="oswald <?=$fsclass?>"><b>Oswald:</b> <?=$fontstr?> </div>
+  <div class="lato <?=$fsclass?>"><b>Lato:</b> <?=$fontstr?> </div>
+  <div class="roboto <?=$fsclass?>"><b>Roboto:</b> <?=$fontstr?> </div>
+  <div class="open-sans <?=$fsclass?>"><b>Open Sans:</b> <?=$fontstr?> </div>
+  <div class="montserrat <?=$fsclass?>"><b>Montserrat:</b> <?=$fontstr?> </div>
+  <div class="raleway <?=$fsclass?>"><b>Raleway:</b> <?=$fontstr?> </div>
+  <div class="droid-sans <?=$fsclass?>"><b>Droid Sans:</b> <?=$fontstr?> </div>
 
   <div class='page-subtitle inverse'>Section:  .page-template .page-subtitle.inverse</div>
   <div class='section'>This is the content of a section</div>

@@ -359,7 +359,10 @@ table.pk-tbl {
   padding: .5em;
   }
 }
-
+.border-bottom, .bb {
+  border-bottom: solid 1px;
+  border-radius: 0;
+}
 .sect-sep {
   border-bottom: solid 1px $pk-tbl-border-color;
   font-weight: bold;
@@ -391,7 +394,8 @@ table.pk-tbl {
 */
 
 
-.flex { display: flex; }
+.table { display: table !important; }
+.flex { display: flex !important; }
 
 
 .align-self-center {align-self: center;}

@@ -284,14 +284,28 @@ div.msg.row {
 }
 
 //The base 'site header' - combine with other classes to make custom headers
+/*
 .sh {
   border-radius: .5em;
   font-weight: 600;
   padding: .3em;
   margin: .3em;
 }
+*/
 
-.sh1 
+/*
+.sh1 { @extend .fs-1; @extend .sh; } 
+.sh2 { @extend .fs-2; @extend .sh; } 
+.sh3 { @extend .fs-3; @extend .sh; } 
+.sh4 { @extend .fs-4; @extend .sh; } 
+.sh5 { @extend .fs-5; @extend .sh; } 
+.sh6 { @extend .fs-6; @extend .sh; } 
+.sh7 { @extend .fs-7; @extend .sh; } 
+.sh8 { @extend .fs-8; @extend .sh; } 
+.sh9 { @extend .fs-9; @extend .sh; } 
+.sh10 { @extend .fs-10; @extend .sh; } 
+*/
+
 
 .inverse-060 {
   color: white;
