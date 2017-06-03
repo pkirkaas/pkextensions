@@ -201,7 +201,7 @@ function yesnonull($arg) {
 function getPossibleViewFiles($name) {
   return array_map(function ($extension) use ($name) {
       return str_replace('.', '/', $name).'.'.$extension;
-  }, ['phtml','php', 'blade.php']);
+  }, ['phtml','php', 'blade.php','html']);
 }
 
 # So we can do like: 
