@@ -258,10 +258,11 @@ $('body [data-instructions]').on({
      }
      var instWrap = $("<div class='instruction-wrapper'></div>").css({
        position: 'absolute',
-       top: '3em',
+       top: '5rem',
        margin: 0,
        padding: '.5em',
        border: 'solid blue 1px',
+       'border-radius': '.5em',
        'background-color': '#fee',
        'z-index': 1000000
      });

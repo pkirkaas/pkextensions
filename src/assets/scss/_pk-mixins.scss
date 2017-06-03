@@ -416,7 +416,7 @@ $base-header-color: #400 !default;
 $base-header-ib: #004 !default;
 $base-header-ir: #400 !default;
 
-.sh, .shb, .shib, .shir {
+.sh, .shr, .shb, .shib, .shir {
   font-size: $base-header-font-size;
   @extend .montserrat;
   //font-family: verdana;
@@ -443,10 +443,9 @@ $base-header-ir: #400 !default;
 }
 
 @mixin mk-site-headers($base-header: sh) {
-  $ib:ib;
   @for $i from 1 through 20 {
      $font-size: $i/5 + $base-header-font-size;
-    .#{$base-header}#{$i}, .#{$base-header}b#{$i} {
+    .#{$base-header}#{$i},  .#{$base-header}r#{$i},.#{$base-header}b#{$i} {
       font-size: $font-size;
       @extend  .#{$base-header};
     }

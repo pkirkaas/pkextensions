@@ -51,14 +51,24 @@ function setAppLog() {
 /**
  * Returns a user friendly string date format for date string or Carbon date object, with default
  * format or given - BUT also returns "Never" if Carbon date is max/min - or null.
- * @param mixed $date - a date parsable by Carbon, including a Carbon Date object
+ * @param mixed $date - a date parsable by Carbon,
+ *    including a Carbon Date object, OR the string 'now' for the current date.
  * @param string $format
+ * @param boolean|string $shownever - what to show for empty/null date?
+ *   false: Return empty string
+ *   true: Return "Never"
+ *   string: return the string
  */
 function friendlyCarbonDate($date = null, $format =  'M j, Y',$shownever = false) {
   // American style m/d/y:   'n/j/y'
   if (!$date) {
-    if ($shownever) return "Never/None";
-    return '';
+    if ($shownever===true) {
+      return "Never/None";
+    } else if (is_string($shownever)) {
+      return $shownever;
+    } else {
+      return '';
+    }
   }
   $date = new Carbon($date);
   $min = Carbon::minValue();

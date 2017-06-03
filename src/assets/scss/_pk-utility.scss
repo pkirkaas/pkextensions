@@ -359,7 +359,7 @@ table.pk-tbl {
   padding: .5em;
   }
 }
-.border-bottom, .bb {
+.border-bottom, .underline {
   border-bottom: solid 1px;
   border-radius: 0;
 }
@@ -368,6 +368,35 @@ table.pk-tbl {
   font-weight: bold;
   margin-top: .5em;
 }
+// Make some inline emphasis
+.bb, .br {
+  font-weight: bold;
+  color: #004;
+  display: inline-block;
+}
+.br {
+  color: #400;
+}
+
+.emr, .emb {
+  font-style: italic;
+  display: inline-block;
+  color: #004;
+}
+.emr {
+  color: #400;
+}
+
+.embr {
+  @extend .emr;
+  @extend .br;
+}
+
+.embb {
+  @extend .emb;
+  @extend .bb;
+}
+
 
 /****  Assume some nice fonts: **/
 /**
