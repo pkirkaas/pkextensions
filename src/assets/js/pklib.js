@@ -391,11 +391,12 @@ $(function () {
   });
 });
 
+//TO encode the params:  ['data-ajax-params'=>html_encode_array(['id'=>$clientlog->id])]));
 $(function () {
   $('body').on('click', '[data-ajax-url]', function (event) {
     var target = $(event.target);
     var ajax_url = htmlDecode(target.attr('data-ajax-url'));
-    var ajax_params = htmlDecode(target.attr('data-ajax-params'));
+    var ajax_params = JSON.parse(htmlDecode(target.attr('data-ajax-params')));
     console.log("AJAX_URL:",ajax_url,"AJAX PARAMS:", ajax_params);
     if (!ajax_url) {
       return false;

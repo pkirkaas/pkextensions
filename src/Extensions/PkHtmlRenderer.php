@@ -315,8 +315,8 @@ class PkHtmlRenderer extends PartialSet {
       $tpl = new PkHtmlRenderer();
     }
     foreach ($arr as $key =>$val) {
-      $raw = (keyVal($key,$tpl) === true) || in_array($key,$rawkeys,true);
-      if (!$raw) $val = hpure($val);
+      //$raw = (keyVal($key,$tpl) === true) || in_array($key,$rawkeys,true);
+      //if (!$raw) $val = hpure($val);
       $tpl[$key] = $val;
     }
     return $this->content($tpl,true);

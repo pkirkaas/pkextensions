@@ -36,7 +36,6 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   ];
   public $presetKey;
   public $presets =[
-
     'wrapinp' =>"
       <div class='{{wrapClass}}' data-tootik-conf='multiline' {{wrapAtts}}>
         <div class='{{lblWrap}}'>{{label}}</div>
@@ -59,8 +58,11 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       'wrapinp'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>''],
       'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val'],
 
+      /*
       'js-ajax-button'=>["button-class"=>'site-button', 'extra-class'=>'',
           'data-ajax-params'=>'', 'label'=>'Submit'],
+       * 
+       */
   ];
 
   /**
@@ -94,7 +96,10 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     $this->tplStr = $tplStr;
     $this->values = $values;
     $this->defaults = $defaults;
-    $this->template();
+    pkdebug("Uh, here?");
+    //pkdebug("tplStr", $tplStr, "Vals", $values,"Defaults:", $defaults);
+    return;
+    //$this->template();
   }
 
   /** Execute/template the template. 
@@ -117,17 +122,13 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   }
   public function template($values = null, $defaults=null, $tplStr = null) {
     if (!$values) $values = $this->values;
-#//    if (!$defaults) $defaults = $this->defaults;
-
-
-
+    pkdebug("Defaults:", $defaults);
+    return;
     if (!$defaults || !is_array($defaults)) {
       $defaults = $this->defaults;
     } else if ($this->defaults && is_array($this->defaults)) {
       $defaults = $defaults + $this->defaults;
     }
-
-
     if (!$tplStr) $tplStr = $this->tplStr;
     if (is_arrayish_indexed($values) && is_arrayish_assoc($values[0])) {
       $ps = new PartialSet();
@@ -136,14 +137,23 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       }
       return $ps;
     }
+    pkdebug("Defaults:", $defaults);
+    return;
     $this->substituted = $tplStr.'';
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
+    /*
+    if ($usepredefs) {
+      $this->substituted = $this->substitute($this->presetdefaults);
+    }
+     * 
+     */
     $this->substituted = $this->substitute($this->defaultdefaults);
     //$this->substituted = $this->substitute();
     //return new PkHtmlRenderer([$this->substituted]);
     return new PkHtmlRenderer([$this->substituted]);
   }
+
 
   public function preset($key = null, $defaults=[]) {
     if (!$key) { #Clear preset
@@ -164,6 +174,8 @@ class PkHtmlTemplate extends PkHtmlRenderer {
 
   public function substitute($arr = null) {
     if (is_arrayish($arr)) {
+      pkdebug("ARR:", $arr);
+      return '';
       foreach ($arr as $tkey => $tval) {
         $this->substituted = str_replace('{{'.$tkey.'}}', hpure($tval), $this->substituted);
         $this->substituted = str_replace('{!!'.$tkey.'!!}', $tval, $this->substituted);
