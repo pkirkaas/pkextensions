@@ -43,7 +43,7 @@ class PercentFormat implements PkDisplayValueInterface {
 class DateFormat implements PkDisplayValueInterface {
   public static function displayValue($value = null, $fmt = null,$ifempty='') {
     //if (!$fmt) $fmt = 'M j, Y';
-    if (!$fmt) $fmt = 'y M j';
+    if (!$fmt) $fmt = 'j M y';
     if (!$value) {
       return $ifempty;
     }

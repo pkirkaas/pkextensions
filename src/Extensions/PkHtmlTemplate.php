@@ -87,7 +87,10 @@ class PkHtmlTemplate extends PkHtmlRenderer {
 
   /** Execute/template the template. 
    * 
-   * @param null|array $values - if null, uses $this->values, else an assoc array 
+   * @param null|array $values - if null, uses $this->values,
+   *   else if an assoc array, substitute. 
+   *   BUT IF INDEXED ARRAY OF ASSOC ARRAYS, return a PartialSet with all the
+   *   value arrays substituted 
    * of values to substitute
    * @param null|array $defaults - if null, uses $this->defaults, else an assoc array 
    * of defaults to substitute - so can temporarily substitute defaults for one
@@ -105,6 +108,13 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     if (!$values) $values = $this->values;
     if (!$defaults) $defaults = $this->defaults;
     if (!$tplStr) $tplStr = $this->tplStr;
+    if (is_arrayish_indexed($values) && is_arrayish_assoc($values[0])) {
+      $ps = new PartialSet();
+      foreach ($values as $valarr) {
+        $ps[]=$this->template($valarr,$defaults,$tplStr);
+      }
+      return $ps;
+    }
     $this->substituted = $tplStr.'';
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
@@ -116,6 +126,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     //return new PkHtmlRenderer([$this->substituted]);
     return new PkHtmlRenderer([$this->substituted]);
   }
+
 
   public function preset($key = null) {
     if (!$key) { #Clear preset
