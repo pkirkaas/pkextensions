@@ -20,10 +20,18 @@ width: 5em;
 </style>
 @extends('app')
 @section('content')
-<div class="big-space">
+<h2>Testing putting too many columns in row</h2>
+<div class="row bg-fef">
+  <div class="col-md-6 bg-ef4 bold fs-6">My first md-6 col in the row</div>
+  <div class="col-md-6 bg-e8f bold fs-6">My second md-6 col in the row</div>
+  <div class="col-md-6 bg-8ac bold fs-6">My third md-6 col in the row</div>
+  <div class="col-md-6 bg-fa8 bold fs-6">My fourth md-6 col in the row</div>
+  <div class="col-md-6 bg-4a8 bold fs-6">My fifth md-6 col in the row</div>
+       
+</div>
   <!--
+<div class="big-space">
   <select class="pk-inp tac">
-  -->
   <p>Top Paragraph</p>
     <br>
   <input type="checkbox" value="1">
@@ -42,6 +50,7 @@ width: 5em;
     <option value="9">The Big Nine</option>
   </select>
 </div>
+  -->
 <h2>Testing various site-header types</h2>
   <div class="sh bg-ff8 tac">SH bg-ff8 tac</div>
   <div class="sh1 bg-8ff tac">SH1 bg-8ff tac</div>
