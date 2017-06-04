@@ -96,7 +96,10 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     $this->tplStr = $tplStr;
     $this->values = $values;
     $this->defaults = $defaults;
-    $this->template();
+    pkdebug("Uh, here?");
+    //pkdebug("tplStr", $tplStr, "Vals", $values,"Defaults:", $defaults);
+    return;
+    //$this->template();
   }
 
   /** Execute/template the template. 
@@ -118,8 +121,9 @@ class PkHtmlTemplate extends PkHtmlRenderer {
     return $this->template($values, $defaults, $tplStr);
   }
   public function template($values = null, $defaults=null, $tplStr = null) {
-    $usepredefs = $tplStr?false:true;
     if (!$values) $values = $this->values;
+    pkdebug("Defaults:", $defaults);
+    return;
     if (!$defaults || !is_array($defaults)) {
       $defaults = $this->defaults;
     } else if ($this->defaults && is_array($this->defaults)) {
@@ -134,6 +138,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       return $ps;
     }
     pkdebug("Defaults:", $defaults);
+    return;
     $this->substituted = $tplStr.'';
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
