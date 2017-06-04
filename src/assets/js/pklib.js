@@ -321,6 +321,7 @@ $('body').on('mouseenter', '.hover-instructions', function (event) {
  * @returns {undefined}
  */
 
+//Like this concept, but I made it WAY too complicated. See simpler version below
 $(function () {
   $('body').on('click', '[data-pk-ajax-element]', function (event) {
     var target = $(event.target);
@@ -390,6 +391,30 @@ $(function () {
   });
 });
 
+$(function () {
+  $('body').on('click', '[data-ajax-url]', function (event) {
+    var target = $(event.target);
+    var ajax_url = htmlDecode(target.attr('data-ajax-url'));
+    var ajax_params = htmlDecode(target.attr('data-ajax-params'));
+    console.log("AJAX_URL:",ajax_url,"AJAX PARAMS:", ajax_params);
+    if (!ajax_url) {
+      return false;
+    }
+    if (!ajax_params || !( typeof ajax_params === 'object')) {
+      ajax_params = {};
+    }
+    var res = $.ajax({
+      url: ajax_url,
+      data: ajax_params,
+      method: 'POST'
+    }).done(function (data) {
+      console.log("Returned from General Ajax w. data:", data);
+      if (data.refresh === true) {
+        window.location.reload(true);
+      }
+    });
+  });
+});
 
 /**
  * Add some formatters to jQuery

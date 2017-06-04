@@ -52,8 +52,23 @@ class PkHtmlBuilder extends HtmlBuilder {
    * @return HTML Link
    */
     public function linkRouteDefault($name,$parameters = [], $attributes = [], $title = null) {
-      if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
+      //if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
+      if (!$title) $title =  $this->attFromRoute('desc',$name);
+      $tootik =  $this->attFromRoute('tootik',$name);
+      if (!array_key_exists('data_tootik', $attributes) && $tootik) {
+        $attributes['data-tootik']=$tootik;
+      }
       return parent::linkRoute($name,$title,$parameters,$attributes);
+    }
+
+    /**
+     * If you defined extra attributes in the route definition, get them from name
+     * @param string $attName
+     * @param string $routeName
+     * @param string route attribute value
+     */
+    public function attFromRoute($attName, $routeName) {
+      return keyVal($attName,app()['router']->getRoutes()->getByName($routeName)->getAction());
     }
   /*
    * //Remove 11 Nov 16 -- maybe not necessary?
