@@ -10,10 +10,11 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   use UtilityMethodsTrait;
   /**
    * @var string 
-   * An HTML Template string, with template keys as: {{key}}, like: 
+   * An HTML Template string, with template keys as: {{key}} (for escaped/cleaned w. hpure)
+   * or {!!$key!!} for unescaped, like form inputs, etc, like: 
    * "<div class='{{wrapClass}}'
    *   <div class='{{lblClass}}'{{lblVal}}</div>
-   *   <div class='{{inpWrapClass}}'>{{input}}</div>
+   *   <div class='{{inpWrapClass}}'>{!!input!!}</div>
    * </div>";
    */
   public $tplStr='';
@@ -31,36 +32,43 @@ class PkHtmlTemplate extends PkHtmlRenderer {
   public $defaults = [];
 
   /**
-   * 
+   * The 'default defaults - if not specified anywhere else 
    * @var type 
    */
   public $defaultdefaults = ['tootik'=>'',
-      'data-tootik'=>''
+      'data-tootik'=>'', 'extra-classs'=>'',
   ];
+  #Provide several 'preset' templates, can be added to in subclasses
   public $presetKey;
+  #Provide several 'preset' templates, can be added to in subclasses
   public  $presets =[
     'wrapinp' =>"
-      <div class='{{wrapClass}}' data-tootik-conf='multiline' {{wrapAtts}}>
+      <div class='{{wrapClass}}' data-tootik='{{tootik}}' {{wrapAtts}}>
         <div class='{{lblWrap}}'>{{label}}</div>
         <div class='{{inpWrap}}'>{!!input!!}</div>
       </div>\n",
 
     'wrapval' =>"
-      <div class='{{wrapClass}} data-tootik-conf='multiline' {{wrapAtts}}>
+      <div class='{{wrapClass}} data-tootik='{{tootik}}' {{wrapAtts}}>
         <div class='{{lblWrap}}'>{{label}}</div>
         <div class='{{valWrap}}'>{{value}}</div>
       </div>\n",
-      
 
       'js-ajax-button'=>"
         <div class='{{button-class}} {{extra-class}}' data-ajax-url='{!!data-ajax-url!!}'
 data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}}</div>",
+
+
+
+
+
   ];
 
+  #Provide defaults for 'preset' templates, can be added to or replaced in subclasses
   public $presetdefaults = [
       'wrapinp'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>''],
       'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val'],
-      'js-ajax-button'=>["button-class"=>'site-button', 'extra-class'=>'',
+      'js-ajax-button'=>["button-class"=>'site-button',
           'data-ajax-params'=>'', 'label'=>'Submit'],
   ];
 
@@ -101,6 +109,19 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->values = $values;
     $this->defaults = $defaults;
     $this->template();
+  }
+
+  /** If you want to add / substitute some preset templates, without subclassing
+   * @param array $presets
+   * @param array $presetdefaults
+   */
+  public function addPresets(Array $presets = [], Array $presetdefaults = []) {
+    if ($presetdefaults && is_array($presetdefaults)) {
+      $this->presetdefaults = $presetdefaults + $this->presetdefaults;
+    }
+    if ($presets && is_array($presets)) {
+      $this->presets = $presets + $this->presets;
+    }
   }
 
   /** Execute/template the template. 
