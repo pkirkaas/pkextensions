@@ -9,10 +9,11 @@ use Illuminate\Validation\Factory;
  */
 class PkValidatorFactory extends Factory {
 
+  /*
   public function make(array $data, array $rules, array $messages = [], array $customAttributes = []) {
     $validator = parent::make($data, $rules, $messages, $customAttributes);
-    /** We assume all custom extend closures would like to bind with the validator - can't hurt. Override
-     * if not the case */
+    // We assume all custom extend closures would like to bind with the validator - can't hurt. Override
+     // if not the case 
     $extensions = $validator->getExtensions();
     foreach ($extensions as $extensionName => $extension) {
       if ($extension instanceOf \Closure) {
@@ -22,9 +23,10 @@ class PkValidatorFactory extends Factory {
     }
     return $validator;
   }
+  */
 
     /**
-     * Resolve a new DLRValidator instance.
+     * Resolve a new PkValidator instance.
      *
      * @param  array  $data
      * @param  array  $rules
@@ -32,10 +34,13 @@ class PkValidatorFactory extends Factory {
      * @param  array  $customAttributes
      * @return \Illuminate\Validation\Validator
      */
-    protected function resolve(array $data, array $rules, array $messages, array $customAttributes) {
+    protected function resolve(array $data, array $rules, array $messages, array $customAttributes)
+    {
         if (is_null($this->resolver)) {
-            return new DLRValidator($this->translator, $data, $rules, $messages, $customAttributes);
+            return new PkValidator($this->translator, $data, $rules, $messages, $customAttributes);
         }
+
         return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
     }
+
 }

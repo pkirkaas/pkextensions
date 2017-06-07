@@ -67,8 +67,8 @@ class PkController extends Controller {
    * @var type 
    */
   public $validationrules; #Allows methods to set their own validators
-  public $validationmessages = []; #Allows methods to set their own validators
-  public $validationcustomattributes = []; #Allows methods to set their own validators
+  public $validationmessages=[]; #Allows methods to set their own validators
+  public $validationcustomattributes=[]; #Allows methods to set their own validators
   #Alternatively, the method creates its own custom validator, and sets it:
   public $validator;
 

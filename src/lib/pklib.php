@@ -585,9 +585,9 @@ function pkdebugOut($str, $logpath = null) {
         throw new Exception("Failed to open DebugLog [$logpath] for writing");
     }
     if ($first) {
-        $v = " \n\n\n\n\n\n\n\n\\n\n\n\n\n\n\n\n";
+        $v = " \n\n";
         $h = "=================================";
-      fwrite($fp,$v.$h.$h.$v );
+      fwrite($fp,$v.$h.$v );
     }
     fwrite($fp, $str);
     fclose($fp);

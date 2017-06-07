@@ -1229,18 +1229,27 @@ function safeSplitString(thestring, splitchar) {
  * @returns {undefined}
  */
 $(function () {
+  var formmodified = false;
+  $('body').on('submit', 'form.chck-frm', function (event) {
+    formmodified = false;
+  });
   $('body').on('change', 'form.chck-frm', function (event) {
-    $(window).on('beforeunload', function (event) {
+    formmodified = true;
+  });
+  $(window).on('beforeunload', function (event) {
+    if (formmodified) {
       var confirmationMessage = "Unsaved Changes";
       event.preventDefault();
       event.returnValue = confirmationMessage;
       return confirmationMessage;
-    });
+    }
   });
+  /*
   $('form.chck-frm').submit(function (event) {
     //console.log("Got in onload - trying 'off' ...");
     $(window).off('beforeunload');
   });
+  */
 });
 
 function isObject(obj) {

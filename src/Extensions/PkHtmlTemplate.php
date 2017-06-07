@@ -93,7 +93,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->presets = $this->getInstanceAncestorArraysMerged('presets');
     $this->presetdefaults = $this->getInstanceAncestorArraysMerged('presetdefaults');
     $this->defaultdefaults = $this->getInstanceAncestorArraysMerged('defaultdefaults');
-    pkdebug("Preset:",$this->presets,'PD',$this->presetdefaults,'dd',$this->defaultdefaults);
+    //pkdebug("Preset:",$this->presets,'PD',$this->presetdefaults,'dd',$this->defaultdefaults);
     if (is_array_assoc($tplStr)) {
       $values = keyVal('values',$tplStr,[]);
       $defaults = keyVal('defaults',$tplStr,[]);

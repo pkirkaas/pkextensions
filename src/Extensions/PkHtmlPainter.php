@@ -189,12 +189,10 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $data_rows = keyVal('data_rows', $args, $this->data_rows);
     $item_count = is_arrayish($data_rows) ? count($data_rows) : 0;
     $rows = new PkHtmlRenderer();
-    //$rows->input(['name'=>$basename,'type'=>'hidden']);
-    $rows->input('hidden', $basename);
+    $rows[]="<input type='hidden' name='$basename' value='' />\n";
 
     foreach ($data_rows as $idx => $data_row) {
       $rowargs = $args + ['data_row' => $data_row, 'idx' => $idx];
-      //$rows[$idx] = $this->mkSubformRow($rowargs);
       $rows[] = $this->mkSubformRow($rowargs);
     }
     $create_button = keyVal('create_button', $args, $this->create_button);
