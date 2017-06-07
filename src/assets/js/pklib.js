@@ -244,21 +244,34 @@ function showHelpDialog() {
 }
 
 
-//Help on Hover - here the instructions are encoded in the data-instructions attribute
+/**
+ * Help/instructions on Hover - Like formatted tooltip.
+ * ANY element that has the 'data-instructions' attribute (HTML Encoded) will 
+ * show them on hover.
+ * Instructions are encoded in the data-instructions attribute
+ */
  
+$(function () {
 $('body [data-instructions]').on({
    mouseenter: function (event) {
      var el = $(event.target);
-     //console.log("The Mouse Entered");
      var instHtml = el.attr('data-instructions');
-     //console.log('instHtml',instHtml);
      if (!instHtml) {
-     //console.log("Leaving?");
+       console.log("Leaving?");
        return;
      }
+     var elOffset = el.offset();
+     var elHeight = el.height();
+     var instTop = elOffset.height + elHeight;
+     var winWidth = $(window).width();
+     var instRelSz = .9; //Relative to size of window
+     var instWidth =instRelSz * $(window).width();
+     var instOffset = ((1-instRelSz)/2) * winWidth;
      var instWrap = $("<div class='instruction-wrapper'></div>").css({
-       position: 'absolute',
-       top: '5rem',
+       position: 'fixed',
+       width: instWidth,
+       top: instTop,
+       left: instOffset,
        margin: 0,
        padding: '.5em',
        border: 'solid blue 1px',
@@ -267,40 +280,13 @@ $('body [data-instructions]').on({
        'z-index': 1000000
      });
      instWrap.html(instHtml);
-     //console.log("Instwrap:", instWrap.html());
      el.after(instWrap);
    },
    mouseleave: function(event) {
      $('.instruction-wrapper').remove();
-     //console.log("The Mouse Left");
    }
  });
- /*
-$('body').on('mouseenter', '.hover-instructions', function (event) {
-  //var inst = $(event.target).attr('data-instructions');
-  var dlgHtml = htmlDecode($(event.target).attr('data-instructions'));
-  if (!dlgHtml) {
-    console.log ("No 'data-instructions");
-    return;
-  }
-  var dlg = $(dlgHtml);
-  var defaultWidth = Math.min(600,$(window).width());
-  var dialogOptions = {
-    modal: true,
-    
-    autoOpen: false,
-    width: defaultWidth,
-    buttons: [{
-        text: closeText,
-        click: function () {
-          $(this).dialog('close');
-        }
-      }
-    ]
-  };
-  var dialogOptions = dialogDefaults;
 });
-*/
 
 /** Generic attachment of AJAX call to DOM element (button?)
  * Attaches to any DOM element with CSS data attribute of 'data-pk-ajax-element'.

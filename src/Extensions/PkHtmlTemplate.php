@@ -33,6 +33,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
    * @var type 
    */
   public $defaultdefaults = ['tootik'=>'',
+      'data-tootik'=>''
   ];
   public $presetKey;
   public $presets =[
@@ -52,7 +53,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
 
       'js-ajax-button'=>"
         <div class='{{button-class}} {{extra-class}}' data-ajax-url='{!!data-ajax-url!!}'
-        data-ajax-params='{!!data-ajax-params!!}'>{{label}}</div>",
+data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}}</div>",
   ];
 
   public $presetdefaults = [
