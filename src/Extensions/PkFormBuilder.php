@@ -301,14 +301,56 @@ class PkFormBuilder extends FormBuilder {
   /** For use with the Query controls - to select the criteria
    * 
    */
-  public function queryselect($basename, $options=[]) {
+  public function critselect($basename, $options=[]) {
     $querymodel = $this->getModel();
     if (ne_string($options)) {
       $options = ['class'=>$options];
     }
     return $this->select($basename.'_crit', $querymodel::critset($basename),null,$options);
-          //{!!PkForm::select('yrsexp_crit',$bouncerSearch::critset('yrsexp'),
-          //null,['class'=>'form-control search-crit'])!!}
+  }
+
+  /**
+   * Used for both "Exists" & "Boolean"
+   * @param type $basename
+   * @return type
+   */
+  public function valis($basename) {
+    return $this->hidden($basename.'_val',1);
+  }
+  public function valtext($basename,$options=[]) {
+    if (ne_string($options)) {
+      $options = ['class'=>$options];
+    }
+    return $this->text($basename.'_val', null, $options);
+  }
+  public function valmultiselect($basename,$list=[],$options=[]) {
+    if (ne_string($options)) {
+      $options = ['class'=>$options];
+    }
+      return $this->multiselect($basename.'_val',$list,null,$options);
+  }
+  
+  public function critvalmultiselect($basename,$list=[],$valopts=[], $critopts=[]){
+    $ps = new PartialSet();
+    $ps[]=$this->critselect($basename,$critopts);
+    $ps[]=$this->valmultiselect($basename,$list, $valopts);
+    return $ps;
+  }
+
+  public function critvaltext($basename,$valopts,$critopts) {
+    $ps = new PartialSet();
+    $ps[]=$this->critselect($basename,$critopts);
+    $ps[]=$this->valtext($basename, $valopts);
+    return $ps;
+  }
+
+
+
+  public function critvalis($basename,$critopts=[]) {
+    $ps = new PartialSet();
+    $ps[]=$this->critselect($basename,$critopts);
+    $ps[]=$this->valis($basename);
+    return $ps;
   }
 
   //public function checkbox($name, $value = 1, $checked = null, $options = [])
