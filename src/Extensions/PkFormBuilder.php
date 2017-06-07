@@ -294,6 +294,22 @@ class PkFormBuilder extends FormBuilder {
   public function ajaxButton($options = [], $content = null) {
     return $this->ajaxElement($options, $content);
   }
+  public function getModel() {
+    return $this->model;
+  }
+
+  /** For use with the Query controls - to select the criteria
+   * 
+   */
+  public function queryselect($basename, $options=[]) {
+    $querymodel = $this->getModel();
+    if (ne_string($options)) {
+      $options = ['class'=>$options];
+    }
+    return $this->select($basename.'_crit', $querymodel::critset($basename),null,$options);
+          //{!!PkForm::select('yrsexp_crit',$bouncerSearch::critset('yrsexp'),
+          //null,['class'=>'form-control search-crit'])!!}
+  }
 
   //public function checkbox($name, $value = 1, $checked = null, $options = [])
 

@@ -1,15 +1,16 @@
 <?php
-
 namespace PkExtensions;
-
 use \Exception;
+use PkExtensions\Traits\CriteriaSetsTrait;
 
 /** Way too simple to call it a query - just does a simple match on simple criteria
  * It has two levels of variables - the names and types of fields it should match -
  * but then has values and criteria
  */
 class PkMatch {
+  use CriteriaSetsTrait;
 
+  /*
   public static $criteriaSets = [
       'numeric' => [
           '0' => "Don't Care",
@@ -56,6 +57,7 @@ class PkMatch {
           'NOT EXISTS' => "Doesn't Exist",
       ],
   ];
+  */
   /*
     public $active; #Should this match be run?
     public $comptype; #Like, 'numeric', 'string', 'between', etc
@@ -69,43 +71,6 @@ class PkMatch {
    */
 #If 0/False, simple attribute, else 'method', 'function', etc
   public $parameters; #Opt Arr - not only methods take args, 'within' & 'between' as well
-
-  /**
-   * 
-   * @param string $key
-   * @param null|array $omit - if $key && is_array($omit), $omit is the array
-   *   of criteria to omit/remove from the results
-   * @return type
-   */
-
-  public static function getCriteriaSets($key = null, $omit = null) {
-    if (!$key) return static::$criteriaSets;
-    $rawCritSet = keyVal($key, static::$criteriaSets, []);
-    if (is_arrayish($omit) && count($omit)) {
-      foreach ($omit as $oc) {
-        unset($rawCritSet[$oc]);
-      }
-      //pkdebug("GETSETS: For Key: [ $key ]; OMIT: ", $omit, 'rawCritSet:', $rawCritSet);
-    }
-    return $rawCritSet;
-  }
-
-  public static function getCriteriaTypes() {
-    return array_keys(static::getCriteriaSets());
-  }
-
-  public static function isValidCompType($comptype = null) {
-    if (in_array($comptype, static::getCriteriaTypes(), 1)) return $comptype;
-    return false;
-  }
-
-  public static function getTypeFromCrit($crit) {
-    if (!$crit || ($crit === '0')) return null;
-    foreach (static::getCriteriaSets() as $comptype => $critarr) {
-      if (in_array($crit, array_keys($critarr, 1))) return $comptype;
-    }
-  }
-
   public static $attributeNames = [
       'active',
       'comptype',

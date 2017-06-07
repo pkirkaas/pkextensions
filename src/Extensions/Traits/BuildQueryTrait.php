@@ -79,6 +79,7 @@ use \Request;
  * convert in-memory arrays to JSON strings stored in the DB
  */
 trait BuildQueryTrait {
+  use CriteriaSetsTrait;
 
   /** In Implemented Classes, will be set to the class/model to be searched.
    * @var ModelClass
@@ -105,6 +106,7 @@ trait BuildQueryTrait {
    * if crit is of type 'numeric'|'string'|'group'
    * @return boolean
    */
+  /*
   public static function isValidCriterion($crit, $type = null) {
     if ((!$type || ($type === 'numeric')) && in_array($crit, array_keys(static::$numericQueryCrit)))
         return true;
@@ -118,12 +120,15 @@ trait BuildQueryTrait {
         return true;
     return false;
   }
+   * 
+   */
 
   /** Must be intish */
   public static function isValidWithinCriterion($crit) {
     if (to_int($crit) === false) return false;
     return true;
   }
+  /*
 
   public static $numericQueryCrit = [
       '0' => "Don't Care",
@@ -170,6 +175,8 @@ trait BuildQueryTrait {
       'IS' => 'Required',
       'IS NOT' => 'Excluded',
   ];
+   * 
+   */
 
   #To use a Boolean query control, do something like this in view form:
   /*
@@ -185,6 +192,7 @@ trait BuildQueryTrait {
    * 
    * @param string|null $type - query type - 'within', 'string', etc. If null, all 
    */
+  /*
   public function getQueryCrit($type = null) {
     static $queryCrit = null;
     if (!$queryCrit) {
@@ -202,6 +210,8 @@ trait BuildQueryTrait {
       return false;
     }
   }
+   * 
+   */
 
 
   /** Converts the simple $search_field_defs into canonical - 
@@ -292,7 +302,7 @@ trait BuildQueryTrait {
       $criteriaSet = keyVal('criteriaSet', $criteria);
       if (!$criteriaSet) {
         $omit = keyVal('omit', $criteria);
-        $criteriaSet = PkMatch::getCriteriaSets($comptype, $omit);
+        $criteriaSet = static::getCriteriaSets($comptype, $omit);
       }
       $def['criteria']['criteriaSet'] = $criteriaSet;
       $fieldDefs = static::$fieldBuildMethod($baseName, $def);
@@ -616,7 +626,7 @@ trait BuildQueryTrait {
         } else if ($critset['crit'] === 'IS') {
           $query = $query->where($root, true);
         } else if ($critset['crit'] === 'IS NOT') {
-          $query = $query->where($root, fals);
+          $query = $query->where($root, false);
         } else {
           $query = $query->where($root, $critset['crit'], $critset['val']);
         }
@@ -836,7 +846,7 @@ trait BuildQueryTrait {
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
         $comptype = keyVal('comptype', $queryDef, 'numeric');
-        $criteriaSet = PkMatch::getCriteriaSets($comptype);
+        $criteriaSet = static::getCriteriaSets($comptype);
     //pkdebug("criteriaSet:", $criteriaSet);
       }
     }
