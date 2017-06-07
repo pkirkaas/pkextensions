@@ -2,6 +2,10 @@
  * overridable in individual sites
  */
 
+$body-font-size: 14px !default;
+body {
+  font-size: $body-font-size;
+}
 $page-template-border:  solid blue 1px !default;
 $page-template-padding:  5px !default;
 $page-template-margin:  5px !default;
@@ -83,13 +87,13 @@ $site-val-color: #422 !default;
 $site-negative-value-color: #a22 !default;
 
 .pk-lbl {
-  font-weight: bold;
+  //font-weight: bold;
   color: $site-lbl-color;
 }
 
 .pk-val {
   color: $site-val-color;
-  font-weight: bold;
+  //font-weight: bold;
 }
 
 .pk-inp-wrap {
@@ -100,6 +104,7 @@ div input[type=checkbox].pk-inp {
   width: auto;
 }
 
+$input-font-size: 14px !default;
 select.pk-inp,
 textarea.pk-inp,
 input.pk-inp {
@@ -108,9 +113,15 @@ input.pk-inp {
   //font-weight: bold;
   //font-family: 'Times New Roman', serif;
   font-family: 'Montserrat', arial;
+  font-size: $input-font-size;
   //font-family: 'Roboto', verdana;
   color: #300;
   //background-color: rgba(255,255,255,.4);
+}
+body div div form div select.pk-inp {
+   &:not([size]):not([multiple]) {
+    height: 1.7 * $input-font-size;
+   }
 }
 
 
