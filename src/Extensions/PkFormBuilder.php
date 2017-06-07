@@ -150,6 +150,9 @@ class PkFormBuilder extends FormBuilder {
    */
   public function multiselect($name, $list = [], $values = null, $options = [], $unset = null) {
     $values = $this->getValueAttribute($name, $values);
+    if ($values && is_string($values)) { #JSON Encoded?
+      $values = json_decode($values,1);
+    }
     $wrapperclass = keyval('wrapperclass', $options, ' form-control ');
     $allclass = keyval('allclass', $options);
     unset($options['wrapperclass']);

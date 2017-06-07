@@ -3,6 +3,8 @@
 namespace PkExtensions\Traits;
 use Illuminate\Database\Eloquent\Collection;
 use PkExtensions\Models\PkModel;
+use PkExtensions\Models\PkSearchModel;
+use PkExtensions\PkController;
 use PkExtensions\PkMatch;
 use PkExtensions\PkHtmlRenderer;
 
@@ -156,6 +158,12 @@ trait BuildQueryTrait {
       'BETWEEN' => 'Between',
   ];
 
+  #Does the value exist - anything but null or ''
+  public static $existsQueryCrit = [
+      '0' => "Don't Care",
+      'EXISTS' => 'Required',
+      'NOT EXISTS' => "Excluded",
+  ];
   #What's the best way to do boolean?
   public static $booleanQueryCrit = [
       '0' => "Don't Care",
@@ -186,6 +194,7 @@ trait BuildQueryTrait {
           'numeric' => static::$numericQueryCrit,
           'between' => static::$betweenQueryCrit,
           'boolean' => static::$booleanQueryCrit,
+          'exists' => static::$existsQueryCrit,
       ];
       if (!$type) return $queryCrit;
       if (in_array($type, array_keys($queryCrit))) return $queryCrit[$type];
@@ -347,6 +356,22 @@ trait BuildQueryTrait {
   }
 
 
+  public static function buildQueryFieldsExists($baseName, $def = null) {
+    $valType = keyVal('fieldtype', $def, 'string');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
+
+  }
+
+
   public static function buildQueryFieldsBoolean($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'boolean');
     $fieldtype_args = keyVal('fieldtype_args', $def);
@@ -417,8 +442,15 @@ trait BuildQueryTrait {
     return $fields;
   }
 
+  /** This builds a _val field to contain a JSON string of multiple values - so
+   * fieldtype HAS to be string
+   * @param type $baseName
+   * @param type $def
+   * @return string
+   */
   public static function buildQueryFieldsGroup($baseName, $def = null) {
-    $valType = keyVal('fieldtype', $def, 'string');
+    //$valType = keyVal('fieldtype', $def, 'string');
+    $valType = 'string';
     $fieldtype_args = keyVal('fieldtype_args', $def);
     $fields = [];
     $parms = keyVal('parms', $def);
@@ -576,7 +608,11 @@ trait BuildQueryTrait {
           }
         }
         //pkdebug("QT: ".typeOf($query)."..");
-        if ($critset['crit'] === 'IS') {
+        if ($critset['crit'] === 'EXISTS') {
+          $query = $query->whereNotNull($root)->where($root,'!=','');
+        } else if ($critset['crit'] === 'NOT EXISTS') {
+          $query = $query->whereNull($root);
+        } else if ($critset['crit'] === 'IS') {
           $query = $query->where($root, true);
         } else {
           $query = $query->where($root, $critset['crit'], $critset['val']);
@@ -675,6 +711,13 @@ trait BuildQueryTrait {
 
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
+      if ($this->comptype($root) === 'group') { #Need to make it an array from json string
+        if (is_string($valval)) {
+          $valval = json_decode($valval,1);
+        }
+        pkdebug("VALVAL",$valval);
+      }
+
        
       $sets[$root] = [];
       $rootMatch->crit=$sets[$root]['crit'] = $arr[$key];
@@ -824,4 +867,42 @@ trait BuildQueryTrait {
     //pkdebug("The QueryDef for [ $basename ]:", $fieldDef);
   }
 
+  /*
+  public function processSubmit($opts = null, $inits = null) {
+    if (! $this instanceOf PkController) return;
+    if (isPost()) {
+      $data = request()->all();
+      $sedefs = static::getSearchFieldDefs();
+      $fqd = static::getFullQueryDef();
+      pkdebug("In Trait PS, data:", $data, 'SDs',$sedefs, "FullQD", $fqd);
+    }
+
+    return parent::processSubmit($opts, $inits);
+  }
+   * 
+   */
+
+  public function save(array $opts = []) {
+    if (! $this instanceOf PkSearchModel) return;
+    pkdebug("These Attributes:",$this->getAttributes());
+    $fqd = static::getFullQueryDef();
+    foreach ($fqd as $basename => $def) {
+      if(keyVal('comptype',$def) === 'group') { #Have to jsonify it
+        $valatt = $basename.'_val';
+        $this->$valatt = json_encode($this->$valatt);
+        pkdebug("THIS att [$valatt]: ", $this->$valatt);
+      }
+    }
+    return parent::save($opts);
+  }
+
+  /**
+   * Returns the comparison type of the query field - like, 'group', 'between',
+   * etc.
+   */
+  public function comptype($root) {
+    $fqd = static::getFullQueryDef($root);
+    if (!is_array($fqd)) return false;
+    return keyVal('comptype',$fqd,false);
+  }
 }
