@@ -48,7 +48,7 @@ Trait CriteriaSetsTrait {
       ],
       'exists' => [
           '0' => "Don't Care",
-          'EXISTS' => 'Has',
+          'EXISTS' => 'Required',
           'NOT EXISTS' => "Doesn't have",
       ],
   ];
