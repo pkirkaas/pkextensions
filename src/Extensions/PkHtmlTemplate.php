@@ -1,11 +1,13 @@
 <?php
 namespace PkExtensions;
+use PkExtensions\Traits\UtilityMethodsTrait;
 /**
  * A keyed Html template, that substitutes keyed values & defaults
  * Can construct once with $tplStr & $defaults, & re-use by resetting
  * $values.
  */
 class PkHtmlTemplate extends PkHtmlRenderer {
+  use UtilityMethodsTrait;
   /**
    * @var string 
    * An HTML Template string, with template keys as: {{key}}, like: 
@@ -36,8 +38,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       'data-tootik'=>''
   ];
   public $presetKey;
-  public $presets =[
-
+  public  $presets =[
     'wrapinp' =>"
       <div class='{{wrapClass}}' data-tootik-conf='multiline' {{wrapAtts}}>
         <div class='{{lblWrap}}'>{{label}}</div>
@@ -59,7 +60,6 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
   public $presetdefaults = [
       'wrapinp'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>''],
       'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val'],
-
       'js-ajax-button'=>["button-class"=>'site-button', 'extra-class'=>'',
           'data-ajax-params'=>'', 'label'=>'Submit'],
   ];
@@ -81,6 +81,11 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
   public $substituted = '';
   public function __construct($tplStr = '', $values = [], $defaults = []) {
     parent::__construct();
+    #Test building presets from this & ancestor presets
+    $this->presets = $this->getInstanceAncestorArraysMerged('presets');
+    $this->presetdefaults = $this->getInstanceAncestorArraysMerged('presetdefaults');
+    $this->defaultdefaults = $this->getInstanceAncestorArraysMerged('defaultdefaults');
+    pkdebug("Preset:",$this->presets,'PD',$this->presetdefaults,'dd',$this->defaultdefaults);
     if (is_array_assoc($tplStr)) {
       $values = keyVal('values',$tplStr,[]);
       $defaults = keyVal('defaults',$tplStr,[]);
@@ -150,12 +155,15 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     if (!$key) { #Clear preset
       $this->presetkey = null;
     } else if (array_key_exists($key, $this->presets)) {
+    //} else if (array_key_exists($key, static::$presets)) {
       $this->presetkey = $key;
+      //$this->tplStr = static::$presets[$key];
       $this->tplStr = $this->presets[$key];
       if (!is_array($defaults)) {
         $defaults = [];
       }
       $presetdefaults = keyVal($key,$this->presetdefaults,[]);
+      //$presetdefaults = keyVal($key,static::$presetdefaults,[]);
       $this->defaults = $defaults + $presetdefaults;
     } else {
       throw new PkException("Preset key [$key] not found");
@@ -182,7 +190,10 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     return $this->substituted;
   }
 
+  /*
   public function __toString() {
     return $this->template();
   }
+   * 
+   */
 }

@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions\Traits;
 use Carbon\Carbon;
+use ReflectionClass;
 /** Common methods that might be useful in many class hierarchies. Like a 
  * common base class for Laravel
  * June 2016 Paul Kirkaas
@@ -85,6 +86,47 @@ trait UtilityMethodsTrait {
     $fullRetArr[$thisClass][$arrayName] = $mgArr;
     return $mgArr;
   }
+
+  /** Like above, only works for instance properties, not just static
+   * @param string $arrayName - the instance property name
+   * @param boolean $idx (default: false) - Is the property array indexed? In 
+   * which case new values are added. If false/assoc, the child/descendent key
+   * values REPLACE the ancestor key values
+   */
+  //  DO I NEED THIS?
+  public function getInstanceAncestorArraysMerged($arrayName, $idx=false) {
+    $thisClass = $class = static::class;
+    #First, build array of arrays....
+    $refClass = new ReflectionClass($class);
+    $defAtts = $refClass->getDefaultProperties();
+    //$retArr[] = $class::$$arrayName; #Deliberate double $$
+    $attArr = keyVal($arrayName,$defAtts,[]);
+    if (!is_array( $attArr)) {
+      return $attArr;
+    }
+    $retArr[] = $attArr;
+    while ($par = get_parent_class($class)) {
+      $refClass = new ReflectionClass($par);
+      $defAtts = $refClass->getDefaultProperties();
+      $parAtt = keyVal($arrayName,$defAtts,[]);
+      if ($parAtt === false) {#If a parent wants stop accension
+        break;
+      }
+      if (($tstArr = $parAtt) && is_array($tstArr) ) {
+        $retArr[] = $tstArr;
+      }
+      $class = $par;
+    }
+    #Now merge. Reverse order so child settings override ancestors...
+    $retArr = array_reverse($retArr);
+    $mgArr = call_user_func_array('array_merge', $retArr);
+    #Mainly to save the developer who respecifies 'id' in the derived direct
+    if ($idx && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
+      $mgArr = array_unique($mgArr);
+    }
+    return $mgArr;
+  }
+
 
   /** Gets the time difference between 2 dates, using defaults
    * 
