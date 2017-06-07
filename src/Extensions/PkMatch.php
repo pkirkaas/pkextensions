@@ -45,6 +45,11 @@ class PkMatch {
           'BETWEEN' => 'Between',
           'NOT BETWEEN' => 'Not Between',
       ],
+      'boolean' => [
+          '0' => "Don't Care",
+          'IS' => 'Required',
+          'IS NOT' => "Excluded",
+      ],
       'exists' => [
           '0' => "Don't Care",
           'EXISTS' => 'Exists',

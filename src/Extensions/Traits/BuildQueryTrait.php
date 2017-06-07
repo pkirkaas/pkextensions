@@ -168,6 +168,7 @@ trait BuildQueryTrait {
   public static $booleanQueryCrit = [
       '0' => "Don't Care",
       'IS' => 'Required',
+      'IS NOT' => 'Excluded',
   ];
 
   #To use a Boolean query control, do something like this in view form:
@@ -614,6 +615,8 @@ trait BuildQueryTrait {
           $query = $query->whereNull($root);
         } else if ($critset['crit'] === 'IS') {
           $query = $query->where($root, true);
+        } else if ($critset['crit'] === 'IS NOT') {
+          $query = $query->where($root, fals);
         } else {
           $query = $query->where($root, $critset['crit'], $critset['val']);
         }
@@ -711,11 +714,11 @@ trait BuildQueryTrait {
 
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
-      if ($this->comptype($root) === 'group') { #Need to make it an array from json string
+      if (static::comptype($root) === 'group') { #Need to make it an array from json string
         if (is_string($valval)) {
           $valval = json_decode($valval,1);
         }
-        pkdebug("VALVAL",$valval);
+        //pkdebug("VALVAL",$valval);
       }
 
        
@@ -884,23 +887,30 @@ trait BuildQueryTrait {
 
   public function save(array $opts = []) {
     if (! $this instanceOf PkSearchModel) return;
-    pkdebug("These Attributes:",$this->getAttributes());
+    //pkdebug("These Attributes:",$this->getAttributes());
     $fqd = static::getFullQueryDef();
+    pkdebug("FQD:",$fqd);
     foreach ($fqd as $basename => $def) {
       if(keyVal('comptype',$def) === 'group') { #Have to jsonify it
         $valatt = $basename.'_val';
         $this->$valatt = json_encode($this->$valatt);
-        pkdebug("THIS att [$valatt]: ", $this->$valatt);
+     //   pkdebug("THIS att [$valatt]: ", $this->$valatt);
       }
     }
     return parent::save($opts);
   }
 
+  public static function critset($root) {
+    $fqd = static::getFullQueryDef($root);
+    return $fqd['criteria']['criteriaSet'];
+  }
+
+
   /**
    * Returns the comparison type of the query field - like, 'group', 'between',
    * etc.
    */
-  public function comptype($root) {
+  public static function comptype($root) {
     $fqd = static::getFullQueryDef($root);
     if (!is_array($fqd)) return false;
     return keyVal('comptype',$fqd,false);

@@ -153,10 +153,10 @@ class PkFormBuilder extends FormBuilder {
     if ($values && is_string($values)) { #JSON Encoded?
       $values = json_decode($values,1);
     }
-    $wrapperclass = keyval('wrapperclass', $options, ' form-control ');
-    $allclass = keyval('allclass', $options);
-    unset($options['wrapperclass']);
-    unset($options['allclass']);
+    $wrapperclass = unsetret($options,'wrapperclass',  ' form-control ');
+    $allclass = unsetret($options, 'allclass' );
+    //unset($options['wrapperclass']);
+    //unset($options['allclass']);
     $out = "\n<div class='multiselect $wrapperclass $allclass '>\n";
     $out .= "\n<input type='hidden' name='$name' value='$unset' />\n";
     foreach ($list as $key => $label) {
