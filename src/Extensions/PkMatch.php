@@ -124,7 +124,7 @@ class PkMatch {
     //pkdebug("REFACTOR MatchFact, arrstes:", $arrSets);
     $matchArr = [];
     foreach ($arrSets as $baseName => $arrSet) {
-      $matchArr[$baseName] = $this->mkMatchObj($arrSet,$baseName);
+      $matchArr[$baseName] = static::mkMatchObj($arrSet,$baseName);
 
       /*
 
@@ -235,10 +235,7 @@ class PkMatch {
    * @param type $arg
    */
   public function satisfy($arg = null) {
-    if ($this->compfield == 'assetdebtratio') {
-      //pkdebug("YES: ASSETDEBTRAT: THIS:", $this, 'ARG', $arg);
-    }
-    //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
+    pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
     if ($this->comptype === 'numeric') return $this->numericComp($arg);

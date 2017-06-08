@@ -625,6 +625,7 @@ trait BuildQueryTrait {
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
+        pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
         if (is_array($critset['val'])) {
 
 
@@ -644,8 +645,10 @@ trait BuildQueryTrait {
             //pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
-          } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root),$root)){
+          } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
+            pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
             $this->addMatchObj($root,$matchObj);
+            continue;
           } else {
             throw new PkException(["Unhandled for root[$root], comptype [$comptype] w. val:",
                 $critset['val']]);
@@ -870,6 +873,7 @@ trait BuildQueryTrait {
    */
   public function filterOnMatch(Collection $collection) {
     $pkmarr = $this->getMatchObj();
+    //pkdebug("MatchArr:",$pkmarr);
     if(!$pkmarr) {
       return $collection;
     }
@@ -975,8 +979,10 @@ trait BuildQueryTrait {
     //pkdebug("These Attributes:",$this->getAttributes());
     $fqd = static::getFullQueryDef();
 //    pkdebug("FQD:",$fqd);
+
     foreach ($fqd as $basename => $def) {
-      if(keyVal('comptype',$def) === 'group') { #Have to jsonify it
+      $comptype = static::comptype($basename);
+      if(($comptype === 'group') || ($comptype === 'intersects')) { #Have to jsonify it
         $valatt = $basename.'_val';
         $this->$valatt = json_encode($this->$valatt);
      //   pkdebug("THIS att [$valatt]: ", $this->$valatt);
