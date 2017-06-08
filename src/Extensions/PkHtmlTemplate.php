@@ -54,22 +54,28 @@ class PkHtmlTemplate extends PkHtmlRenderer {
         <div class='{{valWrap}}'>{{value}}</div>
       </div>\n",
 
+      'checkSet' => "
+        <div class='{{checkrow}}'>
+          <div class='{{checkclass}}'>{{check}}</div>
+          <div class='{{labelclass}}'>{{label}}</div>
+        </div>\n",
+
+
       'js-ajax-button'=>"
         <div class='{{button-class}} {{extra-class}}' data-ajax-url='{!!data-ajax-url!!}'
 data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}}</div>",
-
-
-
 
 
   ];
 
   #Provide defaults for 'preset' templates, can be added to or replaced in subclasses
   public $presetdefaults = [
-      'wrapinp'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>''],
-      'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val'],
+      'wrapinp'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl','inpWrap'=>'', 'wrapClass'=>''],
+      'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val', 'wrapClass'=>''],
       'js-ajax-button'=>["button-class"=>'site-button',
           'data-ajax-params'=>'', 'label'=>'Submit'],
+      'checkSet' => ['checkrow'=>'check-row',
+          'checkclass'=>'check-class inline', 'labelclass'=>'pk-lbl inline'],
   ];
 
   /**
@@ -122,6 +128,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     if ($presets && is_array($presets)) {
       $this->presets = $presets + $this->presets;
     }
+    return $this;
   }
 
   /** Execute/template the template. 
@@ -144,17 +151,11 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
   }
   public function template($values = null, $defaults=null, $tplStr = null) {
     if (!$values) $values = $this->values;
-#//    if (!$defaults) $defaults = $this->defaults;
-
-
-
     if (!$defaults || !is_array($defaults)) {
       $defaults = $this->defaults;
     } else if ($this->defaults && is_array($this->defaults)) {
       $defaults = $defaults + $this->defaults;
     }
-
-
     if (!$tplStr) $tplStr = $this->tplStr;
     if (is_arrayish_indexed($values) && is_arrayish_assoc($values[0])) {
       $ps = new PartialSet();
@@ -167,8 +168,6 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
     $this->substituted = $this->substitute($this->defaultdefaults);
-    //$this->substituted = $this->substitute();
-    //return new PkHtmlRenderer([$this->substituted]);
     return new PkHtmlRenderer([$this->substituted]);
   }
 
@@ -176,20 +175,17 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     if (!$key) { #Clear preset
       $this->presetkey = null;
     } else if (array_key_exists($key, $this->presets)) {
-    //} else if (array_key_exists($key, static::$presets)) {
       $this->presetkey = $key;
-      //$this->tplStr = static::$presets[$key];
       $this->tplStr = $this->presets[$key];
       if (!is_array($defaults)) {
         $defaults = [];
       }
       $presetdefaults = keyVal($key,$this->presetdefaults,[]);
-      //$presetdefaults = keyVal($key,static::$presetdefaults,[]);
       $this->defaults = $defaults + $presetdefaults;
     } else {
       throw new PkException("Preset key [$key] not found");
     }
-    return $this->tplStr;
+    return $this;
   }
 
   public function substitute($arr = null) {

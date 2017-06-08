@@ -153,6 +153,9 @@ class PkFormBuilder extends FormBuilder {
     if ($values && is_string($values)) { #JSON Encoded?
       $values = json_decode($values,1);
     }
+    if (is_string($options)) {
+      $options=['class'=>$options];
+    }
     $wrapperclass = unsetret($options,'wrapperclass',  ' form-control ');
     $allclass = unsetret($options, 'allclass' );
     //unset($options['wrapperclass']);

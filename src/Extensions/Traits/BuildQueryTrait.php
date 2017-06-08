@@ -899,7 +899,7 @@ trait BuildQueryTrait {
     if (! $this instanceOf PkSearchModel) return;
     //pkdebug("These Attributes:",$this->getAttributes());
     $fqd = static::getFullQueryDef();
-    pkdebug("FQD:",$fqd);
+//    pkdebug("FQD:",$fqd);
     foreach ($fqd as $basename => $def) {
       if(keyVal('comptype',$def) === 'group') { #Have to jsonify it
         $valatt = $basename.'_val';

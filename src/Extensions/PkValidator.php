@@ -21,12 +21,12 @@ class PkValidator extends Validator {
           unset ($rules[$att]);
         }
       }
-      pkdebug("Making PkValidator: Translator:", $translator, "Data:", $data, "Rules:", $rules, "Messages:", $messages, "CustomAtts:", $customAttributes);
+      //pkdebug("Making PkValidator: Translator:", $translator, "Data:", $data, "Rules:", $rules, "Messages:", $messages, "CustomAtts:", $customAttributes);
        parent::__construct($translator, $data, $rules, $messages, $customAttributes);
        //$this->setCustomMessages(['id.test'=>"Failed ID Test!", 'test'=>'Failed the Test']);
     }
   public function validateTest2 ($attribute, $value, $params = null) {
-    \pkdebug ("In ValidateTest: attriubute: [$attribute], value: [$value]; Params:", $params);
+    //pkdebug ("In ValidateTest: attriubute: [$attribute], value: [$value]; Params:", $params);
     $errorMsg = "No, Not, not Valid!";
     $this -> setCustomMessages(['test2'=>"Quite a problem"]);
     return false;
@@ -69,7 +69,7 @@ class PkValidator extends Validator {
       return true;
   }
   protected function isValidatable($rule, $attribute, $value) {
-    pkdebug("IN isValidatable, RULE:", $rule);
+    //pkdebug("IN isValidatable, RULE:", $rule);
     if (is_string($rule) && (strtolower($rule)==='sum')) return true;
     return parent::isValidatable($rule, $attribute, $value);
   }
@@ -78,7 +78,7 @@ class PkValidator extends Validator {
     $value = $this->getValue($attribute);
    // pkdebug("In Val Att, Att:",$attribute,'value', $value);
     $res = parent::validateAttribute($attribute, $rule);
-    pkdebug("In Val Att, Att:",$attribute,'value', $value, 'RES:', $res);
+    //pkdebug("In Val Att, Att:",$attribute,'value', $value, 'RES:', $res);
     return $res;
   }
 
@@ -89,7 +89,7 @@ class PkValidator extends Validator {
    * @param array $params - [minsum = 0, "Optional Custom Message"]
    */
   public function validateSum($attribute,$value,$params) {
-    pkdebug("In validatesum, w params::" ,$params, "value:", $value, "Att:", $attribute);
+    //pkdebug("In validatesum, w params::" ,$params, "value:", $value, "Att:", $attribute);
     if (count($params)) {
       $sum = $params[0];
     } else {
@@ -102,7 +102,7 @@ class PkValidator extends Validator {
       $arrpart = '';
       $attpart = $attribute;
     }
-    pkdebug("arrpart: [$arrpart]; attpart: [$attpart]");
+    //pkdebug("arrpart: [$arrpart]; attpart: [$attpart]");
     $atts = explode('+', $attpart);
     $total = 0;
     $attkeys = ' ';
@@ -110,7 +110,7 @@ class PkValidator extends Validator {
       if ($arrpart) $key = $arrpart.$att;
       else $key = $att;
       $value = $this->getValue($key);
-      pkdebug("For key: [$key], Value: [$value]");
+      //pkdebug("For key: [$key], Value: [$value]");
       if (!is_numeric($value)) continue;
       $total += $value;
       $attkeys .= "$att ";

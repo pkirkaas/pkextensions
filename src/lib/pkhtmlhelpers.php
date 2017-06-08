@@ -229,6 +229,32 @@ function checkBox($value) {
   return  '&#9744;';
 }
 
+/**
+ * Use it in templates to show a set of values
+ * Takes an an array/list of possible values, and
+ * array of actual $values, and returns an indexed array
+ * of assoc arrays, with all the labels of $list, and checked boxes
+ * for the ones that are matched in the values. 
+ * @param array $values
+ * @param array $list
+ * @param string $checkKey
+ * @param string $labelKey
+ */
+function checkArray($values, $list, $compact= false, $opts=[]){
+  $labelKey = keyVal('labelKey',$opts,'label');
+  $checkKey = keyVal('checkKey',$opts,'check');
+  $ret = [];
+  foreach($list as $key=>$value) {
+    $row = [];
+    $row[$labelKey] = $value;
+    $row[$checkKey] =  checkBox(in_array_equivalent($key,$values));
+    if (!$compact || in_array_equivalent($key,$values)) {
+      $ret[] = $row;
+    }
+  }
+  return $ret;
+}
+
 function printButton($extraclasses = 'inline', $txt='Print') {
   return "<div class='$extraclasses pkmvc-button print-button'>$txt</div>";
 }
