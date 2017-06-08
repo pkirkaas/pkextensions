@@ -2,73 +2,21 @@
 namespace PkExtensions;
 use \Exception;
 use PkExtensions\Traits\CriteriaSetsTrait;
-
-/** Way too simple to call it a query - just does a simple match on simple criteria
+/**
+ * For searching Collections of Models
+ * We run a match method on a model value
+ *  Way too simple to call it a query - just does a simple match on simple criteria
  * It has two levels of variables - the names and types of fields it should match -
  * but then has values and criteria
+ * 
+ * I think I originally created PkMatch to filter on model method results, which
+ * couldn't be SQLed - but also useful for difficult things like array intersection,
+ * like keeping multiple choices in a json string in the DB
+ * 
+ * Get $matchObj->satisfy($field_Value).
  */
 class PkMatch {
   use CriteriaSetsTrait;
-
-  /*
-  public static $criteriaSets = [
-      'numeric' => [
-          '0' => "Don't Care",
-          '<' => 'Less Than',
-          '<=' => 'At Most',
-          '>=' => 'At Least',
-          '>' => 'More Than',
-          '=' => 'Equal To',
-          '!=' => 'Not Equal To',
-      ],
-      'string' => [
-          '0' => "Don't Care",
-          'LIKE' => 'Is',
-          '%LIKE' => 'Starts With',
-          'LIKE%' => 'Ends With',
-          '%LIKE%' => 'Contains',
-      ],
-      'group' => [
-          '0' => "Don't Care",
-          'IN' => 'In',
-          'NOTIN' => 'Not In',
-      ],
-      'within' => [
-          '0' => "Don't Care",
-          '1' => 'Within 1 mile',
-          '5' => 'Within 5 miles',
-          '10' => 'Within 10 miles',
-          '20' => 'Within 20 miles',
-          '50' => 'Within 50 miles',
-      ],
-      'between' => [
-          '0' => "Don't Care",
-          'BETWEEN' => 'Between',
-          'NOT BETWEEN' => 'Not Between',
-      ],
-      'boolean' => [
-          '0' => "Don't Care",
-          'IS' => 'Required',
-          'IS NOT' => "Excluded",
-      ],
-      'exists' => [
-          '0' => "Don't Care",
-          'EXISTS' => 'Exists',
-          'NOT EXISTS' => "Doesn't Exist",
-      ],
-  ];
-  */
-  /*
-    public $active; #Should this match be run?
-    public $comptype; #Like, 'numeric', 'string', 'between', etc
-    public $criterion; # Like 0 (Don't care), >, <, 'LIKE%', etc
-    public $compvalue; # Should it be > 7? Or an array, like for 'group' or 'between'
-    public $comptarget; #ModelName, TableName, or none
-    public $targettype; #'table', 'model', etc
-    public $compfield; #Field/Attribute name like 'user_id', or a method name
-    public $callable; #Is it a simple filed/attribute name, or a callable method/function/etc
-   * 
-   */
 #If 0/False, simple attribute, else 'method', 'function', etc
   public $parameters; #Opt Arr - not only methods take args, 'within' & 'between' as well
   public static $attributeNames = [
@@ -126,6 +74,44 @@ class PkMatch {
     return $trimArr;
   }
 
+  /** Enable making one match obj at a time, should be the value
+   *  for the matchObj array keyed by $basename
+   * @param type $arrSet
+   * @param str $baseName - nice to have
+   * 
+   */
+  public static function mkMatchObj($arrSet,$baseName = null) {
+      $marr = [];
+      //if ($baseName === 'yrsest') pkdebug("BNAME:  $baseName, arrSetPre", $arrSet);
+      if (!$fs = keyVal('field_set', $arrSet)) {
+        $fs = keyVal('field_defs', $arrSet);
+        if (!$fs) return;
+      }
+      //if ($baseName === 'yrsest') pkdebug("POSTNAM:  $baseName, arrSetPOST", $arrSet);
+      if (array_key_exists('val', $fs)) $marr['val'] = $fs['val'];
+      if (array_key_exists('crit', $fs)) $marr['crit'] = $fs['crit'];
+      if (array_key_exists('minval', $fs)) $marr['minval'] = $fs['minval'];
+      if (array_key_exists('maxval', $fs)) $marr['maxval'] = $fs['maxval'];
+      $meta = keyVal('meta', $arrSet);
+      $comptype = firstKeyVal('comptype', $fs, $arrSet, $meta);
+      if (!$comptype) $comptype = static::getTypeFromCrit(keyVal('crit', $marr));
+      if (!$comptype) {
+        if (array_key_exists('minval', $fs) || array_key_exists('maxval', $fs))
+            $comptype = 'between';
+      }
+      if (!$comptype && is_array(keyVal('val', $marr))) $comptype = 'group';
+      if (!static::isValidCompType($comptype)) return;
+      $marr['comptype'] = $comptype;
+      $marr['compfield'] = $baseName;
+      foreach (static::$attributeNames as $attName) {
+        //if ($baseName === 'yrsest') pkdebug("Looking for attName: $attName");
+        if ($tst = firstKeyVal($attName, $meta, $arrSet, $fs)) {
+          $marr[$attName] = $tst;
+        }
+      }
+      return new PkMatch($marr);
+  }
+
   /** Takes a baseKeyed array and turns it into a array of match objs */
   public static function matchFactory($arrSets = [], $params = []) {
     //pkdebug("Enter MatchFact, arrstes:", $arrSets);
@@ -138,6 +124,11 @@ class PkMatch {
     //pkdebug("REFACTOR MatchFact, arrstes:", $arrSets);
     $matchArr = [];
     foreach ($arrSets as $baseName => $arrSet) {
+      $matchArr[$baseName] = $this->mkMatchObj($arrSet,$baseName);
+
+      /*
+
+
       // pkdebug("BASENEAME: [$baseName] ARRSET: ",$arrSet);
       $marr = [];
       //if ($baseName === 'yrsest') pkdebug("BNAME:  $baseName, arrSetPre", $arrSet);
@@ -167,8 +158,14 @@ class PkMatch {
           $marr[$attName] = $tst;
         }
       }
+
+
+
       $matchArr[$baseName] = new PkMatch($marr);
+      */
     }
+
+
     return $matchArr;
   }
 
@@ -249,6 +246,7 @@ class PkMatch {
     if ($this->comptype === 'within') return $this->withinComp($arg);
     if ($this->comptype === 'between') return $this->betweenComp($arg);
     if ($this->comptype === 'exists') return $this->existsComp($arg);
+    if ($this->comptype === 'intersects') return $this->intersectsComp($arg);
     throw new \Exception("Unknown comparison type: " . $this->comptype);
   }
 
@@ -283,6 +281,34 @@ class PkMatch {
     }
     throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
   }
+
+  /** $arg has to be an array or string to be json_decoded 
+   * 
+   * @param type $arg
+   */
+  function intersectsComp($arg = null) {
+    if (ne_string($arg)) {
+      $arg = json_decode($arg,1);
+    }
+    if (!is_array($arg)) return false;
+    if ($this->crit === 'IN') {
+      if (!$this->val) return false;
+      if (!is_array($this->val)) {
+          throw new Exception("Invalid val:" . print_r($this->val, 1));
+      }
+      return !!count(array_intersect($arg, $this->val));
+    }
+    if ($this->crit === 'NOTIN') {
+      if (!$this->val) return true;
+      if (!is_array($this->val)){
+          throw new Exception("Invalid val:" . print_r($this->val, 1));
+      }
+      return !count(array_intersect($arg, $this->val));
+    }
+    throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
+  }
+    
+
 
   public function withinComp($arg = null) {
     throw new Exception("'WITHIN' not supported yet");

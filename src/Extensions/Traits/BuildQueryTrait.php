@@ -5,6 +5,7 @@ use Illuminate\Database\Eloquent\Collection;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Models\PkSearchModel;
 use PkExtensions\PkController;
+use PkExtensions\PkException;
 use PkExtensions\PkMatch;
 use PkExtensions\PkHtmlRenderer;
 
@@ -475,6 +476,30 @@ trait BuildQueryTrait {
     return $fields;
   }
 
+
+  /** This builds a _val field to contain a JSON string of multiple values - so
+   * fieldtype HAS to be string
+   * BUT THE VALUE IN THE UNDERLYING MODEL IS A JSON STRING OF MULTIPLE VALUES TOO
+   * @param type $baseName
+   * @param type $def
+   * @return string
+   */
+  public static function buildQueryFieldsIntersects($baseName, $def = null) {
+    //$valType = keyVal('fieldtype', $def, 'string');
+    $valType = 'string';
+    $fieldtype_args = keyVal('fieldtype_args', $def);
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      //$fields[$baseName.'_parm'.$i] = $parm; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
+  }
+
   public static function buildQueryFieldsWithin($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'integer');
     $fieldtype_args = keyVal('fieldtype_args', $def);
@@ -525,7 +550,8 @@ trait BuildQueryTrait {
     $collection = $this->buildQueryOnModel()->get();
     //$sz = count($collection);
     //pkdebug("Just ran query from BQT: SZ: $sz");
-    $newcol = $this->filterOnMethods($collection);
+    // ORIG$newcol = $this->filterOnMethods($collection);
+    $newcol = $this->filterOnMatch($collection);
     //$sza = count($newcol);
     //pkdebug("SXA:  $sza");
     return $newcol;
@@ -598,13 +624,17 @@ trait BuildQueryTrait {
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
+        $comptype = static::comptype($root);
         if (is_array($critset['val'])) {
-          if ($critset['crit'] === 'IN') {
+
+
+          if (($comptype === 'group') && ($critset['crit'] === 'IN')) {
             $query = $query->whereIn($root, array_values($critset['val']));
             continue;
-          } else if ($critset['crit'] === 'NOTIN') {
+          } else if (($comptype === 'group') && ($critset['crit'] === 'NOTIN')) {
             $query = $query->whereNotIn($root, array_values($critset['val']));
             continue;
+
           } else if ($critset['crit'] === 'BETWEEN') {
             //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
      // pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
@@ -614,8 +644,11 @@ trait BuildQueryTrait {
             //pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
+          } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root),$root)){
+            $this->addMatchObj($root,$matchObj);
           } else {
-            continue;
+            throw new PkException(["Unhandled for root[$root], comptype [$comptype] w. val:",
+                $critset['val']]);
           }
         }
         //pkdebug("QT: ".typeOf($query)."..");
@@ -640,6 +673,17 @@ trait BuildQueryTrait {
 
   public $querySets = [];
   public $matchObjs;
+  public $matchObjArr = []; #Just duplicate of above, but I want to populate it differently
+
+  public function addMatchObj($baseName,$matchObj) {
+    if (!$matchObj) return;
+    $matchObj->compfield = $baseName;
+    $this->matchObjArr[$baseName]=$matchObj;
+  }
+  public function getMatchObj($base = null) {
+    if ($base) return keyVal($base,$this->matchObjArr);
+    return $this->matchObjArr;
+  }
 
   /** Takes an associative array, possibly from a Search Model, possibly from a post,
    * and only selects matching keys in the form:
@@ -669,8 +713,13 @@ trait BuildQueryTrait {
    * a post array if it is implemented from a controller.
    * @param array $arr
    * @return array keyed by
-   *   'fieldname'=>['val'=>$val,'crit'=>$crit, {'param'=>$param}
+   *   'fieldname'=>['val'=>$val,'crit'=>$crit, 'comptype'=>$comptype, {'param'=>$param}
    */
+
+  ## I should consider NOT building all match objs at once - just ONE AT A TIME
+  ## And adding them when I can't build an SQL query. 
+  ## I want executeQuery to process 3 things - sql queries, PkMatch objs, and
+  ## any custom filter methods defined on the Query Model
   public function buildQuerySets(Array $arr = []) {
     if ($this->matchObjs === null) {
       $this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
@@ -696,6 +745,7 @@ trait BuildQueryTrait {
       if ($val === null) continue;
       if (!$this->isValidCriterion($key)) continue;
       #We COULD get static::getBasenameQueryDef($root) now, and see if we have supplimental info
+      $comptype = static::comptype($root);
       $maxvalfield = $root . '_maxval'; #For 'BETWEEN'comparison
       $minvalfield = $root . '_minval'; #For 'BETWEEN'comparison
       $valfield = $root . '_val';
@@ -724,7 +774,8 @@ trait BuildQueryTrait {
 
       #We have a criterion and value - build our array
       //$sets[$root] = ['crit' => $arr[$key], 'val' => $arr[$valfield], 'param' => $arr[$paramfield]];
-      if (static::comptype($root) === 'group') { #Need to make it an array from json string
+      if (($comptype === 'group') || ($comptype === 'intersects')) {
+        #Need to make it an array from json string
         if (is_string($valval)) {
           $valval = json_decode($valval,1);
         }
@@ -736,6 +787,7 @@ trait BuildQueryTrait {
       $rootMatch->crit=$sets[$root]['crit'] = $arr[$key];
       $rootMatch->val=$sets[$root]['val'] = $valval;
       $rootMatch->param=$sets[$root]['param'] = $arr[$paramfield];
+      $rootMatch->comptype=$sets[$root]['comptype'] = $comptype;
       $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
@@ -807,6 +859,29 @@ trait BuildQueryTrait {
         if ($reject) return $reject;
       } ## Passed all the criteria; don't reject
       return false;
+    });
+    return $trimmedCollection;
+  }
+
+  /** Using the individual match objects I created one at a
+   * time & added to the new array individually. Experiment
+   * @param Collection $collection
+   * @return Collection
+   */
+  public function filterOnMatch(Collection $collection) {
+    $pkmarr = $this->getMatchObj();
+    if(!$pkmarr) {
+      return $collection;
+    }
+    $trimmedCollection = $collection->reject(function ($item) use ($pkmarr) {
+      $failed = false;
+      foreach($pkmarr as $base => $match) {
+        if (!$match->satisfy($item->$base)) {
+          $failed = true;
+          break;  
+        }
+      }
+      return $failed;
     });
     return $trimmedCollection;
   }

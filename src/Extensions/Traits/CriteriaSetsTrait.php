@@ -28,6 +28,13 @@ Trait CriteriaSetsTrait {
           'IN' => 'In',
           'NOTIN' => 'Not In',
       ],
+      #Intersects is like in a 'group' - but rather than 1 value in an array,
+      #do TWO arrays have any common values? Tough to do w. SQL
+      'intersects' => [
+          '0' => "Don't Care",
+          'IN' => 'In',
+          'NOTIN' => 'Not In',
+      ],
       'within' => [
           '0' => "Don't Care",
           '1' => 'Within 1 mile',
