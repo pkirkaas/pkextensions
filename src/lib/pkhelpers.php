@@ -48,7 +48,18 @@ function setAppLog() {
   appLogPath($logPath);
 }
 
-/**
+function isLocal($tst = null) {
+  static $local = null;
+  if($tst !==null) {
+    $local = $tst;
+  }
+  if ($local !== null) {
+    return $local;
+  }
+  return config('app.env') === 'local';
+}
+
+  /**
  * Returns a user friendly string date format for date string or Carbon date object, with default
  * format or given - BUT also returns "Never" if Carbon date is max/min - or null.
  * @param mixed $date - a date parsable by Carbon,
