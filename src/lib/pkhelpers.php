@@ -59,6 +59,8 @@ function isLocal($tst = null) {
   return config('app.env') === 'local';
 }
 
+
+
   /**
  * Returns a user friendly string date format for date string or Carbon date object, with default
  * format or given - BUT also returns "Never" if Carbon date is max/min - or null.
