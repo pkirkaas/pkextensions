@@ -3330,10 +3330,17 @@ if (!function_exists('array_flatten')) {
  * and trimmed as specified.
  */
 function explode_all($delimiter, $string, $trim=true, $omitempty=true) {
+  if (is_string($string)) {
+    $string = [$string];
+  }
+  if (!is_array($string)) {
+    throw new Exception ("Invalid string arg: ".print_r($string,1));
+  }
   if (!is_array($delimiter)) {
     $delimiter = [$delimiter];
   }
-  $utarr = explode(array_shift($delimiter), $string);
+  //$utarr = explode(array_shift($delimiter), $string);
+  /*
   foreach ($delimiter as $del) {
     foreach($utarr as $key => $substr) {
       //$utarr[$key] = explode($del, $substr);
@@ -3341,24 +3348,37 @@ function explode_all($delimiter, $string, $trim=true, $omitempty=true) {
       $utarr = array_merge($utarr, explode($del, $substr));
     }
   }
-  $farr = array_flatten($utarr);
+   * 
+   */
+  
+  //$utarr = [];
+  $utarr = $string;
+  foreach ($delimiter as $del) {
+    foreach($utarr as $key => $substr) {
+        unset($utarr[$key]);
+        $pieces =  explode($del, $substr);
+        foreach ($pieces as $piece) {
+          $utarr[]=$piece;
+        }
+    }
+  }
+  $farr = $utarr;
   if (!$omitempty && !$trim) {
     return $farr;
   }
   $resarr = [];
   foreach ($farr as $el) {
+    if ($trim) {
+      if (is_string($trim)) {
+        $el = trim($el, $trim);
+      } else {
+        $el = trim($el);
+      }
+    } 
     if ($omitempty && ($el === '')) {
       continue;
     }
-    if ($trim) {
-      if (is_string($trim)) {
-        $resarr[] = trim($el, $trim);
-      } else {
-        $resarr[] = trim($el);
-      }
-    } else {
-      $resarr[] = $el;
-    }
+    $resarr[] = $el;
   }
   return $resarr;
 }
