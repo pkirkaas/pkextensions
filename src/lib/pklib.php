@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PKMVC Framework 
  *
@@ -19,10 +20,13 @@ define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 class PkLibConfig {
+
   static $suppressPkDebug = false;
+
   public static function getSuppressPkDebug() {
     return static::$suppressPkDebug;
   }
+
   public static function setSuppressPkDebug($suppress = true) {
     static::$suppressPkDebug = $suppress;
   }
@@ -30,11 +34,19 @@ class PkLibConfig {
   static $warnLogName = 'app.warn.log';
   static $warnLogDir; #Defaults to same dir as debug app log
   static $isWarning = 0; #Toggled by pkwarn to 1, then pkdebugOut, then back to 0
+
 }
 
 Class Undefined {
-  public function __get($x) { return null; }
-  public function __set($x, $y) { }
+
+  public function __get($x) {
+    return null;
+  }
+
+  public function __set($x, $y) {
+    
+  }
+
 }
 
 function isCli() {
@@ -223,7 +235,7 @@ function getCallingFrame($baseFile = null) {
         $idx++;
         continue;
       } else {
-        $str.=$stack[$idx][$name] . "<br>\n";
+        $str .= $stack[$idx][$name] . "<br>\n";
         $num--;
         if (!$num) break;
         $idx++;
@@ -317,10 +329,10 @@ function pkdebug_base() {
   foreach ($retvals as $key => $value) {
     if (($key === 'object') || ($key === 'args')) continue;
     //$tstrr.= "$key: $value, ";
-    $tstrr.= "$value; ";
+    $tstrr .= "$value; ";
   }
-  $tstrr.="; LINE: $fline\n";
-  $out.=$tstrr;
+  $tstrr .= "; LINE: $fline\n";
+  $out .= $tstrr;
   $lastarg = func_get_arg(func_num_args() - 1);
   $dumpobjs = true;
   if (is_bool($lastarg) && ($lastarg === false)) $dumpobjs = false;
@@ -377,11 +389,11 @@ function pkstack_base($depth = 10, $args = false) {
       continue;
     }
     //$out .= pkvardump($frame) . "\n";
-    if (!empty($frame['file'])) $out.=$frame['file'] . ': ';
-    if (!empty($frame['line'])) $out.=$frame['line'] . ': ';
-    if (!empty($frame['function'])) $out.=$frame['function'] . ': ';
-    if (!empty($frame['class'])) $out.=$frame['class'] . ': ';
-    $out.="\n";
+    if (!empty($frame['file'])) $out .= $frame['file'] . ': ';
+    if (!empty($frame['line'])) $out .= $frame['line'] . ': ';
+    if (!empty($frame['function'])) $out .= $frame['function'] . ': ';
+    if (!empty($frame['class'])) $out .= $frame['class'] . ': ';
+    $out .= "\n";
     if ($args) $out .= "Args:" . pkvardump($frame['args']) . "\n";
     //$out .= "Args:" . print_r($frame['args'],true) . "\n";
     if (++$i >= $depth) {
@@ -582,12 +594,12 @@ function pkdebugOut($str, $logpath = null) {
       $fp = fopen($logpath, 'a+');
     }
     if (!$fp) {
-        throw new Exception("Failed to open DebugLog [$logpath] for writing");
+      throw new Exception("Failed to open DebugLog [$logpath] for writing");
     }
     if ($first) {
-        $v = " \n\n";
-        $h = "=================================";
-      fwrite($fp,$v.$h.$v );
+      $v = " \n\n";
+      $h = "=================================";
+      fwrite($fp, $v . $h . $v);
     }
     fwrite($fp, $str);
     fclose($fp);
@@ -1172,10 +1184,11 @@ function cln_arr_val(Array $arr, $key, $filter = FILTER_SANITIZE_STRING) {
  * $param string|null: Enclose the output by these characters? Like: "'".
  * @return String: The HTML Encoded string
  */
-function html_encode($str,$enclose=null) {
-  return $enclose.filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS, ENT_QUOTES).$enclose;
+function html_encode($str, $enclose = null) {
+  return $enclose . filter_var($str, FILTER_SANITIZE_FULL_SPECIAL_CHARS, ENT_QUOTES) . $enclose;
 }
-function html_encode_file($path, $enclose=null) {
+
+function html_encode_file($path, $enclose = null) {
   if (!is_readable($path)) {
     throw new Exception("Couldn't read [$path]");
   }
@@ -1188,7 +1201,7 @@ function html_encode_file($path, $enclose=null) {
  */
 function html_encode_array(Array $arr = [], $enclose = null) {
   $json = json_encode($arr);
-  return html_encode($json,$enclose);
+  return html_encode($json, $enclose);
 }
 
 /**
@@ -1424,9 +1437,11 @@ function max_idx($arr, $next = false) {
 
 // Finally implemented as native function in PHP >= 7.1
 if (!function_exists('is_iterable')) {
+
   function is_iterable($var) {
     return (is_array($var) || $var instanceof Traversable);
   }
+
 }
 
 /**
@@ -1625,7 +1640,7 @@ function generateShortRandomString($length = 5) {
  */
 function combineAsArrays($arg1, $arg2) {
   $arg1 = toArray($arg1);
-  if ($arg2===null) return $arg1;
+  if ($arg2 === null) return $arg1;
   $arg2 = toArray($arg2);
   return array_merge($arg1, $arg2);
 }
@@ -1834,7 +1849,7 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
     } else if (is_numeric($key)) {
       
     }
-    $output .=("$key => " . var_export_square($value, $depth, $indent) . " ");
+    $output .= ("$key => " . var_export_square($value, $depth, $indent) . " ");
   }
   if ($depth > 1) {
     $output .= "],\n";
@@ -2138,7 +2153,7 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
   $formatted = '$' . number_format($num, $prec);
   if (!$wrap_class) return $formatted;
   if ($num < 0) {
-    $wrap_class.= ' negative-dollar-value';
+    $wrap_class .= ' negative-dollar-value';
   }
   return "<div class='pk-dollar-value $wrap_class'>$formatted</div>\n";
 }
@@ -2415,7 +2430,7 @@ function uniqueName($suffix = '') {
   if ($suffix) {
     $suffix = ".$suffix";
   }
-  return uniqid('upld', 1) . '_' . uniqid().$suffix;
+  return uniqid('upld', 1) . '_' . uniqid() . $suffix;
 }
 
 /**
@@ -2442,7 +2457,7 @@ function array_meld($arr1, $arr2) {
   foreach ($arr1 as $key1 => $val1) {
     $key2 = key($arr2);
     //$val2 = $arr2[$key2];
-    $val2 = keyVal($key2,$arr2);
+    $val2 = keyVal($key2, $arr2);
     next($arr2);
     if ($key1 === $key2) {
       $retarr[$key1] = array_meld($val1, $val2);
@@ -2674,11 +2689,11 @@ function displayArraysAsTable($arr, $headers = [], $cssclasses = '') {
   foreach ($headers as $header) {
     $out .= "<th>$header</th>";
   }
-  $out.="</tr>";
+  $out .= "</tr>";
   foreach ($arr as $row) {
     $out .= "<tr>";
     foreach ($row as $item) {
-      $out.="<td>$item</td>";
+      $out .= "<td>$item</td>";
     }
     $out .= "</tr>\n";
   }
@@ -2999,7 +3014,7 @@ function buildFormInputNameFromSegments($arg1 = null, $arg2 = null) {
       if (!is_scalar($val))
           throw new Exception("Invalid value: " . print_r($val, 1));
       if (!$idx) $name = (string) $val;
-      else $name.='[' . (string) $val . ']';
+      else $name .= '[' . (string) $val . ']';
     } else if ($arg1) throw new Exception("Bad arg1: " . print_r($arg1, 1));
 
   if (($arg2 === null) || ($arg2 === '')) return $name;
@@ -3147,23 +3162,24 @@ function normalizeConfigArray(array $arr = [], $struct = null) {
  * returns ['value'=>'Name', 'tag'=>'div]
  */
 function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
-  if (is_stringish($defaults) || ($defaults===null)) $defaults = [$key=>$defaults];
+  if (is_stringish($defaults) || ($defaults === null))
+      $defaults = [$key => $defaults];
   $retarr = [];
   if (is_stringish($arg)) {
-     $retarr = [$key => $arg];
+    $retarr = [$key => $arg];
   } else if (is_array_assoc($arg)) {
     $retarr = $arg;
   } else if (is_array_indexed($arg)) { #arg[0] is $key val, $arg[1] other atts
-    $retarr = keyVal(1,$arg,[]);
+    $retarr = keyVal(1, $arg, []);
     #Cheat - if $retarr is string, assume it's a "class"
-    if (is_string($retarr)) $retarr = ['class'=>$retarr];
+    if (is_string($retarr)) $retarr = ['class' => $retarr];
     $retarr[$key] = $arg[0];
   }
   else if (!$arg && !$key) $retarr = [];
   else throw new Exception("Invalid arg: " . print_r($arg, 1));
   if ($defaults && is_array($defaults)) {
     foreach ($defaults as $ddkey => $ddval) {
-      if (!keyVal($ddkey,$retarr)) {
+      if (!keyVal($ddkey, $retarr)) {
         $retarr[$ddkey] = $ddval;
       }
     }
@@ -3179,8 +3195,8 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
     }
   }
   if (!isset($retarr[$key])) {
-  //  pkdebug("Woops! key [$key] not set in retarr:",$retarr,'OrigArg:', $arg);
-    $retarr[$key]=null;
+    //  pkdebug("Woops! key [$key] not set in retarr:",$retarr,'OrigArg:', $arg);
+    $retarr[$key] = null;
   }
   return $retarr;
 }
@@ -3287,14 +3303,14 @@ function setInstanceAtts($obj, array $atts = []) {
  * @param mixed $default
  * @return mixed
  */
-function unsetret(&$arr, $key=null, $default = null) {
+function unsetret(&$arr, $key = null, $default = null) {
   if (($key === null) || !is_array($arr)) {
-    pkdebug("Odd - not quite an array op: key:, arr:",$key,$arr);
+    pkdebug("Odd - not quite an array op: key:, arr:", $key, $arr);
     $ret = $arr;
-    unset ($arr);
+    unset($arr);
     return $ret;
   }
-  $ret = keyVal($key,$arr, $default);
+  $ret = keyVal($key, $arr, $default);
   unset($arr[$key]);
   return $ret;
 }
@@ -3303,20 +3319,22 @@ function unsetret(&$arr, $key=null, $default = null) {
  * 
  */
 if (!function_exists('array_flatten')) {
+
   function array_flatten($array = null) {
     $result = [];
     if (!is_array($array)) {
-        $array = func_get_args();
+      $array = func_get_args();
     }
     foreach ($array as $key => $value) {
-        if (is_array($value)) {
-            $result = array_merge($result, array_flatten($value));
-        } else {
-            $result = array_merge($result, array($key => $value));
-        }
+      if (is_array($value)) {
+        $result = array_merge($result, array_flatten($value));
+      } else {
+        $result = array_merge($result, array($key => $value));
+      }
     }
     return $result;
   }
+
 }
 
 /** Like Explode, but delimeter may be an ARRAY of delimiters, so all exploded.
@@ -3329,52 +3347,37 @@ if (!function_exists('array_flatten')) {
  * @return array - flat indexed array, with explode applied with all delimiters,
  * and trimmed as specified.
  */
-function explode_all($delimiter, $string, $trim=true, $omitempty=true) {
+function explode_all($delimiter, $string, $trim = true, $omitempty = true) {
   if (is_string($string)) {
     $string = [$string];
   }
   if (!is_array($string)) {
-    throw new Exception ("Invalid string arg: ".print_r($string,1));
+    throw new Exception("Invalid string arg: " . print_r($string, 1));
   }
   if (!is_array($delimiter)) {
     $delimiter = [$delimiter];
   }
-  //$utarr = explode(array_shift($delimiter), $string);
-  /*
   foreach ($delimiter as $del) {
-    foreach($utarr as $key => $substr) {
-      //$utarr[$key] = explode($del, $substr);
-      unset($utarr[$key]);
-      $utarr = array_merge($utarr, explode($del, $substr));
+    foreach ($string as $key => $substr) {
+      unset($string[$key]);
+      $pieces = explode($del, $substr);
+      foreach ($pieces as $piece) {
+        $string[] = $piece;
+      }
     }
   }
-   * 
-   */
-  
-  //$utarr = [];
-  $utarr = $string;
-  foreach ($delimiter as $del) {
-    foreach($utarr as $key => $substr) {
-        unset($utarr[$key]);
-        $pieces =  explode($del, $substr);
-        foreach ($pieces as $piece) {
-          $utarr[]=$piece;
-        }
-    }
-  }
-  $farr = $utarr;
   if (!$omitempty && !$trim) {
-    return $farr;
+    return $string;
   }
   $resarr = [];
-  foreach ($farr as $el) {
+  foreach ($string as $el) {
     if ($trim) {
       if (is_string($trim)) {
         $el = trim($el, $trim);
       } else {
         $el = trim($el);
       }
-    } 
+    }
     if ($omitempty && ($el === '')) {
       continue;
     }
