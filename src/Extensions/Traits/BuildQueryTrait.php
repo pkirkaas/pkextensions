@@ -625,7 +625,7 @@ trait BuildQueryTrait {
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
-        pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
+        //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
         if (is_array($critset['val'])) {
 
 

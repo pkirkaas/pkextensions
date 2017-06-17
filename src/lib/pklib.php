@@ -3298,3 +3298,67 @@ function unsetret(&$arr, $key=null, $default = null) {
   unset($arr[$key]);
   return $ret;
 }
+
+/** Takes an arbitrary number of mixed args, returns as a flattened array
+ * 
+ */
+if (!function_exists('array_flatten')) {
+  function array_flatten($array = null) {
+    $result = [];
+    if (!is_array($array)) {
+        $array = func_get_args();
+    }
+    foreach ($array as $key => $value) {
+        if (is_array($value)) {
+            $result = array_merge($result, array_flatten($value));
+        } else {
+            $result = array_merge($result, array($key => $value));
+        }
+    }
+    return $result;
+  }
+}
+
+/** Like Explode, but delimeter may be an ARRAY of delimiters, so all exploded.
+ * 
+ * @param string|array $delimiter
+ * @param string $string
+ * @param boolean|string $trim - default TRUE, trim results. If false, don't, if
+ * string, use as arg to trim.
+ * @param booleain $omitempty - remove empty results
+ * @return array - flat indexed array, with explode applied with all delimiters,
+ * and trimmed as specified.
+ */
+function explode_all($delimiter, $string, $trim=true, $omitempty=true) {
+  if (!is_array($delimiter)) {
+    $delimiter = [$delimiter];
+  }
+  $utarr = explode(array_shift($delimiter), $string);
+  foreach ($delimiter as $del) {
+    foreach($utarr as $key => $substr) {
+      //$utarr[$key] = explode($del, $substr);
+      unset($utarr[$key]);
+      $utarr = array_merge($utarr, explode($del, $substr));
+    }
+  }
+  $farr = array_flatten($utarr);
+  if (!$omitempty && !$trim) {
+    return $farr;
+  }
+  $resarr = [];
+  foreach ($farr as $el) {
+    if ($omitempty && ($el === '')) {
+      continue;
+    }
+    if ($trim) {
+      if (is_string($trim)) {
+        $resarr[] = trim($el, $trim);
+      } else {
+        $resarr[] = trim($el);
+      }
+    } else {
+      $resarr[] = $el;
+    }
+  }
+  return $resarr;
+}
