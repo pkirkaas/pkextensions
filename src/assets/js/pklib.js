@@ -253,11 +253,15 @@ function showHelpDialog() {
  
 $(function () {
 $('body [data-instructions]').on({
-   mouseenter: function (event) {
-     var el = $(event.target);
+   mouseover: function (event) {
+     //var el = $(event.target);
+     var el = $(this);
+     console.log('El Target:',el);
      var instHtml = el.attr('data-instructions');
+     var prop = el.prop('data-instructions');
+     var dinst = el.data('instructions');
      if (!instHtml) {
-       console.log("Leaving?");
+       console.log("Leaving? InstHTML: ",instHtml, 'dinst: ',dinst,'prop',prop);
        return;
      }
      var elOffset = el.offset();
@@ -282,7 +286,7 @@ $('body [data-instructions]').on({
      instWrap.html(instHtml);
      el.after(instWrap);
    },
-   mouseleave: function(event) {
+   mouseout: function(event) {
      $('.instruction-wrapper').remove();
    }
  });

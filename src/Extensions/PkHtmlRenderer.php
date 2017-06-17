@@ -466,7 +466,7 @@ class PkHtmlRenderer extends PartialSet {
       #us. We DO close after we insert this content, but her position is secure
       # and everyone who joins her is save in the same position.
 
-      $this->rawcontent($this->spaceDepth()."<$tag ".PkHtml::attributes($attributes).">");
+      $this->rawcontent("<$tag ".PkHtml::attributes($attributes).">");
 
       #############  ORIG ##############
       if (is_array($content)){
@@ -476,7 +476,7 @@ class PkHtmlRenderer extends PartialSet {
       } else {
         $this->content($content,$raw);
       }
-      $this->rawcontent($this->spaceDepth()."</$tag>\n");
+      $this->rawcontent("</$tag>\n");
       return $this;
 
 
@@ -826,7 +826,8 @@ class PkHtmlRenderer extends PartialSet {
    *     for the column
    * @param array $opts: (but can be $rowclass string, then $colclass is string)
    *    @param string $rowatts - optional additional attributes for the row
-   *    @param string $colclass - optional additional class for every column
+   *    @param string|array $colclass - optional if string, same col class for every column
+   *      if indexed array, must be same size as $data, custom per data col
    *    @param boolean $raw
    * @return $this
    */
@@ -854,6 +855,11 @@ class PkHtmlRenderer extends PartialSet {
     if (is_stringish($data)) $data=[$data];
     if (!is_array_indexed($data)) throw new PkException(["Invalid data type",$data]);
     foreach ($data as $i => $datum) {
+      if (is_array_indexed($colclass)) {
+        $icolclass = $colclass[$i];
+      } else {
+        $icolclass=$colclass. ' col';
+      }
       $val=$atts=null;
       if (is_stringish($datum)) {
         $val = $datum;
@@ -870,7 +876,7 @@ class PkHtmlRenderer extends PartialSet {
       if (!is_array_assoc($atts)) throw new PkException(['Invalid Atts',$atts]);
       $atts['class'] = keyVal('class',$atts,'');
       //if (strpos($atts['class'],'col') === false) $atts['class'].= ' col ';
-      $atts['class'] .= " $colclass col ";
+      $atts['class'] .= " $icolclass  ";
       $this->$div($val,$atts);
     }
     $this->RENDERCLOSE();

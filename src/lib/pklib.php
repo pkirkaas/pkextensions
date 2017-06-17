@@ -378,7 +378,7 @@ function pkstack_base($depth = 10, $args = false) {
     $depth = $stacksize;
   }
   $frame = $stack[0];
-  $out = "STACKTRACE: " . date('j-M-y; H:i:s') . ": Stack Depth: $stacksize; backtrace depth: $depth\n";
+  $out = "STACKTRACE: Stack Depth: $stacksize; Trace depth: $depth\n";
   //pkdebugOut($out);
   ////pkdebugOut("Stack Depth: $stacksize; backtrace depth: $depth\n");
   $i = 0;
@@ -2128,7 +2128,7 @@ function equivalent($a, $b) {
  *   If array, look for those keys, & 'hide0' as well, for multiple options 
  * @return string - dollar formatted
  */
-function d_f($num, $opts = 0, $hide0 = false) {
+function d_f($num, $opts = 0, $hide0 = true) {
   return dollar_format($num, $opts, $hide0);
 }
 
