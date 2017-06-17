@@ -55,6 +55,11 @@ $(function () {
         yearRange: '1930:2020'
       });
       datepicker.datepicker('setDate', date);
+      datepicker.on('change', function(){
+        if (!$(this).val()) {
+          jThis.val('');
+        }
+      });
       
     });
     /*
