@@ -458,3 +458,14 @@ hr {
 tr {
   page-break-inside: avoid !important;
 }
+
+//Experimental - to get the CHOSEN value of a select control centered
+
+select.select-center {
+  text-align: center;
+  text-align-last: center;
+}
+
+input::placeholder {
+  color: #999 !important;
+}
