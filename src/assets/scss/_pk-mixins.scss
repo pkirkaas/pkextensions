@@ -180,19 +180,20 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @for $i from 0 through 75 {
     $sz: if($i!=0, -$i, 0);
     $offset: $i/3 * 1rem;
+    $foffset: $offset/5;
     @if $i < 50 {
       //$foffset: $offset + 1em;
-      $foffset: $offset/5;
       //Font Size: REM, up and down - fs-0: 1rem;, fs-1: fs--1
-      .fs#{$sz},
-      .f-s#{$sz} {
+      .fs#{$sz}, .f-s#{$sz} {
         font-size: 1rem + $foffset !important;
       }
-      .fs-#{$sz},
-      .f-s-#{$sz} {
+      .fs-#{$sz}, .f-s-#{$sz} {
         font-size: 1rem - $foffset !important;
       }
     } 
+
+    .br-#{$sz} {border-radius: $foffset !important}
+
     //Heights & widths
     .height#{$sz} {height: $offset !important;}
     .minh#{$sz}, .minh-#{$sz},  .min-height#{$sz} {min-height: $offset !important;}
@@ -224,6 +225,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .m-h-#{$sz}, .marg-h-#{$sz} { margin-right: -$offset !important; margin-left: -$offset !important; }
 
     .m#{$sz}, .marg#{$sz} { margin: $offset !important; }
+
   }
 
   .ma, .m-a {margin: auto !important;}

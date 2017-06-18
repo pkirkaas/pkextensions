@@ -1165,6 +1165,9 @@ function parseStr(queryStr) {
  * @returns String: converted array of GET params to a query string
  */
 function getArrToStr(getArr) {
+  if (!getArr) {
+    return '';
+  }
   var retstr = '?';
   for (var paramName in getArr) {
     if (getArr.hasOwnProperty(paramName)) { // paramName is not inherited
