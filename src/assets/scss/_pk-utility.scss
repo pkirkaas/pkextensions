@@ -454,3 +454,7 @@ table.pk-tbl {
 hr {
   @extend .border;
 }
+
+tr {
+  page-break-inside: avoid !important;
+}
