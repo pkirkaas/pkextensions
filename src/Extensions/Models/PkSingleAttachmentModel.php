@@ -49,9 +49,9 @@ abstract class PkSingleAttachmentModel extends PkAttachmentModel {
     if ($this->isValid()) return $this->attachment->url($arg);
     return null;
   }
-  public function delete() {
+  public function delete($cascade = true) {
     if ($this->isValid())  $this->attachment->delete();
-    return parent::delete();
+    return parent::delete($cascade);
   }
 
   /*
