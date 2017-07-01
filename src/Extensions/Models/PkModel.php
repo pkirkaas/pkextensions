@@ -1020,8 +1020,8 @@ class $createclassname extends Migration {
         throw new Exception("Not authorized to delete this object");
     if (!$cascade) return parent::delete();
     foreach (array_keys($this->getLoadRelations()) as $relationSet) {
-      if (is_array($relationSet) || $relationSet instanceOf BaseCollection) {
-        foreach ($this->relationSet as $relationInstance) {
+      if (is_array($this->$relationSet) || $this->$relationSet instanceOf BaseCollection) {
+        foreach ($this->$relationSet as $relationInstance) {
           if ($relationInstance instanceOf Model) {
             $relationInstance->delete($cascade);
           }
