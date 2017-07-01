@@ -410,6 +410,13 @@ class PkFormBuilder extends FormBuilder {
    * values from $arg1 & $arg2 
    */
   public function mergeClass($arg1, $arg2 = null) {
+    if (!$arg1) {
+      if (is_array($arg2)) {
+        $arg2['class'] = keyVal('class', $arg2);
+        return $arg2;
+      }
+      return ['class'=>$arg2];
+    }
     if (is_string($arg1)) $arg1 = ['class' => $arg1];
     if (is_array($arg1)) {
       if (empty($arg1['class'])) {
