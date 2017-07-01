@@ -747,7 +747,7 @@ $(function () {
  * </div>
  */
 
-$('body').on('click', '.js-dialog-button', function (event) {
+$('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (event) {
   var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
   if (!dlgHtml) {
     var src = $(event.target).attr('data-dialog');
@@ -846,8 +846,10 @@ $('body').on('click', 'img.js-big-picture-button', function (event) {
 //Do similar for Bootstrap 4 Modals/Dialogs
 $('body').on('click', '.bs4-dialog-button', function (event) {
   var src = $(event.target).attr('data-bs4-dialog');
-  if (!src)
+  if (!src) { //Where src is the hidden div containing the content.
+    // Don't like this anymore, prefer encoding the content in the button as below
     return;
+  }
   var param1 = $(event.target).attr('data-param1') || '';
   var param2 = $(event.target).attr('data-param2') || '';
   var param3 = $(event.target).attr('data-param3') || '';
@@ -863,6 +865,15 @@ $('body').on('click', '.bs4-dialog-button', function (event) {
   //console.log("After all the replacements, dlgHtml:",dlgHtml);
   dlg = $(dlgHtml);
   dlg.modal();
+});
+
+//Now do it for BS-4, but just with the encoded content
+$('body').on('click', '[data-bs4-enc-dialog]', function (event) {
+  var src = $(event.target).attr('data-bs4-enc-dialog');
+  console.log("Hit it - enc: "+src);
+  if (!src) {
+    return;
+  }
 });
 
 /** Makes a jQuery DialogBox - as simply as possible by providing

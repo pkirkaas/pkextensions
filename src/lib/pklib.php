@@ -1179,7 +1179,7 @@ function cln_arr_val(Array $arr, $key, $filter = FILTER_SANITIZE_STRING) {
  * Encodes a string with HTML special characters -- including single and double
  * quotes - mainly for use to include an arbitrary string (including HTML
  * input elements for form templates) in an HTML data-XXX attribute.
- * IDEMPOTENT!!
+ * IDEMPOTENT!! (EXCEPT for the $enclose, of course)
  * @param String $str: The input string, which may contain special HTML chars.
  * $param string|null: Enclose the output by these characters? Like: "'".
  * @return String: The HTML Encoded string
@@ -1196,7 +1196,8 @@ function html_encode_file($path, $enclose = null) {
 }
 
 /** Takes a PHP array, encodes it to JSON, and then re-encodes it to HTML
- * string for inclusion in html attribute values
+ * string for inclusion in html attribute values, to be reconstituted 
+ * in a script as a JS Object
  * @param array $arr: data to encode
  */
 function html_encode_array(Array $arr = [], $enclose = null) {

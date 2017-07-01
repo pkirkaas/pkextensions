@@ -475,7 +475,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
         'content' => 'Click',
         'tag' => 'div',
     ];
-    $requiredClass = 'js-dialog-button';
+    //$requiredClass = 'js-dialog-button';
     $params = array_merge($defaults, $args);
     $extraClass = keyVal('extra_class', $params);
     unset($params['extra_class']);
@@ -483,7 +483,8 @@ class PkHtmlPainter extends PkHtmlRenderer {
     unset($params['content']);
     $tag = $params['tag'];
     unset($params['tag']);
-    $atts = merge_attributes($params, "$requiredClass $extraClass");
+    //$atts = merge_attributes($params, "$requiredClass $extraClass");
+    $atts = merge_attributes($params, $extraClass);
     $atts['data-dialog-encoded'] = html_encode($dlg);
     return PkRenderer::$tag($content, $atts);
   }

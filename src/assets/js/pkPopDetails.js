@@ -147,7 +147,7 @@ $(function () {
         valueTemplateClass:'enc-attr-val-tpl',
         valueHolderClass:'enc-attr-val-holder-tpl'
      };
-     console.error("!!! popDefObj was undefined - should have been in template/layout!!!");
+     console.log("!!!popDefObj undefined in the template, using defaults !!!");
   }
   //console.log("Trying to get data atts");
   //var res = getDecodedData('borrower','1');
