@@ -1355,5 +1355,20 @@ function dirname(path) {
 
 
 
+//Whatever value is selected from the select box, refresh the page with
+//the GET param 'select_param' = the selected value
+$(function () {
+  $('body').on('change', 'select.refresh-on-select', function (event) {
+    var val = $(this).val();
+    console.log("Val:",val);
+    var getO = false;
+    if (val) {
+      getO={select_param : val};
+    }
+    setGetsAndGo(getO);
+  });
+});
+
+
 
 
