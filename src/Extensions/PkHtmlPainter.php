@@ -159,7 +159,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $defaults = [
         'delbtn_content' => 'Delete',
         'delbtn_tag' => 'div',
-        'class' => 'mf-btn pkmvc-button',
+        'class' => 'fs--2 mf-btn pkmvc-button m-t-0',
         'requiredClasses' => 'js btn data-set-delete',
     ];
     if (keyVal('delbtn_class', $args)) $args['class'] = $args['delbtn_class'];
