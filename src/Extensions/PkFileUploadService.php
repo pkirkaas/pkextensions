@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions;
 use Illuminate\Http\UploadedFile;
+//use PkValidator; #The Facade that is actually a validator factory
 use Validator; #The Facade that is actually a validator factory
 
 /**
@@ -30,7 +31,7 @@ class PkFileUploadService {
     if (!ne_string($typekey)) {
       return;
     }
-    if (in_array(array_keys($this->typearr))) {
+    if (in_array($typekey, array_keys($this->typearr))) {
       $this->typekey = $typekey;
       $this->validationStr = $this->typearr[$typekey];
     } else {
@@ -47,6 +48,7 @@ class PkFileUploadService {
    * 
    */
   public function upload($ctlname,$validationStr = null,$reldir =  null) {
+    pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if (!ne_string($reldir)) {
       $reldir = $this->reldir;
     }
@@ -61,10 +63,14 @@ class PkFileUploadService {
     $request = request();
     $uploadedFile = $request->file($ctlname);
     if (!$uploadedFile instanceOf UploadedFile || !$uploadedFile->isValid()) {
+      pkdebug("UploadedFile: ", $uploadedFile);
       return false;
     }
+    pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if ($validationStr) {
-      Validator::validate($request,[$ctlname=>$validationStr]);
+      $validator = Validator::make($request->all(),[$ctlname=>$validationStr]);
+      $validator->validate();
+      //PkValidator::validate($request,[$ctlname=>$validationStr]);
     }
     $path = $uploadedFile->store('public'.$reldir);
     $ret = ['relpath' => $reldir.basename($path),

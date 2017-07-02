@@ -25,20 +25,36 @@ abstract class PkUploadModel extends PkModel {
       'relpath'=>'string',
       'type' => ['type' => 'string', 'methods' => 'nullable'],
       'mimetype'=>'string',
+      'desc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
   
   public static function getUploadTypes() {
     return static::getAncestorArraysMerged('upload_types');
   }
 
+  public $baseurl = 'storage';
+  public function getBaseUrl() {
+    return pkleadingslashit(pktrailingslashit($this->baseurl));
+  }
+
+  public function url() {
+    return $this->getBaseUrl().$this->relpath;
+  }
+
   public static function CreateUpload($fileinfo,Array $extra) {
-    if (!$fileinfo || !is_array($fileinfo) || !$extra) {
+    pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
+    if (!$fileinfo || !is_array($fileinfo)) {
       return false;
     }
     $fo = new Static();
-    $fo->fill($extra + $fileinfo);
-    $fo->save();
-    return $fo;
+    $fo->fill($fileinfo);
+    if (is_array($extra)) {
+      $fo->fill($extra);
+    }
+    if($fo->save()) {
+      pkdebug("The new ID:", $fo->id);
+      return $fo;
+    }
+    return false;
   }
-
 }
