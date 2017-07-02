@@ -2591,14 +2591,21 @@ function pkuntrailingslashit($string) {
  * The primary use of this is for paths and thus should be used for paths. It is
  * not restricted to paths and offers no specific path support.
  *
- * @since 1.2.0
- *
  * @param string $string What to add the trailing slash to.
  * @return string String with trailing slash added.
  */
 function pktrailingslashit($string) {
   return pkuntrailingslashit($string) . '/';
 }
+
+function pkunleadingslashit($string) {
+  return ltrim($string, '/\\');
+}
+
+function pkleadingslashit($string) {
+  return '/'.pkunleadingslashit($string);
+}
+
 
 /**
  * Wrapper for PHP mcrypt_encrypt, with some defaults. MUST USE the balanced
