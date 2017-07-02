@@ -452,12 +452,16 @@ class $createclassname extends Migration {
     }
   }
 
+  public static $mySqlStrTypes = ['char','varchar','tinytext', 'text', 'mediumtext', 'longtext',];
   public static $mySqlIntTypes = ['tinyint', 'smallint', 'mediumint', 'int', 'bigint'];
   public static $mySqlNumericTypes = ['tinyint', 'smallint', 'mediumint', 'int',
       'bigint', 'decimal', 'float', 'double', 'real', 'bit', 'boolean', 'serial'];
   public static $mySqlDateTimeTypes = [
       'date', 'datetime', 'timestamp', 'time', 'year',
       ];
+
+  public $cleanAllText = true; #Default - runs hpure/escapes every text field
+  public $trustedTextFields = []; #Keep cleanAllText true by default, only allow specific fields by.
 
   /** POSTs submit an empty string for "no value". For integer table fields, 
    * should we convert the empty string to null? Default for MySQL is to insert
@@ -1417,6 +1421,8 @@ class $createclassname extends Migration {
       }
     }
     if ($this->emptyStringToNull) $this->convertEmptyStringToNullForNumerics();
+    if ($this->cleanAllText) $this->hpureAllText();
+
     #Clean dangerous HTML from specified fields
     foreach (static::$escape_fields as $field) {
       if ($this->$field) $this->$field = hpure($this->$field);
@@ -1459,7 +1465,17 @@ class $createclassname extends Migration {
   public function postCreate(Array $options = []) {
     
   }
-
+  public function hpureAllText() {
+    $attributeDefs = $this->getAttributeDefs();
+    foreach ($attributeDefs as $name => $type) {
+      if (in_array(strtolower($type), static::$mySqlStrTypes)) {
+        if (in_array($name,$this->trustedTextFields)) {
+          continue;
+        }
+        $this->$name = hpure($this->$name);
+      }
+    }
+  }
   /** When POSTING empty values, can't POST nulls, get converted to ''
    * No good for int & date types, even if they allow NULL, so convert to NULL
    * @param boolean $anddates: true - and dates?

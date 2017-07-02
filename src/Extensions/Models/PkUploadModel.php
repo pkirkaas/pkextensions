@@ -6,8 +6,9 @@ namespace PkExtensions\Models;
  *
  * @author pkirk
  */
-class PkUploadModel extends PkModel {
+abstract class PkUploadModel extends PkModel {
   #Map the general media type to an array of the specific mime types
+  /*
   public static $upload_types = [
     'image'=>['image/gif','image/png', 'image/jpeg', 'image/bmp', 'image/jpg','image/svg' ],
     'video'=>['video/ogg','video/mpeg', 'video/mp4', 'video/webm',
@@ -17,15 +18,27 @@ class PkUploadModel extends PkModel {
     'pdf'=>['application/pdf'],
     'text'=>['text/plain', 'text/html'],
   ];
+   * 
+   */
   
   public static $table_field_defs = [
-      'name'=>'string',
-      'type'=>'string',
-      'mime_type'=>'string',
-      'full_path'=>'string',
+      'relpath'=>'string',
+      'type' => ['type' => 'string', 'methods' => 'nullable'],
+      'mimetype'=>'string',
       ];
   
   public static function getUploadTypes() {
     return static::getAncestorArraysMerged('upload_types');
   }
+
+  public static function CreateUpload($fileinfo,Array $extra) {
+    if (!$fileinfo || !is_array($fileinfo) || !$extra) {
+      return false;
+    }
+    $fo = new Static();
+    $fo->fill($extra + $fileinfo);
+    $fo->save();
+    return $fo;
+  }
+
 }

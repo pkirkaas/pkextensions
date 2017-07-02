@@ -54,13 +54,13 @@ class PkFileUploadService {
       $validationStr = $this->validationStr;
     }
     if (ne_string($reldir)) {
-      $reldir = pktrrailinslashit(pkleadingslashit($reldir));
+      $reldir = pktrailingslashit(pkleadingslashit($reldir));
     } else {
       $reldir = '';
     }
     $request = request();
     $uploadedFile = $request->file($ctlname);
-    if (! $uploadedFile instanceOf UploadedFile || !$uploadedFile->isValid()) {
+    if (!$uploadedFile instanceOf UploadedFile || !$uploadedFile->isValid()) {
       return false;
     }
     if ($validationStr) {
