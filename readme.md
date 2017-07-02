@@ -202,7 +202,7 @@ It seems ridiculous that Eloquent Model classes don't know what attributes they 
 
 If you extend PkModel and include a static array member: $table\_field\_defs as follows (Example):
 
-    class QProfile extends PkModel {
+    class Profile extends PkModel {
       public static $table_field_defs = [
           'id' => 'increments',
           'user_id' => ['type' => 'integer', 'methods' => 'index'],
@@ -219,9 +219,9 @@ If you extend PkModel and include a static array member: $table\_field\_defs as 
 
 You can generate Migration files by running:
 
-    php artisan make:migration QProfile
+    php artisan make:migration Profile
 
-This will create the initial migration file to create the table `q_profiles`, and if you change/add/remove the Model field definitions in `static $table_field_defs`, the `artisan make:migration QProfile` command will do a reasonable job of creating the Migration Update scripts - though you might have to modify them by hand for complicated changes.
+This will create the initial migration file to create the table `q_profiles`, and if you change/add/remove the Model field definitions in `static $table_field_defs`, the `artisan make:migration Profile` command will do a reasonable job of creating the Migration Update scripts - though you might have to modify them by hand for complicated changes.
 
 ### <span class="header-section-number">2.1.5</span> static::getStaticAttributeNames()
 

@@ -2,7 +2,6 @@
 namespace PkExtensions\Console\Commands;
 use Illuminate\Console\Command;
 use PkExtensions\Models\PkModel;
-//use App\Models\QProfile;
 class DestroyTables extends Command {
     protected $signature = 'destroy:tables {class?} {modelRoot=\\App\\Models}';
 

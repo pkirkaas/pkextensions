@@ -2,7 +2,6 @@
 namespace PkExtensions\Console\Commands;
 use Illuminate\Console\Command;
 use PkExtensions\Models\PkModel;
-//use App\Models\QProfile;
 class ResetModels extends Command {
     protected $signature = 'reset:models {class?} {modelRoot=\\App\\Models}';
 

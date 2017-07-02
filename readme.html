@@ -172,7 +172,7 @@ Class Person extends PkModel {
 
 <p>If you extend PkModel and include a static array member: $table_field_defs as follows (Example):
 <pre>
-class QProfile extends PkModel {
+class Profile extends PkModel {
   public static $table_field_defs = [
       'id' => 'increments',
       'user_id' => ['type' => 'integer', 'methods' => 'index'],
@@ -190,10 +190,10 @@ class QProfile extends PkModel {
 
 <p>You can generate Migration files by running:
 <pre>
-php artisan make:migration QProfile
+php artisan make:migration Profile
 </pre>
 
-<p>This will create the initial migration file to create the table <tt>q_profiles</tt>, and if you change/add/remove the Model field definitions in <tt>static $table_field_defs</tt>, the <tt>artisan make:migration QProfile</tt> command will do a reasonable job of creating the Migration Update scripts - though you might have to modify them by hand for complicated changes.
+<p>This will create the initial migration file to create the table <tt>q_profiles</tt>, and if you change/add/remove the Model field definitions in <tt>static $table_field_defs</tt>, the <tt>artisan make:migration Profile</tt> command will do a reasonable job of creating the Migration Update scripts - though you might have to modify them by hand for complicated changes.
 
 <h3>static::getStaticAttributeNames()</h3>
 <p>Returns all the DB field names from the underlying table.

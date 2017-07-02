@@ -424,6 +424,7 @@ class PkFormBuilder extends FormBuilder {
           $arg1['class'] = $arg2;
           return $arg1;
         }
+        $arg1['class']='';
       }
       if (is_array($arg1['class'])) {
         if (is_string($arg2)) $arg1['class'][] = $arg2;

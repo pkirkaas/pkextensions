@@ -11,6 +11,7 @@ class ClearAll extends Command {
       $this->call('config:clear');
       $this->call('cache:clear');
       $this->call('view:clear');
+      $this->call('route:clear');
       $this->call('clear-compiled');
       $this->call('optimize');
       $this->info("More Stuff Cleared");

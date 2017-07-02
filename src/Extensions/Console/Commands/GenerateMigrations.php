@@ -1,7 +1,6 @@
 <?php
 namespace PkExtensions\Console\Commands;
 use Illuminate\Console\Command;
-//use App\Models\QProfile;
 class GenerateMigrations extends Command {
     protected $signature = 'make:migration {class?} {modelRoot=\\App\\Models}';
 
