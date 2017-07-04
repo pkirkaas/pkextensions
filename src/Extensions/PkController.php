@@ -280,8 +280,33 @@ class PkController extends Controller {
     return $controllerName;
   }
 
+  /** Some simple AJAX helpers */
   public function ajax_header($args = null) {
     header('content-type: application/json');
+  }
+
+  /** An AJAX controller just has to call $this->ajaxsuccess($msg);
+   * If it's a complicated msg, send an array; else a string. This
+   * will arrify it, json it, & die
+   * @param string|array $msg
+   */
+  public function ajaxsuccess($msg = []) {
+    if (!is_array($msg)) {
+      $msg=['success'=>$msg];
+    }
+      die(json_encode($msg));
+  }
+
+  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
+   * sets the response code to 499 - my custom error code, handled by jQuery
+   * @param string|array $msg
+   */
+  public function ajaxerror($msg = []) {
+    http_response_code(499);
+    if (!is_array($msg)) {
+      $msg=['error'=>$msg];
+    }
+      die(json_encode($msg));
   }
 
   /**

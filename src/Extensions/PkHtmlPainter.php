@@ -39,6 +39,12 @@ class PkHtmlPainter extends PkHtmlRenderer {
     
   }
 
+  /** Makes a 
+  public function mkDragNDropUploadBtn($args=[]) {
+  }
+   * 
+   */
+
   /** Returns an array of two arrays - the cleaned, suitable attributes, and
    * the method_vars array, which has values particular to that method
    * NOTE the 'component_args' key - it's an array of arrays of argument sets

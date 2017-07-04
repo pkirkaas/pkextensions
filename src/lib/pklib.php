@@ -2434,6 +2434,16 @@ function uniqueName($suffix = '') {
   return uniqid('upld', 1) . '_' . uniqid() . $suffix;
 }
 
+/** Good for PHP >= 7 -- alphanum, okay for URLs
+ * 
+ * @param int $len
+ * @return string - random
+ */
+function pkrandstr($len = 7) {
+  $bytes = random_bytes($len); //random. Increase input for more bytes
+  $code = bin2hex($bytes); 
+  return $code;
+}
 /**
  * Takes two arrays that have similar key structures, but then not. Makes an
  * array that combines the two input arrays up to the key parallels, then

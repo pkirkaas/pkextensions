@@ -48,7 +48,7 @@ class PkFileUploadService {
    * 
    */
   public function upload($ctlname,$validationStr = null,$reldir =  null) {
-    pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
+    //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if (!ne_string($reldir)) {
       $reldir = $this->reldir;
     }
@@ -63,10 +63,10 @@ class PkFileUploadService {
     $request = request();
     $uploadedFile = $request->file($ctlname);
     if (!$uploadedFile instanceOf UploadedFile || !$uploadedFile->isValid()) {
-      pkdebug("UploadedFile: ", $uploadedFile);
+      //pkdebug("UploadedFile: ", $uploadedFile);
       return false;
     }
-    pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
+    //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if ($validationStr) {
       $validator = Validator::make($request->all(),[$ctlname=>$validationStr]);
       $validator->validate();

@@ -19,6 +19,15 @@ var repository = {};
  });
  */
 
+/** An AJAX error handler - just for my custom error status 499
+ * 
+ * @returns {undefined}
+ */
+$(function () {
+  $(document).ajaxError(function (event, jqxhr, settings, error) {
+    console.log("Event:", event, "jqxhr", jqxhr, 'settings', settings, 'error', error);
+  });
+ });
 
 $(function () {
 
@@ -876,6 +885,21 @@ $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
   }
 });
 
+/** A simple error report - popped up automatically on AJAX errors.
+ * 
+ * @param string msg - the error message
+ * @param string title - optional - defaults to 'Error'
+ * @returns a jquery modal error dialog
+ */
+function errorDlg(msg,title) {
+  var opts = {
+    title : title || "Error"
+  };
+  var selector ="<div class='js-error-dialog'>"
+    + msg + "</div>";
+  return makeDialog(selector, opts);
+}
+
 /** Makes a jQuery DialogBox - as simply as possible by providing
  * defaults, and customizable by overriding defaults with options.
  * Can also take the basic return dialog box and customize after creation,
@@ -886,6 +910,7 @@ $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
  * @returns jQuery Dialog Box with extra methods:
  *   @method title(title) Change the title after the box is created
  */
+
 function makeDialog(selector, opts) {
   opts = opts || {};
   selector = selector || '<div></div>';
@@ -1086,7 +1111,57 @@ function htmlDecode(value) {
 }
 
 
+/** Converts a possibly multi-dimensioal URL encoded query string
+ * (as by PHP http_build_query of an array) into a JS Object
+ * Example:
+$tst = [
+    'key1'=>'val1',
+    'key2'=>'val2',
+    'key3'=> [
+        'key31'=>"'val31'",
+        'key32'=>'val32',
+        ],
+    'key4'=>'val4',
+    ];
 
+$tenc = http_build_query($tst);
+
+JS: urlquery_decode($tenc) will return a JS object (with a couple __proto__
+keys, but that seems not to matter if passed as data to AJAX - doesn't appear
+in the POST in PHP)
+ * 
+ * @param string qstr
+ * @returns Object
+ */ 
+function urlquery_decode (qstr) {
+    var e,
+        urlParams = {},
+        d = function (s) { return decodeURIComponent(s).replace(/\+/g, " "); },
+        //q = window.location.search.substring(1),
+        //q = qstr,
+        q = decodeURI(qstr),
+        r = /([^&=]+)=?([^&]*)/g;
+    while (e = r.exec(q)) {
+        if (e[1].indexOf("[") == "-1")
+            urlParams[d(e[1])] = d(e[2]);
+        else {
+            var b1 = e[1].indexOf("["),
+                aN = e[1].slice(b1+1, e[1].indexOf("]", b1)),
+                pN = d(e[1].slice(0, b1));
+          
+            if (typeof urlParams[pN] != "object") {
+                urlParams[d(pN)] = {};
+                //urlParams[d(pN)].length = 0;
+              }
+            
+            if (aN)
+                urlParams[d(pN)][d(aN)] = d(e[2]);
+            else
+                Array.prototype.push.call(urlParams[d(pN)], d(e[2]));
+        }
+    }
+    return urlParams;
+}
 /**
  * Refresh current page with new GET parameter value
  * Adds the parameter if it doesn't exist, or replaces the current value

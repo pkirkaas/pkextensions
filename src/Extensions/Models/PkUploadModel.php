@@ -1,6 +1,6 @@
 <?php
 namespace PkExtensions\Models;
-
+use Illuminate\Support\Facades\Storage;
 /**
  *  PkUploadModel - pure Laravel, replaces the attachment models that were based on stapler
  *
@@ -33,6 +33,7 @@ abstract class PkUploadModel extends PkModel {
   }
 
   public $baseurl = 'storage';
+  //public $basepath = 
   public function getBaseUrl() {
     return pkleadingslashit(pktrailingslashit($this->baseurl));
   }
@@ -41,8 +42,16 @@ abstract class PkUploadModel extends PkModel {
     return $this->getBaseUrl().$this->relpath;
   }
 
+  /** We want to delete the file as well - but we have to find where Laravel put it...
+   * Shall we just trust the Storage facade?
+   */
+  public function delete($cascade = true) {
+    Storage::delete($this->relpath);
+    return parent::delete($cascade);
+  }
+
   public static function CreateUpload($fileinfo,Array $extra) {
-    pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
+    //pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
     if (!$fileinfo || !is_array($fileinfo)) {
       return false;
     }
@@ -52,7 +61,7 @@ abstract class PkUploadModel extends PkModel {
       $fo->fill($extra);
     }
     if($fo->save()) {
-      pkdebug("The new ID:", $fo->id);
+      //pkdebug("The new ID:", $fo->id);
       return $fo;
     }
     return false;
