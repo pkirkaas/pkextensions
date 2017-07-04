@@ -26,6 +26,14 @@ var repository = {};
 $(function () {
   $(document).ajaxError(function (event, jqxhr, settings, error) {
     console.log("Event:", event, "jqxhr", jqxhr, 'settings', settings, 'error', error);
+    if (jqxhr.status == 499) { // It's a custom error message
+      console.log("We got the 499");
+      var msg = jqxhr.responseJSON.error;
+      if (msg) {
+        console.log("And the msg:",msg);
+        errorDlg(msg);
+      }
+    }
   });
  });
 
@@ -893,7 +901,8 @@ $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
  */
 function errorDlg(msg,title) {
   var opts = {
-    title : title || "Error"
+    title : title || "Error",
+    autoOpen: true
   };
   var selector ="<div class='js-error-dialog'>"
     + msg + "</div>";
@@ -923,7 +932,7 @@ function makeDialog(selector, opts) {
     width: defaultWidth,
     buttons: {
       //Cancel : function () { $(this).dialog('destroy'); }
-      Cancel: function () {
+      Close: function () {
         $(this).dialog('close');
       }
     }

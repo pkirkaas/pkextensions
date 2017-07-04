@@ -302,7 +302,9 @@ class PkController extends Controller {
    * @param string|array $msg
    */
   public function ajaxerror($msg = []) {
-    http_response_code(499);
+    //http_response_code(499);
+    //http_response_code(401);
+    header('HTTP/1.1 499 Custom AJAX Request Error Message');
     if (!is_array($msg)) {
       $msg=['error'=>$msg];
     }
