@@ -18,10 +18,30 @@ var repository = {};
  }
  });
  */
+  /*
+$(function () {
+  //For testing the Laravel Validation error reporting AJAX dialog
+  var errobj = {
+    badfield: ['error msg 1', 'error msg 2', 'error msg 3'],
+    another:  ['error msg 21', 'error msg 22', 'error msg 23'],
+    stillmore:  ['error msg 31', 'error msg 32', 'error msg 33', 'error msg 42', 'error msg 43'],
+    neverends:  ['error msg 41', 'error msg 42', 'error msg 43']
+  };
+  var errobj2 = {
+    badfield: {key11:'error msg 1', key12:'error msg 2', key13: 'error msg 3'},
+    another:  {key21:'error msg 21', key22:'error msg 22', key23:'error msg 23'},
+    stillmore:  {key31:'error msg 31', key32:'error msg 32', key33:'error msg 33',
+      key34:'error msg 42', key35:'error msg 43'},
+    neverends:  {key41:'error msg 41', key42:'error msg 42', key43:'error msg 43'}
+  };
+  var msg = mkNestedHtml(errobj2); 
+  console.log("And the msg test:\n",msg);
+  errorDlg(msg);
 
+ });
+*/
 /** An AJAX error handler - just for my custom error status 499
- * 
- * @returns {undefined}
+ *  AND for Laravel Validation errors 
  */
 $(function () {
   $(document).ajaxError(function (event, jqxhr, settings, error) {
@@ -33,9 +53,50 @@ $(function () {
         console.log("And the msg:",msg);
         errorDlg(msg);
       }
+      return;
+    } else if (jqxhr.status == 422) { //Probably a Laravel Validation error
+      //Have the form of an object with the field names as keys, the value of the 
+      // field keys are an array of all the violations for that field. So double iterate
+      msg = mkNestedHtml(jqhr.responseJSON);
+      console.log("And the msg from 422 & mkHt:",msg);
+      errorDlg(msg);
+      return;
     }
   });
  });
+
+/** Takes a possibly deeply nested object or array (or string), & returns a
+ * nested HTML structure
+ * @param object|array|string item
+ * @param int|null - depth - used only in recursion
+ * @returns HTML structure
+ */
+function mkNestedHtml(item, depth) {
+  depth = depth || 0;
+  var tof = typeof item;
+  console.log("Item:", item, "Typeof item: "+tof+'; depth: '+depth);
+  if (typeof item === 'string') {
+    return "<div class='js-msg'>"+item+"</div>\n";
+  } else if (typeof item === 'object'){
+    //var ret = "<div class='js-nested lvl"+depth+"'>\n";
+    var ret = "<table class='js-nested lvl"+depth+"'>\n";
+    for (var propName in item) {
+      if (item.hasOwnProperty(propName)) {
+        ret += '<tr>';
+        if (!Array.isArray(item)) {
+          ret += '<td class="msg-lbl">' + propName + ":</td>";
+        }
+        ret += "<td>"+mkNestedHtml(item[propName], depth+1) + '</td></tr>\n';
+      }
+    }
+
+    //ret += "</div>\n";
+    ret += "</table>\n";
+  }
+  return  ret;
+}
+
+
 
 $(function () {
 
