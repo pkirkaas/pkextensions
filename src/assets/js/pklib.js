@@ -893,8 +893,10 @@ $('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (even
   return dlg;
 });
 
+$(function () {
 /** Custom 'big-picture' pop-ups - expected the class is on an img element */
 $('body').on('click', 'img.js-big-picture-button', function (event) {
+  console.log("Big Picture");
   var src = $(event.target).attr('src');
   if (!src) return;
   var dlgHtml = "<div class='tac  big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
@@ -919,6 +921,7 @@ $('body').on('click', 'img.js-big-picture-button', function (event) {
   dlg.dialog('open');
   return dlg;
 
+});
 });
 
 //Do similar for Bootstrap 4 Modals/Dialogs
@@ -1525,6 +1528,33 @@ $(function () {
   });
 });
 
+/** Global object Simulates event hanling by registering callbacks. Usage:
+ * The "trigger" can also pass data to the handlers
+ * Everywhere you want to "catch" the event:
+ * VEventDispatcher(eventName, handlingFunction);
+ * Everywhere you want to trigger the event:
+ * VEventDispatcher.trigger(eventName,data);
+ * function handlingFunction(data) {
+ * }
+ */
+
+VEventDispatcher = {
+    events: {},
+    on: function(event, callback) {
+        var handlers = this.events[event] || [];
+        handlers.push(callback);
+        this.events[event] = handlers;
+    },
+
+    trigger: function(event, data) {
+        var handlers = this.events[event];
+        if (!handlers || handlers.length < 1)
+            return;
+        [].forEach.call(handlers, function(handler){
+            handler(data);
+        });
+    }
+};
 
 
 

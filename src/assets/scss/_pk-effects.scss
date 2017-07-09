@@ -452,3 +452,18 @@ input[disabled].disabled {
 .ui-dialog.ui-widget.pk-big-picture {
   @include absolutecenter;
 }
+
+.pimg-del, .del-cross {
+  background-image: url('/gulped/img/cross-31176.svg');
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 3rem;
+  height: 3rem;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.pimg-del:hover, .del-cross:hover {
+  cursor: pointer; 
+}
