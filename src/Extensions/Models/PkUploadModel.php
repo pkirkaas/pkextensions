@@ -32,13 +32,42 @@ abstract class PkUploadModel extends PkModel {
     return static::getAncestorArraysMerged('upload_types');
   }
 
+  /** Try to return the appropriate HTML element for the file type; only a
+   * 
+   * @param array $atts - the attributes for the element (img/audio/div, etc)
+   */
+  public function render($atts = []) {
+  }
+
+  /** Returns the file type - if it exists as a field, return that, else the
+   * first component of the mime type - unless $mimefirst, ignores the type
+   * field & just uses first component of mime type
+   * @param boolean $mimefirst - skip the type field & just use mime? Default false
+   */
+  public function getType($mimefirst = false) {
+    if (!$mimefirst && ne_string($this->type)) {
+      return $this->type;
+    }
+    $mimarr = explode('/', $this->mimetype);
+    return $mimarr[0];
+  }
+
   public $baseurl = 'storage';
   //public $basepath = 
   public function getBaseUrl() {
     return pkleadingslashit(pktrailingslashit($this->baseurl));
   }
 
-  public function url() {
+  /** Return the URL for the file
+   * @param boolean $check - check if file exists? Default: false
+   * @param boolean $deleteonfalse - if checking and no file, delete this? 
+   */
+  public function url($check = false, $deleteonfalse=true) {
+    if ($check) {
+      if (!$this->fileexists($deleteonfalse)) {
+        return false;
+      }
+    }
     return $this->getBaseUrl().$this->relpath;
   }
 
@@ -48,6 +77,20 @@ abstract class PkUploadModel extends PkModel {
   public function delete($cascade = true) {
     Storage::delete($this->relpath);
     return parent::delete($cascade);
+  }
+
+  /** Does the file actually exist?
+   * 
+   * @param boolean $deleteonfalse Default: True. Delete this if no file
+   */
+  public function fileexists($deleteonfalse = true) {
+    if (Storage::exists($this->relpath)) {
+      return true;
+    }
+    if ($deleteonfalse) {
+      $this->delete();
+    }
+    return false;
   }
 
   public static function CreateUpload($fileinfo,Array $extra) {
