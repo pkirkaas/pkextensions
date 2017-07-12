@@ -1202,11 +1202,14 @@ $tenc = http_build_query($tst);
 JS: urlquery_decode($tenc) will return a JS object (with a couple __proto__
 keys, but that seems not to matter if passed as data to AJAX - doesn't appear
 in the POST in PHP)
- * 
+ *  -- but see parseStr below for simpler version
  * @param string qstr
  * @returns Object
  */ 
 function urlquery_decode (qstr) {
+   if (!qstr) {
+     return {};
+   }
     var e,
         urlParams = {},
         d = function (s) { return decodeURIComponent(s).replace(/\+/g, " "); },
@@ -1299,8 +1302,27 @@ function getGets() {
   return parseStr(queryStr);
 }
 
+/** Takes a FormData instance & JS Object, iterates through object &
+ * appends all key/values to the formData
+ * @param FormData formData
+ * @param object object
+ * @returns appended formData object
+ */
+function appendObjectToFormdata(formData,object) {
+  if (!object ||  typeof object !== 'object') {
+    return formData;
+  }
+  for (var propName in object) {
+    if (object.hasOwnProperty(propName)) {
+      formData.append(propName,object[propName]);
+    }
+  }
+  return formData;
+}
+
 /** A VERY light weight version of PHP parse_str - converts a simple
  * HTTP query string (key1=val1&key2=val2..) to a JS Obj 
+ * But see urlquery_decode above for more sophisticated version
  * @param string queryStr
  * @returns object
  */

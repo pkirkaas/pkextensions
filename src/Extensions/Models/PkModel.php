@@ -1646,6 +1646,29 @@ class $createclassname extends Migration {
     return PkTestGenerator::getRandomData($instances, $num);
   }
 
+
+  #################  Testing PkTypedUploadModel - so a PkModel can have many
+  ###########  individual or collections of various types of file upload objects
+  ############ but all of a single class, in a single table
+
+  public function hasManyTyped($attname, $typedClass=null) {
+    if (!$typedClass) {
+      $typedClass = PkTypedUploadModel::class;
+    }
+    return $this->hasMany($typedClass,'owner_id')
+      ->where('owner_model',$this::class)
+      -where('att_name',$attname);
+    }
+
+  public function hasOneTyped($attname, $typedClass=null) {
+    if (!$typedClass) {
+      $typedClass = PkTypedUploadModel::class;
+    }
+    return $this->hasOne($typedClass,'owner_id')
+      ->where('owner_model',$this::class)
+      -where('att_name',$attname);
+    }
+
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
    * Inserting '' into an integer field in MySQL is converted to 0 - so if you want

@@ -93,6 +93,23 @@ abstract class PkUploadModel extends PkModel {
     return false;
   }
 
+  /** If "$this->type" not set, try to guess from mime-type
+   * @param array $args - optional args
+   * @return Model
+   */
+  public function save($args = []) {
+    if (!$this->type) {
+      $this->type = $this->getType(true);
+    }
+      return parent::save($args);
+  }
+
+  /** Create object immediately on upload 
+   * 
+   * @param array $fileinfo - the basic info for this abstract base class
+   * @param array $extra - additional details, 
+   * @return \static|boolean - the new instance, or false if error
+   */
   public static function CreateUpload($fileinfo,Array $extra) {
     //pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
     if (!$fileinfo || !is_array($fileinfo)) {
@@ -104,7 +121,6 @@ abstract class PkUploadModel extends PkModel {
       $fo->fill($extra);
     }
     if($fo->save()) {
-      //pkdebug("The new ID:", $fo->id);
       return $fo;
     }
     return false;
