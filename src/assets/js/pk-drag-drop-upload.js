@@ -12,7 +12,7 @@
 $(function () {
  $(".pk-dd-upload").on('dragenter', function (e){
   e.preventDefault();
-  $(this).css('background', '#BBD5B8');
+  //$(this).css('background', '#BBD5B8');
  });
 
  $(".pk-dd-upload").on('dragover', function (e){
@@ -33,6 +33,7 @@ $(function () {
 
   appendObjectToFormdata(formData,params);
 
+  $(this).addClass('ajax-loader');
   $.ajax({
     url: url,
     type: "POST",
@@ -42,8 +43,10 @@ $(function () {
     processData: false,
     success: function(data){
       VEventDispatcher.trigger('fileUploaded',"A new File");
-      $(me).html(data);
+      //$(me).html(data);
     }
+  }).done(function (data) {
+    $(this).removeClass('ajax-loader');
   });
  });
 

@@ -23,7 +23,9 @@ abstract class PkUploadModel extends PkModel {
   
   public static $table_field_defs = [
       'relpath'=>'string',
-      'type' => ['type' => 'string', 'methods' => 'nullable'],
+      'type' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
+      #Category, like, doc (text & pdf), media (audio, video)
+      'cat' => ['type' => 'string', 'methods' => 'nullable'],
       'mimetype'=>'string',
       'desc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
@@ -48,7 +50,14 @@ abstract class PkUploadModel extends PkModel {
     if (!$mimefirst && ne_string($this->type)) {
       return $this->type;
     }
-    $mimarr = explode('/', $this->mimetype);
+    return static::mimeMainType($this->mimetype);
+  }
+
+  public static function mimeMainType($mimetype) {
+    if (!ne_string($mimetype)) {
+      return null;
+    }
+    $mimarr = explode('/', $mimetype);
     return $mimarr[0];
   }
 
@@ -97,7 +106,7 @@ abstract class PkUploadModel extends PkModel {
    * @param array $args - optional args
    * @return Model
    */
-  public function save($args = []) {
+  public function save(Array $args = []) {
     if (!$this->type) {
       $this->type = $this->getType(true);
     }

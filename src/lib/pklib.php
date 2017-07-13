@@ -477,7 +477,7 @@ function pkvardump($arg, $disableXdebug = true) {
   $useVarDump = false;
   ini_set('html_errors', 0);
   ini_set('xdebug.overload_var_dump', 0);
-  if ($useVarDump) {
+  if ($useVarDump || (is_object($arg) && method_exists('__debuginfo', $arg))) {
     ob_start();
     Var_Dump($arg);
     $vardump = ob_get_contents();
@@ -1064,6 +1064,10 @@ function array_merge_array($arrs = []) {
  * to_int(['a','b']) === FALSE;
  * to_int(NULL) === FALSE;
  * to_int('0') === 0;
+ * SADLY, however:
+ * 
+ * to_int(7.45) === FALSE; - but can use intval
+ * to_int('9.7') === FALSE; - but can use intval
  */
 function to_int($arg, $default = false) {
   //if (is_int($arg)) return $arg; #Optimization attempt

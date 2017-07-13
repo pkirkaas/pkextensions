@@ -614,7 +614,7 @@ class $createclassname extends Migration {
   }
 
   public function __debuginfo() {
-    return $this->attributes;
+    return $this->attributes + ['MODEL CLASS'=>static::class];
   }
 
   /** The authXXX functions determine if the user is allowed to perform XXX
@@ -1656,7 +1656,7 @@ class $createclassname extends Migration {
       $typedClass = PkTypedUploadModel::class;
     }
     return $this->hasMany($typedClass,'owner_id')
-      ->where('owner_model',$this::class)
+      ->where('owner_model',static::class)
       -where('att_name',$attname);
     }
 
@@ -1665,7 +1665,7 @@ class $createclassname extends Migration {
       $typedClass = PkTypedUploadModel::class;
     }
     return $this->hasOne($typedClass,'owner_id')
-      ->where('owner_model',$this::class)
+      ->where('owner_model',static::class)
       -where('att_name',$attname);
     }
 

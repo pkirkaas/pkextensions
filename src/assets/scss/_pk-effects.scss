@@ -467,3 +467,9 @@ input[disabled].disabled {
 .pimg-del:hover, .del-cross:hover {
   cursor: pointer; 
 }
+
+.ajax-loader {
+  background-image: url('/gulped/img/ajax-loader.gif');
+  background-repeat: no-repeat;
+  background-position: center; 
+}
