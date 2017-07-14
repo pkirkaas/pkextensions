@@ -20,6 +20,8 @@ class PkTypedUploadModel extends PkUploadModel {
       'att_name'=> ['type' => 'string', 'methods' => 'index'],
       ];
 
+  
+  /*
   public function __construct(array $atts = []) {
     if (array_key_exists('owner', $atts)) {
       $owner = $atts['owner'];
@@ -28,13 +30,16 @@ class PkTypedUploadModel extends PkUploadModel {
       }
       unset($atts['owner']);
       $atts['owner_id'] = $owner->id;
-      $atts['owner_model']=$owner::class;
-      parent::__construct($atts);
+      $atts['owner_model']=get_class($owner);
     }
+    parent::__construct($atts);
   }
+   * 
+   */
   
   public function getOwnerName() {
-    if (!($om=$this->owner_model)) {
+    $om = $this->owner_model;
+    if (!$om) {
       throw new PkException("No owner model");
     }
       $ucmodel = substr($om, strrpos($om, '\\') + 1)?:$om;
@@ -48,7 +53,7 @@ class PkTypedUploadModel extends PkUploadModel {
    * @return $this
    */
   public function setOwner(PkModel $owner) {
-    $this->owner_model = $owner::class;
+    $this->owner_model = get_class($owner);
     $this->owner_id = $owner->id;
     return $this;
   }

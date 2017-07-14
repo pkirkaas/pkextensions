@@ -50,10 +50,13 @@ abstract class PkUploadModel extends PkModel {
     if (!$mimefirst && ne_string($this->type)) {
       return $this->type;
     }
-    return static::mimeMainType($this->mimetype);
+    return $this->mimeMainType();
   }
 
-  public static function mimeMainType($mimetype) {
+  public function mimeMainType() {
+    return static::smimeMainType($this->mimetype);
+  }
+  public static function smimeMainType($mimetype) {
     if (!ne_string($mimetype)) {
       return null;
     }
@@ -119,9 +122,10 @@ abstract class PkUploadModel extends PkModel {
    * @param array $extra - additional details, 
    * @return \static|boolean - the new instance, or false if error
    */
-  public static function CreateUpload($fileinfo,Array $extra) {
+  public static function CreateUpload($fileinfo,Array $extra = null) {
     //pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
-    if (!$fileinfo || !is_array($fileinfo)) {
+    if (!$fileinfo || !is_array($fileinfo)
+        || !Storage::exists(keyVal('relpath',$fileinfo))) {
       return false;
     }
     $fo = new Static();

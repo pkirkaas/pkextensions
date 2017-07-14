@@ -1657,7 +1657,7 @@ class $createclassname extends Migration {
     }
     return $this->hasMany($typedClass,'owner_id')
       ->where('owner_model',static::class)
-      -where('att_name',$attname);
+      ->where('att_name',$attname);
     }
 
   public function hasOneTyped($attname, $typedClass=null) {
@@ -1666,8 +1666,36 @@ class $createclassname extends Migration {
     }
     return $this->hasOne($typedClass,'owner_id')
       ->where('owner_model',static::class)
-      -where('att_name',$attname);
+      ->where('att_name',$attname);
     }
+
+
+    /**
+     * Creates & adds a typedUploadInstance from the data
+     * @param string $attname - The attribute name from the owning instance
+     * @param array $filedata - Data to build the Typed instance
+     * @param boolean $hasone - if true, delete existing instance
+     * @param string|null $typedClass - the class to build, default PkTypedUploadModel
+     */
+  public function addTyped($attname, Array $filedata, $hasone=false, $typedClass=null) {
+    if (!$typedClass) {
+      $typedClass = PkTypedUploadModel::class;
+    }
+    $filedata += [
+        'owner'=>$this,
+        //'owner_model'=>static::class,
+        //'owner_id'=>$this->id,
+        'att_name' => $attname,
+        ];
+    $prop = $typedClass::createUpload($filedata);
+    if (! $typedClass::instantiated($prop)) {
+      return false;
+    }
+    if ($hasone && $this->$attname) {
+      $this->$attname->delete();
+    }
+    return $prop;
+  }
 
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
