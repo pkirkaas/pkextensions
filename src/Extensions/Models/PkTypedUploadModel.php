@@ -79,6 +79,13 @@ class PkTypedUploadModel extends PkUploadModel {
   }
 
   public function __get($att) {
+    if ($att === 'owner') {
+      $owner_model = $this->owner_model;
+      if (!$owner_model || !$this->owner_id) {
+        return null;
+      }
+      return $owner_model::find($this->owner_id);
+    }
     if ($att === 'owner_model') {
       return keyVal('owner_model',$this->attributes);
     }

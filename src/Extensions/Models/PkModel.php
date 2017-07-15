@@ -1682,10 +1682,14 @@ class $createclassname extends Migration {
      * @param boolean $hasone - if true, delete existing instance
      * @param string|null $typedClass - the class to build, default PkTypedUploadModel
      */
-  public function addTyped($attname, Array $filedata, $hasone=false, $typedClass=null) {
+  public function addTyped($attname, Array $filedata, $typedClass=null, $hasone=false) {
     pkdebug("Adding typed, attname: [$attname], fdata:", $filedata);
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
+    }
+    if ($hasone) {
+      $typedClass::where('att_name',$attname)->where('owner_id',$this->id)
+          ->where('owner_model',static::class)->get()->delete();
     }
     $filedata += [
         'owner'=>$this,
@@ -1694,16 +1698,16 @@ class $createclassname extends Migration {
         'att_name' => $attname,
         ];
     pkdebug("Creating typed, fdata:",$filedata);
-    $current = $this->$attname;
+    //$current = $this->$attname;
     $prop = $typedClass::createUpload($filedata);
     if (! $typedClass::instantiated($prop)) {
       return false;
     }
-    if ($hasone && $current) {
-      $current->delete();
-    }
-    $this->$attname = $prop;
     return $prop;
+  }
+
+  public function setTyped($attname, Array $filedata, $typedClass=null) {
+    return $this->addTyped($attname, $filedata, $typedClass, 1);
   }
 
   /** Mutators for integer attributes - to change '' to NULL */
