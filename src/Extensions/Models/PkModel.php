@@ -46,6 +46,7 @@
 namespace PkExtensions\Models;
 
 use PkExtensions\Traits\UtilityMethodsTrait;
+use PkExtensions\PkCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Schema;
 //use App\Models\User;
@@ -812,6 +813,10 @@ class $createclassname extends Migration {
     }
     $tablesAndKeys[$tableName][]=$key;
     return $sqlInsStr;
+  }
+
+  public function newCollection(array $models =[]) {
+    return new PkCollection($models);
   }
 
   /** 
