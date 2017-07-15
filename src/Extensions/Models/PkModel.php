@@ -1678,6 +1678,7 @@ class $createclassname extends Migration {
      * @param string|null $typedClass - the class to build, default PkTypedUploadModel
      */
   public function addTyped($attname, Array $filedata, $hasone=false, $typedClass=null) {
+    pkdebug("Adding typed, attname: [$attname], fdata:", $filedata);
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
     }
@@ -1687,13 +1688,16 @@ class $createclassname extends Migration {
         //'owner_id'=>$this->id,
         'att_name' => $attname,
         ];
+    pkdebug("Creating typed, fdata:",$filedata);
+    $current = $this->$attname;
     $prop = $typedClass::createUpload($filedata);
     if (! $typedClass::instantiated($prop)) {
       return false;
     }
-    if ($hasone && $this->$attname) {
-      $this->$attname->delete();
+    if ($hasone && $current) {
+      $current->delete();
     }
+    $this->$attname = $prop;
     return $prop;
   }
 

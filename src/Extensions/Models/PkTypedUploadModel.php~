@@ -21,8 +21,8 @@ class PkTypedUploadModel extends PkUploadModel {
       ];
 
   
+  /*
   public function __construct(array $atts = []) {
-    pkdebug("Constructing w. atts:",$atts);
     if (array_key_exists('owner', $atts)) {
       $owner = $atts['owner'];
       if (!$owner instanceOf PkModel) {
@@ -32,22 +32,21 @@ class PkTypedUploadModel extends PkUploadModel {
       $atts['owner_id'] = $owner->id;
       $atts['owner_model']=get_class($owner);
     }
-    pkdebug("Parent Constructing w. atts:",$atts);
     parent::__construct($atts);
-    pkdebug("Finished Constructing w. atts:",$atts);
   }
+   * 
+   */
   
+  /*
   public function getOwnerName() {
-    pkdebug("Trying to get owner name");
-    
-    if (!($om = $this->owner_model)) {
-      return null;
+    $om = $this->owner_model;
+    if (!$om) {
+      throw new PkException("No owner model");
     }
       $ucmodel = substr($om, strrpos($om, '\\') + 1)?:$om;
       $ownername = strtolower($ucmodel);
       return $ownername;
   }
-  /*
    * 
    */
 
@@ -56,12 +55,12 @@ class PkTypedUploadModel extends PkUploadModel {
    * @param \PkExtensions\Models\PkModel $owner
    * @return $this
    */
+  /*
   public function setOwner(PkModel $owner) {
     $this->owner_model = get_class($owner);
     $this->owner_id = $owner->id;
     return $this;
   }
-  /*
    * *
    */
 
@@ -71,6 +70,7 @@ class PkTypedUploadModel extends PkUploadModel {
    * @param array $args
    * @return relationship/builder
    */
+  /*
   public function __call($method, $args=[]) {
     if ($method === $this->getOwnerName()) {
       return $this->belongsTo($this->owner_model, 'owner_id');
@@ -79,20 +79,17 @@ class PkTypedUploadModel extends PkUploadModel {
   }
 
   public function __get($att) {
-    if ($att === 'owner_model') {
-      return keyVal('owner_model',$this->attributes);
-    }
     if ($att === $this->getOwnerName()) {
       return $this->$att()->first();
     }
     return parent::__get($att);
   }
-  /*
    * 
    */
 
   
 
+  /*
   public function __set($att, $val) {
     if ($att === $this->getOwnerName()) {
       if (!$val) {
@@ -104,9 +101,11 @@ class PkTypedUploadModel extends PkUploadModel {
             ["Wrong type Val; Owner-Model: {$this->owner_model}; Val:", $val]);
       }
     } else {
-      parent::__set($att, $val);
+      parent:__set($att, $val);
     }
   }
+   * 
+   */
 
 
 

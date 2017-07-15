@@ -118,7 +118,7 @@ class PkFileUploadService {
       //PkValidator::validate($request,[$ctlname=>$validationStr]);
     }
     $this->path = base_path('storage/app/' . $this->uploadedFile->store('public' . $reldir));
-    if ((PkUploadModel::mimeMainType($this->uploadedFile->getMimeType()) === 'image') && $this->resize) {
+    if ((PkUploadModel::smimeMainType($this->uploadedFile->getMimeType()) === 'image') && $this->resize) {
       $this->resize($resize);
     }
     $ret = ['relpath' => $reldir . basename($this->path),

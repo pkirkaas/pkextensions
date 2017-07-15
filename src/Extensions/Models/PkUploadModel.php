@@ -34,6 +34,31 @@ abstract class PkUploadModel extends PkModel {
     return static::getAncestorArraysMerged('upload_types');
   }
 
+
+  public static function storage_dir($subdir = 'public') { 
+    if (ne_string($subdir)) {
+      $subdir = pktrailingslashit($subdir);
+    } else {
+      $subdir = '';
+    }
+    return base_path("storage/app/$subdir");
+  }
+
+  public static function sfile_path($relpath) {
+    $fp = static::storage_dir().$relpath;
+    if (file_exists($fp)) {
+      return $fp;
+    }
+    return false;
+  }
+
+  public function file_path($deleteonfalse=true) {
+    $fp = static::sfile_path($this->relpath);
+    if ($deleteonfalse && !$fp) {
+      $this->delete();
+    }
+    return $fp;
+  }
   /** Try to return the appropriate HTML element for the file type; only a
    * 
    * @param array $atts - the attributes for the element (img/audio/div, etc)
@@ -76,7 +101,7 @@ abstract class PkUploadModel extends PkModel {
    */
   public function url($check = false, $deleteonfalse=true) {
     if ($check) {
-      if (!$this->fileexists($deleteonfalse)) {
+      if (!$this->file_path($deleteonfalse)) {
         return false;
       }
     }
@@ -96,13 +121,7 @@ abstract class PkUploadModel extends PkModel {
    * @param boolean $deleteonfalse Default: True. Delete this if no file
    */
   public function fileexists($deleteonfalse = true) {
-    if (Storage::exists($this->relpath)) {
-      return true;
-    }
-    if ($deleteonfalse) {
-      $this->delete();
-    }
-    return false;
+    return !!$this->file_path($deleteonfalse);
   }
 
   /** If "$this->type" not set, try to guess from mime-type
@@ -122,17 +141,25 @@ abstract class PkUploadModel extends PkModel {
    * @param array $extra - additional details, 
    * @return \static|boolean - the new instance, or false if error
    */
-  public static function CreateUpload($fileinfo,Array $extra = null) {
-    //pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
+  public static function CreateUpload($fileinfo, $extra = []) {
+    pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
     if (!$fileinfo || !is_array($fileinfo)
-        || !Storage::exists(keyVal('relpath',$fileinfo))) {
+        ) {
+        //|| !Storage::exists(keyVal('relpath',$fileinfo))) {
+      pkdebug("Couldn't file the data", $fileinfo);
       return false;
     }
-    $fo = new Static();
+    if (is_array_assoc($extra)) {
+      $fileinfo += $extra;
+    }
+    $fo = new Static($fileinfo);
+    /*
     $fo->fill($fileinfo);
     if (is_array($extra)) {
       $fo->fill($extra);
     }
+     * *
+     */
     if($fo->save()) {
       return $fo;
     }
