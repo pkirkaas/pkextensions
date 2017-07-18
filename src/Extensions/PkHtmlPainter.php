@@ -619,6 +619,35 @@ class PkHtmlPainter extends PkHtmlRenderer {
     return $trow;
   }
 
+  /** Make a BS4 menu drop list - w. a base route, & array of Models to select from.
+   * @param string $baseRoute - the base route name to use, adding the id's of the models
+   * @param array of models $models - the models to build the full routes from
+   * @param string|array $attLabel - a model attribute name or array of att names
+   *   to build the label from
+   * @param array $params - any extra parameters
+   * @return HTML string of BS4 DropMenu items
+   */
+  public function mkBsDropList($baseRoute,$attLabel,Array $models=[], $params=[]) {
+    $links = new PartialSet();
+    $links[]="<div class='dropdown-menu'>\n";
+    foreach ($models as $model) {
+      //$mid = $model->id;
+      $label = '';
+      if (is_string($attLabel)) {
+        $attLabel = [$attLabel];
+      }
+      foreach ($attLabel as $attName) {
+        $label .= $model->$attName.' ';
+      }
+      //$route = route($baseRoute,[$mid]);
+      $route = route($baseRoute,[$model]);
+                //<a class='dropdown-item' href='{{route('user_editaccount')}}'>Account</a>
+      $links[]="<a class='dropdown-item' href='$route'>$label</a>\n";
+    }
+    $links[]="</div>\n";
+    return $links;
+  }
+
   /** It makes a form based on options, but als passes back a PartialSet template that the 
    * calling function can then populate 
    */
