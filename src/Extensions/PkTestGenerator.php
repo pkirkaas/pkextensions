@@ -44,12 +44,34 @@ class PkTestGenerator {
   }
 
   /** Basic
-   * 
+   *  
    * @param type $method
    * @param type $args
    * @return type
+   * If an undefined starts w randXXX, remove it & see if we have any static
+   * variables with XXX. If so, & array, do rand on the array.
+   * If XXX is a string - see if a file-name - if so, load it into the var
+   * as an array, & do the same
    */
   public static function __callStatic($method, $args) {
+    if($var = removeStartStr('rand',$method)) { #Do we have a static var declared 
+      $var = strtolower($var);
+      if (property_exists(static::class, $var)) {
+        if (is_string(static::$var) && is_file(static::$var)) {
+          static::$var = include(static::$var);
+        } #Hopefully static $var is now an array
+        if (is_array(static::$var)) {
+          if (is_array($args) && count($args)) {
+            return static::randData(static::$var, $args[0]);
+          } else {
+            return static::randData(static::$var);
+          }
+        }
+      }
+    }
+
+          
+      
     if (!array_key_exists($method, static::$externalReferences)) {
       return call_user_func_array(['parent',$method], $args);
     }

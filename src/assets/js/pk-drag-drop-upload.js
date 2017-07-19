@@ -13,6 +13,22 @@
  var hiddenfileinput = $('<input type="file">');
  });
  */
+//Can work this to drag & drop image URLs, like with a post:
+/*
+$(function () {
+  $('.drop-url').on('drop',function(e) {
+    console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData('text/html'));
+        var url = $(e.originalEvent.dataTransfer.getData('text/html')).filter('img').attr('src');
+    if (url) {
+        jQuery('<img/>', {
+            src: url,
+            alt: "resim"
+        }).appendTo(this);            
+    }
+    return false;
+  });
+});
+*/
 
 $(function () {
 /*
