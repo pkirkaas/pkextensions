@@ -469,7 +469,7 @@ class PkHtmlRenderer extends PartialSet {
       $this->rawcontent("<$tag ".PkHtml::attributes($attributes).">");
 
       #############  ORIG ##############
-      if (is_array($content)){
+      if (is_array($content) || ($content instanceOf \Generator)){
         foreach ($content as $citem) {
           $this->content($citem,$raw);
         }
@@ -1447,6 +1447,10 @@ class PkHtmlRenderer extends PartialSet {
      return $this->rawcontent(PkForm::selectset( $name, $list, $selected, $labeltext, $inatts, $labatts, $wrapatts));
   }
 
+  public function dump() {
+    echo($this);
+    return $this;
+  }
 
 
 

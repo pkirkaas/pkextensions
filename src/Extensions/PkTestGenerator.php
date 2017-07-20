@@ -54,26 +54,20 @@ class PkTestGenerator {
    * as an array, & do the same
    */
   public static function __callStatic($method, $args) {
-    if($var = removeStartStr('rand',$method)) { #Do we have a static var declared 
+    if($var = removeStartStr($method,'rand')) { #Do we have a static var declared 
       $var = strtolower($var);
       if (property_exists(static::class, $var)) {
-        if (is_string(static::$var) && is_file(static::$var)) {
-          static::$var = include(static::$var);
+        if (is_string(static::$$var) && is_file(static::$$var)) {
+          static::$$var = include(static::$$var);
         } #Hopefully static $var is now an array
-        if (is_array(static::$var)) {
+        if (is_array(static::$$var)) {
           if (is_array($args) && count($args)) {
-            return static::randData(static::$var, $args[0]);
+            return static::randData(static::$$var, $args[0]);
           } else {
-            return static::randData(static::$var);
+            return static::randData(static::$$var);
           }
         }
       }
-    }
-
-          
-      
-    if (!array_key_exists($method, static::$externalReferences)) {
-      return call_user_func_array(['parent',$method], $args);
     }
     $row = static::$externalReferences[$method];
     if (!array_key_exists('cache', $row)) {
@@ -83,7 +77,6 @@ class PkTestGenerator {
       case 0 : return static::randData($row['cache']);
       case 1 : return static::randData($row['cache'], $args[0]);
     }
-
   }
 
   /** Returns the season (and by defaul Year) from an SQL or Unix date */

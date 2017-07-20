@@ -14,21 +14,46 @@
  });
  */
 //Can work this to drag & drop image URLs, like with a post:
-/*
+/** 4 data- att options - data-imgclass for the CSS class of the image,
+ *  data-ajaxurl if we want to make an AJAX call, & data-params, URL encoded parameter
+ *  data-name - optional the name of the form-control, or defaults to url
+ */
 $(function () {
   $('.drop-url').on('drop',function(e) {
     console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData('text/html'));
-        var url = $(e.originalEvent.dataTransfer.getData('text/html')).filter('img').attr('src');
-    if (url) {
-        jQuery('<img/>', {
-            src: url,
-            alt: "resim"
-        }).appendTo(this);            
+    var url = $(e.originalEvent.dataTransfer.getData('text/html')).filter('img').attr('src');
+    if (!url) {
+      return;
     }
-    return false;
+    var imgclass = $(this).attr('data-imgclass') || 'avatar';
+    var params  = $(this).attr('data-params');
+    var ajaxurl  = $(this).attr('data-ajaxurl');
+    var name = $(this).attr('data-name') || 'url';
+    if (!params) {
+      params = {};
+    } else if (typeof params === 'string') {
+      params = parseStr(params);
+    }
+    params[name]=url;
+    console.log('Params:',params);
+      
+    jQuery('<img/>', {
+          src: url,
+          alt: "resim",
+          class: imgclass
+    }).appendTo(this);            
+    if (ajaxurl) {
+      $.ajax({
+        url: ajaxurl,
+        data: params,
+        type: 'POST',
+        success: function(data) {
+          console.log("Succeeded w. data:",data);
+        }
+      });
+    }
   });
 });
-*/
 
 $(function () {
 /*

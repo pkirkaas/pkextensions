@@ -1371,7 +1371,7 @@ function arrayish_keys_exist($keys, $arr = null) {
  * @return type
  */
 function is_arrayish($arg) {
-  return (is_array($arg) || ($arg instanceOf ArrayAccess) || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
+  return (is_array($arg) || ($arg instanceOf ArrayAccess) || ($arg instanceOf Generator) || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
 }
 
 /** Similar to above (array_keys_exist()), only returns the value at the 

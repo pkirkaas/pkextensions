@@ -22,7 +22,6 @@ class PkTypedUploadModel extends PkUploadModel {
 
   
   public function __construct(array $atts = []) {
-    pkdebug("Constructing w. atts:",$atts);
     if (array_key_exists('owner', $atts)) {
       $owner = $atts['owner'];
       if (!$owner instanceOf PkModel) {
@@ -32,14 +31,10 @@ class PkTypedUploadModel extends PkUploadModel {
       $atts['owner_id'] = $owner->id;
       $atts['owner_model']=get_class($owner);
     }
-    pkdebug("Parent Constructing w. atts:",$atts);
     parent::__construct($atts);
-    pkdebug("Finished Constructing w. atts:",$atts);
   }
   
   public function getOwnerName() {
-    pkdebug("Trying to get owner name");
-    
     if (!($om = $this->owner_model)) {
       return null;
     }

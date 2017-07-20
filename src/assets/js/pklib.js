@@ -321,6 +321,10 @@ function showHelpDialog() {
   helpDialog.dialog('open');
 }
 
+$(function () {
+  $('.hide-empty:empty').css('display','none');
+  if(! $('.hide-empty').text()) {$('.hide-empty').remove();}
+});
 
 /**
  * Help/instructions on Hover - Like formatted tooltip.
