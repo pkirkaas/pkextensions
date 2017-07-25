@@ -33,7 +33,7 @@ use Request;
 use \Exception;
 use \Closure;
 
-class PkController extends Controller {
+abstract class PkController extends Controller {
 
   public static $errorMsgBag; #The error messages, if any. Try static first
   public static $viewErrorBag; #The error messages, if any. Try static first
@@ -238,7 +238,10 @@ class PkController extends Controller {
    * @param string $msg - the error to report
    * @return Redirect Response
    */
-  public function error($msg) {
+  public function error($msg = null) {
+    if (!$msg) {
+      $msg = "There was an error";
+    }
     return redirect()->route('showerror')->withError(new MessageBag(['error' => $msg]));
   }
 
