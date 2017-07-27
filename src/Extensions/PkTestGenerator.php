@@ -55,20 +55,22 @@ class PkTestGenerator {
    */
   public static function __callStatic($method, $args) {
     if($var = removeStartStr($method,'rand')) { #Do we have a static var declared 
-      $var = strtolower($var);
-      if (property_exists(static::class, $var)) {
-        if (is_string(static::$$var) && is_file(static::$$var)) {
-          static::$$var = include(static::$$var);
-        } #Hopefully static $var is now an array
-        if (is_array(static::$$var)) {
-          if (is_array($args) && count($args)) {
-            return static::randData(static::$$var, $args[0]);
-          } else {
-            return static::randData(static::$$var);
-          }
+      $res = static::loadArrayFromFile($var);
+      if (is_array($res)) {
+        if (is_array($args) && count($args)) {
+          return static::randData($res, $args[0]);
+        } else {
+            return static::randData($res);
         }
       }
     }
+
+    if($var = removeStartStr($method,'all')) { #Do we have a static var declared 
+      $res = static::loadArrayFromFile($var);
+      if (is_array($res)) return $res;
+    }
+
+
     $row = static::$externalReferences[$method];
     if (!array_key_exists('cache', $row)) {
       $row['cache'] = include($row['file']);
@@ -77,6 +79,21 @@ class PkTestGenerator {
       case 0 : return static::randData($row['cache']);
       case 1 : return static::randData($row['cache'], $args[0]);
     }
+  }
+
+  /** Some static data arrays might be huge & we don't want to load them if
+   * we don't need them - so they have the path to a PHP file instead. The
+   * first time they are called, we include the PHP file & load the array
+   */
+  public static function loadArrayFromFile($var) {
+    $var = strtolower($var);
+    if (!property_exists(static::class, $var)) return false;
+    if (is_string(static::$$var) && is_file(static::$$var) 
+        && (pathinfo(static::$$var,PATHINFO_EXTENSION) === 'php')) {
+          static::$$var = include(static::$$var);
+    } #Hopefully static $var is now an array
+    if (is_array(static::$$var)) return static::$$var;
+    return false;
   }
 
   /** Returns the season (and by defaul Year) from an SQL or Unix date */
@@ -106,7 +123,7 @@ class PkTestGenerator {
    *   means return an array, empty for $items = 0...
    * @return single instance or array, depending on num items
    */
-  public static function randData( $dataArr, $items=-1) {
+  public static function randData( $dataArr, $items=-1, $withKeys = false) {
     try {
       //if (!$items) throw new \Exception("Invalid value or type for items");
       if (!$items) return [];
@@ -133,7 +150,10 @@ class PkTestGenerator {
     $keys = array_keys($copy);
     $numkeys = count($keys);
     if ($items === -1) {
-      return $copy[$keys[mt_rand(0,  $numkeys - 1)]];
+      $key = $keys[mt_rand(0,  $numkeys - 1)];
+      $val = $copy[$key]; 
+      if ($withKeys) $val = [$key=>$val];
+      return $val;
     }
     #More than one item to return; so an array. Unique menbers
     $retarr = [];
@@ -141,7 +161,7 @@ class PkTestGenerator {
       $keysleft = array_keys($copy);
       $numkeysleft = count($keysleft);
       $key = $keysleft[mt_rand(0,  $numkeysleft - 1)];
-      $retarr[] =  $copy[$key];
+      $retarr[$key] =  $copy[$key];
       unset($copy[$key]);
     }
     return $retarr;
