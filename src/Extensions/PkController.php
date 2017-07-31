@@ -242,7 +242,9 @@ abstract class PkController extends Controller {
     if (!$msg) {
       $msg = "There was an error";
     }
-    return redirect()->route('showerror')->withError(new MessageBag(['error' => $msg]));
+    //return redirect()->route('showerror')->withError(new MessageBag(['error' => $msg]));
+    //return redirect()->route()->back()->withError(new MessageBag(['error' => $msg]));
+    return redirect()->back()->withError(new MessageBag(['error' => $msg]));
   }
 
   /** Ideally, the error will NOT be in the URL, but in the flashed message bag

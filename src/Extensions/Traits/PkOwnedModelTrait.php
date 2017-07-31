@@ -1,5 +1,6 @@
 <?php
 namespace PkExtensions\Traits;
+use PkExtensions\PkException;
 /**
  * If some types of PkModels might be owned by several different other PkModels,
  * instead of making separate classes & tables for them all, make a single class
