@@ -445,7 +445,7 @@ $base-header-ir: #400 !default;
 }
 
 @mixin mk-site-headers($base-header: sh) {
-  @for $i from 1 through 20 {
+  @for $i from -5 through 20 {
      $font-size: $i/5 + $base-header-font-size;
     .#{$base-header}#{$i},  .#{$base-header}r#{$i},.#{$base-header}b#{$i} {
       font-size: $font-size;

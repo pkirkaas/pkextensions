@@ -321,10 +321,41 @@ function showHelpDialog() {
   helpDialog.dialog('open');
 }
 
+/** Should hide elements of class 'hide-empty' that have no content.
+ * Use judiciously. Won't play well w. Vue components.
+ */
 $(function () {
-  $('.hide-empty:empty').css('display','none');
-  if(! $('.hide-empty').text()) {$('.hide-empty').remove();}
+  $('.hide-empty').each(function (idx, subel) {
+    if (isElEmpty(subel)) {
+      console.log("This El is Empty: ", subel);
+      $(subel).css('display','none');
+    }
+  });
 });
+
+/** Determines if an element is "empty" - neither it or its children have content
+ * Special handling for non-content tags - img
+ * @param selector, DOM el, or jQuery object: el
+ * @returns Boolean - is the element empty?
+ */
+function isElEmpty(el) {
+  var elempty = true;
+  el = jQuerify(el);
+  if (el.text()) {
+    return false;
+  }
+  if (el.is('img')) {
+    if (el.attr('src')) {
+      return false;
+    }
+  }
+  el.find().each(function (idx, subel) {
+    if(isElEmpty(subel) === false) {
+      return (elempty = false);
+    }
+  });
+  return elempty;
+}
 
 /**
  * Help/instructions on Hover - Like formatted tooltip.

@@ -192,6 +192,8 @@ $headline-margin-bottom: .5em !default;
 //$img-avatar-max-width: 15rem !default;
 $img-avatar-max-width: auto !default;
 $img-avatar-max-height: 12rem !default;
+$img-avatar-tiny-max-height: 32px !default;
+$img-avatar-micro-max-height: 16px !default;
 
 img.avatar {
   //max-width: $img-avatar-max-width;
@@ -205,11 +207,20 @@ img.avatar {
 img.avatar.small {
   max-height: $img-avatar-max-height/2;
 }
-
-
 img.avatar.xsmall {
   max-height: $img-avatar-max-height/3;
 }
+img.avatar.tiny {
+  max-height: $img-avatar-tiny-max-height;
+  max-width: $img-avatar-tiny-max-height;
+}
+
+img.avatar.micro {
+  max-height: $img-avatar-micro-max-height;
+  max-width: $img-avatar-micro-max-height;
+}
+
+
 
 
 
