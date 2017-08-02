@@ -326,6 +326,7 @@ function showHelpDialog() {
  */
 $(function () {
   $('.hide-empty').each(function (idx, subel) {
+    console.log("Testing Emptyiness of: ", subel);
     if (isElEmpty(subel)) {
       console.log("This El is Empty: ", subel);
       $(subel).css('display','none');
@@ -339,18 +340,19 @@ $(function () {
  * @returns Boolean - is the element empty?
  */
 function isElEmpty(el) {
+  //var elempty = true;
   var elempty = true;
   el = jQuerify(el);
-  if ($.trim(el.text())) {
+  //if ($.trim(el.text()) ||  (el.is('img') && $.trim(el.attr('src')))) {
+  if ($.trim(el.text()) ||   $.trim(el.attr('src'))) {
+    console.log ("This el NOT empty (yet): ", el[0]);
     return false;
   }
-  if (el.is('img')) {
-    if (el.attr('src')) {
-      return false;
-    }
-  }
-  el.find().each(function (idx, subel) {
-    if(isElEmpty(subel) === false) {
+  console.log("El Find: ", el.find());
+  el.children().each(function (idx, subel) {
+    console.log ("In Loop; recursing into Subel:", subel);
+    if (!isElEmpty(subel)) {
+      console.log ("In Loop; recursed empty SubEl:", subel);
       return (elempty = false);
     }
   });
