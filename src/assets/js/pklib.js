@@ -322,7 +322,7 @@ function showHelpDialog() {
 }
 
 /** Should hide elements of class 'hide-empty' that have no content.
- * Use judiciously. Won't play well w. Vue components.
+ * Use judiciously. Won't play well w. Vue components or dynamically created els.
  */
 $(function () {
   $('.hide-empty').each(function (idx, subel) {
@@ -341,7 +341,7 @@ $(function () {
 function isElEmpty(el) {
   var elempty = true;
   el = jQuerify(el);
-  if (el.text()) {
+  if ($.trim(el.text())) {
     return false;
   }
   if (el.is('img')) {

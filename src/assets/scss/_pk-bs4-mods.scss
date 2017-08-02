@@ -3,6 +3,7 @@
 
 //To dropdown menus on hover. Has a JS part also, in jquery-ui-config
 .dropdown:hover>.dropdown-menu {
+  margin: 0;
   display: block;
 }
 //Customizing TAB inactive Background & Font color

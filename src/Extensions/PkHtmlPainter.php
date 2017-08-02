@@ -629,8 +629,12 @@ class PkHtmlPainter extends PkHtmlRenderer {
    */
   public function mkBsDropList($baseRoute,$attLabel,Array $models=[], $params=[]) {
     $links = new PartialSet();
+    $tootikstr = $tootik = keyVal('tootik',$params,'');
     $links[]="<div class='dropdown-menu'>\n";
     foreach ($models as $model) {
+      if (is_callable($tootik)) {
+        $tootikstr = $tootik($model);
+      }
       //$mid = $model->id;
       $label = '';
       if (is_string($attLabel)) {
@@ -642,7 +646,8 @@ class PkHtmlPainter extends PkHtmlRenderer {
       //$route = route($baseRoute,[$mid]);
       $route = route($baseRoute,[$model]);
                 //<a class='dropdown-item' href='{{route('user_editaccount')}}'>Account</a>
-      $links[]="<a class='dropdown-item' href='$route'>$label</a>\n";
+      $links[]="<a class='dropdown-item' data-tootik='$tootikstr'
+        data-tootik-conf='right' href='$route'>$label</a>\n";
     }
     $links[]="</div>\n";
     return $links;
