@@ -40,6 +40,12 @@ class PercentFormat implements PkDisplayValueInterface {
   }
 }
 
+/** Shows a friendly date. 
+ * @param dateish $value - the date to format
+ * @param int|string $fmt - if string, use as format. If int, index to
+ *    array of common formats (see friendlyCarbonDate())
+ * @return string - formatted date
+ */
 class DateFormat implements PkDisplayValueInterface {
   public static function displayValue($value = null, $fmt = null,$ifempty='') {
     //if (!$fmt) $fmt = 'M j, Y';

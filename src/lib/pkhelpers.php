@@ -83,6 +83,26 @@ function friendlyCarbonDate($date = null, $format =  'M j, Y',$shownever = false
       return '';
     }
   }
+  $formats = [
+  1 => 'M j, Y', # Apr 24, 2017
+  2 => 'M j, y', # Apr 24, 17
+  3 => 'n/j/y', # 4/24/17
+  4 => 'j-n-y', # 24-4-17
+  5 => "F j, Y", # April 24, 2017
+  6 => 'M j', # Apr 24
+  7 => 'j M', # 24 Apr
+  8 => 'j M y', # 24 Apr 17
+  9 => 'j M Y', # 24 Apr 2017
+  10 => 'j F Y', # 24 April 2017
+  11 => 'n/j', # 4/24
+];
+  if (is_intish($format)) {
+    $ky = to_int($format);
+    if (in_array($ky,array_keys($formats), 1)) {
+      $format = $formats[$ky];
+    }
+  }
+
   $date = new Carbon($date);
   $min = Carbon::minValue();
   $max = Carbon::maxValue();

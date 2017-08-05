@@ -48,6 +48,7 @@ namespace PkExtensions\Models;
 use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\PkCollection;
 use Illuminate\Database\Eloquent\Builder;
+use Closure;
 use Schema;
 //use App\Models\User;
 //use \Auth;
@@ -59,6 +60,7 @@ use \Request;
 use \Exception;
 use \DB;
 use PkExtensions\PkTestGenerator;
+use PkExtensions\PkException;
 
 abstract class PkModel extends Model {
 
@@ -117,8 +119,9 @@ abstract class PkModel extends Model {
 
   /** Does two entirely different things - by default, 
    * Just returns an indexed array of field names
-   * But if $onlyrefs = true, ONLY RETURNS display value fields mapped to 
-   * PkRef classes
+   * But if $onlyrefs = true, ONLY RETURNS an ASSOC ARRAY of display value fields
+   * as array keys mapped to PkRef classes - or actually, classes that implement
+   * the PkDisplayValueInterface
    */
   public static function getDisplayValueFields($onlyrefs = false) {
     $display_value_fields = static::getAncestorArraysMerged('display_value_fields');
@@ -759,10 +762,16 @@ class $createclassname extends Migration {
   /**
    * Returns all the underlying names of the table fields of the model, whether
    * they are initialized or not.
+   * @param boolean $andPropertyNames: false - if true, also return property names
+   *   defined on this class, NOT part of persisted / DB Model attributes
    * @param type $Model
    */
-  public function getAttributeNames() {
-    return array_keys($this->getAttributeDefs());
+  public function getAttributeNames($andPropertyNames = false) {
+    $attNames = array_keys($this->getAttributeDefs());
+    if ($andPropertyNames) {
+      $attNames = array_merge($attNames, array_keys(get_class_vars(static::class)));
+    }
+    return $attNames;
   }
 
   /** For generating backup SQL files for the model */
@@ -1393,10 +1402,17 @@ class $createclassname extends Migration {
   the PkDisplayValueInterface - then the method is called, with the optional args,
   and the result of the method is processed by the DisplayValueInterface class
   and THAT result is returned. Dollar or Percent Formatting, for example.
+ * 
+ * 8/2017 Enhancement - As originally designed, this would allow Model methods
+ * to execute, return a value, then have the the result formatted by the DV class.
+ * 
+ * BUT Now I want to enhance it by allowing model ATTRIBUTES to take "_DV(arg)"
+ * to send the arg to the DV function....
  */
   public function displayValueMethod($methodName, $args=[]) {
     if (!ne_string($methodName)) return null;
     //$class=get_class($this);
+    $attNms = $this->getAttributeNames(1); #Could call w. True to allow object properties as well?
     $refmaps = static::getDisplayValueFields(true);
     foreach ($refmaps as $fn => $rc) {
       if (!ne_string($fn) || !ne_string($rc) || !class_exists($rc) || 
@@ -1404,8 +1420,16 @@ class $createclassname extends Migration {
         continue;
       }
       if ($fn === $methodName) {
-        $value = call_user_func_array([$this,$methodName], $args);
-        return $rc::displayValue($value);
+        if (in_array($fn, $attNms, 1)) {#args are for the DisplayValue method!
+          if (!is_array($args)) {
+            throw new PkException(["Thought args HAD to be an array, but are:", $args]);
+          }
+          array_unshift($args, $this->$fn);
+          return call_user_func_array([$rc,'displayValue'], $args);
+        } else {
+          $value = call_user_func_array([$this,$methodName], $args);
+          return $rc::displayValue($value);
+        }
       }
     }
   }
@@ -1462,6 +1486,16 @@ class $createclassname extends Migration {
    */
   public function postSave(Array $opts = []) {
     
+  }
+
+  /** Accepts a closure, binds to it, executes & returns it with the (optional) args
+   * Typically used for custom HTML rendering, but whatever
+   * @param Closure $closure
+   * @param mixed $args
+   * @return mixed
+   */
+  public function callClosure(Closure $closure, $args=[]) {
+    return $closure->call($this, $args);
   }
 
   /**
