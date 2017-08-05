@@ -1387,8 +1387,7 @@ class $createclassname extends Migration {
         array_unshift($args, $fldVal);
         return call_user_func_array([$dv_method,'displayValue'],$args);
     }
-    if ($value === null) return $fldVal;
-    return $value;
+    return $fldVal;
   }
 
   /*** Delete if the above works */
