@@ -242,6 +242,7 @@ abstract class PkController extends Controller {
     if (!$msg) {
       $msg = "There was an error";
     }
+    static::addErrorMsg($msg);
     //return redirect()->route('showerror')->withError(new MessageBag(['error' => $msg]));
     //return redirect()->route()->back()->withError(new MessageBag(['error' => $msg]));
     return redirect()->back()->withError(new MessageBag(['error' => $msg]));

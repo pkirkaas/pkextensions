@@ -28,6 +28,43 @@ trait UtilityMethodsTrait {
     return $value;
   }
 
+  /** To add dynamic closure methods to classes. Have to implement actually 
+   * calling them in the __call() method of the classes themselves, though, like
+   * 
+      public function __call($method, $args = []) {
+        #First see if it's a dynamic method in this class...
+        if (static::getDynamicMethod($method)) {
+          return $this->callDynamicMethod($method, $args);
+        }....
+   *   
+   * @var type 
+   */
+  public static $dynamicMethods=[];
+
+  /**
+  @param Array $methods - assoc array ['name1'=>$closure1, 'name2'=>closure2,.]
+   */
+  public static function addDynamicMethod(Array $methods) {
+    foreach ($methods as $name=>$closure) {
+      static::$dynamicMethods[static::class][$name]=$closure;
+    }
+  }
+
+
+  public static function getDynamicMethod($name) {
+    $class=static::class;
+    if (array_key_exists($class, static::$dynamicMethods) &&
+        array_key_exists($name, static::$dynamicMethods[$class])) {
+      return static::$dynamicMethods[$class][$name];
+    }
+    return false;
+  }
+
+  public function callDynamicMethod($name, $args) {
+    array_unshift($args, $this);
+    return call_user_func_array([static::getDynamicMethod($name),'call'],$args);
+  }
+
   /** If any method wants to stop static::getAncestorMethodResultsMerged() from
    * continuing up the ancestor chain, it sets this flag TRUE. 
    * static::getAncestorMethodResultsMerged() will stop accending ancestors, 

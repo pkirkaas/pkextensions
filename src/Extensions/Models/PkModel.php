@@ -980,6 +980,11 @@ class $createclassname extends Migration {
     }
 
   public function __call($method, $args = []) {
+    #First see if it's a dynamic method in this class...
+
+    if (static::getDynamicMethod($method)) {
+      return $this->callDynamicMethod($method, $args);
+    }
     $name = removeEndStr($method,  static::$displayValueSuffix);
     if (ne_string($name) &&  in_array($name,static::getDisplayValueFields(),1)) {
       return $this->displayValueMethod($name, $args);
@@ -1358,7 +1363,36 @@ class $createclassname extends Migration {
    * @param string $fieldName - the name of the DB field to examine
    * @return string - the user-friendly text to display
    */
-  public function displayValue($fieldName, $value = null) {
+  public function displayValue($fieldName) {
+    if (!ne_string($fieldName)) return null;
+    $refmaps = static::getDisplayValueFields(true);
+    #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
+    $rc = $refmaps[$fieldName];
+    #$rc can be a String classname that implements PkDisplayValueInterface or a closure/runnable, OR
+    #an array of [$className,$arg1, $arg2,..] where $args = date format, or $ precision,
+    # default value, whatever
+    $args = [];
+    if (is_array($rc)) { #First el is method, remainder are optional args
+      $dv_method = array_shift($rc);
+      $args = $rc;
+    } else {
+      $dv_method = $rc;
+    }
+    $fldVal = $this->$fieldName;
+    if (is_callable($dv_method)) {
+        array_unshift($args, $fldVal);
+        return call_user_func_array($dv_method,$args);
+    } else if ( ne_string($dv_method) && class_exists($dv_method) &&
+        method_exists($dv_method,'displayValue')) {
+        array_unshift($args, $fldVal);
+        return call_user_func_array([$dv_method,'displayValue'],$args);
+    }
+    if ($value === null) return $fldVal;
+    return $value;
+  }
+
+  /*** Delete if the above works */
+  public function displayValue_old($fieldName, $value = null) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
     #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
@@ -1407,9 +1441,40 @@ class $createclassname extends Migration {
  * to execute, return a value, then have the the result formatted by the DV class.
  * 
  * BUT Now I want to enhance it by allowing model ATTRIBUTES to take "_DV(arg)"
- * to send the arg to the DV function....
+ * to send the arg to the DV function.... - so $possessionName could be an attriubute
+ * name that passes it's value & optional arguments to a callable....
  */
-  public function displayValueMethod($methodName, $args=[]) {
+  public function displayValueMethod($possessionName, $args=[]) {
+    if (!ne_string($possessionName)) return null;
+    //$class=get_class($this);
+    if (in_array($possessionName, $this->getAttributeNames(1), 1)) {
+      $fldVal = $this->$possessionName;
+    } else {
+      $fldVal = call_user_func_array([$this,$possessionName],$args);
+      $args = [];
+    }
+    $rc = static::getDisplayValueFields(true)[$possessionName];
+    if (is_array($rc)) { #First el is callable, remainder are optional args
+      $dv_method = array_shift($rc);
+    } else {
+      $dv_method = $rc;
+      $rc = [];
+    }
+    $mergeargs = array_merge($args, $rc);
+    array_unshift($mergeargs, $fldVal);
+    if (is_callable($dv_method)) {
+        return call_user_func_array($dv_method,$mergeargs);
+    } else if ( ne_string($dv_method) && class_exists($dv_method) &&
+        method_exists($dv_method,'displayValue')) {
+        return call_user_func_array([$dv_method,'displayValue'],$mergeargs);
+    }
+    return $fldVal;
+  }
+
+
+
+  /*** Delete if the above works */
+  public function displayValueMethod_old($methodName, $args=[]) {
     if (!ne_string($methodName)) return null;
     //$class=get_class($this);
     $attNms = $this->getAttributeNames(1); #Could call w. True to allow object properties as well?
@@ -1532,10 +1597,20 @@ class $createclassname extends Migration {
 
   /** To allow override in descendent classes - like get calculated 
    * attributes, or one to many relationship objects, etc
+   * @param array $arg - array of full model classes - if this class is in 
+   * this array, then just return regular getAttributes, otherwise relationship
+   * atts, etc. 
    * @return array of model attributes
    */
   public function getCustomAttributes($arg=null) {
-    return $this->getAttributes();
+    if (is_array($arg) && in_array(static::class, $arg)) {
+      return $this->getAttributes();
+    }
+    $myAtts = $this->getAttributes();
+    $relationAtts = $this->getRelationshipAttributes();
+    $methodAtts = $this->getMethodAttributes();
+    $dvAtts = $this->getDisplayValueAttributes();
+    return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts);
   }
 #If want to return array of ALL real & virtual attributes
 #  public function getCustomAttributes($arg = null) {
@@ -1756,4 +1831,5 @@ class $createclassname extends Migration {
     $this->attributes['loanamt'] = intOrNull($value);
     }
    */
+
 }
