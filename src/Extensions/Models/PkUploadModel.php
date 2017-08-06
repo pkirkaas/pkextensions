@@ -34,6 +34,9 @@ abstract class PkUploadModel extends PkModel {
     return static::getAncestorArraysMerged('upload_types');
   }
 
+  public static $requiredAtts = ['relpath', 'mimetype'];
+
+
 
   public static function storage_dir($subdir = 'public') { 
     if (ne_string($subdir)) {
@@ -135,6 +138,17 @@ abstract class PkUploadModel extends PkModel {
       return parent::save($args);
   }
 
+  public static function extensionCheck($atts) {
+     if (!is_string($atts['mimetype']) ||
+         //!Storage::exists(keyVal('relpath',$atts))) {
+         !is_string($atts['relpath'])) {
+       pkdebug("Failed fupl check w. atts:", $atts);
+       return false;
+     }
+    return $atts;
+  }
+    
+
   /** Create object immediately on upload 
    * 
    * @param array $fileinfo - the basic info for this abstract base class
@@ -143,9 +157,7 @@ abstract class PkUploadModel extends PkModel {
    */
   public static function CreateUpload($fileinfo, $extra = []) {
     pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
-    if (!$fileinfo || !is_array($fileinfo)
-        ) {
-        //|| !Storage::exists(keyVal('relpath',$fileinfo))) {
+    if ($fileinfo === false) {
       pkdebug("Couldn't file the data", $fileinfo);
       return false;
     }
@@ -153,13 +165,6 @@ abstract class PkUploadModel extends PkModel {
       $fileinfo += $extra;
     }
     $fo = new Static($fileinfo);
-    /*
-    $fo->fill($fileinfo);
-    if (is_array($extra)) {
-      $fo->fill($extra);
-    }
-     * *
-     */
     if($fo->save()) {
       return $fo;
     }

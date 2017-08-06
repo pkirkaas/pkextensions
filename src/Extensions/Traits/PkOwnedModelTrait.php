@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions\Traits;
 use PkExtensions\PkException;
+use PkExtensions\Models\PkModel;
 /**
  * If some types of PkModels might be owned by several different other PkModels,
  * instead of making separate classes & tables for them all, make a single class
@@ -31,17 +32,55 @@ trait PkOwnedModelTrait {
       'category'=> ['type' => 'string', 'methods' =>  'nullable'],
     ];
   }
-  public function  OwnedModelTraitConstruct($atts) {
+  /** Both validates and enhances the constructor arguments / atts */
+  public static function OwnedModelTraitExtensionCheck($atts) {
+    pkdebug("Entering & Leaving OMTEC w. atts:", $atts);
+    return $atts;
+    if (!keyVal('att_name', $atts)) {
+      return false;
+    }
     if (array_key_exists('owner', $atts)) {
       $owner = $atts['owner'];
       if (!$owner instanceOf PkModel) {
         throw new PkException(["Owner was set, but not PkModel:", $owner]);
       }
+      //unset($atts['owner']);
+      $atts['owner_id'] = $owner->id;
+      $atts['owner_model']=get_class($owner);
+    } else {
+      $atts['owner'] = $atts['owner_model']::find($atts['owner_id']);
+      if (!$atts['owner'] instanceOf PkModel) {
+        throw new PkException(["Owner was set, but not PkModel:", $owner]);
+      }
+    }
+    pkdebug("Leaving OMTEC w. atts:", $atts);
+    return $atts;
+  }
+  public function  OwnedModelTraitConstruct($atts) {
+    pkdebug("Entering Trait Constructor w. atts:", $atts);
+    /*
+    if (!keyVal('att_name', $atts)) {
+      return false;
+    }
+     * 
+     */
+    if (array_key_exists('owner', $atts)) {
+      $owner = $atts['owner'];
       unset($atts['owner']);
+      if (!$owner instanceOf PkModel) {
+         pkdebug("Owner was set, but not PkModel:", $owner);
+      } else {
+      //unset($atts['owner']);
       $atts['owner_id'] = $owner->id;
       $atts['owner_model']=get_class($owner);
       $this->owner = $owner;
+      }
+    } else {
+      if (keyVal('owner_model',$atts) && keyVal('owner_id', $atts)) {
+        $this->owner = $atts['owner_model']::find($atts['owner_id']);
+      }
     }
+    pkdebug("Leaving OMTEC w. atts:", $atts);
     return $atts;
   }
   

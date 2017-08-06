@@ -14,7 +14,11 @@ use PkExtensions\Traits\PkOwnedModelTrait;
 class PkTypedUploadModel extends PkUploadModel {
   use PkOwnedModelTrait;
   public static $table_field_defs = [ ];
-  
+
+  public static function extensionCheck($atts) {
+      return static::OwnedModelTraitExtensionCheck($atts);
+  }
+
   //protected $owner; #If set, the owning PkModel - make protected to call __get
   public function __construct(array $atts = []) {
     $atts = $this->OwnedModelTraitConstruct($atts);

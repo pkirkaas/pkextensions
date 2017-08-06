@@ -151,6 +151,9 @@ abstract class PkModel extends Model {
    */
   public static $unset_table_field_keys = [];
 
+  public static $requiredArgs = [];
+
+
   public static function getFieldNames() {
     static $fieldNameArr = [];
     $class = static::class;
@@ -1795,10 +1798,7 @@ class $createclassname extends Migration {
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
     }
-    if ($hasone) {
-      $typedClass::where('att_name',$attname)->where('owner_id',$this->id)
-          ->where('owner_model',static::class)->get()->delete();
-    }
+    #Validate we have the $fileData we need before deleting or creating.
     $filedata += [
         'owner'=>$this,
         //'owner_model'=>static::class,
@@ -1807,6 +1807,16 @@ class $createclassname extends Migration {
         ];
     pkdebug("Creating typed, fdata:",$filedata);
     //$current = $this->$attname;
+    $prefd = $filedata;
+    $filedata = $typedClass::canCreate($filedata);
+    if ($filedata === false) {
+      pkdebug("Data validation to create [$typedClass] failed for data:", $pref);
+      return false;
+    }
+    if ($hasone) {
+      $typedClass::where('att_name',$attname)->where('owner_id',$this->id)
+          ->where('owner_model',static::class)->get()->delete();
+    }
     $prop = $typedClass::createUpload($filedata);
     if (! $typedClass::instantiated($prop)) {
       return false;

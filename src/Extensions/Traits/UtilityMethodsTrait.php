@@ -7,7 +7,18 @@ use ReflectionClass;
  * June 2016 Paul Kirkaas
  */
 trait UtilityMethodsTrait {
-
+  public static function defines($method) {
+      $class= static::class;
+      if (!method_exists($class,$method)) {
+        return false;
+      }
+      $rm = new \ReflectionMethod($class, $method);
+      if ($rm->getDeclaringClass()->name === $class) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   /** For caching results of methods that don't change. Keyed by 'key' & class
    *
    * @var array 
@@ -82,11 +93,30 @@ trait UtilityMethodsTrait {
    * //@param String class: The calling class
    * @param $arrayName String: the name of the static attribute array
    * 
-   * @param $idx Boolean: is the array type indexed or associative? Used for 
-   *   merging strategy - $possessionDirectDefs are indexed, others assoc.
+   * @param $idx Boolean or 'normalize': is the array type indexed or associative or mixed?
+   * Used for merging strategy - 
+   * if $idx = true, indexed array, and duplicate values are removed, but indexed 
+   * keys aren't over-written.  * Like $possessionDirectDefs are indexed, others assoc.
+   * Associative arrays won't eliminate duplicated values, but WILL overrwrite if
+   * descendent classes have different values for the same keys.
+   * 
+   * FINALLY: If 'Normalize' or 'config' (string) - the arrays can be mixed, like
+   * ['key1','key2'=>'val2',....
+   * In this case, 'key1' is a value, but will be turned into 'key1'=>NULL
+   * 
+   * Why would you use this? For example, to specify fields that are just required
+   * to exist, vs fields that have to exist AND meet requirements - like:
+   * $reqArr = ['key1', 'key2'=>function($val) {if ($val < 10) return false; return true;},....
    * @return Array: Merged array of hierarchy
    */
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
+    $convert = function($arr) use ($idx) {
+      if (is_string($idx)) {
+        return normalizeConfigArray($arr); 
+      } else {
+        return $arr;
+      }
+    };
     $thisClass = $class = static::class;
     #All static, so cache results...
     static $fullRetArr = [];
@@ -101,7 +131,7 @@ trait UtilityMethodsTrait {
     }
     //$fullRetArr[$class] = null;
     #First, build array of arrays....
-    $retArr[] = $class::$$arrayName; #Deliberate double $$
+    $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
     while ($par = get_parent_class($class)) {
       if (!property_exists($par, $arrayName) ||
          ($par::$$arrayName === false) ) {#If a parent wants stop accension
@@ -109,7 +139,7 @@ trait UtilityMethodsTrait {
       }
       if (($tstArr =$par::$$arrayName) && is_array($tstArr) ) {
         //$retArr[] = $par::$$arrayName;
-        $retArr[] = $tstArr;
+        $retArr[] = $convert($tstArr);
       }
       $class = $par;
     }
@@ -117,12 +147,58 @@ trait UtilityMethodsTrait {
     $retArr = array_reverse($retArr);
     $mgArr = call_user_func_array('array_merge', $retArr);
     #Mainly to save the developer who respecifies 'id' in the derived direct
-    if ($idx && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
+    if (($idx === true) && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
       $mgArr = array_unique($mgArr);
     }
     $fullRetArr[$thisClass][$arrayName] = $mgArr;
     return $mgArr;
   }
+
+  #Not doing it this way
+  public static $requiredAtts = [];
+  public static function getRequiredAtts() {
+    return getAncestorArraysMerged('requiredAtts','config');
+  }
+
+  /** Does the data provided meet the requirements to create an instance
+   * of this class?  Recurses up the ancestor tree to confirm.
+  # canCreate() function shouldn't be over-ridden except in exceptional cases.
+  # Instead, it calls the current and all the ancestor 
+  # static extensionCheck($args) methods which should be implemented in all
+   * concerned descendent classes and
+  #only returns true if all ancestor methods return true.
+  *@param array $args - whatever information the extensionCheck methods require
+   */
+
+  /** Has to explicitly return FALSE if check fails, otherwise
+   * return $args - gives the checker the opportunity to modify the args
+   * @param mixed $args
+   * @return false | $args
+   */
+  public static function extensionCheck($args) {
+    return $args;
+  }
+
+  public static function canCreate($args) {
+    return $args;
+    $class = static::class;
+    while($class) {
+      if (!method_exists($class,'extensionCheck')) {
+        return $args;
+      }
+      if ($class::defines('extensionCheck')) {
+        $pra = $args;
+        $args = $class::extensionCheck($args);
+        if ($args === false) {
+          pkdebug("Failed exchck in [$class] w. args:", $pra);
+          return false;
+        }
+      }
+      $class = get_parent_class($class);
+    }
+    return $args;
+  }
+    
 
   /** Like above, only works for instance properties, not just static
    * @param string $arrayName - the instance property name
