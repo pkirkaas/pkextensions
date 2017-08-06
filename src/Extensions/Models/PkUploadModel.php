@@ -29,6 +29,11 @@ abstract class PkUploadModel extends PkModel {
       'mimetype'=>'string',
       'desc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
+
+  public static $methodsAsAttributeNames = [
+      'url',
+
+  ];
   
   public static function getUploadTypes() {
     return static::getAncestorArraysMerged('upload_types');
