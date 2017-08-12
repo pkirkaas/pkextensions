@@ -1590,7 +1590,7 @@ $(function () {
 /** Global object Simulates event hanling by registering callbacks. Usage:
  * The "trigger" can also pass data to the handlers
  * Everywhere you want to "catch" the event:
- * VEventDispatcher(eventName, handlingFunction);
+ * VEventDispatcher.o(eventName, handlingFunction);
  * Everywhere you want to trigger the event:
  * VEventDispatcher.trigger(eventName,data);
  * function handlingFunction(data) {

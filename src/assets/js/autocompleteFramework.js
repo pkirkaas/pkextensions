@@ -40,7 +40,13 @@
  *   inputs with same class name on the page, by finding a sibling of this parent div.
  *   
  * @param Object param.name -- Optional: String: The user friendly name of the item
+ * 
+ * @param Object param.createAjaxUrl -- Optional: If present, called after 'select',
+ * with data={id:value}
  *   
+ * @param Object param.eventName -- Optional: If present, calls/triggers
+ * VEventDispatcher.trigger(param.eventName, data) after 'select',
+ * 
  *   <p>Sample PHP Code:
  *   
 # Returns json for ajax call for auto-complete of Test table data
@@ -75,7 +81,22 @@ function initializeAC(param) {
       event.preventDefault();
       $(this).val(ui.item.label);
       $(this).attr('data-id',ui.item.value);
+      var me = this;
       this.item = ui.item;
+      if (param.createAjaxUrl) {
+        $.ajax({
+          url: param.createAjaxUrl,
+          data: {id:ui.item.value},
+          method: 'POST'
+        }).done(function(data) {
+          $(me).val('');
+          if (param.eventName) {
+            VEventDispatcher.trigger(param.eventName,data);
+          }
+        });
+      } else if (param.eventName) {
+          VEventDispatcher.trigger(param.eventName,ui);
+      }
       console.log(param.inputSelector + " AC Select, UI:",ui);
       //$(this).trigger('blur');
     },
