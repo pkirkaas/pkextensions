@@ -58,6 +58,9 @@ $inner-border-spread: 1px !default;
 
 @include mk-spacing;
 
+.hw1, .wh1 {height: 1rem !important; width: 1rem !important;}
+.hw2, .wh2 {height: 2rem !important; width: 2rem !important;}
+
 .border-light, .border, .mildborder, .mild-border { border: solid #aaa 1px; }
 
 .border-red {border-color: #f00 ! important;}

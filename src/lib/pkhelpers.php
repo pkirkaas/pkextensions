@@ -45,6 +45,8 @@ function setAppLog() {
   PkLibConfig::setSuppressPkDebug(false);
   $logDir = realpath(storage_path().'/logs');
   $logPath = $logDir.'/pkapp.log';
+  //error_log("AppLogPath: [$logPath]");
+  //error_log("AppLogPath: [logPath]");
   appLogPath($logPath);
 }
 

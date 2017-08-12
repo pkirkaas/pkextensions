@@ -34,7 +34,7 @@ trait PkOwnedModelTrait {
   }
   /** Both validates and enhances the constructor arguments / atts */
   public static function OwnedModelTraitExtensionCheck($atts) {
-    pkdebug("Entering & Leaving OMTEC w. atts:", $atts);
+    //pkdebug("Entering & Leaving OMTEC w. atts:", $atts);
     return $atts;
     if (!keyVal('att_name', $atts)) {
       return false;
@@ -53,11 +53,11 @@ trait PkOwnedModelTrait {
         throw new PkException(["Owner was set, but not PkModel:", $owner]);
       }
     }
-    pkdebug("Leaving OMTEC w. atts:", $atts);
+    //pkdebug("Leaving OMTEC w. atts:", $atts);
     return $atts;
   }
   public function  OwnedModelTraitConstruct($atts) {
-    pkdebug("Entering Trait Constructor w. atts:", $atts);
+    //pkdebug("Entering Trait Constructor w. atts:", $atts);
     /*
     if (!keyVal('att_name', $atts)) {
       return false;
@@ -80,7 +80,7 @@ trait PkOwnedModelTrait {
         $this->owner = $atts['owner_model']::find($atts['owner_id']);
       }
     }
-    pkdebug("Leaving OMTEC w. atts:", $atts);
+    //pkdebug("Leaving OMTEC w. atts:", $atts);
     return $atts;
   }
   

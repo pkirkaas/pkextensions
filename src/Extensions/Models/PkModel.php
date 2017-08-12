@@ -59,7 +59,7 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use \Request;
 use \Exception;
 use \DB;
-use PkExtensions\PkTestGenerator;
+use \PkExtensions\PkTestGenerator;
 use PkExtensions\PkException;
 
 abstract class PkModel extends Model {
@@ -1753,13 +1753,18 @@ class $createclassname extends Migration {
    */
   public static function getRandomInstances($num = -1, $params = []) {
     if ($num === 0) return [];
-    $instances = static::all();
+    $instances = static::all()->all();
     $numinst = count($instances);
-    if (!$numinst || !class_exists('PkTestGenerator',1)) {
+    //pkdebug("For Class: ".static::class."; NumInst: $numinst");
+    if (!class_exists('PkExtensions\PkTestGenerator',1)) {
+      throw new PkException("Huh? PkTestGenerator can't be found?");
+    }
+
+    if (!$numinst || !class_exists('PkExtensions\PkTestGenerator',1)) {
       if ($num === -1) return null;
       return [];
     }
-    return PkTestGenerator::getRandomData($instances, $num);
+    return \PkExtensions\PkTestGenerator::randData($instances, $num);
   }
 
 

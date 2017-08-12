@@ -72,9 +72,12 @@ function initializeAC(param) {
     html: true,
     select: function(event, ui) {
       //On select, do a "blur" (lose focus) and trigger "change" event
+      event.preventDefault();
+      $(this).val(ui.item.label);
+      $(this).attr('data-id',ui.item.value);
       this.item = ui.item;
       console.log(param.inputSelector + " AC Select, UI:",ui);
-      $(this).trigger('blur');
+      //$(this).trigger('blur');
     },
 
     change: function(event, ui) {
@@ -89,7 +92,8 @@ function initializeAC(param) {
         //A value was entered manually, not selected, so check if it already exists in the DB,
         //If so, populate the id field, if not, ask to create it.
         //ac_lastXhr_em = $.getJSON("magiclivingajax.php",{'apicall':'getbrands-ac', brand:brand},
-        ac_lastXhr_em = $.getJSON(param.ajaxUrl,{apicall:param.itemSearchParams.apicall, value:value},
+        //ac_lastXhr_em = $.getJSON(param.ajaxUrl,{apicall:param.itemSearchParams.apicall, value:value},
+        ac_lastXhr_em = $.getJSON(param.ajaxUrl, {term:value},
          function( data, status, xhr ) {
            //Expect data to be an integer ID of found item, else 0/''/false
           console.log("data/id in change for "+param.inputSelector + " is: ",data);
@@ -151,7 +155,8 @@ function initializeAC(param) {
 
     source: function(request, response) {
        console.log(param.inputSelector +" AC Source; request:",request);
-       request.apicall=param.listSearchParams.apicall;
+       //request.apicall=param.listSearchParams.apicall;
+       //request.apicall=param.listSearchParams.apicall;
        console.log("BrandAC Source; request (after set api-call):",request);
        ac_lastXhr_em = $.getJSON(param.ajaxUrl, request, function( data, status, xhr ) {
          if ( xhr === ac_lastXhr_em ) {

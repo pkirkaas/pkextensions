@@ -195,10 +195,13 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .br-#{$sz} {border-radius: $foffset !important}
 
     //Heights & widths
+    .h#{$sz} {height: $offset !important;}
     .height#{$sz} {height: $offset !important;}
     .minh#{$sz}, .minh-#{$sz},  .min-height#{$sz} {min-height: $offset !important;}
     .maxh#{$sz}, .maxh-#{$sz},   .max-height#{$sz} {max-height: $offset !important;}
     .width#{$sz} {width: $offset !important;}
+    .w#{$sz} {width: $offset !important;}
+    .hw#{$sz}, .wh#{sz} {width: $offset !important; height: $offset !important;}
     .minw#{$sz}, .minw-#{$sz}, .min-width#{$sz} {min-width: $offset !important;}
     .maxw#{$sz}, .maxw-#{$sz}, .max-width#{$sz} {max-width: $offset !important;}
     //Paddings

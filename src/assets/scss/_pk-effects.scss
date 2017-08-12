@@ -453,7 +453,7 @@ input[disabled].disabled {
   @include absolutecenter;
 }
 
-.pimg-del, .del-cross {
+.pimg-del, .del-cross, .del-btn {
   background-image: url('/gulped/img/cross-31176.svg');
   background-repeat: no-repeat;
   background-size: contain;
@@ -464,7 +464,7 @@ input[disabled].disabled {
   right: 4px;
 }
 
-.pimg-del:hover, .del-cross:hover {
+.pimg-del:hover, .del-cross:hover, .del-btn:hover {
   cursor: pointer; 
 }
 
