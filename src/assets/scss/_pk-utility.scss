@@ -480,3 +480,7 @@ input::placeholder {
 .absolute {
   position: absolute !important;
 }
+
+.under {
+  z-index: -1 !important;
+}

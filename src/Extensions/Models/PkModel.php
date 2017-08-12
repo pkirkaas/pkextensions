@@ -1614,6 +1614,34 @@ class $createclassname extends Migration {
     $dvAtts = $this->getDisplayValueAttributes();
     return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts);
   }
+
+  /**
+   * Return array of customAttributes for all matching instances
+   * @param array $params - typically an array of id's or instances
+   * @param array $arg - to be passed to instance getCustomAttributes($arg)
+   */
+  public static function getCustomAttributesIn(Array $params=[], $arg=null) {
+    if (!$params) {
+      return [];
+    }
+    $resAtts = [];
+    if (is_array_indexed($params)) { #Then an array of instances or ID's
+      if (is_intish($params[0])) { #Assume IDs of instances
+        $resInsts = Static::find($params);
+      } else if ($params[0] instanceOf static) {
+        $resInsts = $params;
+      } else {
+        throw new PkException(["Illegal params to getCustomAttributesIn:",$params]);
+      }
+      foreach ($resInsts as $inst) {
+        $resAtts[]= $inst->getCustomAttributes($arg);
+      }
+      return $resAtts;
+    }
+    throw new PkException(["Unhandled params to getCustomAttributesIn:",$params]);
+  }
+
+
 #If want to return array of ALL real & virtual attributes
 #  public function getCustomAttributes($arg = null) {
 #    $myAtts = $this->getAttributes();

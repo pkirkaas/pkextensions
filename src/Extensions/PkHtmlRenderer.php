@@ -861,22 +861,27 @@ class PkHtmlRenderer extends PartialSet {
         $icolclass=$colclass. ' col';
       }
       $val=$atts=null;
+      //pkdebug("Datum:",$datum);
       if (is_stringish($datum)) {
         $val = $datum;
         $atts = ['class' =>""];
-      } else if (is_array_indexed($datum)) { #$datum[0] must be stringish
-        if (!is_stringish ($val=$datum[0])) throw new PkException(['Invalid Datum',$datum]);
+      } else if (is_array_indexed($datum)) { #$datum[0] must be stringish - or array?
+        $val=$datum[0];
+        pkdebug("And val:", $val);
+        //if (!is_stringish ($val=$datum[0])) throw new PkException(['Invalid Datum 1',$datum]);
         $atts = keyVal(1,$datum, '');
         if (is_stringish($atts)) {
           $atts = ['class'=>$atts];
         }
+        //pkdebug("...and atts: ", $atts);
       } else {
-        throw new PkException(['Invalid Datum',$datum]);
+        throw new PkException(['Invalid Datum 2',$datum]);
       }
       if (!is_array_assoc($atts)) throw new PkException(['Invalid Atts',$atts]);
       $atts['class'] = keyVal('class',$atts,'');
       //if (strpos($atts['class'],'col') === false) $atts['class'].= ' col ';
       $atts['class'] .= " $icolclass  ";
+      pkdebug("And Val, atts:",$val, $atts);
       $this->$div($val,$atts);
     }
     $this->RENDERCLOSE();
