@@ -50,4 +50,12 @@ class PkCollection extends Collection {
     }
     return $this;
   }
+
+  public function getCustomAttributes($arg=[]) {
+    $retarr = [];
+    foreach ($this as $pkinst) {
+      $retarr[]=$pkinst->getCustomAttributes($arg);
+    }
+    return $retarr;
+  }
 }

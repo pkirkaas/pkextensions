@@ -171,15 +171,31 @@ abstract class PkModel extends Model {
   /** Executes the methods listed in static::getMethodsAsAttributesNames() and
    * returns the results in an array of arrays
    */
-  public function getMethodAttributes() {
+  public function getMethodAttributes($arg=null) {
+    $myclass = get_class($this);
     $methodAttributes = static::getMethodsAsAttributeNames();
     if (!$methodAttributes || !is_arrayish($methodAttributes) || !count($methodAttributes)) {
       return [];
     }
     $resarr = [];
     foreach ($methodAttributes as $methodAttribute) {
-      $resarr[$methodAttribute] = $this->$methodAttribute();
-    }
+      $methatt =  $this->$methodAttribute();
+      //$tma = typeOf($methatt);
+      //if ($methodAttribute == 'friends')
+     // pkdebug("MthAtt in Cls: [$myclass], metat: [$methodAttribute], tma: [$tma]");
+      if ($methatt instanceOf PkModel) {
+        $resarr[$methodAttribute] =  $methatt->getCustomAttributes($arg);
+      } else if ($methatt instanceOf EloquentCollection) {
+        $resarr[$methodAttribute] =  [];
+      //if ($methodAttribute == 'friends') pkdebug("Num Friends: ".count($methatt));
+        foreach($methatt as $pkinst) {
+      //if ($methodAttribute == 'friends') pkdebug("Incrementing...PKINST: ".$pkinst->which());
+          $resarr[$methodAttribute][] = $pkinst->getCustomAttributes($arg);
+        }
+      } else {
+        $resarr[$methodAttribute] =  $methatt;
+      }
+  }
     return $resarr;
   }
 
@@ -1605,12 +1621,21 @@ class $createclassname extends Migration {
    * @return array of model attributes
    */
   public function getCustomAttributes($arg=null) {
-    if (is_array($arg) && in_array(static::class, $arg)) {
+    /*
+    if (is_string($arg)) {
+      $thisclass = get_class($this);
+      pkdebug("Arg: [$arg]; this class: [$thisclass]");
+    }
+     * 
+     */
+    if ( (is_string($arg) && is_a($this,$arg))
+        ||(is_array($arg) && in_array(static::class, $arg))) {
+      //pkdebug("MATCHED! this class: [$thisclass], ARG:", $arg);
       return $this->getAttributes();
     }
     $myAtts = $this->getAttributes();
     $relationAtts = $this->getRelationshipAttributes();
-    $methodAtts = $this->getMethodAttributes();
+    $methodAtts = $this->getMethodAttributes($arg);
     $dvAtts = $this->getDisplayValueAttributes();
     return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts);
   }
@@ -1620,12 +1645,12 @@ class $createclassname extends Migration {
    * @param array $params - typically an array of id's or instances
    * @param array $arg - to be passed to instance getCustomAttributes($arg)
    */
-  public static function getCustomAttributesIn(Array $params=[], $arg=null) {
-    if (!$params) {
+  public static function getCustomAttributesIn( $params=[], $arg=null) {
+    if (!$params || (is_arrayish($params) && !count($params))) {
       return [];
     }
     $resAtts = [];
-    if (is_array_indexed($params)) { #Then an array of instances or ID's
+    if (is_arrayish_indexed($params)) { #Then an array of instances or ID's
       if (is_intish($params[0])) { #Assume IDs of instances
         $resInsts = Static::find($params);
       } else if ($params[0] instanceOf static) {
@@ -1873,5 +1898,21 @@ class $createclassname extends Migration {
     $this->attributes['loanamt'] = intOrNull($value);
     }
    */
+
+  public static $whichfields = ['id'];
+  /** Simple string to indetify the model/instance
+   * 
+   * @param array $fields - optional array of additional fields,
+   * merged with class whichfields
+   */
+  public function which($fields=[]) {
+    $myf = array_merge(static::getAncestorArraysMerged('whichfields',true),$fields);
+    $out = "Class: ".get_class($this);
+    //$out .= "; ID: ". $this->id;
+    foreach ($myf as $field) {
+      $out.="; $field: ".$this->$field;
+    }
+    return $out;
+  }
 
 }

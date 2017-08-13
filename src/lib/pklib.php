@@ -585,6 +585,7 @@ function pkdebugOut($str, $logpath = null) {
         throw new Exception("Failed to open Warning Log [$warnpath] for writing");
       }
       fwrite($fp, $str);
+      fflush($fp);
       fclose($fp);
     }
     if ($first && $reset) {
@@ -602,6 +603,7 @@ function pkdebugOut($str, $logpath = null) {
       fwrite($fp, $v . $h . $v);
     }
     fwrite($fp, $str);
+    fflush($fp);
     fclose($fp);
     $first = false;
   } catch (Exception $e) {
