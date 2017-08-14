@@ -361,6 +361,31 @@ img.js-big-picture-button:hover {
 }
 */
 
+////////////////  Vue Pop-up Classes /////////////
+
+.contact-body-wrapper {
+  
+}
+.contact-header {
+  color: white;
+  background-color: blue;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: .3rem;
+  text-align: center;
+  margin: 0;
+}
+.contact-sub-wrap {}
+.contact-ta-wrap {
+  margin:  3px;
+  padding: 3px;
+}
+.button-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+.popup-btn {} 
 
 
 

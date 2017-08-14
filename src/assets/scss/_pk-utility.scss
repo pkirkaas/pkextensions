@@ -489,3 +489,13 @@ input::placeholder {
   color: inherit;
   text-decoration: inherit;
 }
+
+.reszable, .h-center {
+  z-index: 10;
+}
+
+.vue-popup {
+  position: fixed;
+  top: 10%;
+  @extend .h-center;
+}
