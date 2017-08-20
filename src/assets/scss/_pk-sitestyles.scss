@@ -5,6 +5,7 @@
 $body-font-size: 14px !default;
 body {
   font-size: $body-font-size;
+  padding: 0;
 }
 $page-template-border:  solid blue 1px !default;
 $page-template-padding:  5px !default;
@@ -408,6 +409,44 @@ img.js-big-picture-button:hover {
   justify-content: space-evenly;
 }
 .popup-btn {} 
+
+//////   Some background colors & box sized in em that can be nice labels/containers
+//Just add a font-size class to admust them. Also some gradients & box-shadows
+.sbk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: .5em;
+  padding: .5em;
+  border-radius: .5em;
+  color: white;
+  font-family: verdana;
+  font-weight: bold;
+}
+
+.bC30 { background-color: #C30; }
+.b193542 { background-color: #193542; }
+.b004BA8 { background-color: #004BA8; }
+.bB94E3C { background-color: #B94E3C; }
+.b772B14 { background-color: #772B14; }
+.b0A4082 { background-color: #0A4082; }
+.b9B59B6 { background-color: #9B59B6; }
+.b1C90F3 { background-color: #1C90F3; }
+.bF4307C { background-color: #F4307C; }
+.b3B5998 { background-color: #3B5998; }
+.b283E4A { background-color: #283E4A; }
+.b0092BD { background-color: #0092BD; }
+.gr1 { border: solid black 2px;}
+
+.bs1 {box-shadow: 2px 2px 1px 1px rgba(0,0,0,.5) }
+.bs2 {box-shadow: 3px 3px 2px 2px rgba(0,0,200,.5) }
+
+.gr2 { background: linear-gradient( #02aab0, #00cdac); }
+.gr3 { background: linear-gradient( to bottom, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%); }
+.gr4 { background: linear-gradient( #0fb8ad, #1fc8db); }
+
+
 
 
 

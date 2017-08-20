@@ -346,7 +346,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
   }
 
   public function mkBsMenu($links = [], $opts = []) {
-    $nav_class = keyVal('nav_class', $opts, 'pk-nav');
+    $nav_class = keyVal('nav_class', $opts, 'pk-nav sub-nav');
     $nav_ul_class = keyVal('nav_ul_class', $opts, 'flex-row');
     $menu = new PkHtmlRenderer();
     $menu[] = "

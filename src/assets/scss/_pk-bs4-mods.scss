@@ -37,13 +37,17 @@ img.navbar-brand-img {
 //$nav-item-after-nav-item-margin-left: .5rem !default;
 $nav-item-hpad: .25rem !default;
 $pk-nav-nav-link-margin-top: 5px !default;
-$pk-top-menu-height: 50px !default;
+$pk-top-menu-height: 40px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
 $pk-top-menu-font-size: .8rem !default;
 body nav.navbar.pk-top-menu {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
   z-index: 999999;
   flex-direction: row;
-  //height: $pk-top-menu-height;
+  height: $pk-top-menu-height;
   //nav-link needs the same padding as the inline login form
   a.nav-link {
     font-size: $pk-top-menu-font-size;
@@ -105,9 +109,15 @@ nav.navbar {
 
 //  Sub-menu
 
-  nav.navbar.pk-nav {
+  nav.navbar.pk-nav.sub-nav {
+    position: fixed;
+    z-index: 8888;
+    left: 0;
+    width: 100%;
+    top: $pk-top-menu-height;
+    height: $pk-top-menu-height;
     flex-direction: row;
-    background: red;
+    background: #a00;
     .nav-link {
       color: #ccf;
       font-size: 1rem;
@@ -122,6 +132,13 @@ nav.navbar {
     }
   } 
 
+  div.container-fluid.theme-showcase.app-tpl {
+    position: absolute;
+    margin: 0;
+    width: 100%;
+    left: 0;
+    top: 2 * $pk-top-menu-height; 
+  }
 
 
 //Tootik Override - add 'center' config
