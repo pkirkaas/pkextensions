@@ -1,6 +1,15 @@
-/** Mods/add-ons to default BS 4
-*/
+/** Mods/add-ons to default BS 4 */
+
+/** Replacing removed elements from BS 4 Alpha -> Beta **/
 $brand-inverse:  #292b2c !default;
+.navbar-inverse .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32'
+    xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255, 255, 255, 0.5)'
+    stroke-width='2' stroke-linecap='round' stroke-miterlimit='10'
+    d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+}
+
+
 
 //To dropdown menus on hover. Has a JS part also, in jquery-ui-config
 .dropdown:hover>.dropdown-menu {
@@ -49,7 +58,7 @@ body nav.navbar.pk-top-menu {
   z-index: 999999;
   background-color: $brand-inverse;
   flex-direction: row;
-  height: $pk-top-menu-height;
+ // height: $pk-top-menu-height;
   //nav-link needs the same padding as the inline login form
   a.nav-link {
     font-size: $pk-top-menu-font-size;
@@ -112,12 +121,13 @@ nav.navbar {
 //  Sub-menu
 
   nav.navbar.pk-nav.sub-nav {
-    position: fixed;
+//    position: fixed;
     z-index: 8888;
     left: 0;
     width: 100%;
-    top: $pk-top-menu-height;
-    height: $pk-top-menu-height;
+//    top: $pk-top-menu-height;
+
+//    height: $pk-top-menu-height;
     flex-direction: row;
     background: #a00;
     .nav-link {
@@ -135,11 +145,12 @@ nav.navbar {
   } 
 
   div.container-fluid.theme-showcase.app-tpl {
-    position: absolute;
+    //If we need this, use JS
+    //position: absolute;
     margin: 0;
     width: 100%;
     left: 0;
-    top: 2 * $pk-top-menu-height; 
+    //top: 2 * $pk-top-menu-height; 
   }
 
 
