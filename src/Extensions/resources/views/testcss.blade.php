@@ -83,7 +83,7 @@ $fsclass = 'fs-6';
 
 .vced {
   display: inline-block;
-  vertical-aligne: middle;
+  vertical-align: middle;
   line-height: normal;
 }
 </style>
