@@ -1,5 +1,6 @@
 /** Mods/add-ons to default BS 4
 */
+$brand-inverse:  #292b2c !default;
 
 //To dropdown menus on hover. Has a JS part also, in jquery-ui-config
 .dropdown:hover>.dropdown-menu {
@@ -46,6 +47,7 @@ body nav.navbar.pk-top-menu {
   top: 0;
   left: 0;
   z-index: 999999;
+  background-color: $brand-inverse;
   flex-direction: row;
   height: $pk-top-menu-height;
   //nav-link needs the same padding as the inline login form
