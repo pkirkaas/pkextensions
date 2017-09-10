@@ -350,7 +350,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $nav_ul_class = keyVal('nav_ul_class', $opts, 'flex-row');
     $menu = new PkHtmlRenderer();
     $menu[] = "
-      <nav class='$nav_class navbar navbar-inverse no-print'>";
+      <nav class='$nav_class navbar navbar-inverse no-print zup'>";
     $menu[] = " <ul class='nav navbar-nav $nav_ul_class'>\n";
     foreach ($links as $link) {
       $menu[] = "

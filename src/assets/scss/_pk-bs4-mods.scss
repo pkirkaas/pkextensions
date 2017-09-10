@@ -54,27 +54,34 @@ img.navbar-brand-img {
   @include below-bp(md) {
    position: relative;
   }
+}
 
+body .navbar {
+  padding: .5em 1em;
+}
+
+.zup:hover {
+  z-index: 9999999 !important;
 }
 // Play with customizing navbars
 //$nav-item-after-nav-item-margin-left: .5rem !default;
-$nav-item-hpad: .25rem !default;
+$nav-item-hpad: .25em !default;
 $pk-nav-nav-link-margin-top: 5px !default;
-$pk-top-menu-height: 40px !default;
+//$pk-top-menu-height: 40px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
 $pk-top-menu-font-size: .8rem !default;
 body nav.navbar.pk-top-menu {
 //  position: fixed;
+  font-size: $pk-top-menu-font-size;
   width: 100%;
   top: 0;
   left: 0;
-  z-index: 999999;
+  //z-index: 999999;
   background-color: $brand-inverse;
   flex-direction: row;
  // height: $pk-top-menu-height;
   //nav-link needs the same padding as the inline login form
   a.nav-link {
-    font-size: $pk-top-menu-font-size;
     margin-top: $pk-top-menu-nav-link-margin-top;
     padding: 0 1em;
     color: #eee;
@@ -84,15 +91,16 @@ body nav.navbar.pk-top-menu {
     }
   }
   .navbar-brand.nav-item {
+    font-size: inherit;
     padding-top: 0;
     padding-bottom: 0;
-   // font-size: $pk-top-menu-font-size;
+    margin-right: .8em;
   }
 
 
 //@include bg-variant('.bg-inverse', $brand-inverse);
   ul.nav.navbar-nav {
-    z-index: 100000;
+    //z-index: 100000;
     background-color: $brand-inverse;
     position: relative;
     top: 0;
@@ -154,7 +162,7 @@ nav.navbar {
     background: #a00;
     .nav-link {
       color: #ccf;
-      font-size: 1rem;
+      //font-size: 1rem;
       &:hover {
         color: white;
         text-shadow:0 0 1px white;

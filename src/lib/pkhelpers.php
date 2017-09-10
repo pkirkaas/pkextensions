@@ -5,6 +5,7 @@
  * Paul Kirkaas
  */
 use PkExtensions\PartialSet;
+use PkExtensions\Models\PkModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
 //use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -27,6 +28,18 @@ function eloquentToArray($var) {
   }
   if ($var instanceOf BaseCollection) return $var->toArray();
   return getAsArray($var);
+}
+
+/** Checks $var is an instantiated/persisted (w. ID) instance of PkModel; 
+ * false if not, else the class name.
+ * @param mixed $var - the value to test
+ * @return false|string classname
+ */
+function pkinst($var) {
+  if (PkModel::instantiated($var)) {
+    return null;
+  }
+  return get_class($var);
 }
 
 /** Escape for SQL - but ->quote() quotes everything, so have to work around

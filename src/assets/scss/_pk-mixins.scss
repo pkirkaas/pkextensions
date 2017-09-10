@@ -189,7 +189,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
   @for $i from 0 through 75 {
     $sz: if($i!=0, -$i, 0);
     $offset: $i/3 * 1rem;
+    $eoffset: $i/3 * 1em;
     $foffset: $offset/5;
+    $feoffset: $eoffset/5;
     @if $i < 50 {
       //$foffset: $offset + 1em;
       //Font Size: REM, up and down - fs-0: 1rem;, fs-1: fs--1
@@ -214,6 +216,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .minw#{$sz}, .minw-#{$sz}, .min-width#{$sz} {min-width: $offset !important;}
     .maxw#{$sz}, .maxw-#{$sz}, .max-width#{$sz} {max-width: $offset !important;}
     //Paddings
+    //REM
     .p-r#{$sz}, .pad-r#{$sz} { padding-right: $offset !important; }
     .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }
     .p-t#{$sz}, .pad-t#{$sz} { padding-top: $offset !important; }
@@ -222,6 +225,17 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .p-h#{$sz}, .pad-h#{$sz} { padding-left: $offset !important; padding-right: $offset !important; }
     .p#{$sz}, .pad#{$sz} { padding: $offset !important; }
 
+    //EM
+    .pe-r#{$sz}, .pade-r#{$sz} { padding-right: $eoffset !important; }
+    .pe-l#{$sz}, .pade-l#{$sz} { padding-left: $eoffset !important; }
+    .pe-t#{$sz}, .pade-t#{$sz} { padding-top: $eoffset !important; }
+    .pe-b#{$sz}, .pade-b#{$sz} { padding-bottom: $eoffset !important; }
+    .pe-v#{$sz}, .pade-v#{$sz} { padding-top: $eoffset !important; padding-bottom: $eoffset !important; }
+    .pe-h#{$sz}, .pad-h#{$sz} { padding-left: $eoffset !important; padding-right: $eoffset !important; }
+    .pe#{$sz}, .pad#{$sz} { padding: $eoffset !important; }
+
+    //Margins
+    //REM
     .m-r#{$sz}, .marg-r#{$sz} { margin-right: $offset !important; }
     .m-l#{$sz}, .marg-l#{$sz} { margin-left: $offset !important; }
     .m-t#{$sz} , .marg-t#{$sz} { margin-top: $offset !important; }
@@ -238,6 +252,22 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
     .m#{$sz}, .marg#{$sz} { margin: $offset !important; }
 
+    //EM
+    .me-r#{$sz}, .marge-r#{$sz} { margin-right: $eoffset !important; }
+    .me-l#{$sz}, .marge-l#{$sz} { margin-left: $eoffset !important; }
+    .me-t#{$sz} , .marge-t#{$sz} { margin-top: $eoffset !important; }
+    .me-b#{$sz} , .marge-b#{$sz} { margin-bottom: $eoffset !important; }
+    .me-v#{$sz}, .marge-v#{$sz} { margin-top: $eoffset !important; margin-bottom: $offset !important; }
+    .me-h#{$sz}, .marge-h#{$sz} { margin-right: $eoffset !important; margin-left: $eoffset !important; }
+
+    .me-r-#{$sz}, .marge-r-#{$sz} { margin-right: -$eoffset !important; }
+    .me-l-#{$sz}, .marge-l-#{$sz} { margin-left: -$eoffset !important; }
+    .me-t-#{$sz}, .marge-t-#{$sz} { margin-top: -$eoffset !important; }
+    .me-b-#{$sz}, .marge-b-#{$sz} { margin-bottom: -$eoffset !important; }
+    .me-v-#{$sz}, .marge-v-#{$sz} { margin-top: -$eoffset !important; margin-bottom: -$eoffset !important; }
+    .me-h-#{$sz}, .marge-h-#{$sz} { margin-right: -$eoffset !important; margin-left: -$eoffset !important; }
+
+    .me#{$sz}, .marge#{$sz} { margin: $eoffset !important; }
   }
 
   .ma, .m-a {margin: auto !important;}

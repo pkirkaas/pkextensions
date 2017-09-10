@@ -604,13 +604,23 @@ class $createclassname extends Migration {
 
   /** Returns the object if it is an instance of the Model class, and has
    * been instantiated; else null. So can set <tt>$var = Amodel::instantiated($var)</tt>
-   * and it's either a real object or null.
-   * @param static $var
+   * and it's either a real PkModel object or null.
+   * But it could be an instance of a subclass of Amodel, not necessarily 
+   * @param $var - the value to test
+   * @param boolean $exact - default false - if true, returns false if $var is
+   * not a specific instance of this class (& not subclass)
    * @return static|null
    */
-  public static function instantiated($var = null) {
-    if ($var instanceOf static && $var->exists && $var->getKey()) return $var;
-    return null;
+  public static function instantiated($var = null, $exact = false) {
+    if (!($var instanceOf static) || !$var->exists || !$var->getKey()) return null;
+    //Debugging
+    $varcl = get_class($var);
+    $statcl = static::class;
+    pkdebug("var class: [$varcl]; static class: [$statcl]");
+    if ($exact && ($varcl !== $statcl)) {
+      return null;
+    }
+    return $var;
   }
 
   public function real() {

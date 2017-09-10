@@ -72,6 +72,21 @@ $inner-border-spread: 1px !default;
 .fullheight, div .full-height { height: 100% ! important; }
 .fullwidth, div .full-width { width: 100% ! important; }
 
+.fullheight-1 {height: calc(100% - 1em ) ! important;}
+.fullheight-2 {height: calc(100% - 2em ) ! important;}
+.fullheight-3 {height: calc(100% - 3em ) ! important;}
+.fullheight-4 {height: calc(100% - 4em ) ! important;}
+.fullheight-5 {height: calc(100% - 5em ) ! important;}
+.fullheight-6 {height: calc(100% - 6em ) ! important;}
+
+
+.fullwidth-1 {width: calc(100% - 1em ) ! important;}
+.fullwidth-2 {width: calc(100% - 2em ) ! important;}
+.fullwidth-3 {width: calc(100% - 3em ) ! important;}
+.fullwidth-4 {width: calc(100% - 4em ) ! important;}
+.fullwidth-5 {width: calc(100% - 5em ) ! important;}
+.fullwidth-6 {width: calc(100% - 6em ) ! important;}
+
 .height-90pc, .height90pc, .most-height, .mostheight { height: 90% !important; }
 .height-80pc, .height80pc { height: 80% !important; }
 .height-70pc, .height70pc { height: 70% !important; }
@@ -84,6 +99,8 @@ $inner-border-spread: 1px !default;
 .w-a {width: auto !important; }
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
+
+.oh {overflow: hidden;}
 
 .big-box-shadow {
   box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
