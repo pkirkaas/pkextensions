@@ -43,6 +43,19 @@ img.navbar-brand-img {
   max-height: $site-brand-menu-img-max-height;
 }
 
+.fixed-menu-container {
+  z-index: 100;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  padding: 0;
+  margin: 0;
+  @include below-bp(md) {
+   position: relative;
+  }
+
+}
 // Play with customizing navbars
 //$nav-item-after-nav-item-margin-left: .5rem !default;
 $nav-item-hpad: .25rem !default;
@@ -51,7 +64,7 @@ $pk-top-menu-height: 40px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
 $pk-top-menu-font-size: .8rem !default;
 body nav.navbar.pk-top-menu {
-  position: fixed;
+//  position: fixed;
   width: 100%;
   top: 0;
   left: 0;
@@ -76,6 +89,7 @@ body nav.navbar.pk-top-menu {
    // font-size: $pk-top-menu-font-size;
   }
 
+
 //@include bg-variant('.bg-inverse', $brand-inverse);
   ul.nav.navbar-nav {
     z-index: 100000;
@@ -93,6 +107,14 @@ body nav.navbar.pk-top-menu {
 
   }
 }
+
+/*
+body nav.navbar.pk-top-menu {
+  @include below-bp(md) {
+   position: relative;
+  }
+}
+*/
 
 .droponhover.dropdown:hover .dropdown-menu,
 .droponhover.dropdown .dropdown-menu:hover {

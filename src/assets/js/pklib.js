@@ -326,9 +326,9 @@ function showHelpDialog() {
  */
 $(function () {
   $('.hide-empty').each(function (idx, subel) {
-    console.log("Testing Emptyiness of: ", subel);
+    //console.log("Testing Emptyiness of: ", subel);
     if (isElEmpty(subel)) {
-      console.log("This El is Empty: ", subel);
+      //console.log("This El is Empty: ", subel);
       $(subel).css('display','none');
     }
   });
@@ -345,14 +345,14 @@ function isElEmpty(el) {
   el = jQuerify(el);
   //if ($.trim(el.text()) ||  (el.is('img') && $.trim(el.attr('src')))) {
   if ($.trim(el.text()) ||   $.trim(el.attr('src'))) {
-    console.log ("This el NOT empty (yet): ", el[0]);
+    //console.log ("This el NOT empty (yet): ", el[0]);
     return false;
   }
-  console.log("El Find: ", el.find());
+  //console.log("El Find: ", el.find());
   el.children().each(function (idx, subel) {
-    console.log ("In Loop; recursing into Subel:", subel);
+    //console.log ("In Loop; recursing into Subel:", subel);
     if (!isElEmpty(subel)) {
-      console.log ("In Loop; recursed empty SubEl:", subel);
+      //console.log ("In Loop; recursed empty SubEl:", subel);
       return (elempty = false);
     }
   });
@@ -371,7 +371,6 @@ $('body [data-instructions]').on({
    mouseover: function (event) {
      //var el = $(event.target);
      var el = $(this);
-     console.log('El Target:',el);
      var instHtml = el.attr('data-instructions');
      var prop = el.prop('data-instructions');
      var dinst = el.data('instructions');

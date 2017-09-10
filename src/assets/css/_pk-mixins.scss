@@ -16,7 +16,15 @@ $grid-columns:               12 !default;
 $grid-gutter-width:          1.875rem !default; // 30px
 
 //First three are to define classes at breakpoints - above, below, and between
-
+// Just use like:
+/*
+.container-fluid {
+  @include below-bp(sm) {
+   margin: 0;
+   padding: 0;
+  }
+}
+*/
 @function breakpoint($sz) {
   @if type-of($sz) == string {
     $sz: map-get($grid-breakpoints, $sz)

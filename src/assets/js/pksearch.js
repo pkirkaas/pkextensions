@@ -9,10 +9,8 @@
 
 
 $(function () {
-  console.log("In Init");
   disableDontCares();
   $('body').on('change', 'form.search .search-crit', function (event) {
-    console.log("Search Crit changed");
     var target = event.currentTarget;
     disableDontCare(target);
   });
