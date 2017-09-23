@@ -1197,6 +1197,20 @@ function in_array(key, arr) {
   return res;
 }
 
+/** Like above, but valid for html element IDs */
+function elid  () {
+  return '_' + Math.random().toString(36).substr(2, 9);
+};
+
+function tesstx(arg) {
+  var objj = {
+    a:1,
+    b:arg,
+    c:arg.param
+  };
+  console.log("tesstx objj: ", objj);
+}
+
 /** Supposedly jQuery functions to safely html encode/decode text (html)
  * to store in a data-attribute
  */
@@ -1613,6 +1627,22 @@ VEventDispatcher = {
         });
     }
 };
+
+
+/* Functions to manipulate/extend JS elements, with more modern techniques */
+
+/** For class-like objects, add the same object attributes to the __proto__,
+ * prototype, & object itself
+ * @param Classish Obj
+ * @param Simple Object ext with properties/methods to add to the Obj
+ * @returns Enhanced Object/class
+ */
+  function deepextend(Obj, ext) {
+    Object.setPrototypeOf(Obj.prototype,Object.assign(Object.getPrototypeOf(Obj.prototype),ext));
+    Object.setPrototypeOf(Obj,Object.assign(Object.getPrototypeOf(Obj),ext));
+    Object.assign(Obj,ext);
+    return Obj;
+  }
 
 
 
