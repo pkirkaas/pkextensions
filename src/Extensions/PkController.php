@@ -27,6 +27,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Validator;
 use PkExtensions\Models\PkModel;
 use Illuminate\Http\UploadedFile;
 use Request;
@@ -78,6 +79,27 @@ abstract class PkController extends Controller {
   #Alternatively, the method creates its own custom validator, and sets it:
   public $validator;
 
+  /** For validating requests. 4 implementations - & throws exception if failure
+   * if arg $validator exists, we run it.
+   * Else, if $this->validator exists, we run it
+   * Else if $this->validationrules exist, we build & run with the rules
+   * Else no validation.
+   * @param Validator $validator
+   */
+  public function validateRequest($validator = null, $request = null) {
+    if (!$validator) {
+      $validator = $this->validator;
+    }
+    if ($validator) {
+      return $this->validateWith($validator,$request);
+    }
+    if ($this->validationrules) {
+      return $this->validate(request(), $this->validationrules,
+          $this->validationmessages, $this->validationcustomattributes);
+    }
+    return true;
+  }
+
   /** Verify if we should process this submit, called by $this->processSubmit();
    * If method not a POST, return false. Otherwise, check the submit button name and value
    * $opts are an array of params:
@@ -123,14 +145,10 @@ abstract class PkController extends Controller {
    */
   public function processSubmit($opts = null, $inits = null) {
     if (!$this->ShouldProcessSubmit($opts)) return null;
-    if ($this->validationrules) { #Perform validation
-      $this->validate(request(), $this->validationrules, $this->validationmessages, $this->validationcustomattributes);
-    }
-    if ($this->validator) {
-      if ($this->validator->fails()) {
-        $this->throwValidationException(request(), $this->validator);
-      }
-    }
+    $validator = keyVal('validator', $opts);
+    $valres = $this->validateRequest($validator);
+    pkdebug("Validation Result:", $valres);
+ 
     #In a POST && met 'shouldProcessSubmit' requirements
     if ($opts instanceOf PkModel) {
       $pkmodel = $opts;

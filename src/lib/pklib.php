@@ -477,7 +477,7 @@ function pkvardump($arg, $disableXdebug = true) {
   $useVarDump = false;
   ini_set('html_errors', 0);
   ini_set('xdebug.overload_var_dump', 0);
-  if ($useVarDump || (is_object($arg) && method_exists('__debuginfo', $arg))) {
+  if ($useVarDump || (is_object($arg) && method_exists($arg, '__debuginfo' ))) {
     ob_start();
     Var_Dump($arg);
     $vardump = ob_get_contents();

@@ -43,9 +43,15 @@ class PkUser extends PkModel
   public static $table_field_defs = [
       'name' => ['type'=>'string', 'methods'=>'nullable'],
       'email' => ['type' => 'string', 'methods' => 'unique'],
-      'password' => 'string',
+      'password' =>  ['type'=>'string', 'methods'=>'nullable'],
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
        'admin'=>['type'=>'boolean', 'methods'=>['default'=>'false']],
+      'socialreg' =>  ['type'=>'string', 'methods'=>'nullable'],
+      'logins' =>  ['type'=>'integer', 'methods'=>'nullable'],
+      'lastlogin' =>  ['type'=>'datetime', 'methods'=>'nullable'],
+      'provider' =>  ['type'=>'string', 'methods'=>'nullable'],
+      'provider_id' =>  ['type'=>'string', 'methods'=>'nullable'],
+      'access_token' =>  ['type'=>'string', 'methods'=>'nullable'],
 
     ];
 
@@ -58,6 +64,26 @@ class PkUser extends PkModel
     return $this->email;
   }
 
+  public function newInstance($attributes = [], $exists = false) {
+     $password = KeyVal('password',$attributes);
+     if ($password) {
+       $attributes['password'] = bcrypt($password);
+     }
+     return parent::newInstance($attributes, $exists);
+  }
+    
+  public function isLoggedIn() {
+    return $this.is(Auth::user());
+  }
+  public function delete($cascade = true) {
+    $loggedin = $this->isLoggedIn();
+    $res = parent::delete($cascade);
+    if ($loggedin) {
+      Auth::logout();
+    }
+    return $res;
+  }
+             //Auth::logout();
 
   public function authDelete() {
     return $this->authUpdate();
@@ -122,5 +148,12 @@ class PkUser extends PkModel
       pkdebug("About to return User");
       return $user;
     }
+
+    /** Log in the user - remember if remeber - true */
+    public function login($remember = false) {
+      Auth::login($this,$remember);
+    }
+
+
 
 }
