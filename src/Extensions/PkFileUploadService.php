@@ -80,9 +80,23 @@ class PkFileUploadService {
    * 
    */
   public function upload($ctlname, $validationStr = null, $params = null) {
+    $request = request();
+    $this->uploadedFile = $request->file($ctlname);
+    if (!$this->uploadedFile instanceOf UploadedFile || !$this->uploadedFile->isValid()) {
+      //pkdebug("UploadedFile: ", $uploadedFile);
+      return false;
+    }
+    return processfile($this->uploadedFile,$validationStr,$params);
+  }
 
+  public function processfile($uploadedFile, $validationStr = null, $params = null) {
     //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
-    $this->path = $this->uploadedFile = $reldir = $resize = null;
+    $this->uploadedFile = $uploadedFile;
+    if (!$this->uploadedFile instanceOf UploadedFile || !$this->uploadedFile->isValid()) {
+      //pkdebug("UploadedFile: ", $uploadedFile);
+      return false;
+    }
+    $this->path =  $reldir = $resize = null;
     if (is_array_indexed($params)) {
       $resize = $params;
     } else if (is_array_assoc($params)) {
@@ -104,12 +118,6 @@ class PkFileUploadService {
       $reldir = pktrailingslashit(pkleadingslashit($reldir));
     } else {
       $reldir = '';
-    }
-    $request = request();
-    $this->uploadedFile = $request->file($ctlname);
-    if (!$this->uploadedFile instanceOf UploadedFile || !$this->uploadedFile->isValid()) {
-      //pkdebug("UploadedFile: ", $uploadedFile);
-      return false;
     }
     //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if ($validationStr) {

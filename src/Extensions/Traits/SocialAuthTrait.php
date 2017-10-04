@@ -46,8 +46,12 @@ trait SocialAuthTrait {
         $user->login(true);
         #and other stuff
       } else { #We don't know this user - try to register & log him
+        $name = $fbuser->getName();
+        $namearr = explode(' ',$name,2);
         $data = [
-            'name' => $fbuser->getName(),
+            'name' => $name,
+            'fname' => keyVal(0,$namearr),
+            'lname' =>  keyVal(1,$namearr),
             'email'=> $fbuser->getEmail(),
             'socialreg' => 'facebook',
             'provider' => 'facebook',
