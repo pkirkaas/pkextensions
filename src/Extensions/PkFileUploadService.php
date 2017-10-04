@@ -1,13 +1,14 @@
 <?php
-
+/** Mis-named 'upload' - also includes managing files from other external sources
+ * like images from external URLs
+ */
 namespace PkExtensions;
-
 use PkExtensions\Models\PkUploadModel;
-
 //require_once (base_path('/vendor/stefangabos/zebra_image/Zebra_Image.php'));
-
 //use Zebra_Image;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Http\File;
+use PkExtensions\PkFile;
 use \Eventviva\ImageResize;
 //use PkValidator; #The Facade that is actually a validator factory
 use Validator; #The Facade that is actually a validator factory
@@ -31,7 +32,7 @@ class PkFileUploadService {
       'doc' => 'file|mimes:pdf,txt,html',
   ];
   public $path; #If upload succeeds, contains the full real path & name
-  public $uploadedFile; #If upload succeeds, contains the uploadedFile instance
+  public $file; #If upload succeeds, contains the uploadedFile instance
   public $reldir; #Can be constructed with a reldir, or passed on upload
   public $typekey; #Can be constructed with a basic type (image, video... as key to typearr
   public $validationStr; #If typekey is a key to typarr, the value. Else, typekey is the rule
@@ -81,19 +82,20 @@ class PkFileUploadService {
    */
   public function upload($ctlname, $validationStr = null, $params = null) {
     $request = request();
-    $this->uploadedFile = $request->file($ctlname);
-    if (!$this->uploadedFile instanceOf UploadedFile || !$this->uploadedFile->isValid()) {
-      //pkdebug("UploadedFile: ", $uploadedFile);
+    $this->file = $request->file($ctlname);
+    //if (!$this->file instanceOf UploadedFile || !$this->file->isValid()) {
+    if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
+      //pkdebug("file: ", $file);
       return false;
     }
-    return processfile($this->uploadedFile,$validationStr,$params);
+    return processfile($this->file,$validationStr,$params);
   }
 
-  public function processfile($uploadedFile, $validationStr = null, $params = null) {
+  public function processfile($file, $validationStr = null, $params = null) {
     //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
-    $this->uploadedFile = $uploadedFile;
-    if (!$this->uploadedFile instanceOf UploadedFile || !$this->uploadedFile->isValid()) {
-      //pkdebug("UploadedFile: ", $uploadedFile);
+    $this->file = $file;
+    if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
+      //pkdebug("file: ", $file);
       return false;
     }
     $this->path =  $reldir = $resize = null;
@@ -125,12 +127,12 @@ class PkFileUploadService {
       $validator->validate();
       //PkValidator::validate($request,[$ctlname=>$validationStr]);
     }
-    $this->path = base_path('storage/app/' . $this->uploadedFile->store('public' . $reldir));
-    if ((PkUploadModel::smimeMainType($this->uploadedFile->getMimeType()) === 'image') && $this->resize) {
+    $this->path = base_path('storage/app/' . $this->file->store('public' . $reldir));
+    if ((PkUploadModel::smimeMainType($this->file->getMimeType()) === 'image') && $this->resize) {
       $this->resize($resize);
     }
     $ret = ['relpath' => $reldir . basename($this->path),
-        'mimetype' => $this->uploadedFile->getMimeType(),
+        'mimetype' => $this->file->getMimeType(),
         'type' => $this->typekey,
     ];
     return $ret;
@@ -146,7 +148,7 @@ class PkFileUploadService {
    * @throws PkException
    */
   public function resize($resize) {
-    $mimetype = $this->uploadedFile->getMimeType();
+    $mimetype = $this->file->getMimeType();
     $resizableMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
     if (!in_array($mimetype, $resizableMimeTypes, 1)) {
       pkdebug("The mimetype is not resizable; return");
@@ -224,12 +226,12 @@ class PkFileUploadService {
   /**
    * Detects animated GIF from given file pointer resource or filename.
    *
-   * @param resource|string $file File pointer resource or filename
+   * @param resource|string $file PkFile pointer resource or filename
    * @return bool
    */
   public function is_animated_gif($file = null) {
     if (!$file) {
-      if (!$this->uploadedFile->getMimeType() === 'image/gif') {
+      if (!$this->file->getMimeType() === 'image/gif') {
         return false;
       }
       $file = $this->path;

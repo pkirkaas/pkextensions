@@ -59,14 +59,10 @@ trait SocialAuthTrait {
             ];
         $user = $this->registerBouncerData($data);
       }
+      #Check if this user already has an avatar image; if not, fetch & create...
+
       $avatarUrl = $fbuser->getAvatar();
       pkdebug("The avatar url?", $avatarUrl);
       return redirect('/');
-
-//      return $user;
     }
-
-
-    // End social
-
 }

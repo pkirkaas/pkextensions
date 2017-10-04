@@ -344,4 +344,13 @@ trait UtilityMethodsTrait {
    public function setProperties($propertiesName = 'properties',$properties=null){
      //TODO: Implement. 
    }
+
+   /** Takes a relative path, checks various possible paths, returns full path
+    * if found, else false.
+    * @param string $path
+    * @return boolean|string path
+    */
+   public function fileExists($path) {
+     return false;
+   }
 }
