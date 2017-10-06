@@ -34,8 +34,8 @@ class PkFileUploadService {
   public $path; #If upload succeeds, contains the full real path & name
   public $file; #If upload succeeds, contains the uploadedFile instance
   public $reldir; #Can be constructed with a reldir, or passed on upload
-  public $typekey; #Can be constructed with a basic type (image, video... as key to typearr
-  public $validationStr; #If typekey is a key to typarr, the value. Else, typekey is the rule
+  public $typekey = "image"; #Can be constructed with a basic type (image, video... as key to typearr
+  public $validationStr = "image"; #If typekey is a key to typarr, the value. Else, typekey is the rule
   public $resize = [1920,1080,.7]; #Null, or idx array[maxx,maxy,quality] used to resize img where:
 
   #maxx: maximum pixel width, or none if null
@@ -58,17 +58,27 @@ class PkFileUploadService {
       $this->resize = keyVal('resize', $params);
       $this->reldir = keyVal('reldir');
     } else if (ne_string($params)) {
-      $this->reldir = $reldir;
+      $this->reldir = $params;
     }
-    if (!ne_string($typekey)) {
-      return;
-    }
-    if (in_array($typekey, array_keys($this->typearr))) {
+    if (ne_string($typekey)) {
       $this->typekey = $typekey;
+    }
+    if (in_array($this->typekey, array_keys($this->typearr))) {
       $this->validationStr = $this->typearr[$typekey];
     } else {
-      $this->validationStr = $typekey;
+      $this->validationStr = $this->typekey;
     }
+  }
+
+  public function fetchFromUrl($href,  $validationStr = null, $params = null) {
+    $destpath =sys_get_temp_dir().'/'.uniqid("tfr-",1).'.tmp'; 
+    $success = copy($href,$destpath);
+    if (!$success || !file_exists($destpath)) {
+      pkdebug ("Failed to fetch file from [$href] to [$destpath]");
+      return false;
+    }
+    $this->file = new PkFile($destpath);
+    return processfile($this->file,$validationStr,$params);
   }
 
   /**
@@ -123,7 +133,8 @@ class PkFileUploadService {
     }
     //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
     if ($validationStr) {
-      $validator = Validator::make($request->all(), [$ctlname => $validationStr]);
+      //$validator = Validator::make($request->all(), [$ctlname => $validationStr]);
+      $validator = Validator::make(['file'=>$this->file], ['file' => $validationStr]);
       $validator->validate();
       //PkValidator::validate($request,[$ctlname=>$validationStr]);
     }

@@ -57,12 +57,13 @@ trait SocialAuthTrait {
             'provider' => 'facebook',
             'provider_id' =>   $fbuser->getId(),
             ];
-        $user = $this->registerBouncerData($data);
+        if (method_exists($this,"postProcessSocialRegister")){
+          $user = $this->postProcessSocialRegister($data);
+        }
       }
-      #Check if this user already has an avatar image; if not, fetch & create...
-
-      $avatarUrl = $fbuser->getAvatar();
-      pkdebug("The avatar url?", $avatarUrl);
+      if (method_exists($this,"postProcessSocialLogin")){
+        $this->postProcessSocialLogin($fbuser,$user);
+      }
       return redirect('/');
     }
 }
