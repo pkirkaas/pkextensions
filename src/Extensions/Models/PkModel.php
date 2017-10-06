@@ -634,7 +634,7 @@ class $createclassname extends Migration {
    * @param any $var
    * $return boolean|static - false if not instantiated or not the same object, else the object
    */
-  public function is($var) {
+  public function is(Model $var) {
     if (!$var || !($var instanceOf Model)) return false;
     if (method_exists(get_parent_class(),'is')) {
       if (!parent::is($var)) return false;
