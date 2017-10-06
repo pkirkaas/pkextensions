@@ -616,7 +616,7 @@ class $createclassname extends Migration {
     //Debugging
     $varcl = get_class($var);
     $statcl = static::class;
-    pkdebug("var class: [$varcl]; static class: [$statcl]");
+    //pkdebug("var class: [$varcl]; static class: [$statcl]");
     if ($exact && ($varcl !== $statcl)) {
       return null;
     }
@@ -1068,8 +1068,10 @@ class $createclassname extends Migration {
   ## Need to think through deleting both from here, AND from the "Save Relations"
   ## method below
   public function delete($cascade = true) {
-    if (!$this->authDelete())
-        throw new Exception("Not authorized to delete this object");
+    if (!$this->authDelete()) {
+      pkdebug("Can't delete:", $this);
+      throw new Exception("Not authorized to delete this object");
+    }
     if (!$cascade) return parent::delete();
     foreach (array_keys($this->getLoadRelations()) as $relationSet) {
       if (is_array($this->$relationSet) || $this->$relationSet instanceOf BaseCollection) {
@@ -1090,7 +1092,8 @@ class $createclassname extends Migration {
         $pivotmodel = null;
         $pivottable = keyval('pivot_table', $definition);
         if (!Schema::hasTable($pivottable)) { #Can't do anything
-          throw new Exception("Niether a valid pivot class nor tabe was defined for [$relname]");
+          pkdebug("Couldn't find rel [$relname], Can't delete:", $this);
+          throw new Exception("Neither a valid pivot class nor tabe was defined for [$relname]");
         }
       }
       $mykey = keyval('my_key', $definition, Str::snake(getBaseName(static::class)) . '_id');

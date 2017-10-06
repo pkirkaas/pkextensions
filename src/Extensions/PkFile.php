@@ -5,6 +5,10 @@
 
 namespace PkExtensions;
 use Illuminate\Http\File;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Arr;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
 /**
  * Description of PkFile
@@ -12,6 +16,7 @@ use Illuminate\Http\File;
  * @author pkirkaas
  */
 class PkFile extends File {
+  use Macroable;
   #Just checks if the file exists
   public function isValid() {
     return file_exists($this->getPathname());
@@ -91,6 +96,21 @@ class PkFile extends File {
         return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
             $path, $this, $name, $options
         );
+    }
+
+    /**
+     * Parse and format the given options.
+     *
+     * @param  array|string  $options
+     * @return array
+     */
+    protected function parseOptions($options)
+    {
+        if (is_string($options)) {
+            $options = ['disk' => $options];
+        }
+
+        return $options;
     }
 
 }

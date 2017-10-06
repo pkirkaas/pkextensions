@@ -73,7 +73,7 @@ class PkUser extends PkModel
   }
     
   public function isLoggedIn() {
-    return $this.is(Auth::user());
+    return $this->is(Auth::user());
   }
   public function delete($cascade = true) {
     $loggedin = $this->isLoggedIn();

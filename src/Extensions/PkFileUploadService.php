@@ -64,7 +64,7 @@ class PkFileUploadService {
       $this->typekey = $typekey;
     }
     if (in_array($this->typekey, array_keys($this->typearr))) {
-      $this->validationStr = $this->typearr[$typekey];
+      $this->validationStr = $this->typearr[$this->typekey];
     } else {
       $this->validationStr = $this->typekey;
     }
@@ -78,7 +78,7 @@ class PkFileUploadService {
       return false;
     }
     $this->file = new PkFile($destpath);
-    return processfile($this->file,$validationStr,$params);
+    return $this->processfile($this->file,$validationStr,$params);
   }
 
   /**
@@ -102,7 +102,7 @@ class PkFileUploadService {
   }
 
   public function processfile($file, $validationStr = null, $params = null) {
-    //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
+    pkdebug("in processFile - file:", $file, "THIS",$this);
     $this->file = $file;
     if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
       //pkdebug("file: ", $file);

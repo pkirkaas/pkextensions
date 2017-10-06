@@ -128,7 +128,7 @@ abstract class PkUploadModel extends PkModel {
    * 
    * @param boolean $deleteonfalse Default: True. Delete this if no file
    */
-  public function fileexists($deleteonfalse = true) {
+  public function thisfileexists($deleteonfalse = true) {
     return !!$this->file_path($deleteonfalse);
   }
 

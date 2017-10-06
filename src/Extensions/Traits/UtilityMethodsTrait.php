@@ -350,9 +350,13 @@ trait UtilityMethodsTrait {
     * @param string $path
     * @return boolean|string path
     */
-   public function fileExists($path) {
+   public function fileExists($path, $checkdir=false) {
+     if (!ne_string($path) && !$checkdir) {
+       return false;
+     }
      $fullpath = base_path('storage/app/public/' . $path);
      if (file_exists($fullpath)) {
+       pkdebug("The file exists at: [$fullpath]");
        return $fullpath;
      } else {
        return false;

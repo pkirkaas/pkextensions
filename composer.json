@@ -11,7 +11,8 @@
     "php": ">=5.6",
     "laravelcollective/html": "5.*",
     "jenssegers/agent": "*",
-     "ezyang/htmlpurifier": "*"
+    "ezyang/htmlpurifier": "*",
+    "eventviva/php-image-resize": "*"
   },
   "autoload": {
     "psr-4": {

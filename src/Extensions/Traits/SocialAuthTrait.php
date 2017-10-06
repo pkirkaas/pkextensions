@@ -33,6 +33,30 @@ trait SocialAuthTrait {
         } else if (!filter_var($fbuser->getEmail(), FILTER_VALIDATE_EMAIL)) {
           $error="We didn't get a valid email.";
         }
+        /*
+         * This is the raw array:
+         *     [token] => EAAcDsDZC6XkABAAJzdhxszlmQWob1HJHZAPuhcKfIt2gLlbIblXVP4lyYYM5v5mGt7Kzxx1HfDkNBaGY5ZCpZApTaad7rGkhMFn3fNKTHTQ8DSVWJnkMul2fKsV5RNZAYoQdHCCKEPUZCwZA7oGCdH7m1mBRyjKyXqyinLARiXQpAZDZD
+    [refreshToken] => 
+    [expiresIn] => 5183455
+    [id] => 10212606807038579
+    [nickname] => 
+    [name] => Paul Kirkaas
+    [email] => pkirkaas@gmail.com
+    [avatar] => https://graph.facebook.com/v2.10/10212606807038579/picture?type=normal
+    [user] => Array
+        (
+            [name] => Paul Kirkaas
+            [email] => pkirkaas@gmail.com
+            [gender] => male
+            [verified] => 1
+            [link] => https://www.facebook.com/app_scoped_user_id/10212606807038579/
+            [id] => 10212606807038579
+        )
+
+    [avatar_original] => https://graph.facebook.com/v2.10/10212606807038579/picture?width=1920
+    [profileUrl] => https://www.facebook.com/app_scoped_user_id/10212606807038579/
+)
+         */
  //     } catch (\Exception $e) {
   //      $error = "We had a problem communicating with Facebookx: ".$e->getMessage();
    //   }
@@ -42,27 +66,16 @@ trait SocialAuthTrait {
         return "Got an error [$error]";
       }
       $user = User::where('email', '=', $fbuser->getEmail())->first();
+      if (!User::instantiated($user) && method_exists($this,"socialRegister")) {
+        pkdebug("Registering user:",$fbuser);
+        $user = $this->socialRegister($fbuser);
+      }
       if (User::instantiated($user)) {
         $user->login(true);
-        #and other stuff
-      } else { #We don't know this user - try to register & log him
-        $name = $fbuser->getName();
-        $namearr = explode(' ',$name,2);
-        $data = [
-            'name' => $name,
-            'fname' => keyVal(0,$namearr),
-            'lname' =>  keyVal(1,$namearr),
-            'email'=> $fbuser->getEmail(),
-            'socialreg' => 'facebook',
-            'provider' => 'facebook',
-            'provider_id' =>   $fbuser->getId(),
-            ];
-        if (method_exists($this,"postProcessSocialRegister")){
-          $user = $this->postProcessSocialRegister($data);
+        pkdebug("Logging In user:",$fbuser);
+        if (method_exists($this,"socialLogin")){
+          $this->socialLogin($fbuser,$user);
         }
-      }
-      if (method_exists($this,"postProcessSocialLogin")){
-        $this->postProcessSocialLogin($fbuser,$user);
       }
       return redirect('/');
     }

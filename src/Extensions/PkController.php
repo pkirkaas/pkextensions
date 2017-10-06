@@ -29,12 +29,14 @@ use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use PkExtensions\Models\PkModel;
+use PkExtensions\Traits\UtilityMethodsTrait;
 use Illuminate\Http\UploadedFile;
 use Request;
 use \Exception;
 use \Closure;
 
 abstract class PkController extends Controller {
+  use UtilityMethodsTrait;
 
   public static $errorMsgBag; #The error messages, if any. Try static first
   public static $viewErrorBag; #The error messages, if any. Try static first
