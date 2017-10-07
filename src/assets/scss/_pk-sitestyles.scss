@@ -12,6 +12,7 @@ $page-template-padding:  5px !default;
 $page-template-margin:  5px !default;
 .page-template {
   //border: solid blue 1px;
+  width: 100%
   padding: $page-template-padding;
   margin: $page-template-margin;
   @include below-bp(sm) {
