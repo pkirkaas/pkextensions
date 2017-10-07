@@ -277,6 +277,9 @@ function view_path($name) {
   throw new \Exception("View [$name] not found.");
 }
 
+function pkview($name) {
+  return include (view_path($name));
+}
 
 
 ###########   For uploaded files, get paths, URLs, defaults, etc

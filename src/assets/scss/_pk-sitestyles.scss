@@ -348,7 +348,9 @@ div.msg.row {
   color: white;
   background-color: #600;
 }
-
+.btn:hover {
+  cursor: pointer;
+}
 img.js-big-picture-button {
   cursor: pointer;
 }

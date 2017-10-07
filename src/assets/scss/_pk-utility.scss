@@ -29,6 +29,7 @@ $inner-border-spread: 1px !default;
 .bottom-square-corners { border-bottom-left-radius: 0px ! important; border-bottom-right-radius: 0px ! important; }
 
 .max-width-100 {max-width: 100% !important;}
+.width-auto, .auto-width {width: auto !important}
 
 .tal, .text-align-left, .align-left, .left-align { text-align: left ! important; }
 .tar, .text-align-right, .align-right, .right-align { text-align: right ! important; }

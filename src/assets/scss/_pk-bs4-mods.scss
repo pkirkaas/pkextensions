@@ -32,6 +32,8 @@ $brand-inverse:  #292b2c !default;
   }
 }
 
+$nav-link-color: #eee !default;
+
 $site-brand-menu-img-max-width: 24px !default;
 $site-brand-menu-img-max-height: 24px !default;
 img.navbar-brand-img {
@@ -69,7 +71,8 @@ $nav-item-hpad: .25em !default;
 $pk-nav-nav-link-margin-top: 5px !default;
 //$pk-top-menu-height: 40px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
-$pk-top-menu-font-size: .8rem !default;
+//$pk-top-menu-font-size: .8rem !default;
+$pk-top-menu-font-size: 1rem !default;
 body nav.navbar.pk-top-menu {
 //  position: fixed;
   font-size: $pk-top-menu-font-size;
@@ -81,13 +84,19 @@ body nav.navbar.pk-top-menu {
   flex-direction: row;
  // height: $pk-top-menu-height;
   //nav-link needs the same padding as the inline login form
-  a.nav-link {
+  a.nav-link, .nav-text {
     margin-top: $pk-top-menu-nav-link-margin-top;
     padding: 0 1em;
-    color: #eee;
+    //color: #eee;
+    color: $nav-link-color;
+    @include below-bp(sm) {
+      margin: 0;
+      padding: .5em 0;
+    }
     &:hover {
       color: white;
       text-shadow:0 0 1px white;
+      cursor: pointer;
     }
   }
   .navbar-brand.nav-item {
@@ -108,6 +117,9 @@ body nav.navbar.pk-top-menu {
   .nav-item {
   //font-size: $pk-top-menu-font-size;
     padding-right: $nav-item-hpad; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   .nav-item + .nav-item {
     //margin-left: $nav-item-after-nav-item-margin-left;
