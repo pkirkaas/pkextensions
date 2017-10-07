@@ -27,3 +27,9 @@ function offsetContent() {
     $('.content-main').css('top',0);
   }
 }
+    function setundermenu(item) {
+      console.log("setundermenu Item:",item);
+    //  item = item || 'div.login-register-dialog';
+      jQuerify(item).css('top', 
+       $("nav.navbar.pk-top-menu.main-menu").outerHeight());
+    }
