@@ -143,7 +143,7 @@ function numberItems($items,$word) {
 
 ##View Helpers
 function pk_showcheck($val = null, $styles = [], $checked = "&#9745;", $unchecked ="&#9744;") {
-  pkdebug("Enter w. val", $val, "Styles", $styles);
+  //pkdebug("Enter w. val", $val, "Styles", $styles);
   if (!ne_string($styles)) {
   $defaultstyles = ['zoom'=>1.5];
     if (is_numeric($styles)) {
@@ -159,7 +159,7 @@ function pk_showcheck($val = null, $styles = [], $checked = "&#9745;", $unchecke
     }
     $styles=$stylestr;
   }
-  pkdebug("Leave w. Styles", $styles);
+  //pkdebug("Leave w. Styles", $styles);
   if ($val) return "<span style='$styles'> $checked </span>";
    return "<span style='$styles'>$unchecked</span>";
 }

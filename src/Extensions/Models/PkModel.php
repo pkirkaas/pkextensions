@@ -1072,6 +1072,7 @@ class $createclassname extends Migration {
       pkdebug("Can't delete:", $this);
       throw new Exception("Not authorized to delete this object");
     }
+    pkdebug("In PkModel, trying to delete an instance of ".get_class($this));
     if (!$cascade) return parent::delete();
     foreach (array_keys($this->getLoadRelations()) as $relationSet) {
       if (is_array($this->$relationSet) || $this->$relationSet instanceOf BaseCollection) {
@@ -1082,6 +1083,7 @@ class $createclassname extends Migration {
         }
       }
     }
+    pkdebug("Got this far deleting load relations. Really  risk many to many?");
     #Now deal with the trickier many-to-many deletes. Have to be sure to delete only the relationships, not the related object
     #But the Delete for many-to-many is really way easier than the Update - add or delete...
     foreach (static::$load_many_to_many as $relname => $definition) {
@@ -1104,7 +1106,16 @@ class $createclassname extends Migration {
         DB::table($pivottable)->where($mykey, $this->getKey())->delete();
       }
     }
-    return parent::delete();
+    $myClass = static::class;
+    $myId = $this->id;
+    pkdebug("Finally about to delete myself - the tricky part. Im a instance of $myClass, ID $myId");
+    $res =  parent::delete();
+    pkdebug("Result was:", $res, "but do I really exist? Let's try to find me;");
+    $me = $myClass::find($myId);
+    if (!$myClass::instantiated($me)) pkdebug("No, I seem not be instantiated anymore");
+    else pkdebug("Whoops, I have an instance - what's my ID? {$me->id}");
+    return $res;
+    //return parent::delete();
   }
 
   /** We assume $modelCollection is the original model set, and $modelDataArray

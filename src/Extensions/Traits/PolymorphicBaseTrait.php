@@ -143,4 +143,9 @@ Trait PolymorphicBaseTrait {
      if (property_exists($class,'typeName')) return static::$typeName;
      return 'type';
   }
+
+  public function delete($cascade = true) {
+    pkdebug("The result of this delete:",$this->type->delete($cascade));
+    return parent::delete($cascade);
+  }
 }

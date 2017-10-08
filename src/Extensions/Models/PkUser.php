@@ -75,9 +75,12 @@ class PkUser extends PkModel
   public function isLoggedIn() {
     return $this->is(Auth::user());
   }
+  /** Have to overrisde for polymormphic types */
   public function delete($cascade = true) {
+    pkdebug("About to try to delete myself & my polys");
     $loggedin = $this->isLoggedIn();
     $res = parent::delete($cascade);
+    pkdebug("Wow, the general result of user delete wasl ",$res);
     if ($loggedin) {
       Auth::logout();
     }

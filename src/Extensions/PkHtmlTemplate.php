@@ -95,13 +95,11 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
    */
   public $substituted = '';
   public function __construct($tplStr = '', $values = [], $defaults = []) {
-    pkdebug("Enter construct: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     parent::__construct();
     #Test building presets from this & ancestor presets
     $this->presets = $this->getInstanceAncestorArraysMerged('presets');
     $this->presetdefaults = $this->getInstanceAncestorArraysMerged('presetdefaults');
     $this->defaultdefaults = $this->getInstanceAncestorArraysMerged('defaultdefaults');
-    //pkdebug("Preset:",$this->presets,'PD',$this->presetdefaults,'dd',$this->defaultdefaults);
     if (is_array_assoc($tplStr)) {
       $values = keyVal('values',$tplStr,[]);
       $defaults = keyVal('defaults',$tplStr,[]);
@@ -116,7 +114,6 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->tplStr = $tplStr;
     $this->values = $values;
     $this->defaults = $defaults;
-    pkdebug("After construct: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     $this->template();
   }
 
@@ -154,7 +151,6 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     return $this->template($values, $defaults, $tplStr);
   }
   public function template($values = null, $defaults=null, $tplStr = null) {
-    pkdebug("Enter tpl: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     if (!$values) $values = $this->values;
     if (!$defaults || !is_array($defaults)) {
       $defaults = $this->defaults;
@@ -173,7 +169,6 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
     $this->substituted = $this->substitute($this->defaultdefaults);
-    pkdebug("After Tempalting, subst:",$this->substituted);
     return new PkHtmlRenderer([$this->substituted]);
   }
 
