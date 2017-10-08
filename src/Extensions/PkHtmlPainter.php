@@ -613,9 +613,9 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $tdrend = new PkHtmlRenderer();
     foreach ($tds as $idx => $td) {
       $tdattarr = $this->cleanAttributes(keyVal($idx, $tdatts));
-      $tdrend->td($td, $tdattarr);
+      $tdrend->rawtd($td, $tdattarr);
     }
-    $trow = PkRenderer::tr($tdrend, $rowatts);
+    $trow = PkRenderer::rawtr($tdrend, $rowatts);
     return $trow;
   }
 

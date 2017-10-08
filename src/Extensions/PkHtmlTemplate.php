@@ -75,7 +75,8 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
       'js-ajax-button'=>["button-class"=>'site-button',
           'data-ajax-params'=>'', 'label'=>'Submit'],
       'checkSet' => ['checkrow'=>'check-row',
-          'checkclass'=>'check-class inline', 'labelclass'=>'pk-lbl inline'],
+          'checkclass'=>'check-class inline', 'labelclass'=>'pk-lbl inline',
+          'checkstyle'=>'zoom:1.5;', 'labelstyle'=>''],
   ];
 
   /**
@@ -94,6 +95,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
    */
   public $substituted = '';
   public function __construct($tplStr = '', $values = [], $defaults = []) {
+    pkdebug("Enter construct: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     parent::__construct();
     #Test building presets from this & ancestor presets
     $this->presets = $this->getInstanceAncestorArraysMerged('presets');
@@ -114,6 +116,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->tplStr = $tplStr;
     $this->values = $values;
     $this->defaults = $defaults;
+    pkdebug("After construct: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     $this->template();
   }
 
@@ -147,9 +150,11 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
    * @return string - the substituted/rendered template
    */
   public function tpl($values = null, $defaults=null, $tplStr = null) {
+    
     return $this->template($values, $defaults, $tplStr);
   }
   public function template($values = null, $defaults=null, $tplStr = null) {
+    pkdebug("Enter tpl: tplstr: [$tplStr], values:", $values, "defaults", $defaults);
     if (!$values) $values = $this->values;
     if (!$defaults || !is_array($defaults)) {
       $defaults = $this->defaults;
@@ -168,6 +173,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
     $this->substituted = $this->substitute($values);
     $this->substituted = $this->substitute($defaults);
     $this->substituted = $this->substitute($this->defaultdefaults);
+    pkdebug("After Tempalting, subst:",$this->substituted);
     return new PkHtmlRenderer([$this->substituted]);
   }
 
@@ -191,7 +197,9 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
   public function substitute($arr = null) {
     if (is_arrayish($arr)) {
       foreach ($arr as $tkey => $tval) {
-        $this->substituted = str_replace('{{'.$tkey.'}}', hpure($tval), $this->substituted);
+        //This is the right way, but I didn't all the templates right
+        //$this->substituted = str_replace('{{'.$tkey.'}}', hpure($tval), $this->substituted);
+        $this->substituted = str_replace('{{'.$tkey.'}}', ($tval), $this->substituted);
         $this->substituted = str_replace('{!!'.$tkey.'!!}', $tval, $this->substituted);
       }
     } else { #TODO: do preg_replace to remove tplStr keys without values

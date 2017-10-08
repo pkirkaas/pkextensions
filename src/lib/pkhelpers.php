@@ -143,22 +143,25 @@ function numberItems($items,$word) {
 
 ##View Helpers
 function pk_showcheck($val = null, $styles = [], $checked = "&#9745;", $unchecked ="&#9744;") {
+  pkdebug("Enter w. val", $val, "Styles", $styles);
+  if (!ne_string($styles)) {
   $defaultstyles = ['zoom'=>1.5];
-  if (is_numeric($styles)) {
-    $styles=['zoom'=>$styles];
-  } else if (ne_string($styles)) {
-    $styles=['style'=>$styles];
-  } else if (!is_array_assoc($styles)) {
-    $styles = [];
+    if (is_numeric($styles)) {
+      $styles=["zoom"=>$styles];
+    }
+    if (!is_array_assoc($styles)) {
+      $styles = [];
+    }
+    $styles=array_merge($defaults,$styles);
+    $stylestr = '';
+    foreach ($styles as $key => $value) {
+      $stylestr.="$key:$value; ";
+    }
+    $styles=$stylestr;
   }
-  $styles = array_merge($defaultstyles, $styles);
-  
-  $stylestr = '';
-  foreach ($styles as $key => $value) {
-    $stylestr.="$key:$value; ";
-  }
-  if ($val) return "<span style='$stylestr'> $checked </span>";
-   return "<span style='$stylestr'>$unchecked</span>";
+  pkdebug("Leave w. Styles", $styles);
+  if ($val) return "<span style='$styles'> $checked </span>";
+   return "<span style='$styles'>$unchecked</span>";
 }
 
 function hpure($input = '') {

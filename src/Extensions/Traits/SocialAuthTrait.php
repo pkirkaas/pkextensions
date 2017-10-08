@@ -27,7 +27,6 @@ trait SocialAuthTrait {
 //      try{
         session()->put('state', request()->input('state'));
         $fbuser = Socialite::driver('facebook')->user();
-        pkdebug("Returned FB User:", $fbuser);
         if (!$fbuser instanceOf Auth2User) {
            $error="Sorry, we didn't get your user information back";
         } else if (!filter_var($fbuser->getEmail(), FILTER_VALIDATE_EMAIL)) {
@@ -67,12 +66,10 @@ trait SocialAuthTrait {
       }
       $user = User::where('email', '=', $fbuser->getEmail())->first();
       if (!User::instantiated($user) && method_exists($this,"socialRegister")) {
-        pkdebug("Registering user:",$fbuser);
         $user = $this->socialRegister($fbuser);
       }
       if (User::instantiated($user)) {
         $user->login(true);
-        pkdebug("Logging In user:",$fbuser);
         if (method_exists($this,"socialLogin")){
           $this->socialLogin($fbuser,$user);
         }

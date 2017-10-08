@@ -235,7 +235,7 @@ class PkMatch {
    * @param type $arg
    */
   public function satisfy($arg = null) {
-    pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
+    //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
     if ($this->comptype === 'numeric') return $this->numericComp($arg);

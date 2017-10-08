@@ -104,9 +104,9 @@ $site-negative-value-color: #a22 !default;
 
 div input[type=checkbox].pk-inp {
   width: auto;
-  &.z1 { zoom: 1.5; }
-  &.z2 { zoom: 2; }
 }
+div input[type=checkbox].pk-inp.z1 { zoom: 1.5; }
+div input[type=checkbox].pk-inp.z2 { zoom: 2; }
 
 $input-font-size: 14px !default;
 select.pk-inp,

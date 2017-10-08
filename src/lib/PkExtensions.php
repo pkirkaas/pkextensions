@@ -13,6 +13,7 @@ use PkExtensions\PkDisplayValueInterface;
  */
 class checkBox implements PkDisplayValueInterface {
   public static function displayValue($value = null, $zoom = 1.5) {
+    pkdebug("Called w. val", $value, "& zoom:", $zoom);
     if ($value) {
       $res =  '&#9745;';
     } else {
@@ -24,6 +25,7 @@ class checkBox implements PkDisplayValueInterface {
     if (is_numeric($zoom)) {
       $zoom = "zoom:$zoom;";
     }
+    pkdebug("Returning w. Zoo:", $zoom);
     return "<span style='$zoom'>$res</span>";
   }
 }

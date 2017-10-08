@@ -646,7 +646,7 @@ trait BuildQueryTrait {
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
           } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
-            pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
+            //pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
             $this->addMatchObj($root,$matchObj);
             continue;
           } else {
