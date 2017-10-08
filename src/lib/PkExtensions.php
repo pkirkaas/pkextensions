@@ -6,10 +6,25 @@
 namespace PkExtensions\DisplayValue;
 use PkExtensions\PkDisplayValueInterface;
 
+/*
+ * @param $zoom - false|numeric|string - if false, just retuns the box.
+ * if numeric, wraps in a span with style="zoom: $zoom"
+ * if string, wraps in span w. style=$zoom
+ */
 class checkBox implements PkDisplayValueInterface {
-  public static function displayValue($value = null) {
-    if ($value) return '&#9745;';
-    return  '&#9744;';
+  public static function displayValue($value = null, $zoom = 1.5) {
+    if ($value) {
+      $res =  '&#9745;';
+    } else {
+      $res =  '&#9744;';
+    }
+    if (!$zoom) {
+      return $res;
+    }
+    if (is_numeric($zoom)) {
+      $zoom = "zoom:$zoom;";
+    }
+    return "<span style='$zoom'>$res</span>";
   }
 }
 

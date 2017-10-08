@@ -714,18 +714,22 @@ class PkHtmlRenderer extends PartialSet {
    * @param array|string $attributes
    * @param array|string $defaults, if equivalent key not set in attributes.
    *   Again, $defaults can be string, then converted to $defaults=['class'=>$defaults]
+   * @param $required - The $defaults are REPLACED by the other att, required is combined
    */
-  public function cleanAttributes($attributes, $defaults=null) {
+  public function cleanAttributes($attributes, $defaults=null, $required=null) {
     if (is_array_indexed($attributes)) {
       $attributes = implode (' ', $attributes);
     }
     if (is_string($attributes)) $attributes = ['class' => $attributes];
+    if (is_string($required)) $required = ['class' => $required];
     if (!is_array_assoc($attributes)) $attributes = [];
+    if (!is_array_assoc($required)) $required = [];
+    $atts = merge_attributes($attributes, $required);
     if (!$defaults) {
-      return $attributes;
+      return $atts;
     }
     $defaults = $this->cleanAttributes($defaults);
-    return array_merge($defaults, $attributes);
+    return array_merge($defaults, $atts);
   }
 
   /** To render regular Blade templates within a PkHtmlRenderer context

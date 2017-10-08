@@ -1,7 +1,9 @@
 /* JS for Social Functionality Support - ratings, messaging, blocking, etc.  */
 
 /* Makes the "Send Message" dialog box / form */
-$('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
+//$('body').on('click', 'div.pkmvc-button.js-contact', function (event) {
+$(function () {
+$('body').on('click', '.js-contact', function (event) {
     var tpl = $('.template-container .send-message-dialog').first().prop('outerHTML');
     var user_id_to = $(event.target).attr('data-user_id_to');
     var user_name = $(event.target).attr('data-user_name');
@@ -65,7 +67,6 @@ $('body').on('click', 'div.js-delete-el.del-msg', function (event) {
 $('body').on('click', 'div.js-delete-el.del-conversation', function (event) {
     var them_id = $(event.target).attr('data-them_id');
     var data = {them_id: them_id};
-    console.log('data',data);
     var res = $.ajax({
       url: ajaxUrl + '?action=delete-conversation',
       data: data,
@@ -98,6 +99,7 @@ $('body').on('click', 'div.favorite-toggle', function (event) {
       }
     });
   });
+});
 
 
 

@@ -56,8 +56,8 @@ class PkHtmlTemplate extends PkHtmlRenderer {
 
       'checkSet' => "
         <div class='{{checkrow}}'>
-          <div class='{{checkclass}}'>{{check}}</div>
-          <div class='{{labelclass}}'>{{label}}</div>
+          <div style='{{checkstyle}}' class='{{checkclass}}'>{{check}}</div>
+          <div style='{{labelstyle}}' class='{{labelclass}}'>{{label}}</div>
         </div>\n",
 
 

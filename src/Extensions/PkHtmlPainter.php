@@ -596,7 +596,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     } else if (is_stringish($rowdatas)) {
       $rows = $rowdatas;
     } else throw new PkException(['Invalid rowdatas:',$rowdatas]);
-    return PkRenderer::table($rows, $this->cleanAttributes($tblatts, $this->defaultTblClass));
+    return PkRenderer::table($rows, $this->cleanAttributes($tblatts,null, $this->defaultTblClass));
   }
 
   /** Makes an HTML Table row.

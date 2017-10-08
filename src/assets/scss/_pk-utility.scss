@@ -149,11 +149,19 @@ containing block needs to be positioned relatively*/
 }
 .vertical-center-flex {
   position: relative;
+  flex-direction: column;
   display: flex;
   justify-content: center;
 }
 .align-flex-items-start {
   align-items: flex-start;
+}
+.v-flex {
+  display: flex;
+  flex-direction: column;
+}
+.f-center {
+  justify-content: center;
 }
 /** Apply to the flex box */
 .flexalignstretch {align-items: stretch;}
@@ -517,3 +525,24 @@ input::placeholder {
   top: 10%;
   @extend .h-center;
 }
+
+
+// Make classes that will force a break between columns at certain breakpoints-
+// the regular sm, md, lg, but also pixels brk-sm, brk-md, brk-30
+@mixin mk-breaks {
+  $breaks: ('sm', 'md', 'lg', 'xl', 50, 100, 150, 200, 250, 300, 350, 400,
+    450, 500, 550, 600, 650, 700);
+  @each $break in $breaks {
+    .brk-#{$break} {
+      @include below-bp($break) {
+        display: block;
+        width: 100%;
+        height: 0;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}
+
+@include mk-breaks;

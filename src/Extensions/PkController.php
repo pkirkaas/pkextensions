@@ -507,41 +507,4 @@ abstract class PkController extends Controller {
 //Make sure the browser gets a 200 header
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT', true, 200);
   }
-
-  #Managing uploaded files
-  /**
-   * Returns a URL based on the filename and Laravel default public upload dir
-   * Override in site specific controllers to make a default, eg,
-   * <pre>
-   * public static function getUrlFromUploadedFilename($filename, $default = '/gulped/img/default-avatar.png') {
-   *   return parent::getUrlFromUploadedFilename($filename, $default);
-   * }
-   * </pre>
-   * @param string/UploadedFile $filename - the base uploaded filename, or path relative to doc root/storage.
-   * @param string $default - the relative URL from root of a default URL if no file
-   * @return string URL
-   */
-
-  public static function getUrlFromUploadedFilename($filename, $default = null) {
-    return urlFromUploadedFilename($filename, $default);
-  }
-
-  /** Given a filename, returns the default upload path
-   * 
-   * @param string $filename - the uploaded filename or path, AFTER storage & rename
-   * @param boolean $symlink - return the hard path, or the path in the symlink directory
-   * default: false; the hard path
-   * @return string - the filesystem path, or false if not found.
-   */
-  public static function getPathFromUploadedFilename($filename, $symlink = false) {
-    if (!$filename) return false;
-    if ($symlink) {
-      $path = base_path("/public/storage/$filename");
-    } else {
-      $path = storage_path("app/public/$filename");
-    }
-    if (file_exists($path)) return $path;
-    return false;
-  }
-
 }
