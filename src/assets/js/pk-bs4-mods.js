@@ -15,7 +15,7 @@ $(function () {
 $(function () {
   offsetContent();
   $(window).resize(offsetContent);
- });
+});
 
 function offsetContent() {
   //var topmenu = $('.pk-top-menu');
@@ -24,11 +24,21 @@ function offsetContent() {
   if ((tmpos === 'fixed') || (tmpos === 'absolute')) {
     $('.content-main').offset({top: topmenu.outerHeight()});
   } else {
-    $('.content-main').css('top',0);
+    $('.content-main').css('top', 0);
   }
 }
-    function setundermenu(item) {
-    //  item = item || 'div.login-register-dialog';
-      jQuerify(item).css('top', 
-       $("nav.navbar.pk-top-menu.main-menu").outerHeight());
-    }
+
+/** Puts the item at the bottom of them menu, for any window width over 'over'
+ * 
+ * @param {type} item
+ * @param {type} over
+ * @returns {undefined}
+ */
+function setundermenu(item, over) {
+  over = over || 0;
+  var top = 0;
+  if ($(window).width() > over) {
+    top =  $("nav.navbar.pk-top-menu.main-menu").outerHeight();
+  }
+  jQuerify(item).css('top', top);
+}
