@@ -30,7 +30,7 @@ trait SocialAuthTrait {
         if (!$fbuser instanceOf Auth2User) {
            $error="Sorry, we didn't get your user information back";
         } else if (!filter_var($fbuser->getEmail(), FILTER_VALIDATE_EMAIL)) {
-          $error="We didn't get a valid email.";
+          $error="We didn't get a valid email. You need an email with Facebook to login/register with Facebook on this site. Then try again.";
         }
         /*
          * This is the raw array:
@@ -62,7 +62,7 @@ trait SocialAuthTrait {
       if ($error) {
         //return $this->error($error."\nPlease try registering or logging in manually");
         pkdebug("Got an error?", $error);
-        return "Got an error [$error]";
+        return $this->error("Got an error [$error]");
       }
       $user = User::where('email', '=', $fbuser->getEmail())->first();
       if (!User::instantiated($user) && method_exists($this,"socialRegister")) {
