@@ -653,6 +653,10 @@ class PkHtmlPainter extends PkHtmlRenderer {
     return $links;
   }
 
+  public function mkDropOnHover($renderer, $wrapclass="drop-hover") {
+    return PkRenderer::div($renderer,$this->cleanAttributes($wrapclass));
+  }
+
   /** It makes a form based on options, but als passes back a PartialSet template that the 
    * calling function can then populate 
    */

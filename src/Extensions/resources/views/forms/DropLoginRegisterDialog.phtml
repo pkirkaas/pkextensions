@@ -165,13 +165,27 @@ $(function () {
         <div class="lrdlg-link-wrap">
         <a class="lrdlg-link" href="<?= route('auth_register'); ?>">Register</a>
     </div>
-        <div class="lrdlg-link-wrap">
-        <a class="lrdlg-link" href="<?= route('login_facebook') ?>"
-           class="btn btn-primary btn-block">
-          <img class='tac' style="max-height: 30px;"
-               src='<?=asset('/gulped/img/LoginWFacebook.png')?>' /> 
-        </a>
+
+          <?php
+           if( Route::has('login_facebook') ) {
+             ?>
+
+    <div class="lrdlg-link-wrap">
+      <a class="lrdlg-link" href="<?= route('login_facebook') ?>"
+          class="btn btn-primary btn-block">
+        <img class='tac' style="max-height: 30px;"
+              src='<?=asset('/gulped/img/LoginWFacebook.png')?>' /> 
+      </a>
     </div>
+
+          <?php
+           }
+             ?>
+
+
+
+
+
       </div>
       </div>
     </div>

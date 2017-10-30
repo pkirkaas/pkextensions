@@ -32,6 +32,8 @@ $brand-inverse:  #292b2c !default;
   }
 }
 
+$z-pk-top-menu: 10000 !default;
+$z-sub-nav: 5000 !default;
 $nav-link-color: #eee !default;
 
 $site-brand-menu-img-max-width: 24px !default;
@@ -79,7 +81,7 @@ body nav.navbar.pk-top-menu {
   width: 100%;
   top: 0;
   left: 0;
-  //z-index: 999999;
+  z-index: $z-pk-top-menu;
   background-color: $brand-inverse;
   flex-direction: row;
  // height: $pk-top-menu-height;
@@ -164,7 +166,7 @@ nav.navbar {
 
   nav.navbar.pk-nav.sub-nav {
 //    position: fixed;
-    z-index: 8888;
+    z-index: $z-sub-nav;
     left: 0;
     width: 100%;
 //    top: $pk-top-menu-height;
