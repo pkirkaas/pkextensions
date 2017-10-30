@@ -229,7 +229,6 @@ $(function () {
   $('body').on('click', '.pkmvc-button.showHelp', function (event) {
     showHelpDialog();
   });
-});
 
 ////// Some Togglers
 /** Toggle enabled/disabled other form components
@@ -257,7 +256,6 @@ $('body').on('click', '.hide-toggler', function (event) {
 /** Set subform select inputs after templating */
 
 
-$(function () {
   var tpl_sels = $('.templatable-data-sets select');
   tpl_sels.each(function (idx, sel_el) {
     var jqSelEl = $(sel_el);
@@ -269,7 +267,6 @@ $(function () {
       jqSelEl.val(data_selected);
     }
   });
-});
 
 /**
  * In CSS, define:
@@ -299,11 +296,9 @@ $('body').on('change', 'input.custom-file-input.pkcfi', function (event) {
 });
 
 
-$(function () {
   $('.js-fade-out').fadeOut(8400, function () {
     $(this).css('display', 'none');
   });
-});
 
 function showHelpDialog() {
   var helpDialog = showHelpDialog.helpDialog;
@@ -324,7 +319,6 @@ function showHelpDialog() {
 /** Should hide elements of class 'hide-empty' that have no content.
  * Use judiciously. Won't play well w. Vue components or dynamically created els.
  */
-$(function () {
   $('.hide-empty').each(function (idx, subel) {
     //console.log("Testing Emptyiness of: ", subel);
     if (isElEmpty(subel)) {
@@ -588,6 +582,7 @@ jQuery.fn.extend({
 
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
  * body padding-top to adjust to the height of the menu on window resize and init  */
+$(function () {
 function top_pad_body_to_fixed(menu) {
   if (!menu)
     menu = '#top-menu-fixed';
@@ -604,6 +599,7 @@ $(function () {
 $(window).resize(function () {
   top_pad_body_to_fixed();
 });
+ });
 
 /** Deletes the closest parent that matches the selector
  * To delete a row/subform in a multi-row form
@@ -861,8 +857,11 @@ $(function () {
  * </div>
  */
 
+$(function () {
 $('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (event) {
+  console.log("We were certainly clicked by the event:", event);
   var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
+  console.log("dlgHtml:", dlgHtml);
   if (!dlgHtml) {
     var src = $(event.target).attr('data-dialog');
     if (!src)
@@ -935,7 +934,6 @@ $('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (even
   return dlg;
 });
 
-$(function () {
 /** Custom 'big-picture' pop-ups - expected the class is on an img element */
 $('body').on('click', 'img.js-big-picture-button', function (event) {
   console.log("Big Picture");
@@ -963,7 +961,6 @@ $('body').on('click', 'img.js-big-picture-button', function (event) {
   dlg.dialog('open');
   return dlg;
 
-});
 });
 
 //Do similar for Bootstrap 4 Modals/Dialogs
@@ -1095,7 +1092,6 @@ function makeDialog(selector, opts) {
  */
 
 /** To Pop Up a dialog box on Window Load, if it exists (Version 1. V2 below) */
-$(function () {
   var dbx = $('.jqui-dlg-pop-load');
   if (!dbx.length)
     return;
