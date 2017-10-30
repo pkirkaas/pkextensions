@@ -187,7 +187,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
           ('':(background:$background)));
 
   @for $i from 0 through $szrange {
-    $sz: if($i!=0, -$i, null);
+    $sz: if($i!=0, $i, null);
+    // For a while was:
+    //$sz: if($i!=0, -$i, null);
     $szmap: (font-size:($i/5)+$size);
     @each $bga in map-keys($bgmap) {
       $bmap: map-get($bgmap,$bga);
@@ -211,12 +213,13 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
 // Builds a declaration block from mapped property/values
 
-@mixin mk-decblock($map:()) {
-  $keys: map-keys($map);
-  @each $key in $keys {
-    #{$key}: map-get($map,$key);
-  }
-}
+//@mixin mk-decblock($map:()) {
+//  $keys: map-keys($map);
+//  @each $key in $keys {
+//    #{$key}: map-get($map,$key);
+//  }
+//}
+
 @mixin mk-classdef($cname,$maplist) {
   .#{$cname} {
     @each $map in $maplist {
@@ -233,6 +236,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 }
 
+
 @mixin mk-boxshadow($map:()) {
   @if not(empty($map)) {
     @if $map == true {
@@ -248,6 +252,16 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 
 }
+
+
+//@include mk-format((cname:head,
+//    szrange:3,
+//     color:#456,crange:1,
+//     background:#cde,
+//     bgrange:1,
+//     border: #aaf,
+//     display: inline,
+//     ));
 
 @mixin h-padding($sz) {
   padding-left: $sz;
