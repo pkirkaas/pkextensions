@@ -867,10 +867,16 @@ $('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (even
     var src = $(event.target).attr('data-dialog');
     if (!src)
       return;
-    var dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
-    if (dlg.length === 0)
-      return;
-    var dlgHtml = dlg.prop('outerHTML');
+    var dlg = $('script.js-dialog-content[data-dialog="' + src + '"]');
+    if (dlg.length !== 0) {
+      var dlgHtml = dlg.prop('innerHTML');
+    } else {
+      dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+      if (dlg.length === 0) {
+        return;
+      }
+      var dlgHtml = dlg.prop('outerHTML');
+    }
   }
   var param1 = htmlDecode($(event.target).attr('data-param1')) || '';
   var param2 = htmlDecode($(event.target).attr('data-param2')) || '';
