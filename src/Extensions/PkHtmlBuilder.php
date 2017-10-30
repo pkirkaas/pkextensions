@@ -39,11 +39,15 @@ class PkHtmlBuilder extends HtmlBuilder {
    * @param type $attributes
    * @return type
    */
-    public function linkRoute($name, $title = null, $parameters = [], $attributes = []) {
+    public function linkRoute($name, $title = null, $parameters = [], $attributes = [],
+        $escape=true) {
       if ($title === false) {
+        $escape = false; #The title is coming from the router, trust it
         $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       }
-      return parent::linkRoute($name,$title,$parameters, $attributes);
+
+      return $this->link($this->url->route($name, $parameters), $title, $attributes,null, $escape);
+      //return parent::linkRoute($name,$title,$parameters, $attributes);
     }
   /** This will use the 'desc' key in the Route declaration as a default title for the link,
    * @param string $name - The named link as defined in routes

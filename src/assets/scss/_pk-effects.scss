@@ -7,6 +7,35 @@ CSS / Styling that when used together create effects, like tooltips, liking some
   display: none;
 }
 
+/** An element with class drop-hover has display: none, unless
+ * the user hovers over a containing element with class 'drop-in'
+ * or an immediately preceding sibling element with class 'drop-after'
+*/
+
+.drop-hover {
+  display: none;
+  position: absolute;
+  top: 3em;
+  width: 130%;
+  left: -30%;
+  padding: 2px;
+  border-radius: 6px;
+  opacity: 1;
+  background-color: white;
+}
+
+.drop-in {
+  position: relative;
+  background-color: white;
+  opacity: 1;
+  z-index: 5000;
+}
+.drop-after:hover + .drop-hover,
+.drop-in:hover .drop-hover {
+  display: block;
+  background-color: white;
+  opacity: 1;
+}
 
 /** Speach bubble effects */
 div.speech-bubble{
