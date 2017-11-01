@@ -65,6 +65,66 @@ $(function () {
   });
  });
 
+// Make 'Confirm' Dialog
+$(function () {
+  $('body').on('click', '.js-verify', function (event) {
+    var target = event.target;
+    var origEv = event.originalEvent;
+    console.log ("Event:", event, 'target', target, 'this', this,
+    "Cancelable:", event.cancelable, 'altKey', event.altKey, "origEv.detail", origEv.detail);
+    if (!event.cancelable || !origEv.detail) {
+      console.log("Trying to continue");
+      return true;
+    }
+    event.preventDefault();
+    var msg = $(event.target).attr('data-msg') || "Are you sure?";
+    var titleTxt = $(event.target).attr('data-title') || "Are you sure?";
+    var continueTxt = $(event.target).attr('data-continue') || "Continue";
+    var cancelTxt = $(event.target).attr('data-cancel') || "Cancel";
+
+    var dlg = $("<div class='confirm-msg'>"+msg+"</div>");
+    var defaultWidth = Math.min(600,$(window).width());
+    var dialogOptions = {
+      modal: true,
+      dialogClass : "confirm-dialog",
+      autoOpen: true,
+      width: defaultWidth,
+      title: titleTxt,
+      buttons: [
+        {
+          text: continueTxt,
+          class: "btn-continue",
+          click: function () {
+            var newEv = new MouseEvent(event.type,{
+              view: window,
+              bubbles: true,
+              //cancelable: false,
+              // (If detail isn't initially 1, change to use cancelable false)
+              cancelable: true,
+              detail: 0,
+            });
+            console.log("Trying to continue w. JS event:", newEv);
+            target.dispatchEvent(newEv);
+            $(this).dialog('destroy');
+        }
+      },
+      {
+        text: cancelTxt,
+          class: "btn-cancel",
+        click: function () {
+          $(this).dialog('destroy');
+        },
+      }
+    ]
+  };
+  dlg.dialog(dialogOptions);
+  });
+ });
+
+
+
+
+
 /** Takes a possibly deeply nested object or array (or string), & returns a
  * nested HTML structure
  * @param object|array|string item
@@ -859,7 +919,6 @@ $(function () {
 
 $(function () {
 $('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (event) {
-  console.log("We were certainly clicked by the event:", event);
   var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
   console.log("dlgHtml:", dlgHtml);
   if (!dlgHtml) {

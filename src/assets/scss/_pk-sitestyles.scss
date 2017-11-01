@@ -27,6 +27,33 @@ $page-template-margin:  5px !default;
   z-index: 10000;
 }
 
+//Confirm Action jquery dialog styles
+.ui-dialog.confirm-dialog {
+  font-size: x-large;
+  text-align: center;
+  .ui-dialog-titlebar {
+    background-color: #6ff;
+    color: #a00;
+  }
+  .confirm-msg {
+    color: #a00;
+    font-weight: bold;
+    padding: 1rem;
+  }
+  .ui-dialog-buttonpane {
+    display: flex;
+    justify-content: stretch;
+  }
+  .ui-dialog-buttonset {
+    display: flex;
+    flex-grow: 1;
+    justify-content: space-evenly;
+    button {
+      @extend .pkmvc-button;
+    }
+  }
+}
+
 .container-fluid {
   @include below-bp(sm) {
    margin: 0;
