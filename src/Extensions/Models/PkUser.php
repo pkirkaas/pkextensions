@@ -157,6 +157,20 @@ class PkUser extends PkModel
       Auth::login($this,$remember);
     }
 
+    /** Verifies $user exists, or gets the logged in user, or throws
+     * exception
+     * @param User $user
+     */
+    public static function getUser($user) {
+      if (!static::instantiated($user)) {
+        $user = Auth::user();
+      }
+      if (!static::instantiated($user)) {
+        throwerr("No valid user");
+      }
+      return $user;
+    }
+
 
 
 }

@@ -5,6 +5,7 @@
  * Paul Kirkaas
  */
 use PkExtensions\PartialSet;
+use PkExtensions\PkExceptionResponsable;
 use PkExtensions\Models\PkModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection as BaseCollection;
@@ -72,6 +73,10 @@ function isLocal($tst = null) {
     return $local;
   }
   return config('app.env') === 'local';
+}
+
+function throwerr($msg) {
+  throw new PkExceptionResponsable($msg);
 }
 
 

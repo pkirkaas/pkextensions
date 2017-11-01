@@ -658,6 +658,14 @@ class PkHtmlRenderer extends PartialSet {
    * 
    */
 
+  /** If 'options' contains 'label'=>text, wraps input within label
+   * 
+   * @param type $type
+   * @param type $name
+   * @param type $value
+   * @param type $options
+   * @return type
+   */
   public function input($type, $name, $value = null, $options = []) {
     if (!is_stringish($name) && is_arrayish($name)) {
       $name = keyVal('name', $name);
@@ -669,10 +677,33 @@ class PkHtmlRenderer extends PartialSet {
     $value=keyVal('value',$options,$value);
     #Set name in options
     $options['name']=keyVal('name',$options,$name);
-    //$this[] = PkForm::input($type, $name, $value, $options);
+    $label = unsetret($options,'label');
     $input = PkForm::input($type, $name, $value, $options);
+    if ($label) { 
+      $input = $this->labelize($label, $input);
+    }
     return $this->rawcontent($input);
     //return $this->rawcontent(PkForm::input($type, $name, $value, $options));
+  }
+
+  /**
+   * Wrap a form input with a label
+   * @param mixed $label - can be label text, or assoc array of label & atts,
+   * ['label'=>"User Name",'class'=>"inp-lbl", ...]
+   * @param htmlInput $input
+   * @param type $options
+   */
+  public function labelize($label,$input, $options=[]) {
+    if (is_array_assoc($label)) {
+      $txt = unsetret($label,'label');
+      $attstr = PkHtml::attributes($label);
+    } else {
+      $txt = $label;
+      $attstr = '';
+    }
+    $ret = new static();
+    $ret::rawcontent("<label $attstr>$txt $input</label>\n");
+    return $ret;
   }
 
   /** Don't just default to 'tagged', cuz it's input
