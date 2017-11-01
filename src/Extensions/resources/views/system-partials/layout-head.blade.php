@@ -12,7 +12,6 @@ use PkExtensions\PopAtts;
     <?php /*
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700|Roboto:400,700|Raleway:400,600,700"
           rel="stylesheet">
-     * 
      */?>
     <title>{{SITE_NAME}}</title>
     <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">

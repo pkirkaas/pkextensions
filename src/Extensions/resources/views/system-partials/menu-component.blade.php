@@ -1,6 +1,11 @@
 <!--   Wraps the body of the main menu  & inserts it into $slot -->
 
     <!-- New BS 4 Nav --> <!-- Navbar -->
+
+    <?php /*
+    {{$namedslotcontent}}
+     * 
+     */ ?>
     <nav class="navbar  navbar-expand-md navbar-inverse bg-inverse pk-top-menu main-menu no-print">
       <!-- Toggle Button -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content">
