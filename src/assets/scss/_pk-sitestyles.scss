@@ -21,6 +21,12 @@ $page-template-margin:  5px !default;
   }
 }
 
+.pk-warn-dlg.error-dlg-box {
+  position: fixed;
+  top: 100px;
+  z-index: 10000;
+}
+
 .container-fluid {
   @include below-bp(sm) {
    margin: 0;

@@ -1115,6 +1115,12 @@ function makeDialog(selector, opts) {
       }
     ]
   };
+
+  var dialogOpts = JSON.parse(htmlDecode(dbx.attr('data-dialog-opts')));
+  if (isObject (dialogOpts) && !isEmpty(dialogOpts)) {
+    dialogDefaults = Object.assign(dialogDefaults, dialogOpts);
+  }
+  console.log("In 'OLD' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
   $('.jqui-dlg-pop-load').dialog(dialogDefaults);
 });
 
@@ -1154,6 +1160,12 @@ $(function () {
       }
     ]
   };
+
+  var dialogOpts = JSON.parse(htmlDecode($dbx.attr('data-dialog-opts')));
+  if (isObject (dialogOpts) && !isEmpty(dialogOpts)) {
+    dialogDefaults = Object.assign(dialogDefaults, dialogOpts);
+  }
+  console.log("In 'new' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
   $dbx.dialog(dialogDefaults);
 });
 

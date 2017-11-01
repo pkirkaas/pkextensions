@@ -430,9 +430,13 @@ class PkHtmlPainter extends PkHtmlRenderer {
       $errorItems->rawli($error);
     }
     $errorList = PkRenderer::ul($errorItems, 'popup error-list');
-    $errorMsgOut = PkRenderer::div($errorList, ['class' => "error-popup-box",
-            'data-title' => "Notice:",
-            'data-dialogClass' => 'pk-warn-dlg error-dlg-box']);
+    $errorMsgOut = PkRenderer::div($errorList, [
+      'class' => "error-popup-box",
+      'data-title' => "Notice:",
+      'data-dialog-opts' =>
+          //html_encode('{"position":{"my":"top","at":"top","of":"window"}','"'),
+          html_encode('{"position":{"my":"top","at":"bottom + 20px","of":".pk-top-menu"}}'),
+      'data-dialogClass' => 'pk-warn-dlg error-dlg-box']);
     /*
       [
       PkRenderer::div("The following errors occurred",'error-head'),
