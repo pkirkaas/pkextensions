@@ -23,6 +23,7 @@ namespace PkExtensions;
  */
 class PartialSet extends \ArrayObject {
   public $separator = '';
+  public $arrayseparator = '';
   /** Settings that are not echoed but can be used to hold values, set opts, etc
    *
    * @var array 
@@ -127,7 +128,7 @@ class PartialSet extends \ArrayObject {
     }
     $str = $this->separator;
     foreach ($x as $y) {
-      $str .= $this->decomposeArray($y).$this->separator;
+      $str .= $this->decomposeArray($y).$this->arrayseparator;
     }
     return $str;
   }
