@@ -115,6 +115,12 @@ Trait PolymorphicBaseTrait {
     return $this->$typeField;
   }
 
+  public function getBaseMorphType() { #Like, just "Borrower"
+    return basename(str_replace('\\','/',$this->getMorphType()));
+    //$typeField = static::getTypeField();
+    //return $this->$typeField;
+  }
+
   /*
    public static function getTableFieldDefs() {
      $_fieldDefs = static::_getTableFieldDefs();
