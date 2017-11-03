@@ -484,7 +484,7 @@ class $createclassname extends Migration {
       ];
 
   public $cleanAllText = true; #Default - runs hpure/escapes every text field
-  public $trustedTextFields = []; #Keep cleanAllText true by default, only allow specific fields by.
+  public $trustedTextFields = ['password']; #Keep cleanAllText true by default, only allow specific fields by.
 
   /** POSTs submit an empty string for "no value". For integer table fields, 
    * should we convert the empty string to null? Default for MySQL is to insert
@@ -1939,4 +1939,139 @@ class $createclassname extends Migration {
     return $out;
   }
 
+  public static function getAllPkModelsTables() {
+    $modeltotable=[];
+    foreach ( config('app.buildmodels') as $model) {
+      $modeltotable[$model]=$model::getTableName();
+    }
+    return $modeltotable;
+  }
+
+  public static function getAllChildModels() {
+    $childModels = [];
+    $pkModelTables = static::getAllPkModelsTables();
+    foreach (config('app.buildmodels') as $model) {
+      if ($parentStruct = $model::isChildModel($pkModelTables)) {
+        $childModels[$model]=$parentStruct;
+      }
+    }
+    return $childModels;
+  }
+
+  public static function getAllOrphans() {
+    $orphans =[];
+    foreach (static::getAllChildModels() as $model => $parentStruct) {
+      if ($morphans = $model::getOrphans($parentStruct)) {
+        $orphans[$model] = $morphans;
+      }
+    /*
+    */
+    }
+    return $orphans;
+  }
+
+  public static function getOrphans($parentStruct) {
+     $morphans = [];
+     foreach (static::all() as $me) {
+       $missings = [];
+       foreach ($parentStruct as $parentRow) {
+         $pmodel = $parentRow['model'];
+         $key = $parentRow['key'];
+         if (!$me->$key) {
+           $missings[$key] = [$pmodel=>'NULL'];
+         } else if (!$pmodel::find($me->$key)) {
+           $missings[$key] = [$pmodel => $me->$key];
+         }
+       }
+      if (!empty($missings)) {
+        $morphans[] = [$me->id,$missings];
+      }
+     }
+     if (count($morphans)) return $morphans;
+  }
+
+
+  public static function isChildModel($pkModelTables) {
+    //$tables = array_values($pkModelTables);
+    $fields = static::getFieldNames();
+    $parentStruct = [];
+    foreach ($fields as $field) {
+      $tst = removeEndStr($field, '_id').'s';
+      foreach($pkModelTables as $pmodel => $ptable) {
+        if ($tst === $ptable) {
+          $parentStruct[] = ['model'=> $pmodel, 'table'=> $ptable, 'key'=>$field];
+          continue;
+        }
+      }
+    }
+    if (count($parentStruct)) return $parentStruct;
+  }
+
+
+
+
+  //  This section for diagonosing the current DB
+  /*
+  public static function getAllPkModelsTablesFields() {
+    $mtfs = []; $tables =[];
+    //foreach (  Config::get('app.buildmodels') as $model) {
+    foreach (  config('app.buildmodels') as $model) {
+      $mtrow = ['model'=>$model, 'table'=>$model::getTableName(), 'fields' => $model::getFieldNames()];
+      $mtfs[] = $mtrow;
+      $tables[]=$mtrow['table'];
+    }
+    foreach ($mtfs as &$mtf) {
+      $parents = [];
+      foreach ($mtf['fields'] as $field) {
+        $tst = removeEndStr($field, '_id').'s';
+        if (in_array($tst,$tables,1)) {
+          $row = $mtfs[array_search($tst,$tables)];
+          $parents[]=['table'=>$tst,'model'=>$row['model']];
+        }
+      $mtf['parents']=$parents;
+      }
+    }
+    pkdebug("Quick survey says:", $mtfs);
+    return $mtfs;
+  }
+
+  public static function getAllOwnedModel() {
+    $omdls = [];
+    foreach (static::getAllPkModelsTablesFields() as $row) {
+      if (count($row['parents'])) {
+        $omdls[] = $row;
+      }
+    }
+    return $omdls;
+  }
+
+  public static function getAllOrphaned() {
+    $related = static::getAllOwned();
+    $orphanModels = [];
+    foreach ($related as $childType) {
+      $childModel = $childType['model'];
+      $parentModels = [];
+      foreach ( $childModel::all() as $achild) {
+        foreach ($childType['parents'] as $pr) {
+          foreach ($childType['parents'] as $parentSet) {
+            $pmodel = $parentSet['model'];
+            $parentAtt = removeEndStr($parentSet['table'],'s').'_id';
+            if (!$child->$parentAtt) $missing = [$pmodel=>'NULL'];
+            else if (!$pmodel::find($child->$parentAtt)) $missing [$pmodel => $child->$parentAtt];
+            if (!empty($missing)) 
+
+            $parentModels[]
+      $orphans = [];
+      foreach ($childType[$parents] as $tm) {
+        
+
+*/
+
+
+  /*
+   * 
+  public static function getTableName() {
+      $currenttablefields = static::getStaticAttributeNames();
+   */
+  //Config::get('app.buildmodels');
 }

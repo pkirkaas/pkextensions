@@ -10,6 +10,7 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Notifications\Notifiable;
+use \Hash;
 /*
  * Set up some reasonable defaults. 
  */
@@ -57,6 +58,9 @@ class PkUser extends PkModel
 
   public static $allowUpdate = 0; #To allow user registration/update 
 
+  public function setPasswordAttribute($password) { 
+    return $this->attributes['password'] = Hash::make($password);
+  }
 
   /** Can be overridden - but basic try here */
   public function getName() {
@@ -64,13 +68,6 @@ class PkUser extends PkModel
     return $this->email;
   }
 
-  public function newInstance($attributes = [], $exists = false) {
-     $password = KeyVal('password',$attributes);
-     if ($password) {
-       $attributes['password'] = bcrypt($password);
-     }
-     return parent::newInstance($attributes, $exists);
-  }
     
   public function isLoggedIn() {
     return $this->is(Auth::user());
@@ -117,6 +114,7 @@ class PkUser extends PkModel
 
     /** Special handling to reset passwords in a form, then calls parent method
      */
+  /*
     public function saveRelations(Array $arr = []) {
       if (!$this->authUpdate()) throw new Exception("Not authorized to update this object");
       ## Check for password reset 
@@ -128,11 +126,11 @@ class PkUser extends PkModel
           pkdebug("Type of redirback: " , typeOf($redirback));
           return $redirback;
         }
-        //$arr['password'] = $new_password;
-        $this->password = bcrypt($new_password);
       }
       return parent::saveRelations($arr);
     }
+   * 
+   */
 
     /** Makes sure only the logged in user OR Admin can use the $user object
      * 
