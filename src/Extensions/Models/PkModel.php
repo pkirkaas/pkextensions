@@ -1576,7 +1576,7 @@ class $createclassname extends Migration {
    * <b><tt>performInsert</tt></b> is only called from Model::save() - 
    * So every insert will also involve a save, but not every save involves an
    * insert - SO ANYTHING THAT INVOKES postCreate() WILL ALSO CALL postSave()!
-   * Put another way, postSave() will aslo be called on create, so you can put it all in there...
+   * Put another way, postSave() will also be called on create, so you can put it all in there...
    * @param Builder $query
    * @param array $options
    * @return type
@@ -1609,8 +1609,8 @@ class $createclassname extends Migration {
    * @param array $options - comes from "save" options, in case we want to add any
    */
   public function postCreate(Array $options = []) {
-    
   }
+
   public function hpureAllText() {
     $attributeDefs = $this->getAttributeDefs();
     foreach ($attributeDefs as $name => $type) {
