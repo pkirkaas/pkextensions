@@ -169,7 +169,7 @@ containing block needs to be positioned relatively*/
 
 /** Apply to the flex items */
 .flexgrow-2, .flexgrow2 { flex-grow: 2; }
-.flexgrow-1, .flexgrow1 { flex-grow: 1; }
+.flexgrow-1, .flexgrow1, .flex-grow, .flexgrow { flex-grow: 1; }
 .no-grow, .flexgrow-0, .flexgrow0 { flex-grow: 0; }
 .flex-grow { flex-grow: 5; }
 

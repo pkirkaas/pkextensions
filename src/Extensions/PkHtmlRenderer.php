@@ -673,6 +673,10 @@ class PkHtmlRenderer extends PartialSet {
       $options = keyVal('options', $name,$options);
     }
     $options = $this->cleanAttributes($options);
+    if ($type === 'checkbox') {
+      $value=keyVal($options,'value',1);
+    }
+
     #If value exists in options, override arg
     $value=keyVal('value',$options,$value);
     #Set name in options

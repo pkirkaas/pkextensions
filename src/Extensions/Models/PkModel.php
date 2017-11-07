@@ -976,6 +976,7 @@ class $createclassname extends Migration {
    */
   public function __construct(array $attributes = []) {
     $this->fillable($this->getAttributeNames());
+    unset ($attributes['id']);
     parent::__construct($attributes);
   }
 
