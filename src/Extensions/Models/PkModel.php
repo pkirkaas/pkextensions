@@ -61,6 +61,7 @@ use \Exception;
 use \DB;
 use \PkExtensions\PkTestGenerator;
 use PkExtensions\PkException;
+use PkHtml;
 
 abstract class PkModel extends Model {
 
@@ -1923,6 +1924,20 @@ class $createclassname extends Migration {
     }
    */
 
+  /** Return a route to delete this PkModel instance. 
+   * 
+   * @param string $baseroute
+   * @param string $link - if present, return entire <a href...>$link</a>,
+   * else just the URL to delete
+   */
+  public function deleteRoute($baseroute = 'admin_deletemodel', $link='Delete') {
+    $params = ['model'=>get_class($this), 'id'=>$this->id];
+    if ($link) {
+      return PKHtml::linkRoute($baseroute,$link,$params);
+    }
+    return route($baseroute,$params);
+  }
+
   public static $whichfields = ['id'];
   /** Simple string to indetify the model/instance
    * 
@@ -1949,28 +1964,34 @@ class $createclassname extends Migration {
 
   public static function getAllChildModels() {
     $childModels = [];
-    $pkModelTables = static::getAllPkModelsTables();
     foreach (config('app.buildmodels') as $model) {
-      if ($parentStruct = $model::isChildModel($pkModelTables)) {
-        $childModels[$model]=$parentStruct;
+      if ($model::isChildModel()) {
+        $childModels[] = $model;
       }
     }
     return $childModels;
   }
 
-  public static function getAllOrphans() {
+  /** Get all orphaned objects. 
+   * 
+   * @param boolean $instances - if true, return the instances as well,
+   * otherwise just the model types & IDs
+   * @return array - orphaned objects
+   */
+  public static function getAllOrphans($instances = false) {
     $orphans =[];
-    foreach (static::getAllChildModels() as $model => $parentStruct) {
-      if ($morphans = $model::getOrphans($parentStruct)) {
+    foreach (static::getAllChildModels() as $model) {
+      if ($morphans = $model::getOrphans($instances)) {
         $orphans[$model] = $morphans;
       }
-    /*
-    */
     }
     return $orphans;
   }
 
-  public static function getOrphans($parentStruct) {
+  /** The generic 'getOrphans' - but override in special PkModels */
+  public static function getOrphans($instances = false) {
+     $parentStruct = static::parentStructure();
+     //$pkModelTables = static::getAllPkModelsTables();
      $morphans = [];
      foreach (static::all() as $me) {
        $missings = [];
@@ -1978,21 +1999,34 @@ class $createclassname extends Migration {
          $pmodel = $parentRow['model'];
          $key = $parentRow['key'];
          if (!$me->$key) {
-           $missings[$key] = [$pmodel=>'NULL'];
+           $missings[$key] = ['parentmodel'=>$pmodel, 'parentkey'=>'NULL'];
          } else if (!$pmodel::find($me->$key)) {
-           $missings[$key] = [$pmodel => $me->$key];
+           $missings[$key] = ['parentmodel'=>$pmodel, 'parentkey' => $me->$key];
          }
        }
       if (!empty($missings)) {
-        $morphans[] = [$me->id,$missings];
+        if ($instances) {
+          $morphans[] = ['id'=>$me->id, 'orphan'=>$me, 'missings' => $missings];
+        } else {
+          $morphans[] = ['id'=>$me->id, 'missings' => $missings];
+        }
       }
      }
-     if (count($morphans)) return $morphans;
+     return $morphans;
   }
 
 
-  public static function isChildModel($pkModelTables) {
-    //$tables = array_values($pkModelTables);
+  /** The generic 'isChildModel' - but override in special PkModels */
+  public static function isChildModel() {
+    return static::parentStructure();
+  }
+
+  /** Default: Guesses parent / "owner" models by looking for all fields in 
+   * this model ending in "XXX_id", and looking for parent tables called XXXs
+   * returns false if none, or else parent struct array of ['model', 'table', 'key']
+   */
+  public static function parentStructure() {
+    $pkModelTables = static::getAllPkModelsTables();
     $fields = static::getFieldNames();
     $parentStruct = [];
     foreach ($fields as $field) {
@@ -2004,7 +2038,7 @@ class $createclassname extends Migration {
         }
       }
     }
-    if (count($parentStruct)) return $parentStruct;
+    return $parentStruct;
   }
 
 
