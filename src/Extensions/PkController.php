@@ -22,7 +22,7 @@
  */
 
 namespace PkExtensions;
-
+use Illuminate\Routing\Route;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
@@ -32,6 +32,7 @@ use PkExtensions\Models\PkModel;
 use PkExtensions\Traits\UtilityMethodsTrait;
 use Illuminate\Http\UploadedFile;
 use Request;
+use Route as RouteFacade;
 use \Exception;
 use \Closure;
 
@@ -506,5 +507,39 @@ abstract class PkController extends Controller {
 
 //Make sure the browser gets a 200 header
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT', true, 200);
+  }
+
+  /** Examines all the routes of a given 'type' that also have a 'desc' field,
+   * then builds a BS4 drop-down menu of those elements. Mainly for admin.
+   * @param type $type
+   * @param type $title
+   */
+  public static $type = null;
+  public static $title = null;
+  public static function menuFromRoutes($type=null,$title=null) {
+    if (!$type) {
+      $type = static::$type;
+    }
+    if (!$type) { #Don't know what to make 
+      return null;
+    }
+    if (!$title) {
+      $title = static::$title;
+    }
+    if (!$title) {
+      $title = ucfirst($type);
+    }
+
+    $routes = [];
+    foreach (RouteFacade::getRoutes() as $route) {
+      #The extra fields in the route are kept in the route->getAction() array
+      if (($route->getAction('type') === $type) && $route->getAction('desc')) {
+        $routes[] = $route;
+      }
+    }
+    if (!$routes) {
+      return null;
+    }
+    return PkMenuBuilder::Drop($title,$routes);
   }
 }

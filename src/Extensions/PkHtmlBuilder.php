@@ -65,6 +65,10 @@ class PkHtmlBuilder extends HtmlBuilder {
       return parent::linkRoute($name,$title,$parameters,$attributes);
     }
 
+    public function getRouteUrl($route, $params = []) {
+      return $this->url->route($route->getName(), $params);
+    }
+
     /**
      * If you defined extra attributes in the route definition, get them from name
      * @param string $attName

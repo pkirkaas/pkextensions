@@ -3,6 +3,7 @@
  * changes in one place
  */
 namespace PkExtensions;
+use Illuminate\Routing\Route;
 use \PkRenderer;
 use \PkHtml;
 
@@ -71,22 +72,31 @@ class PkMenuBuilder {
     $ps = new PartialSet();
     if (is_array($lnkarr)) {
       foreach ($lnkarr as $arr) {
-        $atts = keyVal($arr,2,[]);
-        if (ne_string($atts)) {
-          $atts = ['data-tootik'=>$atts];
+        if (! $arr instanceOf Route) { 
+          $atts = keyVal(2,$arr,[]);
+          if (ne_string($atts)) {
+            $atts = ['data-tootik'=>$atts];
+          }
+          $atts['href']=$arr[1];
+        } else { #It's a route
+          $route = $arr;
+          $arr = [$route->getAction('desc')];
+          $atts = ['href'=>PkHtml::getRouteUrl($route)];
         }
-        $atts['href']=$arr[1];
         $ps[]=$mb->adrop($arr[0], $atts);
       }
-    } else { #Assume already prepared
-      $ps[]=$lnkarr;
     }
     return $mb->lidrop([
       $mb->atoggle($label),
       $mb->divdrop($ps)]);
   }
 
-  public static function Link($label, $href, $opts=[]) {
+  public static function Link($label, $href=null, $opts=[]) {
+    if ($label instanceOf Route) {
+      $route = $label;
+      $label = $route->getAction('desc');
+      $href = $route->getUri();
+    }
     if (ne_string($opts)) {
       $opts = ['data-tootik' => $opts];
     }
