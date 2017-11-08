@@ -29,6 +29,13 @@ class PkHtmlBuilder extends HtmlBuilder {
     return parent::attributes($attributes);
   }
 
+    //public function image($url, $alt = null, $attributes = [], $secure = null)
+  public function image($url, $attributes = null, $secure = [], $alt = null) {
+    if (ne_string($attributes)) $attributes = ['class'=>$attributes];
+    if (!is_array($attributes)) $attributes = [];
+    if (!$secure) $secure = null;
+    return parent::image($url, $alt, $attributes, $secure);
+  }
 
   /** This will use the 'desc' key in the Route declaration as a default title for the link,
    * if $title === false (don't want to override default too much - but see
