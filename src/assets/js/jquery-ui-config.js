@@ -95,9 +95,9 @@ $(function () {
 $(function () {
   $('body').on('focus', 'input.timepicker.auto-attach', function (e) {
     $(this).timepicker({
-      timeFormat: 'h:i A',
-      minTime: '8AM',
-      maxTime: '10PM'
+      timeFormat: 'h:i',
+      minTime: '8',
+      maxTime: '22'
     });
   });
 });

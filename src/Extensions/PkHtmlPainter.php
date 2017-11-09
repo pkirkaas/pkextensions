@@ -661,6 +661,17 @@ class PkHtmlPainter extends PkHtmlRenderer {
     return PkRenderer::rawdiv($renderer,$this->cleanAttributes($wrapclass));
   }
 
+  /** Wrap an external URL appropriates - img or video - just trust the extension
+   * If link is dead, returns nothing. For now, just assumes img 
+   * @param mixed int|string|array $class 
+   * If string, used as the image class name. If array, presumed an array of 
+   * img element attributes. If integer, assumed the maximum width & height
+   * of the image in pixels, using 
+   */
+  public static function wrapMedia($url,$class) {
+    return "<img class='$class' src='$url'>";
+  }
+
   /** It makes a form based on options, but als passes back a PartialSet template that the 
    * calling function can then populate 
    */
