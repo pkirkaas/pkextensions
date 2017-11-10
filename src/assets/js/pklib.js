@@ -916,33 +916,66 @@ $(function () {
  *     <div class="image-desc">__TPL_PARAM2__</div>
  * </div>
  */
+$(function () {
+  $('body').on('click', '.shib2', function (event) {
+  });
+});
 
 $(function () {
-$('body').on('click', '.js-dialog-button, [data-dialog-encoded]', function (event) {
+$('body').on('click', '[data-dialogx], .shib2', function (event) {
+  console.log("I definitely got clicked, & my contents are");
+  var key = $(this).attr('data-dialogx');
+  console.log("The key value:", key, "Try to get the template next");
+  var fulltpl = $('script'+key);
+  console.log("Tpl is:",fulltpl);
+  var jqhtml = fulltpl.html();
+  console.log("jqhtml", jqhtml);
+  
+});
+});
+
+
+
+
+$(function () {
+$('body').on('click', '.js-dialog-button, [data-dialog], [data-dialog-encoded]', function (event) {
+    
+  console.log("we got clicked on by myrical");
   var dlgHtml = htmlDecode($(event.target).attr('data-dialog-encoded'));
   console.log("dlgHtml:", dlgHtml);
   if (!dlgHtml) {
-    var src = $(event.target).attr('data-dialog');
-    if (!src)
-      return;
-    var dlg = $('script.js-dialog-content[data-dialog="' + src + '"]');
+    var tplsel = $(event.target).attr('data-dialog'); //The selector for the dialog```
+    console.log("ypldry:",tplsel);
+    if (!tplsel) return;
+    var dlg = $('script'+tplsel);
+    if (!dlg.length) {
+      dlg = $('script.js-dialog-content[data-dialog="' + tplsel + '"]');
+    }
     if (dlg.length !== 0) {
       var dlgHtml = dlg.prop('innerHTML');
+      console.log('dlgHtml prop innerHRML', dlgHtml);
     } else {
-      dlg = $('.js-dialog-content[data-dialog="' + src + '"]');
+      console.log("Script + tplsel =[script"+tplsel+"]");
+      dlg = $('script'+tplsel);
+      if (dlg.length === 0) {
+        dlg = $('.js-dialog-content[data-dialog="' + tplsel + '"]');
+      }
       if (dlg.length === 0) {
         return;
       }
       var dlgHtml = dlg.prop('outerHTML');
+      console.log("Her dlgHTML is",dlgHtml);
     }
   }
+  console.log("htmlDecode got dcoded to:", htmlDecode);
   var param1 = htmlDecode($(event.target).attr('data-param1')) || '';
   var param2 = htmlDecode($(event.target).attr('data-param2')) || '';
   var param3 = htmlDecode($(event.target).attr('data-param3')) || '';
   dlgHtml = dlgHtml.replace(/__TPL_PARAM1__/g, param1);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM2__/g, param2);
   dlgHtml = dlgHtml.replace(/__TPL_PARAM3__/g, param3);
-  //console.log("After all the replacements, dlgHtml:",dlgHtml);
+  console.log("After all the replacements, dlgHtml:",dlgHtml);
+  //dlgHtml = htmlDecode(dlgHtm);
   dlg = $(dlgHtml);
   //opts.title = dlg.attr('data-title');
   var closeText = $(event.target).attr('data-closetext');
@@ -1055,6 +1088,7 @@ $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
   }
 });
 
+});
 /** A simple error report - popped up automatically on AJAX errors.
  * 
  * @param string msg - the error message
@@ -1151,6 +1185,7 @@ function makeDialog(selector, opts) {
  */
 
 /** To Pop Up a dialog box on Window Load, if it exists (Version 1. V2 below) */
+/*
   var dbx = $('.jqui-dlg-pop-load');
   if (!dbx.length)
     return;
@@ -1182,6 +1217,7 @@ function makeDialog(selector, opts) {
   console.log("In 'OLD' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
   $('.jqui-dlg-pop-load').dialog(dialogDefaults);
 });
+*/
 
 
 
@@ -1716,6 +1752,15 @@ VEventDispatcher = {
     Object.assign(Obj,ext);
     return Obj;
   }
+
+
+function getTemplateHtml(selector) {
+  var tpl;
+  if (! (tpl = $('script'+selector))) {
+    return false;
+  }
+  return tpl.html();
+}
 
 
 

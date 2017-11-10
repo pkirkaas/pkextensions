@@ -786,6 +786,12 @@ class PkHtmlRenderer extends PartialSet {
         $viewfile = $testpath;
         break;
       }
+      $testpath = $viewroot.'/'.$relview.'.html';
+     // pkdebug("testpath:  $testpath");
+      if (file_exists($testpath)) {
+        $viewfile = $testpath;
+        break;
+      }
       #Will this work with Blade templates?
       $testpath = $viewroot.'/'.$relview.'.blade.php';
       if (file_exists($testpath)) {
@@ -823,6 +829,32 @@ class PkHtmlRenderer extends PartialSet {
   #Alias for ->close()
   public function RENDERCLOSE() {
     return $this->closematch();
+  }
+
+  /** Just renders a template like above, but for convenience wraps in in
+   * script template tags, & gives it the ID of the last component of view
+   * @param type $view
+   * @param type $opts
+   */
+  public function renderXTpl($view,$opts = []) {
+    pkdebug("Input view: [$view]");
+    $idarr = explode('.',$view);
+    pkdebug("After explode:", $idarr);
+    $id = $idarr[count($idarr)-1];
+    $tplstr=$this->render($view,$opts);
+    pkdebug ("The template view [$view], the string:",$tplstr->__toString());
+    if (!$tplstr) throwerr("Couldn't find the template '$view'");
+    $outstr ="<script type='text/x-template' id='$id'>
+        $tplstr
+        </script>\n";
+    pkdebug("The out str: \n\n",$tplstr, 'outstr',$outstr);
+    return $outstr;
+    $ps = new PartialSet();
+    $ps[]="<script type='text/x-template' id='$id'>";
+    $ps[]=$tplstr;
+    $ps[]="</script>";
+    $ps->separator = "\n";
+    return $ps->__toString();
   }
 
 

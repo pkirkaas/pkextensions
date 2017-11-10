@@ -161,7 +161,13 @@ containing block needs to be positioned relatively*/
   flex-direction: column;
 }
 .f-center {
+  display: flex;
   justify-content: center;
+}
+
+.f-between {
+  display: flex;
+  justify-content: space-between;
 }
 /** Apply to the flex box */
 .flexalignstretch {align-items: stretch;}
