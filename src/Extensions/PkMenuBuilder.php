@@ -6,6 +6,7 @@ namespace PkExtensions;
 use Illuminate\Routing\Route;
 use \PkRenderer;
 use \PkHtml;
+use Illuminate\Support\HtmlString;
 
 /** Mostly builds drop & link li menu items. Like:
  * 
@@ -70,20 +71,23 @@ class PkMenuBuilder {
   public static function Drop($label, $lnkarr) {
     $mb = new static();
     $ps = new PartialSet();
-    if (is_array($lnkarr)) {
+    if (is_arrayish($lnkarr)) {
       foreach ($lnkarr as $arr) {
-        if (! $arr instanceOf Route) { 
+        if ($arr instanceOf Route) { 
+          $route = $arr;
+          $arr = [$route->getAction('desc')];
+          $atts = ['href'=>PkHtml::getRouteUrl($route)];
+          $ps[]=$mb->adrop($arr[0], $atts);
+        } else if (is_arrayish($arr)) {
           $atts = keyVal(2,$arr,[]);
           if (ne_string($atts)) {
             $atts = ['data-tootik'=>$atts];
           }
           $atts['href']=$arr[1];
-        } else { #It's a route
-          $route = $arr;
-          $arr = [$route->getAction('desc')];
-          $atts = ['href'=>PkHtml::getRouteUrl($route)];
+          $ps[]=$mb->adrop($arr[0], $atts);
+        } else { #It's a stringish link, with everything set
+          $ps[]=$arr;
         }
-        $ps[]=$mb->adrop($arr[0], $atts);
       }
     }
     return $mb->lidrop([
