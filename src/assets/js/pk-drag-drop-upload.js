@@ -20,7 +20,9 @@
  */
 $(function () {
   $('.drop-url').on('drop',function(e) {
-    console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData('text/html'));
+    e.preventDefault();
+    //console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData('text/html'));
+    console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData());
     var url = $(e.originalEvent.dataTransfer.getData('text/html')).filter('img').attr('src');
     if (!url) {
       return;
