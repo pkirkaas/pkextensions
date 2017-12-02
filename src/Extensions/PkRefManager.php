@@ -43,6 +43,59 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return [null=>'None'] + static::$refArr;
   }
 
+  /** Returns the $refArr as an array of <option>s - 
+   * The key of the refarr will the the option value,
+   * if the target of the key is scalar, that will be displayed
+   * in the option - BUT if the target is an array, the first
+   * value of the array will be the "option" contents, the second
+   * value of the array will be the tooltip/data-tootik
+   *@param boolean|string $null -
+     Include null as an option? TRUE for default, or string for custom message
+    @param $current - the current value if one is selected 
+   *@return array of strings like "<option value='1' title='A tip'>First</option>"
+   */
+  public static function getOptionList($null = false, $current = false) {
+    if ($null && !is_string(null)) {
+      $null = "None";
+    }
+
+    $ret = [];
+    if ($null) {
+      $ret[]="<option>$null</option>\n";
+    }
+    foreach (static::$refArr as $key => $target) {
+      if (is_array_idx($target)) {
+        $display=$target[0];
+        $tip = " title='$target[1]' ";
+      } else if (is_array_assoc($target)) {
+        $i=0;
+        foreach ($target as $tkey => $tval) {
+          if ($i === 0) {
+            $display = $tval;
+          } else if ($i===1) {
+            $tip = " $tkey='$tval' ";
+          } else {
+            break;
+          }
+        }
+      } else {
+        $display = $target;
+        $tip = '';
+      }
+      if ($current == $key) {
+        $selected = ' selected ';
+      } else {
+        $selected = '';
+      }
+      $ret[] = "<option value='$key' $selected $tip>$display</option>\n";
+    }
+    return $ret;
+  }
+
+
+
+
+
   /**Defaults to getRefArr, but if $merged, combines the
    * key & value in the select display, with $merged as the separator
    * @param boolean $null - include null value?
@@ -62,6 +115,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return [null=>'None'] + $refArr;
 
   }
+
+
 
 
   /** Really should ONLY use this, NOT getRefArr()!
@@ -118,9 +173,19 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return keyval($idx, static::getLabels());
   }
 
-  public static function displayValue($key = null) {
+  /** Returns the value for the key.
+   * @param $key - the key
+   * @param $raw - if true & the $value is an array, return the array
+   *   if false, just the first element of the value array.
+   * @return the value matching the key.
+   */
+  public static function displayValue($key = null, $raw = false) {
     $refArr = static::getKeyValArr(true);
-    return keyVal($key, $refArr, '');
+    $value = keyVal($key, $refArr);
+    if (is_array($value) && !$raw) {
+      $value = keyVal(0,array_values($value));
+    }
+    return $value;
   }
 
   public static function giveLabelAndValue($key, $idx) {

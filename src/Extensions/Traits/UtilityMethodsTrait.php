@@ -110,6 +110,7 @@ trait UtilityMethodsTrait {
    * @return Array: Merged array of hierarchy
    */
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
+    $retArr = [];
     $convert = function($arr) use ($idx) {
       if (is_string($idx)) {
         return normalizeConfigArray($arr); 
@@ -131,7 +132,9 @@ trait UtilityMethodsTrait {
     }
     //$fullRetArr[$class] = null;
     #First, build array of arrays....
-    $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
+    if (property_exists($class, $arrayName) && is_array($class::$$arrayName)) {
+      $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
+    }
     while ($par = get_parent_class($class)) {
       if (!property_exists($par, $arrayName) ||
          ($par::$$arrayName === false) ) {#If a parent wants stop accension
@@ -159,6 +162,13 @@ trait UtilityMethodsTrait {
   public static function getRequiredAtts() {
     return getAncestorArraysMerged('requiredAtts','config');
   }
+
+  public static function basename($lc = false) {
+    $bn = class_basename(static::class);
+    if ($lc) $bn = strtolower($bn);
+    return $bn;
+  }
+
 
   /** Does the data provided meet the requirements to create an instance
    * of this class?  Recurses up the ancestor tree to confirm.

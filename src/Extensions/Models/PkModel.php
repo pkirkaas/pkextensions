@@ -820,7 +820,7 @@ class $createclassname extends Migration {
 
   public static function getRelationClasses($relClasses = []) {
     //static $relationClasses = [];
-    foreach (static::$load_relations as $load_relation) {
+    foreach (static::getLoadRelations() as $load_relation) {
       if (!in_array($load_relation, $relClasses)) {
         $relClasses = array_merge($relClasses,[$load_relation],$load_relation::getRelationClasses($relClasses));
       }
@@ -844,7 +844,7 @@ class $createclassname extends Migration {
     }
 
     $sqlInsStr = $this->sqlInsertAttributes();
-    $relations = array_keys(static::$load_relations);
+    $relations = array_keys(static::getLoadRelations());
     foreach ($relations as $relation) {
       foreach ($this->$relation as $item) {
         $sqlInsStr.=$item->getSqlInserts();
@@ -874,7 +874,7 @@ class $createclassname extends Migration {
       pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
       return $tablesAndKeys; #Hope that takes care of cycles
     }
-    $relations = array_keys(static::$load_relations);
+    $relations = array_keys(static::getLoadRelations());
     foreach ($relations as $relation) {
       foreach ($this->$relation as $item) {
         $tablesAndKeys = $item->getTablesAndKeys($tablesAndKeys);
@@ -1039,8 +1039,10 @@ class $createclassname extends Migration {
   public static $load_relations = [ /* 'items' => 'App\Models\Item' */];
 
   /** Default, just returns the static setting.  */
-  public function getLoadRelations() {
-    return static::$load_relations;
+  public static function getLoadRelations() {
+    $classLoadRelations = static::getAncestorArraysMerged('load_relations');
+    $traitLoadRelations = static::getAncestorArraysMerged('_load_relations');
+    return array_merge($classLoadRelations, $traitLoadRelations);
   }
 
   /** For many to many edits. Needless to say, any changes/deletions stop at
@@ -1233,6 +1235,15 @@ class $createclassname extends Migration {
       if (!sizeof($keys)) $this->$relationName()->delete();
       else $this->$relationName()->whereNotIn($keyName, $keys)->delete();
     }
+    return true;
+  }
+
+  /** Very approximate - extended models should override this */
+  public function owns($item) {
+    if (!$item instanceOf PkModel) return false;
+    if (!$this->id || !$item->id) return false;
+    $ownerID = static::basename(true).'_id';
+    if ($this->id != $item->$ownerID) return false;
     return true;
   }
 
@@ -1940,7 +1951,7 @@ class $createclassname extends Migration {
   }
 
   public static $whichfields = ['id'];
-  /** Simple string to indetify the model/instance
+  /** For debugging - Simple string to identify the model/instance
    * 
    * @param array $fields - optional array of additional fields,
    * merged with class whichfields

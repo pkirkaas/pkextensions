@@ -1,0 +1,47 @@
+<-- A generic Vue Modal Template -->
+<style>
+.pk-modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.pk-modal-container {
+  border-radius: 1em;
+  width: 600px;
+  text-align: center;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #eba;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+  transition: all .3s ease;
+  font-family: Helvetica, Arial, sans-serif;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
+</style>
+<script type="text/x-template" id="base-vue-modal">
+  <div :class= "templateClass" v-show="show_modal">
+    <transition name="modal">
+      <div class="vue-modal-mask">
+        <div class="pk-modal-wrapper">
+          <div class="pk-modal-container">
+           <div :class="modalContentClass">
+
+
+           <slot></slot>
+
+
+
+          </div>
+        </div>
+        </div>
+        </div>
+    </transition>
+  </div>
+</script>
+

@@ -52,13 +52,17 @@ class PkCollection extends Collection {
   }
 
   public function which() {
-    return $this->getCustomAttributes();
+    $out = 'Class: '.get_class($this).":\n";
+    foreach ($this as $item) {
+      $out.="  {$item->which()}\n";
+    }
+    return $out;
   }
 
   public function getCustomAttributes($arg=[]) {
     $retarr = [];
     foreach ($this as $pkinst) {
-      $retarr[]=$pkinst->getCustomAttributes($arg);
+      $retarr[]=['class_type'=>get_class($pkinst)] + $pkinst->getCustomAttributes($arg);
     }
     return $retarr;
   }
