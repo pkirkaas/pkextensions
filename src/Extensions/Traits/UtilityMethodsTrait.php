@@ -163,9 +163,12 @@ trait UtilityMethodsTrait {
     return getAncestorArraysMerged('requiredAtts','config');
   }
 
-  public static function basename($lc = false) {
+  /**Gets the basename of the class, if $foreign key is true,
+   * returns the default foreign key table name used in the "many" side.
+   */
+  public static function basename($foreignkey = false) {
     $bn = class_basename(static::class);
-    if ($lc) $bn = strtolower($bn);
+    if ($foreignkey) $bn = Str::snake($bn)."_id";
     return $bn;
   }
 

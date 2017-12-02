@@ -17,8 +17,6 @@ Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
   Route::any('/orphans', ['as' => 'admin_orphans', 'uses' => 'AdminController@orphans',
       'type'=>'admin', 'desc'=>'Manage Orphans']);
 });
-
-
 //Non - admin roles
 Route::any('auth/logout', ['as' => 'auth_logout', 
       function() {
@@ -26,4 +24,8 @@ Route::any('auth/logout', ['as' => 'auth_logout',
         return redirect()->route('home');
       }
   ]);
+
+//Ajax Routes for common PkAjaxController
+Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
+
 });

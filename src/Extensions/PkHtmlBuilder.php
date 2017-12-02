@@ -18,10 +18,16 @@ class PkHtmlBuilder extends HtmlBuilder {
     if (is_array($attributes)) unset($attributes['name_prefix']);
 
     /** Automate using BS4 tether Tooltips */
-    if (is_array($attributes) && array_key_exists('tooltip', $attributes)) {
-      $attributes['data-toggle'] = 'tooltip';
-      $attributes['title'] = html_encode($attributes['tooltip']);
-      unset ($attributes['tooltip']);
+    if (is_array($attributes)) {
+        if(array_key_exists('tooltip', $attributes)) {
+          $attributes['data-toggle'] = 'tooltip';
+          $attributes['title'] = html_encode($attributes['tooltip']);
+          unset ($attributes['tooltip']);
+        }
+        if(array_key_exists('tootik', $attributes)) {
+          $attributes['data-tootik'] = html_encode($attributes['tootik']);
+          unset ($attributes['tootik']);
+        }
     }
     unset ($attributes['']);
     unset ($attributes[null]);
@@ -46,13 +52,16 @@ class PkHtmlBuilder extends HtmlBuilder {
    * @param type $attributes
    * @return type
    */
-    public function linkRoute($name, $title = null, $parameters = [], $attributes = [],
-        $escape=true) {
+    public function linkRoute($name, $title = false, $parameters = [], $attributes = [],
+        $escape=false) {
       if ($title === false) {
         $escape = false; #The title is coming from the router, trust it
         $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       }
-
+      $title = keyVal('img',$attributes,'').$title;
+      $title = keyVal('image',$attributes,'').$title;
+      unset($attributes['img']);
+      unset($attributes['image']);
       return $this->link($this->url->route($name, $parameters), $title, $attributes,null, $escape);
       //return parent::linkRoute($name,$title,$parameters, $attributes);
     }
@@ -62,14 +71,16 @@ class PkHtmlBuilder extends HtmlBuilder {
    * @param array $attributes - link attributes, class, data-tootik, etc
    * @return HTML Link
    */
-    public function linkRouteDefault($name,$parameters = [], $attributes = [], $title = null) {
+    public function linkRouteDefault(
+        $name,$parameters = [], $attributes = [], $title = null, $secure=null, $escape = false) {
       //if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       if (!$title) $title =  $this->attFromRoute('desc',$name);
       $tootik =  $this->attFromRoute('tootik',$name);
       if (!array_key_exists('data_tootik', $attributes) && $tootik) {
         $attributes['data-tootik']=$tootik;
       }
-      return parent::linkRoute($name,$title,$parameters,$attributes);
+      return $this->link($this->url->route($name, $parameters), $title, $attributes,$secure, $escape);
+      //return parent::linkRoute($name,$title,$parameters,$attributes);
     }
 
     public function getRouteUrl($route, $params = []) {

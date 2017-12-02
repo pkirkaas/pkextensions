@@ -837,17 +837,17 @@ class PkHtmlRenderer extends PartialSet {
    * @param type $opts
    */
   public function renderXTpl($view,$opts = []) {
-    pkdebug("Input view: [$view]");
+    //pkdebug("Input view: [$view]");
     $idarr = explode('.',$view);
-    pkdebug("After explode:", $idarr);
+    //pkdebug("After explode:", $idarr);
     $id = $idarr[count($idarr)-1];
     $tplstr=$this->render($view,$opts);
-    pkdebug ("The template view [$view], the string:",$tplstr->__toString());
+    //pkdebug ("The template view [$view], the string:",$tplstr->__toString());
     if (!$tplstr) throwerr("Couldn't find the template '$view'");
     $outstr ="<script type='text/x-template' id='$id'>
         $tplstr
         </script>\n";
-    pkdebug("The out str: \n\n",$tplstr, 'outstr',$outstr);
+    //pkdebug("The out str: \n\n",$tplstr, 'outstr',$outstr);
     return $outstr;
     $ps = new PartialSet();
     $ps[]="<script type='text/x-template' id='$id'>";

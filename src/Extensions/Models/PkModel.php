@@ -1242,7 +1242,7 @@ class $createclassname extends Migration {
   public function owns($item) {
     if (!$item instanceOf PkModel) return false;
     if (!$this->id || !$item->id) return false;
-    $ownerID = static::basename(true).'_id';
+    $ownerID = Str::snake(static::basename()).'_id';
     if ($this->id != $item->$ownerID) return false;
     return true;
   }
@@ -1936,6 +1936,16 @@ class $createclassname extends Migration {
     }
    */
 
+  /** Allow models to determine who can delete them */
+   function deletableBy($deleter) {
+     if (($deleter instanceOf PkUser) && $deleter->isAdmin()) {
+       return true;
+     }
+     if (($deleter instanceOf PkModel) && $deleter->owns($this)) {
+       return true;
+     }
+     return false;
+   }
   /** Return a route to delete this PkModel instance. 
    * 
    * @param string $baseroute
@@ -1949,6 +1959,40 @@ class $createclassname extends Migration {
     }
     return route($baseroute,$params);
   }
+
+  /** Provides the properties to include in any HTML element that will triger
+   * an AJAX delete - with supporting code in laravel-support.js
+   * @param boolean $cascade - should the delete cascade to the many possesions
+   */
+  public function ajaxDeleteProps($cascade = true, $delroute = "ajax_delete") {
+    $model = static::class;
+    $id = $this->id;
+    $url = route($delroute);
+    $atts = " class='ajax-delete' data-model='$model' data-id='$id'
+      data-url='$url' data-cascade='$cascade' ";
+    return $atts;
+  }
+
+  /** When you want to use either a PkModel instance or just it's ID as
+   * an argument to a method
+   * @param \PkExtensions\Models\PkModel $var
+   * @return type
+   */
+  public static function asid($var) {
+    if(!$var) return false;
+    if ($var instanceOf PkModel) {
+      return $var->id;
+    }
+    return to_int($var);
+  }
+  
+  /** The reverse of the above - takes an instance OR id, & returns the instance */
+  public static function asmodel($var) {
+    if (!$var) return false;
+    if ($var instanceOf static) return $var;
+    return static::find($var);
+  }
+
 
   public static $whichfields = ['id'];
   /** For debugging - Simple string to identify the model/instance

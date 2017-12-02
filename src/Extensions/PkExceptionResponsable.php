@@ -11,6 +11,7 @@ use Request;
 
 class PkExceptionResponsable extends PkException implements Responsable {
   public function render($request) {
+    pkdebug("Request:", $request);
     return redirect("/")->withError(new MessageBag(['error' => $this->getMessage()]));;
   }
 
