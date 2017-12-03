@@ -60,7 +60,9 @@ class PkHtmlBuilder extends HtmlBuilder {
       }
       $title = keyVal('img',$attributes,'').$title;
       $title = keyVal('image',$attributes,'').$title;
+      $escape = keyVal('escape',$attributes,$escape); #So escape can be an argument or attribute
       unset($attributes['img']);
+      unset($attributes['escape']);
       unset($attributes['image']);
       return $this->link($this->url->route($name, $parameters), $title, $attributes,null, $escape);
       //return parent::linkRoute($name,$title,$parameters, $attributes);

@@ -16,6 +16,7 @@ class PkExceptionResponsable extends PkException implements Responsable {
   }
 
   public function toResponse($request) {
+    pkdebug("Request:", $request);
     return $this->getMessage();
   }
 }

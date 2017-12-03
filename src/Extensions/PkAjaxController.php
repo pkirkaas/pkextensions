@@ -2,8 +2,9 @@
 namespace PkExtensions;
 use App\Models\User;
 use \PkExtenstions\Models\PkModel;
+use Illuminate\Http\Request;
 use \PkExtenstions\PkCollection;
-use \Request;
+use \Request as RequestFacade;
 use \Auth;
 
 /**
@@ -33,10 +34,11 @@ abstract class PkAjaxController extends PkController {
    * @param string|array $msg
    */
   public function success($msg = []) {
+    $jsonopts = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS;
     if (!is_array($msg)) {
       $msg=['success'=>$msg];
     }
-      die(json_encode($msg));
+      die(json_encode($msg, $jsonopts));
   }
 
   /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
@@ -90,7 +92,7 @@ abstract class PkAjaxController extends PkController {
         $res = $res->$method2($arg2);
       }
       return $res;
-    }
+    };
 
     #The onlything we really need is the model
     if (!$model || !is_subclass_of($model, PkModel::class, 1)) {
@@ -105,7 +107,7 @@ abstract class PkAjaxController extends PkController {
       }
     } else if ($id) { # $res is a model; if we have $id, we're looking for an instance
       $res = $getinstance($id);
-    } else {  We have a model, not an instance
+    } else {  //We have a model, not an instance
       $res = $model::$method($arg); #This should have given us an instance
       if ($method2) {
         $res = $res->$method2($arg2);
@@ -119,6 +121,46 @@ abstract class PkAjaxController extends PkController {
     return $this->success($res->getCustomAttributes());
   }
 
+  public function delete() { //Delete anything you own
+      return $this->error("You cant do that!");
+    $data = request()->all();
+    $model = keyVal('model', $data);
+    $id = to_int(keyVal('id', $data));
+    $cascade = keyVal('cascade', $data);
+    $me = Auth::user();
+    $item = $model::find($id);
+    if (!$me->owns($item)) {
+      return $this->error("Can't delete that $model");
+    }
+    $item->delete($cascade);
+    return $this->success("Deleted");
+  }
 
+  /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
+   * 
+   */
+  public function refinfo() {
+    $jsonopts = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS;
+    $data = request()->all();
+    $refclass = keyVal('refclass', $data); #Just the base Model name
+    $namespace = keyVal('namespace', $data, "App\\Models\\"); #Just the base Model name
+    $method = keyVal('method', $data,'getKeyValArr');
+    $arg  = keyVal('arg', $data);
+    $fullclass = $namespace.$refclass;
+    $res = $fullclas::$method($arg);
+    $json = json_encode($res, $jsonopts );
+    $fail = static::json_error();
+    if (!$fail) {
+      return $this->success($res);
+      return $this->success(['refs'=>$json]);
+    }
+    return $this->error($fail);
+  }
 
 }
+
+
+    
+
+
+

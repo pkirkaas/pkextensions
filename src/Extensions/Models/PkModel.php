@@ -1952,10 +1952,10 @@ class $createclassname extends Migration {
    * @param string $link - if present, return entire <a href...>$link</a>,
    * else just the URL to delete
    */
-  public function deleteRoute($baseroute = 'admin_deletemodel', $link='Delete') {
+  public function deleteRoute($baseroute = 'admin_deletemodel', $link='Delete',$attributes=[]) {
     $params = ['model'=>get_class($this), 'id'=>$this->id];
     if ($link) {
-      return PKHtml::linkRoute($baseroute,$link,$params);
+      return PKHtml::linkRoute($baseroute,$link,$params, $attributes);
     }
     return route($baseroute,$params);
   }

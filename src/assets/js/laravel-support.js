@@ -6,9 +6,10 @@ $(function () {
   });
   */
   $.ajaxSetup({ headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') } });
-
+console.log("At least loaded...");
   // Attach to delete buttons & delete with ajax
   $('body').on('click','.ajax-delete', function (event) {
+    console.log("We clicked!");
      return ajaxDeleteModel(
            $(this).attr('data-model'),
           $(this).attr('data-id'),
