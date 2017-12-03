@@ -14,7 +14,9 @@ Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
     return redirect()->back();
   }]);
 
-  Route::any('/orphans', ['as' => 'admin_orphans', 'uses' => 'AdminController@orphans',
+  Route::any('/orphans', ['as' => 'admin_orphans',
+   //function(){return view('admin.orphans');},
+      'uses' => 'AdminController@orphans',
       'type'=>'admin', 'desc'=>'Manage Orphans']);
 });
 //Non - admin roles

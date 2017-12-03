@@ -1674,7 +1674,16 @@ class $createclassname extends Migration {
     $relationAtts = $this->getRelationshipAttributes();
     $methodAtts = $this->getMethodAttributes($arg);
     $dvAtts = $this->getDisplayValueAttributes();
-    return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts);
+    $extraAtts = $this->getExtraAtts();
+    return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts, $extraAtts);
+  }
+
+  /** Does nothing, but derived classes might want to add extra details, like
+   * a real user name from a user_id
+   * @return array
+   */
+  public function getExtraAtts() {
+    return [];
   }
 
   /**

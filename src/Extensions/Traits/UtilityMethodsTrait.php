@@ -170,6 +170,9 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       }
       $class = $par;
     }
+    if (!count($retArr)) {
+      return [];
+    }
     #Now merge. Reverse order so child settings override ancestors...
     $retArr = array_reverse($retArr);
     $mgArr = call_user_func_array('array_merge', $retArr);

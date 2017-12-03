@@ -143,11 +143,11 @@ abstract class PkAjaxController extends PkController {
     $jsonopts = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS;
     $data = request()->all();
     $refclass = keyVal('refclass', $data); #Just the base Model name
-    $namespace = keyVal('namespace', $data, "App\\Models\\"); #Just the base Model name
+    $namespace = keyVal('namespace', $data, "App\\References\\"); #Just the base Model name
     $method = keyVal('method', $data,'getKeyValArr');
     $arg  = keyVal('arg', $data);
     $fullclass = $namespace.$refclass;
-    $res = $fullclas::$method($arg);
+    $res = $fullclass::$method($arg);
     $json = json_encode($res, $jsonopts );
     $fail = static::json_error();
     if (!$fail) {
@@ -155,6 +155,12 @@ abstract class PkAjaxController extends PkController {
       return $this->success(['refs'=>$json]);
     }
     return $this->error($fail);
+  }
+
+  /** Takes a JSON object with model, methods, parameters & returns the query 
+   * results as attributes. The request type should be:
+   */
+  public function query() {
   }
 
 }
