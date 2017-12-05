@@ -169,7 +169,8 @@ abstract class PkAjaxController extends PkController {
   public function query() {
     //$query = request()
     $data = request()->all();
-    $search = json_decode(keyVal('search', $data), 1);
+    //$search = json_decode(keyVal('search', $data), 1);
+    $search = keyVal('search', $data);
     $model = keyVal('model', $search);
     $builder = $model::where('id','>',0); #There is a better way to do this
     $filters = keyVal('filters', $search,[]);
@@ -181,12 +182,6 @@ abstract class PkAjaxController extends PkController {
     $result = $builder->get()->getCustomAttributes();
     return $this->success($result);
   }
-    
-
-    
-    //$query 
-  }
-
 }
 
 

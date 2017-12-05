@@ -29,5 +29,6 @@ Route::any('auth/logout', ['as' => 'auth_logout',
 
 //Ajax Routes for common PkAjaxController
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
+Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
 
 });
