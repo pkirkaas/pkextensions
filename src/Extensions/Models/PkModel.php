@@ -1675,7 +1675,7 @@ class $createclassname extends Migration {
     $methodAtts = $this->getMethodAttributes($arg);
     $dvAtts = $this->getDisplayValueAttributes();
     $extraAtts = $this->getExtraAtts();
-    return array_merge($dvAtts, $methodAtts, $relationAtts, $myAtts, $extraAtts);
+    return array_merge(['model'=>get_class($this)],$dvAtts, $methodAtts, $relationAtts, $myAtts, $extraAtts);
   }
 
   /** Does nothing, but derived classes might want to add extra details, like

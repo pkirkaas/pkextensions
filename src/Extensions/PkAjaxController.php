@@ -159,8 +159,32 @@ abstract class PkAjaxController extends PkController {
 
   /** Takes a JSON object with model, methods, parameters & returns the query 
    * results as attributes. The request type should be:
+   * 'search' => {model:model,
+   *  filters:[ 
+   *     [method:method, 
+   *        params:[params,...],
+   * }
+   * @return JSON of the ".getCustomAttributes()" of the result
    */
   public function query() {
+    //$query = request()
+    $data = request()->all();
+    $search = json_decode(keyVal('search', $data), 1);
+    $model = keyVal('model', $search);
+    $builder = $model::where('id','>',0); #There is a better way to do this
+    $filters = keyVal('filters', $search,[]);
+    foreach ($filters as $filter) {
+      $method = $filter['method'];
+      $params = $filter['params'];
+      $builder->$method(...$params);
+    }
+    $result = $builder->get()->getCustomAttributes();
+    return $this->success($result);
+  }
+    
+
+    
+    //$query 
   }
 
 }
