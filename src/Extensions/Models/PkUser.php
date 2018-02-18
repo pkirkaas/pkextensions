@@ -58,9 +58,12 @@ class PkUser extends PkModel
 
   public static $allowUpdate = 0; #To allow user registration/update 
 
+  /*
   public function setPasswordAttribute($password) { 
     return $this->attributes['password'] = Hash::make($password);
   }
+   * 
+   */
 
   /** Can be overridden - but basic try here */
   public function getName() {
