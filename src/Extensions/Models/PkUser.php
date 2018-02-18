@@ -71,6 +71,23 @@ class PkUser extends PkModel
     return $this->email;
   }
 
+  /** They keep messing with the process, so don't do anything by default.
+   * Just make it available & try to keep up & use when necessary.
+   * @param mixed $mixed - either a string or indexed array. 
+   * @return string or array - if $mixed is a string, returns the default hash
+   * of it as an encrypted password. If $mixed is an array, only if the array
+   * has a key/value of password, will this method hash ONLY the value of the
+   * password & return a copy of the array, with the password value hashed.
+   */
+  public static function hashPassword($mixed) {
+    if (is_string($mixed)) {
+      return Hash::make($mixed);
+    } else if (is_array($mixed) && array_key_exists('password', $mixed)) {
+      $mixed['password'] = Hash::make($mixed['password']);
+    }
+    return $mixed;
+  }
+
     
   public function isLoggedIn() {
     return $this->is(Auth::user());
