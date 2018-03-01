@@ -22,7 +22,8 @@
       "src/lib/PkExtensions.php",
       "src/lib/pklib.php",
       "src/lib/pkhtmlhelpers.php",
-      "src/lib/pkhelpers.php"
+      "src/lib/pkhelpers.php",
+      "src/lib/includes/tagconstants.php"
     ]
   }
 }

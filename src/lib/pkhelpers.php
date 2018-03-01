@@ -179,6 +179,76 @@ function hpure($input = '') {
   return $htmlpurifier->purify($input);
 }
 
+
+    /**
+     * Build an HTML attribute string from an array.
+     * @param array $attArr
+     * @return string
+     */
+function attArrToString ($attArr = null) {
+  if (!ne_array_assoc($attArr)) {
+    return '';
+  }
+  $html = " ";
+  foreach ( $attArr as $key => $value) {
+              $html .= attPair($key, $value)." ";
+  }
+  return " $html ";
+}
+  /**
+    * Build a single attribute element.
+    * @param string $key
+    * @param string $value
+    * @return string $key="htmlescaped value"
+    */
+  function attPair($key, $value) {
+    if (!ne_stringish($value) || !is_numeric($value)) {
+        return " $key ";
+    }
+    return " $key =" . html_encode($value,'"').' ';
+  }
+
+
+/**
+ * Makes an HTML dom element as a string. To  make it faster than the 
+ * more elaborate systems. Checks if the tag is a content tag or not,
+ * assumes the content has already been cleaned if necessary, applies the
+ * attributes, closes it & returns the HTML string.
+ * @param sting $tag: the tag - either content or self closing
+ * @param string|array|null $aorc1 - if self closing, the attributes of the el.
+ *    as an associative array, or If string, class
+ * @param string|null $aorc2 - if self closing, ignored. If tag is content tag,
+ *   then the atts.
+ * @return HTML String
+ */
+function makeEl($tag,$aorc1=null, $aorc2=null) {
+  if (!isTag($tag)) {
+    throw new Exception("In makeEl, tag not valid: $tag");
+  }
+  if (isContentTag($tag)) {
+    $content = '';
+    if (is_array($aorc1)) {
+      $aorc1 = implode("\n",$aorc1);
+    }
+    if (is_stringish($aorc1)) {
+      $content = $aorc1;
+    }
+    $atts = $aorc2;
+  } else {
+    $atts = $aorc1;
+  }
+  if (ne_string($atts)) {
+    $atts = ['class'=>$atts];
+  } else if (!is_array_assoc($atts)) {
+    $atts = [];
+  }
+  $retstr = "<$tag ". attArrToString($atts).">"; 
+  if (isContentTag($tag)) {
+    $retstr.="$content</$tag>";
+  }
+  return $retstr;
+}
+
 function makeStyleLinks($relPaths = null) {
   if (!$relPaths) $relPaths = \Config::get('view.relcsspaths');
   if (is_string($relPaths)) $relPaths = [$relPaths];

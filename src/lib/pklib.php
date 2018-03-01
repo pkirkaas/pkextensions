@@ -3291,6 +3291,10 @@ function ne_string($var) {
   return $var && is_string($var) && strlen($var);
 }
 
+function ne_array_assoc($var) {
+  return $var && is_array_assoc($var) && count($var);
+}
+
 function ne_array($var) {
   return $var && is_array($var) && count($var);
 }
