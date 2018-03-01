@@ -408,7 +408,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * Returns a URL based on the filename and Laravel default public upload dir
    * Override in site specific controllers to make a default, eg,
    * <pre>
-   * public static function getUrlFromUploadedFilename($filename, $default = '/gulped/img/default-avatar.png') {
+   * public static function getUrlFromUploadedFilename($filename, $default = '/mixed/img/default-avatar.png') {
    *   return parent::getUrlFromUploadedFilename($filename, $default);
    * }
    * </pre>

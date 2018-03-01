@@ -13,7 +13,7 @@ $user = Auth::user();
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Lato">
     <title>{{SITE_NAME}}</title>
-    <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">
+    <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
     <script>
       // Only Chrome & Opera pass the error object.
       window.onerror = function (message, file, line, col, error) {
@@ -84,7 +84,7 @@ $user = Auth::user();
       */ ?>
 
     </div> <!-- Close main container fluid -->
-    <script language="javascript" src="{{asset('/gulped/js/scripts.js')}}"></script>
+    <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
   </body>
 </html>
 

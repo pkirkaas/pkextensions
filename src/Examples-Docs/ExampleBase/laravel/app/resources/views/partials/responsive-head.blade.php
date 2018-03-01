@@ -10,7 +10,7 @@ if (empty($extraClass)) $extraClass = '';
 <div class="row resp-head">
   <div class="col-md-3 hidden-sm-down head-img-col head-col">
     <div class="head-img-wrapper">
-      <img class="head-img img-fluid" src="{{asset('gulped/img/sbc-logo.png')}}">
+      <img class="head-img img-fluid" src="{{asset('mixed/img/sbc-logo.png')}}">
     </div>
   </div>
   <div class="col-md-9 col-sm-12 head-slug head-col {{$extraClass}}">
