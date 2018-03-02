@@ -3287,6 +3287,10 @@ function is_number($val) {
   return false;
 }
 
+function ne_stringish($var) {
+  return $var && is_stringish($var) && strlen($var.'');
+}
+
 function ne_string($var) {
   return $var && is_string($var) && strlen($var);
 }

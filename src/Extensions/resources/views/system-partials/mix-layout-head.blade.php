@@ -28,6 +28,7 @@ use PkExtensions\PopAtts;
         console.log(e.error.message, "from", e.error.stack);
       });
     </script>
+    <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
     <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
     <!--
     -->
