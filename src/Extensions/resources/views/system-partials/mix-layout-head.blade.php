@@ -9,15 +9,19 @@ use PkExtensions\PopAtts;
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel='stylesheet' href='/mixed/fonts/google-fonts.css' />
+    <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
+    <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
     <?php /*
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700|Roboto:400,700|Raleway:400,600,700"
           rel="stylesheet">
      */?>
     <title>{{SITE_NAME}}</title>
-    <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">
+    <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
     <!--
+    <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">
     <link href="{{ asset('/mixed/css/sassed.css') }}" rel="stylesheet">
     -->
+      <?php /*
     <script>
       // Only Chrome & Opera pass the error object.
       window.onerror = function (message, file, line, col, error) {
@@ -28,8 +32,8 @@ use PkExtensions\PopAtts;
         console.log(e.error.message, "from", e.error.stack);
       });
     </script>
-    <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
-    <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
+       * 
+       */ ?>
     <!--
     -->
     {!!PopAtts::jsInit()!!}

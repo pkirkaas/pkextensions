@@ -95,7 +95,7 @@ $(function () {
 $(function () {
   $('body').on('focus', 'input.timepicker.auto-attach', function (e) {
     $(this).timepicker({
-      timeFormat: 'h:i',
+      timeFormat: 'H:i',
       minTime: '8',
       maxTime: '22'
     });
