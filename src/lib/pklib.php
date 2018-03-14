@@ -221,7 +221,7 @@ function pkdebug() {
  * Not top priority now - but useful for DB logging
  * 
  * TODO: This version only for calling from within a LOG class - not general
- * functon yet.
+ * function yet.
  * @return assoc array - file, line, function, method, etc.
  * 
  */
@@ -267,6 +267,98 @@ function getCallingFrame($baseFile = null) {
   return $retinfo;
 }
 
+/** Another attempt to get the calling frame */
+function callingFrame2($file = null) {
+  $stack = debug_backtrace();
+  $retvals = [];
+  $keys = ['file', 'class', 'object', 'function', 'line', 'args'];
+  $uninteresting =
+      ['pkdebug','pkdebug_base','call_user_func_array', __FILE__, '', $file];
+  foreach ($stack as $aframe) { #Set line at the first interesting
+    if (in_array(keyVal('file',$aframe), $uninteresting, 1)) {
+      continue;
+    }
+    return $aframe;
+    /*
+    foreach ($keys as $key) {
+      $tst = keyVal($key, $aframe);
+      if (!keyVal($key, $retvals) && $tst &&
+          !in_array($tst, $uninteresting) && ($key !== 'line')) {
+        $retvals[$key] = $tst;
+        if (!keyVal('line', $retvals) && keyVal('line', $aframe)) {
+          $retvals['line'] = keyVal('line', $aframe);
+        }
+      }
+    }
+     */
+  }
+  return null;
+}
+
+/** $exclusions are an array of the form:
+ * 
+    ['file'=>__FILE__,'line'=>__LINE__,
+ *  'class'=>__CLASS_, 'function' => __FUNCTION__];
+ * @param type $exclusions
+ * @return type
+ */
+function callingFrame($exclusions) {
+  $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+  $retvals = [];
+  //$keys = ['file', 'class', 'object', 'function', 'line', 'args'];
+  //$keys = ['file', 'class', 'object', 'function', 'line',];
+  $allskip = ['',null];
+  $fuskip = array_merge(['pkdebug','pkdebug_base','call_user_func_array',
+      __FUNCTION__, keyVal('function',$exclusions)] , $allskip);
+  $fiskip = array_merge([__FILE__, keyVal('file',$exclusions)] , $allskip);
+  $lskip = array_merge([__LINE__,keyVal('line',$exclusions)],$allskip);
+  $cskip = array_merge([__CLASS__,keyVal('class',$exclusions)],$allskip);
+  //PC::debug(['fuskip'=>$fuskip,'fiskip'=>$fiskip,'lskip'=>$lskip,'cskip'=>$cskip]);
+  foreach ($stack as $aframe) { #Set line at the first interesting
+   // PC::debug(['aframe'=>$aframe]);
+    if (!keyVal('file',$retvals)) {
+      if (!in_array(keyVal('file',$aframe),$fiskip, 1)) {
+        $retvals['file'] = keyVal('file',$aframe);
+      }
+    }
+    if (!keyVal('class',$retvals)) {
+      if (!in_array(keyVal('class',$aframe),$cskip, 1)) {
+        $retvals['class'] = keyVal('class',$aframe);
+      }
+    }
+    if (!keyVal('line',$retvals)) {
+      if (!in_array(keyVal('line',$aframe),$lskip, 1)) {
+        $retvals['line'] = keyVal('line',$aframe);
+      }
+    }
+    if (!keyVal('function',$retvals)) {
+      if (!in_array(keyVal('function',$aframe),$fuskip, 1)) {
+        $retvals['function'] = keyVal('function',$aframe);
+      }
+    }
+  }
+  return $retvals;
+}
+function callingFrame3($file = null) {
+  $stack = debug_backtrace();
+  $retvals = [];
+  $keys = ['file', 'class', 'object', 'function', 'line', 'args'];
+  $uninteresting =
+      ['pkdebug','pkdebug_base','call_user_func_array', __FILE__, '', $file];
+  foreach ($stack as $aframe) { #Set line at the first interesting
+    foreach ($keys as $key) {
+      $tst = keyVal($key, $aframe);
+      if (!keyVal($key, $retvals) && $tst &&
+          !in_array($tst, $uninteresting) && ($key !== 'line')) {
+        $retvals[$key] = $tst;
+        if (!keyVal('line', $retvals) && keyVal('line', $aframe)) {
+          $retvals['line'] = keyVal('line', $aframe);
+        }
+      }
+    }
+  }
+  return $retvals;
+}
 /**
  * Returns the (unlimited) args as a string, arg strings as strings,
  * array and obj args as var_dumps.
@@ -279,8 +371,8 @@ function pkdebug_base() {
   if (PkLibConfig::getSuppressPkDebug()) return null;
   $stack = debug_backtrace();
   $retvals = [];
-  $keys = ['file', 'object', 'function', 'line', 'args'];
-  $uninteresting = ['pkdebug', 'pkdebug_base', 'call_user_func_array', __FILE__];
+  $keys = ['file', 'class', 'object', 'function', 'line', 'args'];
+  $uninteresting = ['pkdebug','pkdebug_base','call_user_func_array', __FILE__, ''];
   foreach ($stack as $aframe) { #Set line at the first interesting
     foreach ($keys as $key) {
       $tst = keyVal($key, $aframe);
