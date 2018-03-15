@@ -828,6 +828,17 @@ class $createclassname extends Migration {
     $uv = array_unique($relClasses);
     return $uv;
   }
+
+  public static function getAttributeCollectionNames() {
+    return array_keys(static::getLoadRelations());
+  }
+
+  public static function getRelationalClass($relclass) {
+    if (in_array($relclass, static::getRelationalClasses(),1)) {
+      return $relclass;
+    }
+    return null;
+  }
   /**
    * For generating backup SQL files of the current instance.
    *  Gets the inserts for the current instance, then recursively for all its

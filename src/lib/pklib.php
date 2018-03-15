@@ -339,6 +339,31 @@ function callingFrame($exclusions) {
   }
   return $retvals;
 }
+
+$starttime = 0;
+$startframe = [];
+function startTime($msg=null) {
+  if (ne_string($msg)) {
+    $msg = ['startmsg' => $msg];
+  } else {
+    $msg = [];
+  }
+  global $starttime, $startframe; 
+  $starttime = time();
+  $startframe = $msg + callingFrame(['function'=>__FUNCTION__]);
+}
+function endTime($msg=null) {
+  if (ne_string($msg)) {
+    $msg = ['endmsg' => $msg];
+  } else {
+    $msg = [];
+  }
+  global $starttime, $startframe;
+  $interval = time() - $starttime ." seconds";
+  $endframe = $msg + callingFrame(['function'=>__FUNCTION__]);
+  $data = ['start'=>$startframe, 'end'=>$endframe, 'interval'=>$interval];
+  pkdebugOut(print_r($data,1));
+}
 function callingFrame3($file = null) {
   $stack = debug_backtrace();
   $retvals = [];
@@ -564,9 +589,7 @@ function pkcatchecho($runnable) {
  * @param type $disableXdebug
  * @return type
  */
-function pkvardump($arg, $disableXdebug = true) {
-  $useVarDump = true;
-  $useVarDump = false;
+function pkvardump($arg, $disableXdebug = true, $useVarDump=true) {
   ini_set('html_errors', 0);
   ini_set('xdebug.overload_var_dump', 0);
   if ($useVarDump || (is_object($arg) && method_exists($arg, '__debuginfo' ))) {

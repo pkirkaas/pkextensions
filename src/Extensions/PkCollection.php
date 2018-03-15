@@ -59,6 +59,29 @@ class PkCollection extends Collection {
     return $out;
   }
 
+  /** This will combine collections of shared collections 
+   * Like, users have clients, client have appointments, appointments have payments
+   * Silly that Users->client->appointments->payments can't all combine
+   * @param type $key - the colletion name - like "appointments" for appointment
+   * @return typeWe have several models in the model type collection with same models
+   */
+  public function __get($key) {
+    $type = $this->type();
+    $typecollections = $type::getAttributeCollectionNames();
+    if (!in_array($key,$typecollections, 1)) {
+      return parent::__get($key);
+    }
+    $joinedcollections= new static();
+    foreach ( $this as $item) {
+      $joinedcollections = $joinedcollections->merge($item->$key);
+    }
+    return $joinedcollections;
+  }
+    
+  public function type() {
+    return $this->getQueueableClass();
+  }
+
   public function getCustomAttributes($arg=[]) {
     $retarr = [];
     foreach ($this as $pkinst) {
