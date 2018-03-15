@@ -99,7 +99,7 @@ function ajaxerror($msg) {
   die(json_encode(['error'=>$msg]));
 } 
 
-function ajaxsuccess($msg) {
+function ajaxsuccess($msg, $code = 200) {
   if (!is_array($msg)) {
     $msg = ['value'=>$msg];
   }

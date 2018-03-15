@@ -5,6 +5,8 @@ use \PkExtenstions\Models\PkModel;
 use Illuminate\Http\Request;
 use \PkExtenstions\PkCollection;
 use \Request as RequestFacade;
+//use \Illuminate\Http\Response;
+
 use \Auth;
 
 /**
@@ -33,13 +35,29 @@ abstract class PkAjaxController extends PkController {
    * will arrify it, json it, & die
    * @param string|array $msg
    */
-  public function success($msg = []) {
-    $jsonopts = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS;
+
+    //return response()->json($data = [], $status = 200, array $headers = [], $options = 0);
+  public function jsonsuccess($msg = [], $status=200, $headers=[],
+      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
     if (!is_array($msg)) {
-      $msg=['success'=>$msg];
+      $msg=['data'=>$msg];
     }
-      die(json_encode($msg, $jsonopts));
+    return response()->json($msg, $status, $headers, $options);
   }
+
+  public function jsonerror($msg = [], $status=500,
+      $headers=['HTTP/1.1 499 Custom AJAX Request Error Message'],
+      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
+    if ($msg instanceOf \Exception) {
+      $msg = $msg->__toString;
+    }
+    if (!is_array($msg)) {
+      $msg=['error'=>$msg];
+    }
+    return response()->json($msg, $status, $headers, $options);
+  }
+
+    
 
   /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
    * sets the response code to 499 - my custom error code, handled by jQuery
