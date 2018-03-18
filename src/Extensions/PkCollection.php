@@ -59,6 +59,15 @@ class PkCollection extends Collection {
     return $out;
   }
 
+  public function pkpluck ($value, $key = null) {
+    $plucked = $this->pluck($value, $key);
+    pkdebug("Plucked:", $plucked);
+    return $plucked;
+    //return $this->pluck($value, $key);
+  }
+
+
+
   /** This will combine collections of shared collections 
    * Like, users have clients, client have appointments, appointments have payments
    * Silly that Users->client->appointments->payments can't all combine
