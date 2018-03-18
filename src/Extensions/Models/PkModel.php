@@ -2118,6 +2118,21 @@ class $createclassname extends Migration {
   }
 
 
+  /** Gets instance (if ID), & checks if user is authed, & returns */
+  public static function authInstance($instance) {
+    if (is_scalar($instance)) {
+      $instance = static::find($instance);
+    }
+    if (!$instance instanceOf PkModel) {
+      throw new Exception("Bad arg for authIntance");
+    }
+    if (!$instance->authUpdate()) {
+      throw new Exception ("Not authorized");
+    }
+    return $instance;
+  }
+
+
 
 
   //  This section for diagonosing the current DB
