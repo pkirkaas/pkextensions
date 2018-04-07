@@ -340,7 +340,11 @@ function yesnonull($arg) {
   return '';
 }
 
-
+## Multiple functions to implement pkview
+######  Extend the laravel view helper to include other file types, but 
+# using same view syntax
+# If want to look for vue html templates, include the vue template path 
+# in config/view.php
 #########  For . separated view names, look for a real file
 function getPossibleViewFiles($name) {
   return array_map(function ($extension) use ($name) {
@@ -364,7 +368,8 @@ function view_path($name) {
 }
 
 function pkview($name) {
-  return include (view_path($name));
+  //return include (view_path($name));
+   include (view_path($name));
 }
 
 
