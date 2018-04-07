@@ -35,6 +35,7 @@ use Request;
 use Route as RouteFacade;
 use \Exception;
 use \Closure;
+use \Auth;
 
 abstract class PkController extends Controller {
   use UtilityMethodsTrait;
@@ -47,6 +48,11 @@ abstract class PkController extends Controller {
    * layout (or wherever). Can be called from any controller method.
    * @param string $msg
    */
+
+  public function __construct($args = null) {
+    $this->me =Auth::User();
+  }
+  public $me;
 
   public static function addErrorMsg($msg) {
     if (!static::$errorMsgBag instanceOf MessageBag) {

@@ -310,20 +310,20 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .height#{$sz} {height: $offset !important;}
     .minh#{$sz}, .minh-#{$sz},  .min-height#{$sz} {min-height: $offset !important;}
     .maxh#{$sz}, .maxh-#{$sz},   .max-height#{$sz} {max-height: $offset !important;}
-    .width#{$sz} {width: $offset !important;}
-    .w#{$sz} {width: $offset !important;}
+    .width#{$sz}, .w#{$sz}  {width: $offset !important;}
+    
     .hw#{$sz}, .wh#{sz} {width: $offset !important; height: $offset !important;}
     .minw#{$sz}, .minw-#{$sz}, .min-width#{$sz} {min-width: $offset !important;}
     .maxw#{$sz}, .maxw-#{$sz}, .max-width#{$sz} {max-width: $offset !important;}
     //Paddings
     //REM
-    .p-r#{$sz}, .pad-r#{$sz} { padding-right: $offset !important; }
-    .p-l#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }
-    .p-t#{$sz}, .pad-t#{$sz} { padding-top: $offset !important; }
-    .p-b#{$sz}, .pad-b#{$sz} { padding-bottom: $offset !important; }
-    .p-v#{$sz}, .pad-v#{$sz} { padding-top: $offset !important; padding-bottom: $offset !important; }
-    .p-h#{$sz}, .pad-h#{$sz} { padding-left: $offset !important; padding-right: $offset !important; }
-    .p#{$sz}, .pad#{$sz} { padding: $offset !important; }
+    .p-r#{$sz}, .pr#{$sz}, .pad-r#{$sz} { padding-right: $offset !important; }
+    .p-l#{$sz}, .pl#{$sz}, .pad-l#{$sz} { padding-left: $offset !important; }
+    .p-t#{$sz}, .pt#{$sz}, .pad-t#{$sz} { padding-top: $offset !important; }
+    .p-b#{$sz}, .pb#{$sz}, .pad-b#{$sz} { padding-bottom: $offset !important; }
+    .p-v#{$sz}, .pv#{$sz}, .pad-v#{$sz} { padding-top: $offset !important; padding-bottom: $offset !important; }
+    .p-h#{$sz}, .ph#{$sz}, .pad-h#{$sz} { padding-left: $offset !important; padding-right: $offset !important; }
+    .p#{$sz}, .p#{$sz}, .pad#{$sz} { padding: $offset !important; }
 
     //EM
     .pe-r#{$sz}, .pade-r#{$sz} { padding-right: $eoffset !important; }
@@ -336,36 +336,36 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
     //Margins
     //REM
-    .m-r#{$sz}, .marg-r#{$sz} { margin-right: $offset !important; }
-    .m-l#{$sz}, .marg-l#{$sz} { margin-left: $offset !important; }
-    .m-t#{$sz} , .marg-t#{$sz} { margin-top: $offset !important; }
-    .m-b#{$sz} , .marg-b#{$sz} { margin-bottom: $offset !important; }
-    .m-v#{$sz}, .marg-v#{$sz} { margin-top: $offset !important; margin-bottom: $offset !important; }
-    .m-h#{$sz}, .marg-h#{$sz} { margin-right: $offset !important; margin-left: $offset !important; }
+    .m-r#{$sz},.mr#{$sz}, .marg-r#{$sz} { margin-right: $offset !important; }
+    .m-l#{$sz},.ml#{$sz}, .marg-l#{$sz} { margin-left: $offset !important; }
+    .m-t#{$sz},.mt#{$sz}, .marg-t#{$sz} { margin-top: $offset !important; }
+    .m-b#{$sz},.mb#{$sz}, .marg-b#{$sz} { margin-bottom: $offset !important; }
+    .m-v#{$sz},.mv#{$sz}, .marg-v#{$sz} { margin-top: $offset !important; margin-bottom: $offset !important; }
+    .m-h#{$sz},.mh#{$sz}, .marg-h#{$sz} { margin-right: $offset !important; margin-left: $offset !important; }
 
-    .m-r-#{$sz}, .marg-r-#{$sz} { margin-right: -$offset !important; }
-    .m-l-#{$sz}, .marg-l-#{$sz} { margin-left: -$offset !important; }
-    .m-t-#{$sz}, .marg-t-#{$sz} { margin-top: -$offset !important; }
-    .m-b-#{$sz}, .marg-b-#{$sz} { margin-bottom: -$offset !important; }
-    .m-v-#{$sz}, .marg-v-#{$sz} { margin-top: -$offset !important; margin-bottom: -$offset !important; }
-    .m-h-#{$sz}, .marg-h-#{$sz} { margin-right: -$offset !important; margin-left: -$offset !important; }
+    .m-r-#{$sz}, .mr-#{$sz}, .marg-r-#{$sz} { margin-right: -$offset !important; }
+    .m-l-#{$sz}, .ml-#{$sz}, .marg-l-#{$sz} { margin-left: -$offset !important; }
+    .m-t-#{$sz}, .mt-#{$sz}, .marg-t-#{$sz} { margin-top: -$offset !important; }
+    .m-b-#{$sz}, .mb-#{$sz}, .marg-b-#{$sz} { margin-bottom: -$offset !important; }
+    .m-v-#{$sz}, .mv-#{$sz}, .marg-v-#{$sz} { margin-top: -$offset !important; margin-bottom: -$offset !important; }
+    .m-h-#{$sz}, .mh-#{$sz}, .marg-h-#{$sz} { margin-right: -$offset !important; margin-left: -$offset !important; }
 
     .m#{$sz}, .marg#{$sz} { margin: $offset !important; }
 
     //EM
-    .me-r#{$sz}, .marge-r#{$sz} { margin-right: $eoffset !important; }
-    .me-l#{$sz}, .marge-l#{$sz} { margin-left: $eoffset !important; }
-    .me-t#{$sz} , .marge-t#{$sz} { margin-top: $eoffset !important; }
-    .me-b#{$sz} , .marge-b#{$sz} { margin-bottom: $eoffset !important; }
-    .me-v#{$sz}, .marge-v#{$sz} { margin-top: $eoffset !important; margin-bottom: $offset !important; }
-    .me-h#{$sz}, .marge-h#{$sz} { margin-right: $eoffset !important; margin-left: $eoffset !important; }
+    .me-r#{$sz}, .mer#{$sz}, .marge-r#{$sz} { margin-right: $eoffset !important; }
+    .me-l#{$sz}, .mel#{$sz}, .marge-l#{$sz} { margin-left: $eoffset !important; }
+    .me-t#{$sz}, .met#{$sz}, .marge-t#{$sz} { margin-top: $eoffset !important; }
+    .me-b#{$sz}, .meb#{$sz}, .marge-b#{$sz} { margin-bottom: $eoffset !important; }
+    .me-v#{$sz}, .mev#{$sz}, .marge-v#{$sz} { margin-top: $eoffset !important; margin-bottom: $offset !important; }
+    .me-h#{$sz}, .meh#{$sz}, .marge-h#{$sz} { margin-right: $eoffset !important; margin-left: $eoffset !important; }
 
-    .me-r-#{$sz}, .marge-r-#{$sz} { margin-right: -$eoffset !important; }
-    .me-l-#{$sz}, .marge-l-#{$sz} { margin-left: -$eoffset !important; }
-    .me-t-#{$sz}, .marge-t-#{$sz} { margin-top: -$eoffset !important; }
-    .me-b-#{$sz}, .marge-b-#{$sz} { margin-bottom: -$eoffset !important; }
-    .me-v-#{$sz}, .marge-v-#{$sz} { margin-top: -$eoffset !important; margin-bottom: -$eoffset !important; }
-    .me-h-#{$sz}, .marge-h-#{$sz} { margin-right: -$eoffset !important; margin-left: -$eoffset !important; }
+    .me-r-#{$sz}, .mer-#{$sz}, .marge-r-#{$sz} { margin-right: -$eoffset !important; }
+    .me-l-#{$sz}, .mel-#{$sz}, .marge-l-#{$sz} { margin-left: -$eoffset !important; }
+    .me-t-#{$sz}, .met-#{$sz}, .marge-t-#{$sz} { margin-top: -$eoffset !important; }
+    .me-b-#{$sz}, .meb-#{$sz}, .marge-b-#{$sz} { margin-bottom: -$eoffset !important; }
+    .me-v-#{$sz}, .mev-#{$sz}, .marge-v-#{$sz} { margin-top: -$eoffset !important; margin-bottom: -$eoffset !important; }
+    .me-h-#{$sz}, .meh-#{$sz}, .marge-h-#{$sz} { margin-right: -$eoffset !important; margin-left: -$eoffset !important; }
 
     .me#{$sz}, .marge#{$sz} { margin: $eoffset !important; }
   }
@@ -560,6 +560,7 @@ $base-header-color: #400 !default;
 $base-header-ib: #004 !default;
 $base-header-ir: #400 !default;
 
+// Making site headers - 
 .sh, .shr, .shb, .shib, .shir {
   font-size: $base-header-font-size;
   @extend .montserrat;
