@@ -1,7 +1,7 @@
 <?php
 namespace PkExtensions;
 use App\Models\User;
-use \PkExtenstions\Models\PkModel;
+use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
 use \PkExtenstions\PkCollection;
 use \Request as RequestFacade;
@@ -114,7 +114,7 @@ abstract class PkAjaxController extends PkController {
 
     #The onlything we really need is the model
     if (!$model || !is_subclass_of($model, PkModel::class, 1)) {
-      pkdebug("Error: Model: '$model', ID:",$id);
+      pkdebug("Error: Model: '$model', ID:",$id, "PkModel:", PkModel::class);
       return $this->error("Invalid Model [$model]");
     }
     if ($ids && is_string($ids)) {
