@@ -367,10 +367,39 @@ function view_path($name) {
   throw new \Exception("View [$name] not found.");
 }
 
-function pkview($name) {
-  //return include (view_path($name));
-   include (view_path($name));
+/** NOW can pass parameters!
+*/
+function pkview($name, $params=[], $print = true ) {
+  if (! $file= view_path($name)) {
+    return false;
+  }
+  /*
+  if (!$params) {
+    $output = include($file);
+    if ($print) {
+      echo $output;
+    }
+    return;
+  }
+  */
+  if ($params && !is_array_assoc($params)) {
+    throw new PkException('$params in pkview must be an associative array!');
+  }
+  $XXX_output = null;
+  if (is_array($params)) {
+    extract($params);
+  }
+  ob_start();
+  include ($file);
+  $XXX_output = ob_get_clean();
+  if ($print) {
+    echo $XXX_output;
+  } else {
+    return $XXX_output;
+  }
 }
+
+
 
 
 ###########   For uploaded files, get paths, URLs, defaults, etc

@@ -24,6 +24,10 @@ use PkExtensions\PopAtts;
       window.addEventListener("error", function (e) {
         console.log(e.error.message, "from", e.error.stack);
       });
+      if (window.axios) {
+         window.axios.defaults.headers.common['X-CSRF-TOKEN'] = 
+         document.querySelector('meta[name="csrf-token"]').getAttribute('content'); 
+      }
     </script>
     <script language="javascript" src="{{asset('/gulped/js/scripts.js')}}"></script>
     <!--
