@@ -21,6 +21,12 @@ $inner-border-spread: 1px !default;
 }
 
 
+// Depends on jQuery removing this class when loaded!
+.hide-until-loaded {
+  display: none !important;
+}
+
+
 .overflowauto, .overflow-auto {overflow:auto;}
 
 .top-square-corners { border-top-left-radius: 0px ! important; border-top-right-radius: 0px ! important; }

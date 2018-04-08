@@ -1762,5 +1762,7 @@ function getTemplateHtml(selector) {
   return tpl.html();
 }
 
-
-
+/** Removes display none after load */
+$(function () {
+  $(".hide-until-loaded").removeClass('hide-until-loaded');
+});
