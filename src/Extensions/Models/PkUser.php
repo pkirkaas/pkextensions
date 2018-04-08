@@ -189,6 +189,25 @@ class PkUser extends PkModel
       return $user;
     }
 
+    /** Gets the logged in user, if none, returns
+     *  false or throws exception
+     * @param boolean $throw - Throw if not logged in? Default true
+     * @return User|boolean
+     * @throws PkException
+     */
+    public static function me($throw = true) {
+      $me = Auth::user();
+      if (!static::instantiated($me)) {
+        if ($throw) {
+          throw new PkException("Not Logged In");
+        } else {
+          return false;
+        }
+      }
+      return $me;
+    }
+
+
 
 
 }
