@@ -30,7 +30,7 @@ abstract class PkAjaxController extends PkController {
     }
   }
 
-  /** An AJAX controller just has to call $this->success($msg);
+  /** An AJAX controller just has to call $this->jsonsuccess($msg);
    * If it's a complicated msg, send an array; else a string. This
    * will arrify it, json it, & die
    * @param string|array $msg
@@ -132,11 +132,11 @@ abstract class PkAjaxController extends PkController {
       }
     }
     if (!$res) {
-      return $this->success([]);
+      return $this->jsonsuccess([]);
     }
     #$res should be a PKModel or PkCollection of PkModels
     //pkdebug("The Res Atts:",$res->getCustomAttributes());
-    return $this->success($res->getCustomAttributes());
+    return $this->jsonsuccess($res->getCustomAttributes());
   }
 
   public function delete() { //Delete anything you own
@@ -151,7 +151,7 @@ abstract class PkAjaxController extends PkController {
       return $this->error("Can't delete that $model");
     }
     $item->delete($cascade);
-    return $this->success("Deleted");
+    return $this->jsonsuccess("Deleted");
   }
 
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
@@ -169,8 +169,8 @@ abstract class PkAjaxController extends PkController {
     $json = json_encode($res, $jsonopts );
     $fail = static::json_error();
     if (!$fail) {
-      return $this->success($res);
-      return $this->success(['refs'=>$json]);
+      return $this->jsonsuccess($res);
+      return $this->jsonsuccess(['refs'=>$json]);
     }
     return $this->error($fail);
   }
@@ -198,7 +198,7 @@ abstract class PkAjaxController extends PkController {
       $builder->$method(...$params);
     }
     $result = $builder->get()->getCustomAttributes();
-    return $this->success($result);
+    return $this->jsonsuccess($result);
   }
 }
 
