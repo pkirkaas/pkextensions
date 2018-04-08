@@ -87,7 +87,7 @@ abstract class PkAjaxController extends PkController {
    */
   public function attributes() {
     $data = request()->all();
-    pkdebug("Data:",$data);
+    //pkdebug("Data:",$data);
     $model = keyVal('model', $data);
     $method = keyVal('method', $data);
     $arg = keyVal('arg', $data);

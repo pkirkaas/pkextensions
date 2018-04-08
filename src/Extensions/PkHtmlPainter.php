@@ -625,16 +625,21 @@ class PkHtmlPainter extends PkHtmlRenderer {
 
   /** Make a BS4 menu drop list - w. a base route, & array of Models to select from.
    * @param string $baseRoute - the base route name to use, adding the id's of the models
+        if null, $params must have ['routemethod'=> modelmethod, ...
+          to generate the route. 
    * @param array of models $models - the models to build the full routes from
    * @param string|array $attLabel - a model attribute name or array of att names
    *   to build the label from
    * @param array $params - any extra parameters
    * @return HTML string of BS4 DropMenu items
    */
-  public function mkBsDropList($baseRoute,$attLabel,Array $models=[], $params=[]) {
+  public function mkBsDropList($baseRoute=null,$attLabel=null, $models=[], $params=[]) {
     $links = new PartialSet();
+    $nodropwrap = keyVal('nodropwrap', $params);
     $tootikstr = $tootik = keyVal('tootik',$params,'');
-    $links[]="<div class='dropdown-menu'>\n";
+    if (!$nodropwrap) {
+      $links[]="<div class='dropdown-menu'>\n";
+    }
     foreach ($models as $model) {
       if (is_callable($tootik)) {
         $tootikstr = $tootik($model);
@@ -648,12 +653,20 @@ class PkHtmlPainter extends PkHtmlRenderer {
         $label .= $model->$attName.' ';
       }
       //$route = route($baseRoute,[$mid]);
-      $route = route($baseRoute,[$model]);
+      if ($routemethod = keyVal('routemethod', $params)) {
+        $route = $model->$routemethod();
+      } else {
+        $route = route($baseRoute,[$model]);
+      }
+
+
                 //<a class='dropdown-item' href='{{route('user_editaccount')}}'>Account</a>
       $links[]="<a class='dropdown-item' data-tootik='$tootikstr'
         data-tootik-conf='right' href='$route'>$label</a>\n";
     }
-    $links[]="</div>\n";
+    if (!$nodropwrap) {
+      $links[]="</div>\n";
+    }
     return $links;
   }
 

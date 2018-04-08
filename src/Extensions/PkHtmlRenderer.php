@@ -750,20 +750,25 @@ class PkHtmlRenderer extends PartialSet {
    * @param array|string $defaults, if equivalent key not set in attributes.
    *   Again, $defaults can be string, then converted to $defaults=['class'=>$defaults]
    * @param $required - The $defaults are REPLACED by the other att, required is combined
+   * @param $deftype - string - default 'class': if $attributes is a string, what is it?
+   * Default is 'class', but could be 'data-tootik', for example
    */
-  public function cleanAttributes($attributes, $defaults=null, $required=null) {
+  public function cleanAttributes($attributes, $defaults=null, $required=null, $defatt='class') {
+    return static::scleanAttributes($attributes, $defaults, $required, $defatt);
+  }
+  public static function scleanAttributes($attributes, $defaults=null, $required=null, $defatt='class') {
     if (is_array_indexed($attributes)) {
       $attributes = implode (' ', $attributes);
     }
-    if (is_string($attributes)) $attributes = ['class' => $attributes];
-    if (is_string($required)) $required = ['class' => $required];
+    if (is_string($attributes)) $attributes = [$defatt => $attributes];
+    if (is_string($required)) $required = [$defatt => $required];
     if (!is_array_assoc($attributes)) $attributes = [];
     if (!is_array_assoc($required)) $required = [];
     $atts = merge_attributes($attributes, $required);
     if (!$defaults) {
       return $atts;
     }
-    $defaults = $this->cleanAttributes($defaults);
+    $defaults = static::scleanAttributes($defaults);
     return array_merge($defaults, $atts);
   }
 

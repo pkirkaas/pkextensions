@@ -5,6 +5,7 @@
 namespace PkExtensions;
 use Illuminate\Routing\Route;
 use \PkRenderer;
+use PkExtensions\PkHtmlRenderer;
 use \PkHtml;
 use Illuminate\Support\HtmlString;
 
@@ -64,11 +65,13 @@ class PkMenuBuilder {
   /** Makes a single link item drop-down with labels & links
    * 
    * @param string $label - What the top menu li category should be
-   * @param arrray $lnkarr array of labels, href, & optatts,
+   * @param array $lnkarr array of labels, href, & optatts,
+   * @param $atts array|string - optional atts for top item - if string, assume tootik
    * [[$label, $href, $optarr],[$label,$href , $optattar]]
    * If $optarr exists & is a string, assumed to be data-tootik
    */
-  public static function Drop($label, $lnkarr) {
+  public static function Drop($label, $lnkarr, $optatts=[]) {
+
     $mb = new static();
     $ps = new PartialSet();
     if (is_arrayish($lnkarr)) {
@@ -90,9 +93,10 @@ class PkMenuBuilder {
         }
       }
     }
+    $optatts = PkRenderer::cleanAttributes($optatts,[],[],'data-tootik');
     return $mb->lidrop([
       $mb->atoggle($label),
-      $mb->divdrop($ps)]);
+      $mb->divdrop($ps)], $optatts);
   }
 
   public static function Link($label, $href=null, $opts=[]) {
@@ -138,4 +142,34 @@ class PkMenuBuilder {
     }
     return $this->ps->__toString();
   }
+
+  // Now do for AJAX menu data
+  /**
+    Just make single menu list item, with direct link, or dropdown items.
+@param $label - string - what it should be called
+    @param $links - string for direct link, or else an array, means it's a
+      drop-down
+    @param $latts - array | string - optional - attributes for the LI - if string, tootik
+    @param $aatts - array | string - attributes for the a link 
+  **/
+
+/*
+  public function alijson($label, $links, $latts = [], $aatts = []) {
+    if (is_arrayish($links) { // Have to build dropdown
+      $ddlist = new PartialSet();
+      foreach ($links as $dditem) { 
+        #$dditem array of ['label'=>, 'href'=>, 'atts'=>string|ass arr ]
+        $dditem['atts'= keyVal('atts',$dditem,[]);
+        if (is_stringish(keyVal('atts',$dditem)) {
+          $dditem['atts'] = ['data-tootik' => $dditem['atts']];
+        }
+        $ddlist[] = $dditem;
+      }
+        
+
+    }
+  }
+
+  public function ajaxdropdown(
+  */
 }
