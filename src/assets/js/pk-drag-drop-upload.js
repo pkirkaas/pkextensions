@@ -190,6 +190,7 @@ $(function () {
       appendObjectToFormdata(formData, params);
 
       $(this).addClass('ajax-loader');
+      console.log("Trying to upload file w. ajax url:",url);
       $.ajax({
         url: url,
         type: "POST",
@@ -198,6 +199,7 @@ $(function () {
         cache: false,
         processData: false,
         success: function (data) {
+          console.log ("Seems like we succeeded upload w. data:",data);
           $(me).removeClass('ajax-loader');
           VEventDispatcher.trigger('fileUploaded', data.success);
           //$(me).html(data);
@@ -205,9 +207,12 @@ $(function () {
       }).done(function (data) {
         $(me).removeClass('ajax-loader');
       }).always(function (data) {
+        console.log("Trying to drag & drop, data:", data);
         $(me).removeClass('ajax-loader');
+          VEventDispatcher.trigger('fileUploaded', 'avatar');
       });
     });
+    console.log("Exiting ddupload");
   };
 
 

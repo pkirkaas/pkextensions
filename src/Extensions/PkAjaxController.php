@@ -15,6 +15,7 @@ use \Auth;
  */
 abstract class PkAjaxController extends PkController {
   public $data;
+  public $jsonopts = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES; 
   public $me;
   public function __construct() {
     if (method_exists(get_parent_class(),'__construct')) {
@@ -38,11 +39,12 @@ abstract class PkAjaxController extends PkController {
 
     //return response()->json($data = [], $status = 200, array $headers = [], $options = 0);
   public function jsonsuccess($msg = [], $status=200, $headers=[],
-      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
+      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES) {
     if (!is_array($msg)) {
       $msg=['data'=>$msg];
     }
-    return response()->json($msg, $status, $headers, $options);
+    pkdebug("Success, msg:",$msg); 
+    response()->json($msg, $status, $headers, $options);
   }
 
   public function jsonerror($msg = [], $status=500,

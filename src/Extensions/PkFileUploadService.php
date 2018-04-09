@@ -98,7 +98,7 @@ class PkFileUploadService {
       //pkdebug("file: ", $file);
       return false;
     }
-    return processfile($this->file,$validationStr,$params);
+    return $this->processfile($this->file,$validationStr,$params);
   }
 
   public function processfile($file, $validationStr = null, $params = null) {
