@@ -44,8 +44,11 @@ $(function () {
  *  AND for Laravel Validation errors 
  */
 $(function () {
+  /*
   $(document).ajaxError(function (event, jqxhr, settings, error) {
-    console.log("Event:", event, "jqxhr", jqxhr, 'settings', settings, 'error', error);
+    var j = jqxhr;
+    console.log('jQuery thinks there was an AJAX error? Status:', jqxhr.status, "Event:", event, "jqxhr", jqxhr, 'settings', settings, 'error', error, {response:j.response, responseType:j.responseType,
+      respURL:j.responseURL,headers:j.getAllResponseHeaders()});
     if (jqxhr.status == 499) { // It's a custom error message
       console.log("We got the 499");
       var msg = jqxhr.responseJSON.error;
@@ -63,6 +66,7 @@ $(function () {
       return;
     }
   });
+  */
  });
 
 // Make 'Confirm' Dialog

@@ -102,9 +102,10 @@ class PkFileUploadService {
   }
 
   public function processfile($file, $validationStr = null, $params = null) {
-    pkdebug("in processFile - file:", $file, "THIS",$this);
+    //pkdebug("in processFile - file:", $file, "THIS",$this);
     $this->file = $file;
-    if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
+    if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) // || !$this->file->isValid()
+        ) {
       //pkdebug("file: ", $file);
       return false;
     }
@@ -132,16 +133,22 @@ class PkFileUploadService {
       $reldir = '';
     }
     //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
+    /*
     if ($validationStr) {
       //$validator = Validator::make($request->all(), [$ctlname => $validationStr]);
-      $validator = Validator::make(['file'=>$this->file], ['file' => $validationStr]);
-      $validator->validate();
+      //$validator = Validator::make(['file'=>$this->file], ['file' => $validationStr]);
+      //$validator->validate();
       //PkValidator::validate($request,[$ctlname=>$validationStr]);
     }
+     * *
+     */
     $this->path = base_path('storage/app/' . $this->file->store('public' . $reldir));
+    /**
     if ((PkUploadModel::smimeMainType($this->file->getMimeType()) === 'image') && $this->resize) {
       $this->resize($resize);
     }
+     * 
+     */
     $ret = ['relpath' => $reldir . basename($this->path),
         'mimetype' => $this->file->getMimeType(),
         'type' => $this->typekey,

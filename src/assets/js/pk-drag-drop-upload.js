@@ -143,13 +143,6 @@ $(function () {
           return;
         }
         //var ifiles = this.files;
-
-        //console.log("The selected items:",this.files,'ifiles',ifiles);
-        /*
-        for (var i = 0, len = this.files.length; i < len; i++) {
-        console.log("File " + i, this.files[i], this.files.item(i));
-        }
-        */
         //$(me).trigger('drop', this.files);
         var onclick = 'onClk';
         $(me).trigger('drop', [this.files, onclick]);
@@ -190,7 +183,17 @@ $(function () {
       appendObjectToFormdata(formData, params);
 
       $(this).addClass('ajax-loader');
-      console.log("Trying to upload file w. ajax url:",url);
+      console.log("Trying to upload file w. ajax url:",url, "Wnd form data:",formData);
+      
+
+      axios.post(url,formData)
+        .then(function(response) { console.log("success wth response: ",response);})
+        .catch(function(response) { console.log("BIG FAILURE wth response: ",response);})
+;
+
+
+
+      /** Try with Axios...
       $.ajax({
         url: url,
         type: "POST",
@@ -204,18 +207,27 @@ $(function () {
           VEventDispatcher.trigger('fileUploaded', data.success);
           //$(me).html(data);
         }
-      }).done(function (data) {
+      }).done(function (data, d2, d3) {
+        var j=data;
+        console.log("Succedded to drag & drop, data:",
+          data, 'd2', d2, 'd3', d3,
+          {response:j.response,  responseType:j.responsType});
         $(me).removeClass('ajax-loader');
-      }).always(function (data) {
-        console.log("Trying to drag & drop, data:", data);
+        VEventDispatcher.trigger('fileUploaded', 'avatar');
+      }).fail(function (data, d2, d3) {
+        var j = data;
+        console.log("Failed to drag & drop,respdata:",
+          data, 'd2', d2, 'd3', d3,
+          {response:j.response,  responseType:j.responseType, url:url, formData:formData});
         $(me).removeClass('ajax-loader');
-          VEventDispatcher.trigger('fileUploaded', 'avatar');
+        VEventDispatcher.trigger('fileUploaded', 'avatar');
       });
     });
     console.log("Exiting ddupload");
+  };*/
+
+  });
   };
-
-
-
+  
 });
 

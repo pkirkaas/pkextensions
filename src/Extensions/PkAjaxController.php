@@ -14,9 +14,10 @@ use \Auth;
  * @author pkirk
  */
 abstract class PkAjaxController extends PkController {
-  public $data;
+//  public $data;
   public $jsonopts = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES; 
-  public $me;
+ // public $me;
+  /*
   public function __construct() {
     if (method_exists(get_parent_class(),'__construct')) {
       parent::__construct();
@@ -30,6 +31,8 @@ abstract class PkAjaxController extends PkController {
       }
     }
   }
+   * *
+   */
 
   /** An AJAX controller just has to call $this->jsonsuccess($msg);
    * If it's a complicated msg, send an array; else a string. This
@@ -44,7 +47,25 @@ abstract class PkAjaxController extends PkController {
       $msg=['data'=>$msg];
     }
     pkdebug("Success, msg:",$msg); 
-    response()->json($msg, $status, $headers, $options);
+    return response()->json($msg, $status, $headers, $options);
+  }
+  /**
+   */
+  public function xjsonsuccess($msg = []) {
+    http_response_code(200); 
+    if (!is_array($msg)) {
+      if (!is_scalar($msg)) {
+        pkdebug("Bad Message:",$msg);
+        $msg=['success'=>'true', 'error'=>"Message Type"];
+      } else {
+        $msg=['data'=>$msg];
+      }
+    }
+    if (!is_array($msg)) {
+      pkdebug("Bad Message:",$msg);
+      $msg=['success'=>'true', 'error'=>"Message Type"];
+    }
+    die(json_encode($msg,$this->jsonopts));
   }
 
   public function jsonerror($msg = [], $status=500,

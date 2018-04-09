@@ -373,15 +373,6 @@ function pkview($name, $params=[], $print = true ) {
   if (! $file= view_path($name)) {
     return false;
   }
-  /*
-  if (!$params) {
-    $output = include($file);
-    if ($print) {
-      echo $output;
-    }
-    return;
-  }
-  */
   if ($params && !is_array_assoc($params)) {
     throw new PkException('$params in pkview must be an associative array!');
   }
