@@ -182,13 +182,21 @@ $(function () {
 
       appendObjectToFormdata(formData, params);
 
-      $(this).addClass('ajax-loader');
-      console.log("Trying to upload file w. ajax url:",url, "Wnd form data:",formData);
+      $(me).addClass('ajax-loader');
+     // console.log("Trying to upload file w. ajax url:",url, "Wnd form data:",formData);
       
 
       axios.post(url,formData)
-        .then(function(response) { console.log("success wth response: ",response);})
-        .catch(function(response) { console.log("BIG FAILURE wth response: ",response);})
+        .then(function(response) { 
+          var atype = response.data.success;
+          console.log("success wth response: ",response, "Type:", atype);
+          $(me).removeClass('ajax-loader');
+          VEventDispatcher.trigger('fileUploaded', atype);
+      })
+        .catch(function(response) { 
+          console.log("BIG FAILURE wth response: ",response);
+          $(me).removeClass('ajax-loader');
+      })
 ;
 
 
