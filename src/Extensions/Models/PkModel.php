@@ -1909,7 +1909,7 @@ class $createclassname extends Migration {
      * @param string|null $typedClass - the class to build, default PkTypedUploadModel
      */
   public function addTyped($attname, Array $filedata, $typedClass=null, $hasone=false) {
-    pkdebug("Adding typed, attname: [$attname], fdata:", $filedata);
+    //pkdebug("Adding typed, attname: [$attname], fdata:", $filedata);
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
     }
@@ -1920,12 +1920,12 @@ class $createclassname extends Migration {
         //'owner_id'=>$this->id,
         'att_name' => $attname,
         ];
-    pkdebug("Creating typed, fdata:",$filedata);
+    //pkdebug("Creating typed, fdata:",$filedata);
     //$current = $this->$attname;
     $prefd = $filedata;
     $filedata = $typedClass::canCreate($filedata);
     if ($filedata === false) {
-      pkdebug("Data validation to create [$typedClass] failed for data:", $pref);
+     // pkdebug("Data validation to create [$typedClass] failed for data:", $pref);
       return false;
     }
     if ($hasone) {

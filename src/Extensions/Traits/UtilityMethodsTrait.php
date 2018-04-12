@@ -396,7 +396,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
      }
      $fullpath = base_path('storage/app/public/' . $path);
      if (file_exists($fullpath)) {
-       pkdebug("The file exists at: [$fullpath]");
+       //pkdebug("The file exists at: [$fullpath]");
        return $fullpath;
      } else {
        return false;
