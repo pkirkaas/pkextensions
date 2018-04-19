@@ -768,7 +768,7 @@ class PkHtmlRenderer extends PartialSet {
     if (!$defaults) {
       return $atts;
     }
-    $defaults = static::scleanAttributes($defaults);
+    $defaults = static::scleanAttributes($defaults, null, null, $defatt);
     return array_merge($defaults, $atts);
   }
 

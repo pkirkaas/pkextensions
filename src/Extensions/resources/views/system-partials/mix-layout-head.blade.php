@@ -11,6 +11,9 @@ use PkExtensions\PopAtts;
     <link rel='stylesheet' href='/mixed/fonts/google-fonts.css' />
     <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
     <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
+    <!--
+    Oddly, the below causes errors in the above...
+    -->
     <script language="javascript" src="{{asset('/mixed/js/vscripts.js')}}"></script>
     <?php /*
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700|Roboto:400,700|Raleway:400,600,700"
