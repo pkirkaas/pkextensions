@@ -28,7 +28,7 @@ CSS / Styling that when used together create effects, like tooltips, liking some
   position: relative;
   background-color: white;
   opacity: 1;
-  z-index: 5000;
+  z-index: 10;
 }
 .drop-after:hover + .drop-hover,
 .drop-in:hover .drop-hover {
