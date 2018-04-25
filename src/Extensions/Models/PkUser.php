@@ -199,7 +199,7 @@ class PkUser extends PkModel
       if (! (ne_string($ident) && ne_string($password))) {
         return false;
       }
-      foreach ($static::$idents as $field) {
+      foreach (static::$idents as $field) {
         $try = static::where($field,$ident)->first();
         if (!$try instanceOf static) {
           continue;
@@ -231,6 +231,15 @@ class PkUser extends PkModel
         throwerr("No valid user");
       }
       return $user;
+    }
+
+    /** Returns the ID of the authenticated user, else false */
+    public static function id() {
+      $user = Auth::user();
+      if ($user instanceof static) {
+        return $user->id;
+      }
+      return false;
     }
 
     /** Gets the logged in user, if none, returns
