@@ -34,20 +34,28 @@ abstract class PkAjaxController extends PkController {
    * *
    */
 
-  /** An AJAX controller just has to call $this->jsonsuccess($msg);
+  /** An AJAX controller just has to call $this->jsonsuccess($resp);
+   * jsonsucess will return an assoc array, typically:
+   * ['success'=>true, 'msg'=>$msg, 'data'=>$data]
+   * If $resp is a string, it will be the msg. If $resp is array,
+   * success=>true will be added, unless it already is a key. Any 
+   * data the caller wants should be keyed by 'data'
    * If it's a complicated msg, send an array; else a string. This
    * will arrify it, json it, & die
-   * @param string|array $msg
+   * @param string|array $resp
+   * 
+   * This way, we can set up automatic handlers if we like
    */
 
     //return response()->json($data = [], $status = 200, array $headers = [], $options = 0);
-  public function jsonsuccess($msg = [], $status=200, $headers=[],
+  public function jsonsuccess($resp = [], $status=200, $headers=[],
       $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES) {
-    if (!is_array($msg)) {
-      $msg=['data'=>$msg];
+    if (!is_array($resp)) {
+      $resp=['msg'=>$resp];
     }
-    pkdebug("Success, msg:",$msg); 
-    return response()->json($msg, $status, $headers, $options);
+    $resp['status'] = keyVal('status',$resp,true);
+    pkdebug("Success, resp:",$resp); 
+    return response()->json($resp, $status, $headers, $options);
   }
   /**
    */
@@ -63,21 +71,22 @@ abstract class PkAjaxController extends PkController {
     }
     if (!is_array($msg)) {
       pkdebug("Bad Message:",$msg);
-      $msg=['success'=>'true', 'error'=>"Message Type"];
+      $msg=['success'=>true, 'error'=>"Message Type"];
     }
     die(json_encode($msg,$this->jsonopts));
   }
 
-  public function jsonerror($msg = [], $status=500,
+  public function jsonerror($resp = [], $status=500,
       $headers=['HTTP/1.1 499 Custom AJAX Request Error Message'],
       $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
-    if ($msg instanceOf \Exception) {
-      $msg = $msg->__toString;
+    if ($resp instanceOf \Exception) {
+      $resp = $resp->__toString;
     }
-    if (!is_array($msg)) {
-      $msg=['error'=>$msg];
+    if (!is_array($resp)) {
+      $resp=['msg'=>$resp];
     }
-    return response()->json($msg, $status, $headers, $options);
+    $resp['status'] = keyVal('status',$resp,false);
+    return response()->json($resp, $status, $headers, $options);
   }
 
     

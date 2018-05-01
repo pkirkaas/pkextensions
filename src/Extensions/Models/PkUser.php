@@ -42,7 +42,7 @@ class PkUser extends PkModel
         'password', 'remember_token',
     ];
   public static $table_field_defs = [
-      'name' => ['type'=>'string', 'methods'=>'nullable'],
+      'name' => ['type'=>'string', 'methods'=>['nullable','unique']],
       'email' => ['type' => 'string', 'methods' => 'unique'],
       'password' =>  ['type'=>'string', 'methods'=>'nullable'],
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
@@ -86,6 +86,10 @@ class PkUser extends PkModel
       $mixed['password'] = Hash::make($mixed['password']);
     }
     return $mixed;
+  }
+
+  public function pwdMatch($pwd) {
+    return $this->password === static::hashPassword(trim($pwd));
   }
 
     
@@ -170,9 +174,49 @@ class PkUser extends PkModel
       return $user;
     }
 
+    /** Allow a user to log in, with either name or email, & 
+     * $password
+     * @param string|array $ident - if string, look for users with
+     * either that name or that email. If array, assoc,
+     * ['ident'=>$ident,'password'=>$password]
+     * @param string|null $password
+     * @return - either logged in user, or false
+     * TODO: Disallow emails as user names, require emails
+     * to be valid - so we don't risk dups
+     */
+
+    /** Default identifying fields, subclasses can change -
+     *  like phone number
+     * @var array 
+     */
+    public static $idents = ['name','email'];
+    public static function tryLogin($ident, $password=null, $remember=null) {
+      if (is_array($ident)) {
+        $password = keyVal('password',$ident);
+        $remember = keyVal('remember',$ident);
+        $ident = keyVal('ident',$ident);
+      }
+      if (! (ne_string($ident) && ne_string($password))) {
+        return false;
+      }
+      foreach (static::$idents as $field) {
+        $try = static::where($field,$ident)->first();
+        if (!$try instanceOf static) {
+          continue;
+        }
+        if ($try->pwdMatch($password)) {
+          return $try->login($remember); 
+        } else {
+          return false;
+        }
+      }
+      return false;
+    }
+
     /** Log in the user - remember if remeber - true */
     public function login($remember = false) {
       Auth::login($this,$remember);
+      return $this;
     }
 
     /** Verifies $user exists, or gets the logged in user, or throws
@@ -187,6 +231,15 @@ class PkUser extends PkModel
         throwerr("No valid user");
       }
       return $user;
+    }
+
+    /** Returns the ID of the authenticated user, else false */
+    public static function id() {
+      $user = Auth::user();
+      if ($user instanceof static) {
+        return $user->id;
+      }
+      return false;
     }
 
     /** Gets the logged in user, if none, returns
