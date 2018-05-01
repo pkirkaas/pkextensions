@@ -223,6 +223,17 @@ abstract class PkAjaxController extends PkController {
     $result = $builder->get()->getCustomAttributes();
     return $this->jsonsuccess($result);
   }
+
+
+  /** Verifies Authentication of alread logged in user, or logs
+   * in, or declines
+   */
+  public function authenticate() {
+  if ($me = Auth::user() ) { //Already logged in, return details
+    return $this->jsonsuccess(['user_id'=>$me->id]);
+  } #Not logged in - do we have the credentials?
+    $data = request()->all();
+  }
 }
 
 
