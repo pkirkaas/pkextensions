@@ -2132,6 +2132,12 @@ class $createclassname extends Migration {
     return $instance;
   }
 
+//Represent this object as Javascript, for inclusion in templates!
+
+  public function attsAsJson() {
+    return json_encode($this->attributesToArray(),
+        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ); 
+  }
 
 
 
