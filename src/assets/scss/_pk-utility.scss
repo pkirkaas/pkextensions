@@ -331,6 +331,11 @@ a.undecorated {
   .no-print {
     display: none ! important;
   }
+
+  .print-black {
+    color: black ! important;
+    text-decoration: none ! important;
+    }
 }
 
 @media screen {
