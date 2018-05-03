@@ -1,5 +1,6 @@
 <?php
 namespace PkExtensions;
+use PkRenderer;
 /**
  * Abstract class mapping keys to descriptions
  * Subclasses generally just need to create a static $refArray of integers to descriptions
@@ -43,6 +44,25 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return [null=>'None'] + static::$refArr;
   }
 
+/** See function getOptionList below for more option definition
+  * makes a full select box control for the current reference item.
+  @param $name - string or array of "select" attributes. If just string, assumed
+  to be ['name'=>$name]
+  @return - Render wrapped HTML select box for this refence class
+  */
+  public static function makeSelect($name,$null=false,$current=false) {
+    if (ne_stringish($name)) {
+      $name = ['name'=>$name];
+    }
+    if (!ne_array($name)) {
+      throw new PkException ("Invalid name arg for making select control");
+    }
+
+    $options = static::getOptionList($null, $current);
+    $selectbox = PkRenderer::tagged('select',$options,$name,true);
+    return $selectbox;
+  }
+
   /** Returns the $refArr as an array of <option>s - 
    * The key of the refarr will the the option value,
    * if the target of the key is scalar, that will be displayed
@@ -64,7 +84,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       $ret[]="<option>$null</option>\n";
     }
     foreach (static::$refArr as $key => $target) {
-      if (is_array_idx($target)) {
+      if (is_array_indexed($target)) {
         $display=$target[0];
         $tip = " title='$target[1]' ";
       } else if (is_array_assoc($target)) {

@@ -435,6 +435,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return $this
    */
 
+### Can also use this to bypass explictly defined functions, like 'select'
   ######!!!! TODO!!! See PkRendEx.php for testing of nested children
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $ctype = typeOf($content);
