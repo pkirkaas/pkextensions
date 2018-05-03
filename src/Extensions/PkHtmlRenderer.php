@@ -441,6 +441,7 @@ class PkHtmlRenderer extends PartialSet {
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
+    $raw = $raw?$raw:keyVal('raw',$attributes);
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
       #We don't know when the balanced close is going to happen, so cant automate it,
       #so we just use the open tag wait for "RENDERCLOSE() to add the closing tag.

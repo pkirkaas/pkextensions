@@ -20,6 +20,11 @@ JSON_ERROR_UNSUPPORTED_TYPE => "A value of a type that cannot be encoded was giv
 JSON_ERROR_INVALID_PROPERTY_NAME => "A property name that cannot be encoded was given",
 JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
 ];
+
+//Default json encode opts:
+  public static $jsonopts = JSON_PRETTY_PRINT |
+     JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES ;
+
   /** Success will always return false.
    * 
    * @param boolean $text  if true, returns the text description on error,

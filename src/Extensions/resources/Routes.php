@@ -1,5 +1,16 @@
 <?php /* Generic Routes available to all applications */
-
+/**
+ *  in RouteServiceProvider:
+<pre>
+protected function mapWebRoutes() {
+  Route::middleware('web')
+     ->namespace($this->namespace)
+     ->group(function() {
+       require base_path('vendor/pkirkaas/PkExtensions/src/Extensions/resources/Routes.php');
+       require base_path('routes/web.php');
+     });
+}
+ */
 Auth::routes();
 Route::group(['middleware' => ['web']], function () {
 Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
@@ -30,5 +41,10 @@ Route::any('auth/logout', ['as' => 'auth_logout',
 //Ajax Routes for common PkAjaxController
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
 Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
+Route::any('test', ['as' => 'test',  function() { ## Just echos the submitted data
+    $data = Request::all();
+    pkdebug("The submitted data:\n\n", $data);
+    return json_encode(["The Request Data" =>$data], JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES);
+}]);
 
 });

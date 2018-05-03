@@ -15,7 +15,6 @@ use \Auth;
  */
 abstract class PkAjaxController extends PkController {
 //  public $data;
-  public $jsonopts = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES; 
  // public $me;
   /*
   public function __construct() {
