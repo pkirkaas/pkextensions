@@ -53,7 +53,7 @@ abstract class PkAjaxController extends PkController {
       $resp=['msg'=>$resp];
     }
     $resp['status'] = keyVal('status',$resp,true);
-    pkdebug("Success, resp:",$resp); 
+    //pkdebug("Success, resp:",$resp); 
     return response()->json($resp, $status, $headers, $options);
   }
   /**
