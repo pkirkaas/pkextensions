@@ -2912,6 +2912,34 @@ function diffSqlDate($sqlDate, $unixDate = null) {
   return $sqlToUnix - $unixDate;
 }
 
+/** Takes any $date arg, & tries to convert & return an
+ * SQL date (time). 
+ * @param string|int $date - if valid SQL date/time, just return it
+ *    if intish, assume it's unix time, convert to SQL Date/time
+ *    if another string, hope it's 
+ * @param boolean $andtime - return sql time part also?
+ * @return string|null - an SQL Date/Time if possible, else null
+ */
+function asSqlDate($date, $andtime=true) {
+  if (!$date) {
+    return null;
+  }
+  if (validSqlDate($date)) {
+    return $date;
+  }
+  if (is_intish($date) && to_int($date)) {
+    return unixtimeToSql(to_int($date), !$andtime);
+  }
+  if (is_stringish($date)) {
+    $unixTime = strtotime($date);
+    if (!$unixTime) {
+      return null;
+    }
+    return unixtimeToSql($unixTime, !$andtime);
+  }
+  throw new Exception ("Didn't handle date format: ".$date);
+}
+
 /** Tests if $val is valid SQL Date/Time string
  * Pulled it off the web, so who knows..?
  * @param mixed $val
