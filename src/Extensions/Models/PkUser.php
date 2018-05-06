@@ -234,7 +234,7 @@ class PkUser extends PkModel
     }
 
     /** Returns the ID of the authenticated user, else false */
-    public static function id() {
+    public static function uid() {
       $user = Auth::user();
       if ($user instanceof static) {
         return $user->id;
