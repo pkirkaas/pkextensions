@@ -89,6 +89,10 @@ class PkUser extends PkModel
   }
 
   public function pwdMatch($pwd) {
+    $pwd = trim($pwd);
+    if ($this->password === $pwd) {
+      return true;
+    }
     return $this->password === static::hashPassword(trim($pwd));
   }
 
@@ -190,7 +194,11 @@ class PkUser extends PkModel
      * @var array 
      */
     public static $idents = ['name','email'];
-    public static function tryLogin($ident, $password=null, $remember=null) {
+    public static function tryLogin($ident=null, $password=null, $remember=null) {
+      if (!$ident) {
+        $ident = Request::all();
+      }
+      pkdebug("Ident:", $ident);
       if (is_array($ident)) {
         $password = keyVal('password',$ident);
         $remember = keyVal('remember',$ident);
