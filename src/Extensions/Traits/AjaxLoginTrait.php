@@ -12,11 +12,18 @@ use Request;
 use App\User;
 
 /**
- *
  * @author paulk
  */
 trait AjaxLoginTrait {
+  /** First check if already logged in, return UID, else try to login
+   * 
+   * @return type
+   */
   public function login() {
+    $uid = User::uid();
+    if ($uid) {
+      return $this->jsonsuccess(['status'=>true,'user_id'=>$uid, 'msg'=>"Welcome"]);
+    }
     $data = Request::all();
     $user = User::tryLogin($data);
     if (!$user || !$user instanceOf User) {
@@ -28,7 +35,7 @@ trait AjaxLoginTrait {
   }
 
   public function loggedin() {
-    $id = User::id();
+    $id = User::uid();
     if ($id) {
       $result = ['status'=>true,'user_id'=>$id];
     } else {

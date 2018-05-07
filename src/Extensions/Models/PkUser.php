@@ -213,7 +213,7 @@ class PkUser extends PkModel
       return false;
     }
 
-    /** Log in the user - remember if remeber - true */
+    /** Log in the user - remember if remember - true */
     public function login($remember = false) {
       Auth::login($this,$remember);
       return $this;
