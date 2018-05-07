@@ -20,6 +20,7 @@ trait AjaxLoginTrait {
    * @return type
    */
   public function login() {
+    //die(json_encode(['return'=>'from_login']));
     $uid = User::uid();
     if ($uid) {
       return $this->jsonsuccess(['status'=>true,'user_id'=>$uid, 'msg'=>"Welcome"]);
