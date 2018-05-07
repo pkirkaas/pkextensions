@@ -1160,6 +1160,46 @@ function makeDialog(selector, opts) {
   };
   return dlg;
 }
+
+/**
+ * Makes a "Login" Dialog, with over-ridable defaults
+ * @param HtmlTemplate|CssSelector|Null selector - the login tpl
+ * @param obj|null opts - options to override defaults
+ * @returns Pop-Up Login Dialog
+ */
+/*
+function mkLoginDlg(selector,opts) {
+  selector = selector || `
+    <div class='login-dialog'>
+      <form method='post' target='/ajax/login' class='ajax-login-form'>
+        <div class='login-ident'>
+          <label class='login-ident-lbl'>Name
+            <input type='text' name='ident' class='login-ident-input'>
+          </label>
+        </div>
+        <div class='login-pwd'>
+          <label class='login-pwd-lbl'>Password
+            <input type='password' name='password' class='login-password-input'>
+          </label>
+        </div>
+      </form>
+    </div>
+  `;
+  opts = opts || {};
+  var defaultLoginOpts = {
+    title: "Login",
+    buttons: {
+      Login: function() {
+        $.ajax({
+          
+        }).done(function(){
+        });
+      },
+      Cancel : function () { $(this).dialog('destroy'); },
+    }
+  }
+}
+*/
 /** Example Usage...
  
  function showHelpDialog() {
