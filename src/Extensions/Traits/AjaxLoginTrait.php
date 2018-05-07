@@ -9,7 +9,8 @@
 namespace PkExtensions\Traits;
 use Auth;
 use Request;
-use App\User;
+use App\Models\User;
+
 
 /**
  * @author paulk
