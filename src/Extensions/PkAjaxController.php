@@ -1,12 +1,16 @@
 <?php
 namespace PkExtensions;
 use App\Models\User;
+use PkExtensions\PkFileUploadService;
 use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
 use \PkExtenstions\PkCollection;
+
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
-
+use Carbon\Carbon;
+use \Request;
+use \Auth;
 use \Auth;
 
 /**
@@ -242,6 +246,36 @@ abstract class PkAjaxController extends PkController {
   } #Not logged in - do we have the credentials?
     $data = request()->all();
   }
+
+  /** Helper Function for other Ajax Uloads - does the heavy, upload, validation, but
+   * doesn't create the object - returns it's details, and allows the caller 
+   * method to handle the results
+   * @params assoc array - type(s), validation(s),  
+   */
+   pubic function _upload($params=[]) {
+     /*
+     $defaultparams [
+       'types'=>'image',
+
+
+     ];
+     */
+     $types = keyVal('types', $reqparams, 'image');
+     allow_guest = keyVal('allow_guest', $reqparams);
+     if (!($me = Auth::user()) &&  ! allow_guest) {
+       throw new PkException("User not logged in");
+     }
+     if (ne_stringish($types)) {
+      $types = [$types];
+    }
+    if (!ne_arayish($types)) {
+      throw new PkException ("Invalid Types: ",$types);
+    }
+    $at
+     $request = request();
+     $data = $request->all();
+
+   }
 }
 
 
