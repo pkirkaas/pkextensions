@@ -577,8 +577,8 @@ function pkcatchecho($runnable) {
   //print_r($arg);
   $vardump = ob_get_contents();
   //Experimenting 6/16 - replacing with ob_end_flush...
-  //ob_end_clean();
-  ob_end_flush();
+  ob_end_clean();
+  //ob_end_flush();
   ini_set('xdebug.overload_var_dump', 1);
   return "<pre>$vardump</pre>";
 }
@@ -597,8 +597,9 @@ function pkvardump($arg, $disableXdebug = true, $useVarDump=true) {
     Var_Dump($arg);
     $vardump = ob_get_contents();
     //Experimenting 6/16 - replacing with ob_end_flush...
-    // ob_end_clean();
-    ob_end_flush();
+    //NOPE! Flush also outputs to browser!
+    ob_end_clean();
+    //ob_end_flush();
   } else {
     $vardump = print_r($arg, true);
   }
