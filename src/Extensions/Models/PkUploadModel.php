@@ -27,6 +27,9 @@ abstract class PkUploadModel extends PkModel {
       #Category, like, doc (text & pdf), media (audio, video)
       'cat' => ['type' => 'string', 'methods' => 'nullable'],
       'mimetype'=>'string',
+      'size'=>'integer',
+      'originalname'=>'string',
+
       'desc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
 

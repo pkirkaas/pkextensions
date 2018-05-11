@@ -575,6 +575,26 @@ class $createclassname extends Migration {
     return $this->getTableFieldAttributes($fieldName);
   }
 
+  /** Can be called from construct. The model sets any attributes   * to the value of the $att value if it exists, unless the
+   * att name is in the indexed array of excludes.
+   *
+   * that have an attribute in the model
+   * @param assoc_array $arr - initializing attributes
+   * @param indexed array of atts to  $exclude
+   */
+  public function initializeFromArr($arr,$exclude=[]) {
+    $myattnames = static::getStaticAttributeNames();
+    $arrkeys = keys($arr);
+    foreach ($myattnames as $myattname) {
+      if (in_array($myattname, $arrkeys, 1) &&
+          !in_array($myattname, $exclude,1) &&
+          !$this->$myattname) {
+        $this->$myattname = $arr[$myattname];
+      }
+    }
+    return $this;
+  }
+
   /** Get all the defined table field names (attributes) from the static
    * class, without needing an instance.
    * @return array of table field names.

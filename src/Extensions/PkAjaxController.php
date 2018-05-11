@@ -249,31 +249,29 @@ abstract class PkAjaxController extends PkController {
 
   /** Helper Function for other Ajax Uloads - does the heavy, upload, validation, but
    * doesn't create the object - returns it's details, and allows the caller 
-   * method to handle the results
+   * method to handle the results. Knows nothing about the model/object, just the file
    * @params assoc array - type(s), validation(s),  
    */
    pubic function _upload($params=[]) {
+     $types = keyVal('types', $params, ['image']);
      /*
-     $defaultparams [
-       'types'=>'image',
-
-
-     ];
-     */
-     $types = keyVal('types', $reqparams, 'image');
      allow_guest = keyVal('allow_guest', $reqparams);
      if (!($me = Auth::user()) &&  ! allow_guest) {
        throw new PkException("User not logged in");
      }
+     */
      if (ne_stringish($types)) {
-      $types = [$types];
-    }
-    if (!ne_arayish($types)) {
-      throw new PkException ("Invalid Types: ",$types);
-    }
-    $at
-     $request = request();
-     $data = $request->all();
+       $types = [$types];
+      }
+      if (!$types) { #all types accepted
+        $types = [];
+      }
+      if (!is_array($types)) {
+        throw new PkException ("Invalid Types: ",$types);
+      }
+      $at
+      $request = request();
+      $data = $request->all();
 
    }
 }
