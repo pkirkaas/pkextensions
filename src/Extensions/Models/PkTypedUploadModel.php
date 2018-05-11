@@ -23,5 +23,6 @@ class PkTypedUploadModel extends PkUploadModel {
   public function __construct(array $atts = []) {
     $atts = $this->OwnedModelTraitConstruct($atts);
     parent::__construct($atts);
+    $this->initializeFromArr($atts);
   }
 }

@@ -584,7 +584,7 @@ class $createclassname extends Migration {
    */
   public function initializeFromArr($arr,$exclude=[]) {
     $myattnames = static::getStaticAttributeNames();
-    $arrkeys = keys($arr);
+    $arrkeys = array_keys($arr);
     foreach ($myattnames as $myattname) {
       if (in_array($myattname, $arrkeys, 1) &&
           !in_array($myattname, $exclude,1) &&

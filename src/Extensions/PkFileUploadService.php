@@ -58,6 +58,7 @@ class PkFileUploadService {
    * @return file
    */
   public function __construct($types = null, $params = null) {
+    pkdebug("Entering __construct, FileUploadService");
     if (is_array_indexed($params)) {
       $this->resize = $params;
     } else if (is_array_assoc($params)) {
@@ -72,12 +73,13 @@ class PkFileUploadService {
     if (ne_array($types)) {
       $this->types = $types;
     }
+    pkdebug("Leaving __construct, FileUploadService");
   }
 
   /** If the mimetype is 'image/jpeg', the major type is "image"
    */
   public static function majorType($file) {
-    if ($file instanceOf SymfonyFile) {
+    if ($file instanceOf SymfonyFile || $file instanceOf UploadedFile) {
       $mimeType = $file->getMimeType();
     } else if (is_file($file)) {
       $mimeType = mime_content_type($file);
@@ -102,7 +104,7 @@ class PkFileUploadService {
     if (!is_arrayish($types)) {
       return false;
     }
-    if (in_array($type, $types,1) {
+    if (in_array($type, $types,1)) {
       return $type;
     }
     return false;
@@ -133,6 +135,7 @@ class PkFileUploadService {
    */
   public function upload($ctlname='file', $types = null, $params = null) {
     $request = request();
+    pkdebug("Entering upload, FileUploadService, req data:", request()->all());
     $this->file = $request->file($ctlname);
     //if (!$this->file instanceOf UploadedFile || !$this->file->isValid()) {
     if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
@@ -154,6 +157,7 @@ class PkFileUploadService {
       //pkdebug("file: ", $file);
       return false;
     }
+    pkdebug("This File: ", $this->file);
     $this->type = static::isType($this->file, $this->types);
     if (!$this->type) {
       return false;
@@ -190,7 +194,7 @@ class PkFileUploadService {
     $ret = ['relpath' => $this->reldir . basename($this->path),
         'mimetype' => $this->file->getMimeType(),
         'size'=>$this->file->getSize(),
-        'originalname'=>$this->originalName,
+        'originalname'=>$file->getClientOriginalName(),
         'type' => $this->type,
     ];
     return $ret;

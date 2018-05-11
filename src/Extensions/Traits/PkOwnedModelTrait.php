@@ -27,7 +27,7 @@ trait PkOwnedModelTrait {
       #Like - 7 - the ID of the owning model
       'owner_id' => ['type' => 'integer', 'methods' => ['index', 'nullable']],
       #Like 'avatar'; The "owner's" name for the attribute, in the relationship method
-      'att_name'=> ['type' => 'string', 'methods' => 'index'],
+      'att_name'=> ['type' => 'string', 'methods' => ['nullable','index']],
 
       'category'=> ['type' => 'string', 'methods' =>  'nullable'],
     ];
@@ -64,25 +64,17 @@ trait PkOwnedModelTrait {
     }
      * 
      */
-    if (array_key_exists('owner', $atts)) {
-      $owner = $atts['owner'];
+      $owner = keyVal('owner',$atts);
       unset($atts['owner']);
-      if (!$owner instanceOf PkModel) {
-         pkdebug("Owner was set, but not PkModel:", $owner);
+      if ($owner instanceOf PkModel) {
+        $this->owner_id = $owner->id;
+        $this->owner_model = get_class($owner);
       } else {
-      //unset($atts['owner']);
-      $atts['owner_id'] = $owner->id;
-      $atts['owner_model']=get_class($owner);
-      $this->owner = $owner;
+        $this->owner_id = keyVal('owner_id',$atts);
+        $this->owner_model =  keyVal('owner_model',$atts);
       }
-    } else {
-      if (keyVal('owner_model',$atts) && keyVal('owner_id', $atts)) {
-        $this->owner = $atts['owner_model']::find($atts['owner_id']);
-      }
-    }
-    //pkdebug("Leaving OMTEC w. atts:", $atts);
     return $atts;
-  }
+    }
   
   public function getOwnerName() {
     if (!($om = $this->owner_model)) {

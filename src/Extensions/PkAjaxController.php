@@ -9,8 +9,6 @@ use \PkExtenstions\PkCollection;
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
 use Carbon\Carbon;
-use \Request;
-use \Auth;
 use \Auth;
 
 /**
@@ -252,27 +250,13 @@ abstract class PkAjaxController extends PkController {
    * method to handle the results. Knows nothing about the model/object, just the file
    * @params assoc array - type(s), validation(s),  
    */
-   pubic function _upload($params=[]) {
+   public function _upload($params=[]) {
+     pkdebug("Entered _upload");
      $types = keyVal('types', $params, ['image']);
-     /*
-     allow_guest = keyVal('allow_guest', $reqparams);
-     if (!($me = Auth::user()) &&  ! allow_guest) {
-       throw new PkException("User not logged in");
-     }
-     */
-     if (ne_stringish($types)) {
-       $types = [$types];
-      }
-      if (!$types) { #all types accepted
-        $types = [];
-      }
-      if (!is_array($types)) {
-        throw new PkException ("Invalid Types: ",$types);
-      }
-      $at
-      $request = request();
-      $data = $request->all();
-
+     $fus = new PkFileUploadService();
+     $uploaded = $fus->upload();
+     pkdebug("Uploaded: ", $uploaded);
+     return $uploaded;
    }
 }
 
