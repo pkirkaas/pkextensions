@@ -111,7 +111,14 @@ trait PkOwnedModelTrait {
     }
     return parent::__call($method, $args);
   }
+  public function owner() {
+    if ($this->owner instanceOf PkModel) {
+      return $this->owner;
+    }
+    return $this->owner = $this->owner_model::find($this->owner_id);
+  }
 
+    /*
   public function __get($att) {
     if ($att === 'owner') {
       if ($this->owner) {
@@ -131,6 +138,7 @@ trait PkOwnedModelTrait {
     }
     return parent::__get($att);
   }
+     */
   
 
   public function __set($att, $val) {
