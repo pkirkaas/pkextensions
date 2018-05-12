@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 abstract class PkSearchModel extends PkModel {
   use BuildQueryTrait;
 
+  public $cleanAllText = false; #Default - runs hpure/escapes every text field
   /* An array of keys to be searched, containing the criteria and values */
   public function initializeQuerySets() {
     $this->querySets = $this->buildQuerySets($this->getAttributes());

@@ -157,7 +157,7 @@ function pk_showcheck($val = null, $styles = [], $checked = "&#9745;", $unchecke
     if (!is_array_assoc($styles)) {
       $styles = [];
     }
-    $styles=array_merge($defaults,$styles);
+    $styles=array_merge($defaultstyles,$styles);
     $stylestr = '';
     foreach ($styles as $key => $value) {
       $stylestr.="$key:$value; ";
