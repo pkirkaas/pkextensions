@@ -230,7 +230,7 @@ $('body').on('click', '.'+popDefObj.popCallerClass, function (event) {
 //$('body').on('hover', '.'+popDefObj.popCallerClass, function (event) {
 $('body').on( {
     mouseenter: function (event) {
-      console.log("THE TARGET", event.target);
+      //console.log("THE TARGET", event.target);
       var jqtarget = $(event.target);
       var src = $(event.target).attr(popDefObj.jsPopupTmpCallerDataAttr);
       if (!src) return;
@@ -286,7 +286,7 @@ function buildDetailDialog(template,encdata,hideempty) {
   }
   var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']');
   dataFields.each(function() {
-    console.log("In each data-el - this: ", this);
+    //console.log("In each data-el - this: ", this);
     var jqthis = $(this);
     var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
     if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
@@ -329,7 +329,7 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
     var arrChldCl = '.'+popDefObj.arrayChildClass;
     var attrDataSel = '['+popDefObj.popAttrNameDataAttr+']';
 
-console.log("The var sels:", arrParCl,arrChldCl, attrDataSel);
+//console.log("The var sels:", arrParCl,arrChldCl, attrDataSel);
 var tstDF1 = template.find(attrDataSel);
 
 //The below filters out the parent arrays as well
@@ -370,13 +370,13 @@ var dataFields = template.find(attrDataSel).not(arrParCl +' *');
       //Not elegant, but - length either 0 (delete child), 1 (populate child)
       // > 1 - copy child
       var len = encdata[encAttName].length;
-      console.log("ENCATTNAME: "+encAttName+' len '+ len + ' encattdata ',encdata[encAttName] );
+      //console.log("ENCATTNAME: "+encAttName+' len '+ len + ' encattdata ',encdata[encAttName] );
       //if (!len) jqthis.find(arrChldCl).remove();
       var childClone =  jqthis.find(arrChldCl).clone();
       for (var i = 0 ; i < len ; i++ ) {
         var datarow = encdata[encAttName][i];
         var childArrCopy =  childClone.clone();
-        console.log("ChildArrayCopy: ",childArrCopy );
+        //console.log("ChildArrayCopy: ",childArrCopy );
         childArrCopy.removeClass('hidden');
         var dataEls = childArrCopy.find(attrDataSel);
         dataEls.each(function () {
