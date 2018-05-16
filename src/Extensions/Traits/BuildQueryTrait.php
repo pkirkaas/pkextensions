@@ -551,6 +551,8 @@ trait BuildQueryTrait {
     //$sz = count($collection);
     //pkdebug("Just ran query from BQT: SZ: $sz");
     // ORIG$newcol = $this->filterOnMethods($collection);
+    //$newcol = $this->filterOnMethods($collection);
+
     $newcol = $this->filterOnMatch($collection);
     //$sza = count($newcol);
     //pkdebug("SXA:  $sza");
@@ -617,6 +619,11 @@ trait BuildQueryTrait {
       //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
       if ($root == '0') continue;
       //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
+
+      if (($root==='assetdebtratio') || ($root === "loanamt") || ($root === 'yrsest'))  {
+        pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
+        //pkdebug("ADR: QT: ".typeOf($query)."..");
+      }
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
       if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val']))
@@ -646,7 +653,7 @@ trait BuildQueryTrait {
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
           } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
-            //pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
+            pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
             $this->addMatchObj($root,$matchObj);
             continue;
           } else {
@@ -723,11 +730,16 @@ trait BuildQueryTrait {
   ## And adding them when I can't build an SQL query. 
   ## I want executeQuery to process 3 things - sql queries, PkMatch objs, and
   ## any custom filter methods defined on the Query Model
+
+
+  ### !!TODO!! May 2018 - MatchFilters don't work anymore... In addition,
+  #  Have to distinguish between SQL query filters & match set/method
+  ## Filters. AND - Don't build filter if "don't care"
   public function buildQuerySets(Array $arr = []) {
-    if ($this->matchObjs === null) {
-      $this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
-    }
-    //pkdebug("The generated 'matches' are", $this->matchObjs);
+    //if ($this->matchObjs === null) {
+      //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
+    //}
+    pkdebug("The generated 'matches' are", $this->matchObjs);
     $this->checkClearPost();
     if (empty($arr)) {
       if ($this instanceOf PkModel) {
@@ -827,9 +839,10 @@ trait BuildQueryTrait {
   }
 
   public function getMatchObjs() {
-    if ($this->matchObjs && is_arrayish($this->matchObjs)) return $this->matchObjs;
-    $this->buildQuerySets();
-    if ($this->matchObjs && is_arrayish($this->matchObjs)) return $this->matchObjs;
+    if (!$this->matchObjs || !is_arrayish($this->matchObjs)) {
+      $this->buildQuerySets();
+    }
+    return $this->matchObjs;
   }
 
   /** After the Eloquent has run on the attributes and returned an eloquent collection,
@@ -839,7 +852,7 @@ trait BuildQueryTrait {
    * @param array $querySets or null to take from local object
    */
   public function filterOnMethods(Collection $collection, $matchObjs=null) {
-    //pkdebug("Yes, trying to filter.");
+    pkdebug("Yes, trying to filter on Method!.");
     if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
     if (!$matchObjs || !is_arrayish($matchObjs)) return $collection;
     $numpre = count($matchObjs);
@@ -873,7 +886,7 @@ trait BuildQueryTrait {
    */
   public function filterOnMatch(Collection $collection) {
     $pkmarr = $this->getMatchObj();
-    //pkdebug("MatchArr:",$pkmarr);
+    pkdebug("MatchArr:",$pkmarr);
     if(!$pkmarr) {
       return $collection;
     }
