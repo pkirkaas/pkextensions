@@ -178,7 +178,13 @@ containing block needs to be positioned relatively*/
 
 .f-between, .flex-between {
   display: flex;
+  flex-flow: row wrap;
   justify-content: space-between;
+}
+
+.flex-between:after {
+  content: "";
+  flex: auto;
 }
 /** Apply to the flex box */
 .flexalignstretch {align-items: stretch;}

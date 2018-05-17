@@ -67,7 +67,7 @@ abstract class PkController extends Controller {
     if ($this->submenu_literal) {
       return $this->submenu_literal;
     }
-    $ptr = new PKHtmlPainter();
+    $ptr = new PkHtmlPainter();
     $links = [];
     $routeArrs = $this->allSubmenuRouteArrs();
     if ($routeArrs) { #Assumes array of findable routes, with params
