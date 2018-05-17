@@ -953,6 +953,7 @@ trait BuildQueryTrait {
    * 
    */
 
+  /*
   public function save(array $opts = []) {
     if (! $this instanceOf PkSearchModel) return;
     //pkdebug("These Attributes:",$this->getAttributes());
@@ -963,12 +964,15 @@ trait BuildQueryTrait {
       $comptype = static::comptype($basename);
       if(($comptype === 'group') || ($comptype === 'intersects')) { #Have to jsonify it
         $valatt = $basename.'_val';
-        $this->$valatt = json_encode($this->$valatt);
-     //   pkdebug("THIS att [$valatt]: ", $this->$valatt);
+        pkdebug("THIS att [$valatt] PRE encode: ", $this->$valatt);
+        $this->$valatt = json_encode($this->$valatt, JSON_NUMERIC_CHECK);
+        pkdebug("THIS att [$valatt] POST encode: ", $this->$valatt);
       }
     }
     return parent::save($opts);
   }
+   * 
+   */
 
   public static function critset($root) {
     $fqd = static::getFullQueryDef($root);
