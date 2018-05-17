@@ -1988,16 +1988,33 @@ class $createclassname extends Migration {
    }
   /** Return a route to delete this PkModel instance. 
    * 
-   * @param string $baseroute
-   * @param string $link - if present, return entire <a href...>$link</a>,
+   * @param assoc_array $args. Keys:
+   *    deleteroute : the route name. Default: admin_deletemodel
+   *    label - if present, return entire <a href...>$label</a>,
+   *    just_href: if true, just the href/url w/o <a>
+   *    class: CSS Classes: default: 'pkmvc-button inline'
+   *    additional: passed to linkroute as attributes
    * else just the URL to delete
    */
-  public function deleteRoute($baseroute = 'admin_deletemodel', $link='Delete',$attributes=[]) {
-    $params = ['model'=>get_class($this), 'id'=>$this->id];
-    if ($link) {
-      return PKHtml::linkRoute($baseroute,$link,$params, $attributes);
+  public function deleteRoute($args=[]) { // = 'admin_deletemodel', $link='Delete',$attributes=[]) {
+    $defaultargs = ['deleteroute'=>'admin_deletemodel',
+        'label'=>'Delete',
+        'class'=>'pkmvc-button inline'];
+    if (ne_string($args)) {
+      $args = ['label'=>$args];
+    } else if (!$args) {
+      $args=[];
     }
-    return route($baseroute,$params);
+    $args = array_merge($defaultargs, $args);
+    $params = ['model'=>get_class($this), 'id'=>$this->id];
+    $deleteroute = unsetret($args,'deleteroute');
+    if (keyVal($args,'just_href')) {
+      return route($deleteroute,$params);
+    }
+    $label = unsetret($args,'label');
+     
+  //public function deleteRoute($baseroute = 'admin_deletemodel', $link='Delete',$attributes=[]) {
+    return PKHtml::linkRoute($deleteroute,$label,$params, $args);
   }
 
   /** Provides the properties to include in any HTML element that will triger

@@ -70,15 +70,21 @@ class PkHtmlBuilder extends HtmlBuilder {
   /** This will use the 'desc' key in the Route declaration as a default title for the link,
    * @param string $name - The named link as defined in routes
    * @param array $parameters - parameters to include w. the link
-   * @param array $attributes - link attributes, class, data-tootik, etc
+   * @param array|string $attributes - link attributes, class, data-tootik, etc. If str, class
    * @return HTML Link
    */
     public function linkRouteDefault(
         $name,$parameters = [], $attributes = [], $title = null, $secure=null, $escape = false) {
+      if (ne_string($attributes)) {
+        $attributes=['class'=>$attributes];
+      } else if (!$attributes) {
+        $attributes = [];
+      }
+
       //if (!$title) $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
       if (!$title) $title =  $this->attFromRoute('desc',$name);
-      $tootik =  $this->attFromRoute('tootik',$name);
-      if (!array_key_exists('data_tootik', $attributes) && $tootik) {
+      $tootik =  keyVal('data-tootik',$attributes,$this->attFromRoute('tootik',$name));
+      if ($tootik) {
         $attributes['data-tootik']=$tootik;
       }
       return $this->link($this->url->route($name, $parameters), $title, $attributes,$secure, $escape);

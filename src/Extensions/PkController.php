@@ -36,9 +36,47 @@ use Route as RouteFacade;
 use \Exception;
 use \Closure;
 use \Auth;
+use PkHtml;
 
 abstract class PkController extends Controller {
   use UtilityMethodsTrait;
+
+  public function __construct($args = null) {
+    $this->middleware(function ($request, $next) {
+        $this->me = Auth::user();
+        return $next($request);
+    });
+    $submenu = $this->mkSubMenu();
+    if ($submenu) {
+      view()->share('sub_menu',$submenu);
+    }
+  }
+
+  #Generic submenu generation:
+  public $submenu_literal; #If exists, just use it, as pure HTML
+  public $submenu_routearr; #If exists, build submenu from routes, using descs
+  public $submenu_opts; #If exists, use for PkHtmlPainter::mkBsMenu
+  public $submenu_link_class='nav-link';
+  public $submenu_class;
+
+  public function mkSubMenu($args = null) { #Override as desired
+    if ($this->submenu_literal) {
+      return $this->submenu_literal;
+    }
+    $ptr = new PKHtmlPainter();
+    $links = [];
+    if ($this->submenu_routearr) { #Assumes array of findable routes, with params
+      $routeName = RouteFacade::getCurrentRoute()->getName();
+      foreach ($this->submenu_routearr as $route) {
+        if ($routeName == $route) {
+          continue;
+        }
+        $links[] = PkHtml::linkRouteDefault($route, [], $this->submenu_link_class);
+      }
+      return $ptr->mkBsMenu($links,$this->submenu_opts);
+    }
+    return null;
+  }
 
   public static $errorMsgBag; #The error messages, if any. Try static first
   public static $viewErrorBag; #The error messages, if any. Try static first
@@ -49,9 +87,7 @@ abstract class PkController extends Controller {
    * @param string $msg
    */
 
-  public function __construct($args = null) {
-    $this->me =Auth::User();
-  }
+
   public $me;
 
   public static function addErrorMsg($msg) {

@@ -13,7 +13,8 @@ protected function mapWebRoutes() {
  */
 Auth::routes();
 Route::group(['middleware' => ['web']], function () {
-Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
+//Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
+Route::group(['prefix'=>'admin','middleware'=> ['auth']],function() {
   Route::get('/btest',function () {return "<h1> Proxied Hi, kid</h1><h1> Proxied ";});
   //Route::any('/deletemodel', ['as' => 'admin_deletemodel'], function() {
   Route::any('/deletemodel',['as'=>'admin_deletemodel',  function() {
