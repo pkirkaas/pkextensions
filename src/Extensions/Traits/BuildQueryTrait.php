@@ -100,27 +100,9 @@ trait BuildQueryTrait {
     if (property_exists(static::class,'targetModel')) return static::$targetModel;
   }
 
-  /** Is $crit a valid DB criterion?
-   * 
-   * @param string $crit
-   * @param string|null $type - if null, true for any valid. Else, only true
-   * if crit is of type 'numeric'|'string'|'group'
-   * @return boolean
-   */
-  /*
+  /** From CriteriaSetsTrait:
   public static function isValidCriterion($crit, $type = null) {
-    if ((!$type || ($type === 'numeric')) && in_array($crit, array_keys(static::$numericQueryCrit)))
-        return true;
-    if ((!$type || ($type === 'string')) && in_array($crit, array_keys(static::$stringQueryCrit)))
-        return true;
-    if ((!$type || ($type === 'group')) && in_array($crit, array_keys(static::$groupQueryCrit)))
-        return true;
-    if ((!$type || ($type === 'between')) && in_array($crit, array_keys(static::$betweenQueryCrit)))
-        return true;
-    if ((!$type || ($type === 'boolean')) && in_array($crit, array_keys(static::$booleanQueryCrit)))
-        return true;
-    return false;
-  }
+  public static $criteriaSets = [
    * 
    */
 
@@ -129,55 +111,6 @@ trait BuildQueryTrait {
     if (to_int($crit) === false) return false;
     return true;
   }
-  /*
-
-  public static $numericQueryCrit = [
-      '0' => "Don't Care",
-      '>' => 'More Than',
-      '<' => 'Less Than',
-      '=' => 'Equal To',
-      '!=' => 'Not Equal To',
-  ];
-  public static $stringQueryCrit = [
-      '0' => "Don't Care",
-      'LIKE' => 'Is',
-      '%LIKE' => 'Starts With',
-      'LIKE%' => 'Ends With',
-      '%LIKE%' => 'Contains',
-  ];
-  public static $groupQueryCrit = [
-      '0' => "Don't Care",
-      'IN' => 'In',
-      'NOTIN' => 'Not In',
-  ];
-  public static $withinQueryCrit = [
-      '0' => "Don't Care",
-      '1' => 'Within 1 mile',
-      '5' => 'Within 5 miles',
-      '10' => 'Within 10 miles',
-      '20' => 'Within 20 miles',
-      '50' => 'Within 50 miles',
-  ];
-  #TODO: Should allow for "at least" & 'at_most'
-  public static $betweenQueryCrit = [
-      '0' => "Don't Care",
-      'BETWEEN' => 'Between',
-  ];
-
-  #Does the value exist - anything but null or ''
-  public static $existsQueryCrit = [
-      '0' => "Don't Care",
-      'EXISTS' => 'Required',
-      'NOT EXISTS' => "Excluded",
-  ];
-  #What's the best way to do boolean?
-  public static $booleanQueryCrit = [
-      '0' => "Don't Care",
-      'IS' => 'Required',
-      'IS NOT' => 'Excluded',
-  ];
-   * 
-   */
 
   #To use a Boolean query control, do something like this in view form:
   /*
@@ -258,7 +191,7 @@ trait BuildQueryTrait {
   }
     
   /** This returns an array keyed by basename=>array of all defs for that basename
-   *  query. It needs to be flattened and indexed to be used in building actual
+   *  query/filter. It needs to be flattened and indexed to be used in building actual
    *  migration table building code, which is what the above
    *   getTableFieldDefsExtraBuildQuery does.
    * @param $baseName - null or string - if null returns all basenames
@@ -283,10 +216,9 @@ trait BuildQueryTrait {
        * esle.
        */
       //$searchFields[$baseName]['attribute'] = keyVal('attribute', $def,'property');
+      #$attribute - property, so use SQL, or method, so use PkMatch
       $attribute = keyVal('attribute', $def,'property');
       $model = keyVal('model', $def);
-
-
       $def['attribute'] = $attribute;
       if (($model === 'target') || !$model) {
         $def['model'] = static::getTargetModel();
@@ -559,7 +491,9 @@ trait BuildQueryTrait {
     return $newcol;
   }
 
-  /** Return an Eloquent Query Builder Instance
+  /** Return an Eloquent Query Builder Instance for "property" comparisons, AND
+   * should build a PkMatch filter for method comparisons, to be applied AFTER
+   * the Eloquent Query runs.
    * Builds a basic chained "AND WHERE..." query from the instance 'querySets" array.
    * The query set is an associative array of <tt>what=>[crit, val]</tt>, where
    * 'what' is either a field/column name, OR the root of a custom query method,
@@ -595,6 +529,7 @@ trait BuildQueryTrait {
       if (!empty($this->querySets)) $querySets = $this->querySets;
       else $querySets = $this->buildQuerySets();
     }
+    //pkdebug("QuerySets:", $querySets);
     #Sets are keyed by 'root' or 'baseName', with a definition array. If the
     #root key matches an attribute name on the model, that's what we search 
     #against. If not, try to figure out what the query is on/for/to.
@@ -614,7 +549,23 @@ trait BuildQueryTrait {
     //pkdebug("QuerySets:", $querySets);
 
     //pkdebug("My PkMatchObjs:", $this->matchObjs);
+    #$querySets includes both attribute=>'property' types, which are eloquent/SQL suitable,
+    #as well as attribute=>'method', which should go to PkMatch filters 
     foreach ($querySets as $root => $critset) {
+      if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val'])) {
+        continue;
+      }
+      if ($critset['def']['attribute'] === 'method') {
+        #add to PkMatch set & continue
+        $matchObj = PkMatch::mkMatchObj(
+              static::getFullQueryDef($root)+['field_set'=>$critset],$root);
+        pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset,
+            "matchObj: ", $matchObj);
+        if ($matchObj) {
+          $this->addMatchObj($root,$matchObj);
+        }
+        continue;
+      }
       $toq = typeOf($query);
       //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
       if ($root == '0') continue;
@@ -626,16 +577,12 @@ trait BuildQueryTrait {
       }
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
-      if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val']))
-          continue;
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
         //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
         if (is_array($critset['val'])) {
-
-
           if (($comptype === 'group') && ($critset['crit'] === 'IN')) {
             $query = $query->whereIn($root, array_values($critset['val']));
             continue;
@@ -652,10 +599,13 @@ trait BuildQueryTrait {
             //pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
-          } else if($matchObj = PkMatch::mkMatchObj(static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
+          /*
+          } else if($matchObj = PkMatch::mkMatchObj(
+              static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
             pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
             $this->addMatchObj($root,$matchObj);
             continue;
+           */
           } else {
             throw new PkException(["Unhandled for root[$root], comptype [$comptype] w. val:",
                 $critset['val']]);
@@ -678,6 +628,7 @@ trait BuildQueryTrait {
         $query = $this->$customQueryMethod($query, $critset['crit'], $critset['val'], $critset['param']);
       }
     }
+    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr);
     return $query;
   }
 
@@ -739,7 +690,7 @@ trait BuildQueryTrait {
     //if ($this->matchObjs === null) {
       //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
     //}
-    pkdebug("The generated 'matches' are", $this->matchObjs);
+    //pkdebug("The generated 'matches' are", $this->matchObjs);
     $this->checkClearPost();
     if (empty($arr)) {
       if ($this instanceOf PkModel) {
@@ -810,6 +761,7 @@ trait BuildQueryTrait {
     //foreach ($this->matchObjs as $ma) {
       //if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma);
     //}
+    //pkdebug("querySets should contain both property & method queries: SETS:", $sets);
     return $sets;
   }
 
@@ -838,12 +790,15 @@ trait BuildQueryTrait {
     }
   }
 
+  /** Temporarilly deprecated? Maybe restore later? 
   public function getMatchObjs() {
     if (!$this->matchObjs || !is_arrayish($this->matchObjs)) {
       $this->buildQuerySets();
     }
     return $this->matchObjs;
   }
+   * 
+   */
 
   /** After the Eloquent has run on the attributes and returned an eloquent collection,
    * this method takes the collection and $querySets as above, 
@@ -851,6 +806,7 @@ trait BuildQueryTrait {
    * @param Eloquent Collection $collection
    * @param array $querySets or null to take from local object
    */
+  /** Temporarilly deprecated? Maybe restore later? 
   public function filterOnMethods(Collection $collection, $matchObjs=null) {
     pkdebug("Yes, trying to filter on Method!.");
     if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
@@ -878,11 +834,14 @@ trait BuildQueryTrait {
     });
     return $trimmedCollection;
   }
+   * 
+   */
 
   /** Using the individual match objects I created one at a
    * time & added to the new array individually. Experiment
-   * @param Collection $collection
-   * @return Collection
+   * @param Collection $collection - the result of Eloquent queries  - should
+   * be further filtered by the match filters
+   * @return Collection - trimmed/filtered collection
    */
   public function filterOnMatch(Collection $collection) {
     $pkmarr = $this->getMatchObj();

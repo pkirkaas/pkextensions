@@ -82,12 +82,12 @@ class PkMatch {
    */
   public static function mkMatchObj($arrSet,$baseName = null) {
       $marr = [];
-      if ($baseName === 'yrsest') pkdebug("BNAME:  $baseName, arrSetPre", $arrSet);
+      //if ($baseName === 'yrsest') pkdebug("BNAME:  $baseName, arrSetPre", $arrSet);
       if (!$fs = keyVal('field_set', $arrSet)) {
         $fs = keyVal('field_defs', $arrSet);
         if (!$fs) return;
       }
-      if ($baseName === 'yrsest') pkdebug("POSTNAM:  $baseName, arrSetPOST", $arrSet);
+      //if ($baseName === 'yrsest') pkdebug("POSTNAM:  $baseName, arrSetPOST", $arrSet);
       if (array_key_exists('val', $fs)) $marr['val'] = $fs['val'];
       if (array_key_exists('crit', $fs)) $marr['crit'] = $fs['crit'];
       if (array_key_exists('minval', $fs)) $marr['minval'] = $fs['minval'];
@@ -109,9 +109,9 @@ class PkMatch {
           $marr[$attName] = $tst;
         }
       }
-      pkdebug("MARR: ", $marr);
+      //pkdebug("MARR: ", $marr);
       $matchObj = new PkMatch($marr);
-      pkdebug ("New Match Obj:", $matchObj);
+      //pkdebug ("New Match Obj:", $matchObj);
       return new PkMatch($marr);
   }
 
