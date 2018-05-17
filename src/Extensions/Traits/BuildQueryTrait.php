@@ -559,8 +559,11 @@ trait BuildQueryTrait {
         #add to PkMatch set & continue
         $matchObj = PkMatch::mkMatchObj(
               static::getFullQueryDef($root)+['field_set'=>$critset],$root);
+        /*
         pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset,
             "matchObj: ", $matchObj);
+         * *
+         */
         if ($matchObj) {
           $this->addMatchObj($root,$matchObj);
         }
@@ -571,10 +574,13 @@ trait BuildQueryTrait {
       if ($root == '0') continue;
       //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
 
+      /*
       if (($root==='assetdebtratio') || ($root === "loanamt") || ($root === 'yrsest'))  {
         pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
         //pkdebug("ADR: QT: ".typeOf($query)."..");
       }
+       * 
+       */
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
@@ -628,7 +634,8 @@ trait BuildQueryTrait {
         $query = $this->$customQueryMethod($query, $critset['crit'], $critset['val'], $critset['param']);
       }
     }
-    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr);
+    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
+        "Query to SQL:", $query->toSql());
     return $query;
   }
 
@@ -845,7 +852,7 @@ trait BuildQueryTrait {
    */
   public function filterOnMatch(Collection $collection) {
     $pkmarr = $this->getMatchObj();
-    pkdebug("MatchArr:",$pkmarr);
+    //pkdebug("MatchArr:",$pkmarr);
     if(!$pkmarr) {
       return $collection;
     }
