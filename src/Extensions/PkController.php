@@ -52,7 +52,11 @@ abstract class PkController extends Controller {
     }
   }
 
+
   #Generic submenu generation:
+  public function allSubmenuRouteArrs() {
+    return $this->getInstanceAncestorArraysMerged('submenu_routearr',true);
+  }
   public $submenu_literal; #If exists, just use it, as pure HTML
   public $submenu_routearr; #If exists, build submenu from routes, using descs
   public $submenu_opts; #If exists, use for PkHtmlPainter::mkBsMenu
@@ -65,9 +69,10 @@ abstract class PkController extends Controller {
     }
     $ptr = new PKHtmlPainter();
     $links = [];
-    if ($this->submenu_routearr) { #Assumes array of findable routes, with params
+    $routeArrs = $this->allSubmenuRouteArrs();
+    if ($routeArrs) { #Assumes array of findable routes, with params
       $routeName = RouteFacade::getCurrentRoute()->getName();
-      foreach ($this->submenu_routearr as $route) {
+      foreach ($routeArrs as $route) {
         if ($routeName == $route) {
           continue;
         }

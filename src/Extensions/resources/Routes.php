@@ -14,20 +14,22 @@ protected function mapWebRoutes() {
 Auth::routes();
 Route::group(['middleware' => ['web']], function () {
 //Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
-Route::group(['prefix'=>'admin','middleware'=> ['auth']],function() {
+Route::group(['prefix'=>'admin','middleware'=> ['auth','admin']],function() {
   Route::get('/btest',function () {return "<h1> Proxied Hi, kid</h1><h1> Proxied ";});
   //Route::any('/deletemodel', ['as' => 'admin_deletemodel'], function() {
-  Route::any('/deletemodel',['as'=>'admin_deletemodel',  function() {
-    $data = Request::all();
-    $model = $data['model'];
-    $id = to_int ($data['id']);
-    $instance = $model::find($id);
-    $instance->delete(true);
-    return redirect()->back();
+  Route::any('/deletemodel',['as'=>'admin_deletemodel',  'middleware'=>['auth','admin'],
+      function() {
+        $data = Request::all();
+        $model = $data['model'];
+        $id = to_int ($data['id']);
+        $instance = $model::find($id);
+        $instance->delete(true);
+        return redirect()->back();
   }]);
 
   Route::any('/orphans', ['as' => 'admin_orphans',
    //function(){return view('admin.orphans');},
+      'middleware'=>['auth','admin'],
       'uses' => 'AdminController@orphans',
       'type'=>'admin', 'desc'=>'Manage Orphans']);
 });

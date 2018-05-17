@@ -8,6 +8,7 @@ use PkExtensions\Models\PkModel;
 use Auth;
 Abstract class PkAdminController extends PkController {
   /** Finds "Orphans", identifies their missing "parents", & allows deletion */
+  public $submenu_routearr = ['admin_orphans'];
   public function orphans() {
     return view('admin.orphans');
   }
