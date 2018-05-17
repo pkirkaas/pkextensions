@@ -59,6 +59,11 @@ $inner-border-spread: 1px !default;
   margin-bottom: auto ! important;
 }
 
+.min-line-height:empty::after {
+    content: ".";
+    visibility: hidden;
+}
+
 .self-center {
   justify-content: center;
 }
@@ -171,7 +176,7 @@ containing block needs to be positioned relatively*/
   justify-content: center;
 }
 
-.f-between {
+.f-between, .flex-between {
   display: flex;
   justify-content: space-between;
 }
@@ -256,6 +261,7 @@ a.undecorated {
 
 
 .flex-center {
+  display: flex;
   align-items: center;
   align-content: center;
   justify-content: center;

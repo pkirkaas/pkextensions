@@ -3,6 +3,7 @@ Sites styled AFTER now use this "assets/scss" folder.
 Sites styled BEFORE use the legacy "assets/css" folder
 
 Some useful classes:
+.pre-wrap
 
 From mk-spacing:
 Font (N=-50 -> 50)
@@ -10,9 +11,12 @@ Font (N=-50 -> 50)
   Weight: fwN (N = 1 -> 9)
   Families: oswald, lato, roboto, open-sans, montserrat, raleway, droid-sans, s-sans-pro
 
+
 Div Dimensions:
   hN, heightN, minhN, min-hN, min-heightN, maxhN, etc.
   widthN, wN, minwN, minw-N, maxwN, maxw-N, min-widthN
+
+.min-line-height - empty div minimum 1 line height
 
 (x = t (top), b (bottom), l (left), r (right), v (vertical), h (horizontal)
 Padding:
@@ -52,8 +56,14 @@ Headings:
 Bunch of Avatar classes - in 'sitestyles'
 
 Flexing:
+.flex-wrap - wraps contained flex items
+.flex-center - tries to center everything
+.flex-between: Evenly spaces content
 
 
+Fonts:
+.oswald .lato .roboto .open-sans .montserrat .raleway 
+.droid-sans .s-sans-pro 
 
 
 

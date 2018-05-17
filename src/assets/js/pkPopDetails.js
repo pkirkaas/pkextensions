@@ -250,7 +250,11 @@ $('body').on( {
         console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
         return false;
       }
+      console.log("EncData:",encdata);
       dlg = buildHoverDetailDialog(dlgHtml, encdata);
+      if (!dlg) {
+        return;
+      }
       dlg.addClass('block');
       var dlg_title = dlg.find('.'+popDefObj.titleHolderClass).text();
       if ((dlg_title === undefined) || !dlg_title) dlg_title='Details';
@@ -312,50 +316,19 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
   }
 
 
-/*
-      //Manage arrays here ...
-      var parentArrs  = dlg.find('.'+popDefObj.arrayParentClass);
-      parentArrs.each(function (idx) {
-        $(this).child_arr = $(this).find('.'+popDefObj.arrayChildClass).clone();
-        $(this).find('.'+popDefObj.arrayChildClass).remove();
-      });
-      console.log("Parent Arrs stripped:",parentArrs.html());
-      parentArrs.each(function (idx) {
-        console.log("Trying to see the child array...",$(this).child_arr.html());
-      });
-  */
+  var arrParCl = '.'+popDefObj.arrayParentClass;
+  var arrChldCl = '.'+popDefObj.arrayChildClass;
+  var attrDataSel = '['+popDefObj.popAttrNameDataAttr+']';
 
-    var arrParCl = '.'+popDefObj.arrayParentClass;
-    var arrChldCl = '.'+popDefObj.arrayChildClass;
-    var attrDataSel = '['+popDefObj.popAttrNameDataAttr+']';
-
-//console.log("The var sels:", arrParCl,arrChldCl, attrDataSel);
-var tstDF1 = template.find(attrDataSel);
+  var tstDF1 = template.find(attrDataSel);
 
 //The below filters out the parent arrays as well
 //var tstDF2 = template.find(attrDataSel).not(arrParCl +', '+arrParCl +' *');
 //
 //This keeps the parent arrays, but filters out the children arrays
-var dataFields = template.find(attrDataSel).not(arrParCl +' *');
+  var dataFields = template.find(attrDataSel).not(arrParCl +' *');
 
-//console.log("LN1: ",tstDF1.length, "LN2: ", tstDF2.length);
-//console.log("tst2: ", tstDF2);
-
-
-  //var dataFields = template.find('['+popDefObj.popAttrNameDataAttr+']').not(arrParCl + ' '+arrParCl +' *');
-  //var topDataFields = dataFields.filter()
-//  console.log("DataFields:", dataFields);
-  //tstDF2.each (function() {
-   // console.log("tstDF2  DATAFIELD", this);
-
-  //});
-  //dataFields.each (function() {
-   // console.log("THIS DATAFIELD", this);
-
-  //});
-
-
-
+  var hasData = false;
   dataFields.each(function() {
     //console.log("In each data-el - this: ", this);
     var jqthis = $(this);
@@ -364,12 +337,17 @@ var dataFields = template.find(attrDataSel).not(arrParCl +' *');
       console.error("The template had a bad data-attribute name");
       template.closest('.'+popDefObj.valueTemplateClass).remove();
     }
-    if (encdata[encAttName] === undefined) {
+    if ((encdata[encAttName] === undefined) || (encdata[encAttName] === null)) {
+      console.log("We have an empty value for ",encAttName);
       if (hideempty) template.closest('.'+popDefObj.valueTemplateClass).remove();
     } else if (isArray(encdata[encAttName])) { //We have an array - what do we do?
       //Not elegant, but - length either 0 (delete child), 1 (populate child)
       // > 1 - copy child
       var len = encdata[encAttName].length;
+      if (len) {
+        hasData = true;
+        console.log ("Array Data for "+encAttName + "is: ", encdata[encAttName]);
+      }
       //console.log("ENCATTNAME: "+encAttName+' len '+ len + ' encattdata ',encdata[encAttName] );
       //if (!len) jqthis.find(arrChldCl).remove();
       var childClone =  jqthis.find(arrChldCl).clone();
@@ -387,38 +365,20 @@ var dataFields = template.find(attrDataSel).not(arrParCl +' *');
         jqthis.append(childArrCopy);
       }
     } else { //We have a value - insert it!
+      console.log ("Non-array Data for "+encAttName + " is: ", encdata[encAttName]);
+      if ( (encAttName !== 'fname') &&  (encAttName !== 'lname')) {
+        hasData = true;
+      }
       jqthis.htmlFormatted(encdata[encAttName]);
     }
   });
 
-
-
-
-
-
-//This kind of works, but not for arrays. Fiddle with it for arrays, but keep the
-// original...
-/*
-  dataFields.each(function() {
-    //console.log("In each data-el - this: ", this);
-    var jqthis = $(this);
-    var encAttName = jqthis.attr(popDefObj.popAttrNameDataAttr);
-    if ((encAttName === undefined) || !encAttName) { //Bad encAttName - delete
-      console.error("The template had a bad data-attribute name");
-      template.closest('.'+popDefObj.valueTemplateClass).remove();
-    }
-    if (encdata[encAttName] === undefined) {
-      if (hideempty) template.closest('.'+popDefObj.valueTemplateClass).remove();
-    } else { //We have a value - insert it!
-      jqthis.htmlFormatted(encdata[encAttName]);
-    }
-  });
-  */
-
-
-
-
-  return template;
+  if (hasData) {
+    return template;
+  } else {
+    console.log("We found no data for template:", template);
+    return null;
+  }
 }
 
 /** Takes an encoding template and recursively iterates through it building

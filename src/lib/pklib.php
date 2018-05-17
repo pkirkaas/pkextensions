@@ -2273,7 +2273,11 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
   }
   //if($db)pkdebug('hide0', $hide0, 'num', $num, 'wrap-class',$wrap_class,'prec',$prec);
   if (($num === null) || ($num === '') || ($hide0 && !$num)) return '';
-  $formatted = '$' . number_format($num, $prec);
+  $dol = '$';
+  if ($num < 0) {
+    $dol = '-$';
+  }
+  $formatted = $dol . number_format(abs($num), $prec);
   if (!$wrap_class) return $formatted;
   if ($num < 0) {
     $wrap_class .= ' negative-dollar-value';
