@@ -47,6 +47,9 @@ Tables:
   No Borders: table.no-borders
   Collapsed: table.pk-tbl
 
+Zooms: .z1, .z2, etc increase zoom by 1.1, 1.2, etc
+   .z-1, .z-2 to .9, .8
+
 Headings:
   .template-heading
   .page-template .page-title, .page-template .page-title.inverse

@@ -17,12 +17,18 @@ $(function () {
   $(window).resize(offsetContent);
 });
 
+
 function offsetContent() {
   //var topmenu = $('.pk-top-menu');
-  var topmenu = $('.fixed-menu-container');
+    //<nav class="navbar  navbar-expand-md navbar-inverse bg-inverse pk-top-menu main-menu no-print">
+  var topmenu = $('nav.pk-top-menu');
+    //<div class="menus-wrapper">
+  var menuwrap = $('div.menus-wrapper');
   var tmpos = topmenu.css('position');
-  if ((tmpos === 'fixed') || (tmpos === 'absolute')) {
-    $('.content-main').offset({top: topmenu.outerHeight()});
+  var wrppos = menuwrap.css('position');
+  if ((tmpos === 'fixed') || (tmpos === 'absolute') ||
+      (wrppos === 'fixed') || (wrppos === 'absolute')) {
+    $('.content-main').offset({top: menuwrap.outerHeight()});
   } else {
     $('.content-main').css('top', 0);
   }

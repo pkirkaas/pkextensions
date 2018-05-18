@@ -76,7 +76,7 @@ $pk-top-menu-nav-link-margin-top: 0 !default;
 //$pk-top-menu-font-size: .8rem !default;
 $pk-top-menu-font-size: 1rem !default;
 body nav.navbar.pk-top-menu {
-//  position: fixed;
+  position: fixed;
   font-size: $pk-top-menu-font-size;
   width: 100%;
   top: 0;

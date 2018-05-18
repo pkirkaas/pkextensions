@@ -6,6 +6,7 @@
     {{$namedslotcontent}}
      * 
      */ ?>
+    <div class="menus-wrapper">
     <nav class="navbar  navbar-expand-md navbar-inverse bg-inverse pk-top-menu main-menu no-print">
       <!-- Toggle Button -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content">
@@ -27,4 +28,5 @@
       </div>
     </nav>
     <?php if (!empty($sub_menu)) echo $sub_menu; ?>
-    <?php pkview("forms.DropLoginRegisterDialog")?>
+    </div>
+    <?php if (!Auth::user()) pkview("forms.DropLoginRegisterDialog")?>

@@ -171,7 +171,7 @@ containing block needs to be positioned relatively*/
   display: flex;
   flex-direction: column;
 }
-.f-center {
+.f-center, .flex-center {
   display: flex;
   justify-content: center;
 }
@@ -181,11 +181,18 @@ containing block needs to be positioned relatively*/
   flex-flow: row wrap;
   justify-content: space-between;
 }
+.flex-around {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
 
+/*
 .flex-between:after {
   content: "";
   flex: auto;
 }
+*/
 /** Apply to the flex box */
 .flexalignstretch {align-items: stretch;}
 .flexjustifyaround {justify-content: space-around;}

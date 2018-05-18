@@ -237,6 +237,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 }
 
 
+
 @mixin mk-boxshadow($map:()) {
   @if not(empty($map)) {
     @if $map == true {
@@ -282,6 +283,15 @@ $grid-gutter-width:          1.875rem !default; // 30px
   margin-left: $sz;
   margin-right: $sz;
 }
+
+@mixin mk-zooms {
+  @for $i from 0 through 50 {
+    $inc: $i/10;
+    .z#{$i} { zoom: 1+$inc; }
+    .z-#{$i} { zoom: 1-$inc; }
+  }
+}
+@include mk-zooms;
 
 /* Makes a bunch of left/right margins/paddings */
 //These are REM - so absolute across the site.

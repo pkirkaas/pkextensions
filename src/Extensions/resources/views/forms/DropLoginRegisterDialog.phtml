@@ -8,9 +8,15 @@ Include this just inside the main container (w. BS)
     display: flex;
     flex-grow: 10;
     opacity: 0;
+    /*
     position: absolute;
+    */
+    position: fixed;
     margin: auto;
+    /*
     width: 100%;
+    */
+    z-index: 1000;
     /*
     */
     align-items: center;
@@ -78,12 +84,25 @@ Include this just inside the main container (w. BS)
 </style>
 <script>
 $(function () {
+  $(document).on('click', function(event) {
+    if (!$(event.target).closest('div.login-register-dialog').length &&
+      !$(event.target).hasClass("log-reg-pop")) {
+      console.log("We think we clicked outside the demo dialog");
+      $("div.login-register-dialog").hide();
+      return;
+    }
+  });
+  
     $('div.login-register-dialog').hide();
     $('div.login-register-dialog').css('opacity',1);
+    
     $(".log-reg-pop").on("click hover mouseover", function () {
       setundermenu('div.login-register-dialog');
+      $('div.demo-dialog').hide();
       $('div.login-register-dialog').show();
+      console.log("Tried to show reg dlg?");
     });
+
     $(window).resize(function () {
       setundermenu('div.login-register-dialog');
     });
@@ -91,7 +110,7 @@ $(function () {
     $('.lrdlg-cancel-btn').click(function() {
       $('div.login-register-dialog').hide();
     });
-  });
+});
 </script>
 
 <style>
