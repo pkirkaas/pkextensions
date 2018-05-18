@@ -28,7 +28,7 @@ function offsetContent() {
   var wrppos = menuwrap.css('position');
   if ((tmpos === 'fixed') || (tmpos === 'absolute') ||
       (wrppos === 'fixed') || (wrppos === 'absolute')) {
-    $('.content-main').offset({top: menuwrap.outerHeight()});
+    $('.content-main').offset({top: topmenu.outerHeight()});
   } else {
     $('.content-main').css('top', 0);
   }
