@@ -671,6 +671,10 @@ class $createclassname extends Migration {
     return $this->attributes + ['MODEL CLASS'=>static::class];
   }
 
+  public function jsonDebug($args=[]) {
+    return json_encode($this->__debuginfo(), static::$jsonopts);
+  }
+
   /** The authXXX functions determine if the user is allowed to perform XXX
    * on the current Model instance. TO BE OVERRIDDEN in extended classes, but
    * some safe defaults are provided.

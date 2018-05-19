@@ -24,6 +24,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
 //Default json encode opts:
   public static $jsonopts = JSON_PRETTY_PRINT |
      JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES ;
+  public static $jopts_inatts = JSON_HEX_APOS | JSON_HEX_QUOT;
 
   /** Success will always return false.
    * 
