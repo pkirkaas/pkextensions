@@ -54,6 +54,11 @@ class PkHtmlBuilder extends HtmlBuilder {
    */
     public function linkRoute($name, $title = false, $parameters = [], $attributes = [],
         $escape=false) {
+      if (ne_string($attributes)) {
+        $attributes = ['class'=>$attributes];
+      } else if (!is_arrayish($attributes)) {
+        $attributes = [];
+      }
       if ($title === false) {
         $escape = false; #The title is coming from the router, trust it
         $title =  keyVal('desc',app()['router']->getRoutes()->getByName($name)->getAction());
