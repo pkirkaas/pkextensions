@@ -1,38 +1,24 @@
 <?php
-namespace PkExtensions\Models;
-use Illuminate\Support\Facades\Storage;
+namespace PkExtensions\Traits;
 /**
- * DEPRECATED! Use PkUploadTrait instead!
- *  PkUploadModel - pure Laravel, replaces the attachment models that were based on stapler
- *
- * @author pkirk
+ * Supports uploads
+ * @author pkirkaas
  */
-abstract class PkUploadModel extends PkModel {
-  #Map the general media type to an array of the specific mime types
-  /*
-  public static $upload_types = [
-    'image'=>['image/gif','image/png', 'image/jpeg', 'image/bmp', 'image/jpg','image/svg' ],
-    'video'=>['video/ogg','video/mpeg', 'video/mp4', 'video/webm',
-        'video/3gpp','video/quicktime', ],
-    'audio'=>['audio/ogg','audio/mpeg', 'audio/mp4', 'audio/webm', 'audio/mp3',
-        'audio/wav', 'audio/wave'],
-    'pdf'=>['application/pdf'],
-    'text'=>['text/plain', 'text/html'],
-  ];
-   * 
-   */
+trait PkUploadTrait {
   
-  public static $table_field_defs = [
+  public static function getTableFieldDefsExtraPkUpload() {
+     return  [
       'relpath'=>'string',
-      'type' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
+      'mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
       #Category, like, doc (text & pdf), media (audio, video)
       'cat' => ['type' => 'string', 'methods' => 'nullable'],
       'mimetype'=>'string',
       'size'=>'integer',
       'originalname'=>'string',
 
-      'desc' => ['type' => 'string', 'methods' => 'nullable'],
+      'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
+  }
 
   public static $methodsAsAttributeNames = [
       'url',
@@ -84,8 +70,8 @@ abstract class PkUploadModel extends PkModel {
    * @param boolean $mimefirst - skip the type field & just use mime? Default false
    */
   public function getType($mimefirst = false) {
-    if (!$mimefirst && ne_string($this->type)) {
-      return $this->type;
+    if (!$mimefirst && ne_string($this->mediatype)) {
+      return $this->mediatype;
     }
     return $this->mimeMainType();
   }
@@ -136,13 +122,13 @@ abstract class PkUploadModel extends PkModel {
     return !!$this->file_path($deleteonfalse);
   }
 
-  /** If "$this->type" not set, try to guess from mime-type
+  /** If "$this->mediatype" not set, try to guess from mime-type
    * @param array $args - optional args
    * @return Model
    */
   public function save(Array $args = []) {
-    if (!$this->type) {
-      $this->type = $this->getType(true);
+    if (!$this->mediatype) {
+      $this->mediatype = $this->getType(true);
     }
       return parent::save($args);
   }

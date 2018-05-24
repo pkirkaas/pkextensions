@@ -17,22 +17,43 @@ use PkExtensions\Models\PkModel;
 
  * @author pkirk
  */
+
+/** Geez, just so much easier to create, say "profile_id" in the implementing 
+ * classes....
+ */
 trait PkOwnedModelTrait {
 
-  protected $owner; #If set, the owning PkModel - make protected to call __get
+  /*
+  public function getOwner() {
+    if (!$this->owner instanceOf PkModel) {
+      if (!$this->owner_id || !$this->owner_model) {
+        return null;
+      }
+      $this->owner = $this->owner_model::find($this->owner_id);
+    }
+    return $this->owner;
+  }
+   * 
+   */
+
   public static function getTableFieldDefsExtraOwnedModel() {
     return [
+        /*
       #Like, 'App\Models\Profile'
       'owner_model'=> ['type' => 'string', 'methods' => 'nullable'],
       #Like - 7 - the ID of the owning model
       'owner_id' => ['type' => 'integer', 'methods' => ['index', 'nullable']],
+         * 
+         */
       #Like 'avatar'; The "owner's" name for the attribute, in the relationship method
       'att_name'=> ['type' => 'string', 'methods' => ['nullable','index']],
-
+      'type'=> ['type' => 'string', 'methods' => ['nullable','index']],
+      'subtype'=> ['type' => 'string', 'methods' => ['nullable','index']],
       'category'=> ['type' => 'string', 'methods' =>  'nullable'],
     ];
   }
   /** Both validates and enhances the constructor arguments / atts */
+  /*
   public static function OwnedModelTraitExtensionCheck($atts) {
     //pkdebug("Entering & Leaving OMTEC w. atts:", $atts);
     return $atts;
@@ -53,22 +74,14 @@ trait PkOwnedModelTrait {
         throw new PkException(["Owner was set, but not PkModel:", $owner]);
       }
     }
-    //pkdebug("Leaving OMTEC w. atts:", $atts);
     return $atts;
   }
   public function  OwnedModelTraitConstruct($atts) {
     //pkdebug("Entering Trait Constructor w. atts:", $atts);
-    /*
-    if (!keyVal('att_name', $atts)) {
-      return false;
-    }
-     * 
-     */
-      $owner = keyVal('owner',$atts);
-      unset($atts['owner']);
+      $owner = unsetret($atts,'owner');
       if ($owner instanceOf PkModel) {
-        $this->owner_id = $owner->id;
-        $this->owner_model = get_class($owner);
+        $this->owner_id = $atts['owner_id'] = $owner->id;
+        $this->owner_model = $atts['owner_model']  = get_class($owner);
       } else {
         $this->owner_id = keyVal('owner_id',$atts);
         $this->owner_model =  keyVal('owner_model',$atts);
@@ -85,17 +98,21 @@ trait PkOwnedModelTrait {
       return $ownername;
   }
 
+*/
   /** In case we create the upload object before we give it an owner
    * 
    * @param \PkExtensions\Models\PkModel $owner
    * @return $this
    */
+  /*
   public function setOwner(PkModel $owner) {
     $this->owner_model = get_class($owner);
     $this->owner_id = $owner->id;
     $this->owner = $owner;
     return $this;
   }
+   * 
+   */
 
 
 
@@ -105,6 +122,7 @@ trait PkOwnedModelTrait {
    * @param array $args
    * @return relationship/builder
    */
+  /*
   public function __call($method, $args=[]) {
     if ($method === $this->getOwnerName()) {
       return $this->belongsTo($this->owner_model, 'owner_id');
@@ -117,6 +135,8 @@ trait PkOwnedModelTrait {
     }
     return $this->owner = $this->owner_model::find($this->owner_id);
   }
+   * 
+   */
 
     /*
   public function __get($att) {
@@ -140,6 +160,7 @@ trait PkOwnedModelTrait {
   }
      */
   
+  /*
 
   public function __set($att, $val) {
     if (($att === 'owner') && ($val instanceOf PkModel) ) {
@@ -161,4 +182,5 @@ trait PkOwnedModelTrait {
       parent::__set($att, $val);
     }
   }
+   */
 }
