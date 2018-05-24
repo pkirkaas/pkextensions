@@ -3,9 +3,9 @@ namespace PkExtensions\Traits;
 use PkExtensions\PkException;
 use PkExtensions\Models\PkModel;
 /**
- * If some types of PkModels might be owned by several different other PkModels,
- * instead of making separate classes & tables for them all, make a single class
- * that can have different owner types
+ * If some types of PkModels might be similar, create a single model & adjust
+ * behavior by type. Instead of making separate classes & tables for them all,
+ * make a single class that can have different owner types
  * 
  * I've clevery extended PkModel to add the relationships hasOneTyped & hasManyTyped,
  * so you can use them like any other relationship definition:
@@ -19,9 +19,9 @@ use PkExtensions\Models\PkModel;
  */
 
 /** Geez, just so much easier to create, say "profile_id" in the implementing 
- * classes....
+ * classes...., & function profile() {return $this->ownedBy(Profile::class);}
  */
-trait PkOwnedModelTrait {
+trait PkTypedModelTrait {
 
   /*
   public function getOwner() {
@@ -36,7 +36,7 @@ trait PkOwnedModelTrait {
    * 
    */
 
-  public static function getTableFieldDefsExtraOwnedModel() {
+  public static function getTableFieldDefsExtraTypedModel() {
     return [
         /*
       #Like, 'App\Models\Profile'

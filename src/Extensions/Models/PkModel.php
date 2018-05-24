@@ -1013,7 +1013,28 @@ class $createclassname extends Migration {
     $this->fillable($this->getAttributeNames());
     unset ($attributes['id']);
     parent::__construct($attributes);
+    $this->ExtraConstructors($attributes);
   }
+
+  /** Calls all special trait constructor methods, which start with
+   * ExtraConstructor[TraitName]
+   * @param type $attributes
+   */
+  public function ExtraConstructors($attributes) {
+    $fnpre = 'ExtraConstructor';
+    $methods = get_class_methods(static::class);
+    $constructors = [];
+    foreach ($methods as $method) {
+      if (startsWith($method, $fnpre, false)) {
+        $constructors[] = $method;
+      }
+    }
+    foreach ($constructors as $constructor) {
+      $this->$constructor($attributes);
+    }
+  }
+
+
 
 
   /**
@@ -1906,6 +1927,8 @@ class $createclassname extends Migration {
   ###########  individual or collections of various types of file upload objects
   ############ but all of a single class, in a single table
 
+  /****  Change to using Typed as trait  **/
+  /*
   public function hasManyTyped($attname, $typedClass=null) {
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
@@ -1923,17 +1946,72 @@ class $createclassname extends Migration {
       ->where('owner_model',static::class)
       ->where('att_name',$attname);
     }
+   * 
+   */
+  /**
+   * 
+   * @param string $typedClass - full typed class name
+   * @param array $filters - optional like ['att_name'=>$attname,....
+   * @return builder
+   */
+  public function hasManyTyped($typedClass, $params=[]) {
+    $builder =  $this->hasMany($typedClass);
+    foreach ($params as $propname =>  $propval) {
+      $builder->where($propname,$propval);
+    }
+    return $builder;
+  }
+
+  /** Don't think this will work, as hasOne will only return one, without
+   * checking the params
+   * @param type $typedClass
+   * @param type $params
+   * @return type
+   */
+  public function hasOneTyped($typedClass, $params=[]) {
+    $builder = $this->hasMany($typedClass);
+    foreach ($params as $propname =>  $propval) {
+      $builder->where($propname,$propval);
+    }
+    return $builder;
+  }
 
 
     /**
-     * Creates & adds a typedUploadInstance from the data
-     * @param string $attname - The attribute name from the owning instance
-     * @param array $filedata - Data to build the Typed instance
+     * Creates & adds a typed (Owned) Instance from the data
+     * @param array $filedata - Data to build the Typed instance - like,
+     *   ['att_name'=>$att_name,...
      * @param boolean $hasone - if true, delete existing instance
-     * @param string|null $typedClass - the class to build, default PkTypedUploadModel
+     * @param string $typedClass - the class to build
      */
+  public function addTyped($typedClass, Array $filedata=[],  $hasone=false) {
+    if ($hasone) { #Delete all existing matches
+    }
+    $filedata[$this->getForeignKey()]=$this->getKey();
+    #Validate we have the $fileData we need before deleting or creating.
+    //$current = $this->$attname;
+    //$prefd = $filedata;
+    //$filedata = $typedClass::canCreate($filedata);
+    //if ($filedata === false) {
+     // pkdebug("Data validation to create [$typedClass] failed for data:", $pref);
+     // return false;
+    //}
+    if ($hasone) {
+      $typedClass::where('att_name',$attname)->where('owner_id',$this->id)
+          ->where('owner_model',static::class)->get()->delete();
+    }
+    $prop = $typedClass::createUpload($filedata);
+    if (! $typedClass::instantiated($prop)) {
+      return false;
+    }
+    return $prop;
+  }
+
+  public function setTyped($typedClass, Array $filedata) {
+    return $this->addTyped($typedClass, $filedata,  1);
+  }
+  /*
   public function addTyped($attname, Array $filedata, $typedClass=null, $hasone=false) {
-    //pkdebug("Adding typed, attname: [$attname], fdata:", $filedata);
     if (!$typedClass) {
       $typedClass = PkTypedUploadModel::class;
     }
@@ -1966,6 +2044,8 @@ class $createclassname extends Migration {
   public function setTyped($attname, Array $filedata, $typedClass=null) {
     return $this->addTyped($attname, $filedata, $typedClass, 1);
   }
+   * 
+   */
 
   /** Mutators for integer attributes - to change '' to NULL */
   /** If getting data from POST, the empty value is converted to '' in POST array.
