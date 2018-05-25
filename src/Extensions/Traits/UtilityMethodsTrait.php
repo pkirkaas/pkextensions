@@ -49,22 +49,26 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     } else if (is_object($target)) {
       $target = get_class($target);
     }
-    $traits = class_uses($target);
-    if (!$traits) {
-      return false;
+    return usesTrait($traitName, $target, $useBaseName);
+  }
+
+  public static function getAllTraits($target =null) {
+    if (!$target) {
+      $target = get_called_class();
+    } else if (is_object($target)) {
+      $target = get_class($target);
     }
-    if ($useBaseName) {
-      $target = getBaseName($target);
+    return getAllTraits($target);
+  }
+
+  public static function getTraitMethods($target = null) {
+    if (!$target) {
+      $target = get_called_class();
+    } else if (is_object($target)) {
+      $target = get_class($target);
     }
-    foreach ($traits as $trait) {
-      if ($useBaseName) {
-        $trait = getBaseName($trait);
-      }
-      if (strtolower($trait) === strtolower($target)) {
-        return true;
-      }
-    }
-    return false;
+    $traits = getDirectTraits($target);
+    return traitMethods($traits);
   }
     
 

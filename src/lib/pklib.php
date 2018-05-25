@@ -3565,3 +3565,104 @@ function explode_all($delimiter, $string, $trim = true, $omitempty = true) {
   }
   return $resarr;
 }
+
+/** Getting hierarchies, classes & methods */
+/**
+ * Returns an array of parent classes PLUS this class
+  @param object|class_name $oorc
+ */
+function classHierarchy ($oorc) {
+  if (is_object($oorc)) {
+    $oorc = get_class($oorc);
+  }
+  $hierarchy = class_parents($oorc) ?:[];
+  $hierarchy[] = $oorc;
+  return $hierarchy;
+}
+
+/** Ascends the class hierarchy & returns all the traits used 
+ * inherited by this class 
+ * @param type $oorc
+ */
+function getAllTraits($oorc) {
+  return getTraits($oorc, 1);
+}
+function getDirectTraits($oorc) {
+  return getTraits($oorc,false);
+}
+/** $traits using traits is if using a trait that uses another trait */
+function getTraits($oorc, $traitsusingtraits) {
+  $hierarchy =  classHierarchy($oorc);
+  $traits = [];
+  foreach ($hierarchy as $class) {
+    $traits = array_merge($traits, class_uses($class)?:[]);
+  }
+  if ($traitsusingtraits) {
+    $traits_to_search = $traits;
+    while (!empty($traits_to_search)) {
+      $new_traits = class_uses(array_pop($traits_to_search))?:[];
+      $traits = array_merge($new_traits, $traits);
+      $traits_to_search = array_merge($new_traits, $traits_to_search);
+    }
+  }
+  return array_unique($traits);
+}
+
+/** Does an object/class use a trait? Like instanceOf
+ * 
+ * @param type $oorc
+ * @param string $trait
+ * @root - just compare the root, not the whole namespace name
+ */
+/*
+function hasTrait($oorc, $trait, $root = true) {
+  $traits = getTraits($oorc, 1);
+  if (!$root) {
+    return in_array($trait, $traits, 1);
+  }
+ * 
+ */
+  /** Checks if class "instanceOf" $traitname
+   * $target - default null, so for the current class. Else,
+   * can be a classname or object instance
+   * $useBaseName - default true - remove Namespace components
+   */
+function usesTrait($traitName, $target, $useBaseName=true) {
+    if (is_object($target)) {
+      $target = get_class($target);
+    }
+    $traits = getTraits($target, 1);
+    if (!$traits) {
+      return false;
+    }
+    if (!$useBaseName) {
+      return in_array($traitName, $traits);
+    }
+    $traitName = strtolower(getBaseName($traitName));
+    foreach ($traits as $trait) {
+      if ($traitName === strtolower(getBaseName($trait))) {
+        return true;
+      }
+    }
+    return false;
+}
+
+/** Returns the trait methods - if $trait is an array, 
+ * all the methods for all the traits
+ * @param string|array $trait
+ * @return array of methods
+ */
+function traitMethods($traits) {
+  if (!$traits) {
+    return [];
+  }
+  if (is_string($traits)) {
+    $traits = [$traits];
+  }
+  $traitmethods = [];
+  foreach ($traits as $trait) {
+    $reflection = new ReflectionClass($trait);
+    $traitmethods = array_merge($traitmethods, $reflection->getMethods()); 
+  }
+  return array_unique($traitmethods);
+}

@@ -1024,19 +1024,7 @@ class $createclassname extends Migration {
   public function RunExtraConstructors($attributes) {
     #Too many methods, most models don't use traits. so,
     #Assume only from Traits
-    $classes = class_parents($this);
-    $classes[] = get_class($this);
-    
-    $traits = class_uses($this);
-    if (!$traits) {
-      pkdebug("No Traits for ! class: ".get_class($this));
-      return $attributes;
-    }
-    $traitmethods = [];
-    foreach ($traits as $trait) {
-      $reflection = new ReflectionClass($trait);
-      $traitmethods = array_merge($traitmethods, $reflection->getMethods()); 
-    }
+    $traitmethods = static::getTraitMethods();
     $fnpre = 'ExtraConstructor';
     //$methods = get_class_methods(static::class);
     $constructors = [];
@@ -1045,7 +1033,7 @@ class $createclassname extends Migration {
         $constructors[] = $traitmethod;
       }
     }
-    pkdebug("Constructors? ", $constructors, "Methods:", $traitmethods, "This Class:", get_class($this));
+    pkdebug("Constructors? ", $constructors, "Methods:", $traitmethods, "This Class:", get_class($this), "Traits? ", static::getAllTraits());
     foreach ($constructors as $constructor) {
       $this->$constructor($attributes);
     }
