@@ -1013,14 +1013,14 @@ class $createclassname extends Migration {
     $this->fillable($this->getAttributeNames());
     unset ($attributes['id']);
     parent::__construct($attributes);
-    $this->ExtraConstructors($attributes);
+    $this->RunExtraConstructors($attributes);
   }
 
   /** Calls all special trait constructor methods, which start with
    * ExtraConstructor[TraitName]
    * @param type $attributes
    */
-  public function ExtraConstructors($attributes) {
+  public function RunExtraConstructors($attributes) {
     $fnpre = 'ExtraConstructor';
     $methods = get_class_methods(static::class);
     $constructors = [];
@@ -1029,9 +1029,13 @@ class $createclassname extends Migration {
         $constructors[] = $method;
       }
     }
+    pkdebug("Constructors? ", $constructors, "Methods:", $methods, "This Class:", get_class($this));
     foreach ($constructors as $constructor) {
       $this->$constructor($attributes);
     }
+    /*
+     * 
+     */
   }
 
 
@@ -1964,30 +1968,41 @@ class $createclassname extends Migration {
 
   /** Don't think this will work, as hasOne will only return one, without
    * checking the params
-   * @param type $typedClass
-   * @param type $params
-   * @return type
+   * @param string $typedClass
+   * @param array $typeFilters
+   * @return $builder
    */
-  public function hasOneTyped($typedClass, $params=[]) {
+  public function hasOneTyped($typedClass, $typeFilters=[]) {
     $builder = $this->hasMany($typedClass);
     foreach ($params as $propname =>  $propval) {
       $builder->where($propname,$propval);
     }
-    return $builder;
+    return $builder->first();
   }
 
 
     /**
      * Creates & adds a typed (Owned) Instance from the data
      * @param array $filedata - Data to build the Typed instance - like,
+     * @param array $typeFilters - Data to make the object a specific type
      *   ['att_name'=>$att_name,...
-     * @param boolean $hasone - if true, delete existing instance
+     * @param boolean $hasone - if true, delete existing instances
      * @param string $typedClass - the class to build
      */
-  public function addTyped($typedClass, Array $filedata=[],  $hasone=false) {
+  public function addTyped($typedClass, Array $typeFilters = [], Array $filedata=[],  $hasone=false) {
+    $typeFilters[$this->getForeignKey()]=$this->getKey();
     if ($hasone) { #Delete all existing matches
+      $builder = $typedClass::query();
+      foreach ($typeFilters as $key=>$val) {
+        $builder->where($key, $val);
+      } #Now delete them all
+      $builder->delete();
     }
-    $filedata[$this->getForeignKey()]=$this->getKey();
+    #Create a new instance
+
+    $instance = new $typedClass(array_merge($typeFilters, $filedata));
+    return $instance;
+    //$filedata[$this->getForeignKey()]=$this->getKey();
     #Validate we have the $fileData we need before deleting or creating.
     //$current = $this->$attname;
     //$prefd = $filedata;
@@ -1996,19 +2011,24 @@ class $createclassname extends Migration {
      // pkdebug("Data validation to create [$typedClass] failed for data:", $pref);
      // return false;
     //}
+    /*
     if ($hasone) {
       $typedClass::where('att_name',$attname)->where('owner_id',$this->id)
           ->where('owner_model',static::class)->get()->delete();
     }
+     */
+    /*
     $prop = $typedClass::createUpload($filedata);
     if (! $typedClass::instantiated($prop)) {
       return false;
     }
     return $prop;
+     * 
+     */
   }
 
-  public function setTyped($typedClass, Array $filedata) {
-    return $this->addTyped($typedClass, $filedata,  1);
+  public function setTyped($typedClass, Array $typeFilters = [], Array $filedata) {
+    return $this->addTyped($typedClass, $typeFilters, $filedata,  1);
   }
   /*
   public function addTyped($attname, Array $filedata, $typedClass=null, $hasone=false) {

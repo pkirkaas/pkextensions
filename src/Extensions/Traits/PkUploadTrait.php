@@ -24,9 +24,23 @@ trait PkUploadTrait {
       'url',
 
   ];
+
+  public static $uploadTypesPkUploadTrait = [
+
+   ];
+
   
+  /** Implementing classes can define their own upload types & combine them 
+   * with the default from the trait
+   * @return complex array mapping keyed by upload type names to properties
+   */
   public static function getUploadTypes() {
-    return static::getAncestorArraysMerged('upload_types');
+    $ancestorUploadTypes = static::getAncestorArraysMerged('upload_types');
+    return array_merge($ancestorUploadTypes, static::$uploadTypesPkUploadTrait);
+  }
+
+  #What could be in here?
+  public function ExtraConstructorUploadTrait($atts = []) {
   }
 
   public static $requiredAtts = ['relpath', 'mimetype'];

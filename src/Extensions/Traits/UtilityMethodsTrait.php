@@ -37,6 +37,37 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     if ($text) return static::$jsoncodes[$res];
     return $res;
   }
+
+  /** Checks if class "instanceOf" $traitname
+   * $target - default null, so for the current class. Else,
+   * can be a classname or object instance
+   * $useBaseName - default true - remove Namespace components
+   */
+  public static function usesTrait($traitName, $target = null, $useBaseName=true) {
+    if (!$target) {
+      $target = get_called_class();
+    } else if (is_object($target)) {
+      $target = get_class($target);
+    }
+    $traits = class_uses($target);
+    if (!$traits) {
+      return false;
+    }
+    if ($useBaseName) {
+      $target = getBaseName($target);
+    }
+    foreach ($traits as $trait) {
+      if ($useBaseName) {
+        $trait = getBaseName($trait);
+      }
+      if (strtolower($trait) === strtolower($target)) {
+        return true;
+      }
+    }
+    return false;
+  }
+    
+
   public static function defines($method) {
       $class= static::class;
       if (!method_exists($class,$method)) {

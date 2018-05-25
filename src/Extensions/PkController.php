@@ -30,6 +30,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Traits\UtilityMethodsTrait;
+use PkExtensions\Traits\PkUploadTrait;
 use Illuminate\Http\UploadedFile;
 use Request;
 use Route as RouteFacade;
@@ -276,11 +277,13 @@ abstract class PkController extends Controller {
     if ($validationStr) {
       $this->validate($request,[$ctlName=>$validationStr]);
     }
+    //if (static::usesTrait('PkUploadTrait', $uploadedFile)) {
     if ($uploadedFile instanceOf UploadedFile) {
       $path = $uploadedFile->store('public');
       $baseName = basename($path);
       $pkmodel->$attName = $baseName;
       $pkmodel->save();
+      return $pkmodel;
     } else {
       pkdebug("No file uploaded to ".get_class($pkmodel).
           " for att: [$attName] with ctlName: [$ctlName]");

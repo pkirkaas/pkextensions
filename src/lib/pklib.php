@@ -3144,7 +3144,7 @@ function pk_is_mobile() {
 }
 
 /**
- * Returns the base class name of the namespaced class or object
+ * Returns the base class name of the namespaced class or object or trait
  * @param string|object - the class or object to get the basename of
  * @return string - the basename of the class/object
  */
