@@ -270,10 +270,10 @@ abstract class PkController extends Controller {
    * @param string $validationStr - The validation string to use for validation
    * @return type
    */
-  public function processFileUploads($pkmodel,$ctlName,$attName,$validationStr='image') {
+  public function processFileUploads($pkmodel ,$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
     $request = request();
-    $uploadedFile = $request->file($ctlName);
+    $uploadedFile  = $request->file($ctlName);
     if ($validationStr) {
       $this->validate($request,[$ctlName=>$validationStr]);
     }

@@ -3,7 +3,8 @@
  * like images from external URLs
  */
 namespace PkExtensions;
-use PkExtensions\Models\PkUploadModel;
+//use PkExtensions\Models\PkUploadModel;
+use PkExtentions\Traits\PkUploadTrait;
 //require_once (base_path('/vendor/stefangabos/zebra_image/Zebra_Image.php'));
 //use Zebra_Image;
 use Symfony\Component\HttpFoundation\File\File as SymphonyFile;

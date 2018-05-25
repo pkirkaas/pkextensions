@@ -126,20 +126,24 @@ abstract class PkModel extends Model {
    * the PkDisplayValueInterface
    */
   public static function getDisplayValueFields($onlyrefs = false) {
-    $display_value_fields = static::getAncestorArraysMerged('display_value_fields');
-    if ($onlyrefs) {
-      $refarr = [];
-      foreach ($display_value_fields as $key => $value) {
-        if (is_string ($key) && $value) {
-          $refarr[$key] = $value;
+    $prefix = 'display_value_fields';
+
+    $closure = function () use ($prefix, $onlyrefs ) {
+      $displayValueFields = static::combineAncestorsAndSiblings('display_value_fields');
+      if ($onlyrefs) {
+        $refarr = [];
+        foreach ($display_value_fields as $key => $value) {
+          if (is_string ($key) && $value) {
+            $refarr[$key] = $value;
+          }
         }
       }
       return $refarr;
-    }
-    if (!$display_value_fields ||
+      if (!$display_value_fields ||
         !count($display_value_fields)) {
-      return [];
-    }
+        return [];
+      }
+    };
     $normalized = normalizeConfigArray($display_value_fields);
     if (is_array($normalized)) return array_keys($normalized);
     return [];
@@ -153,7 +157,15 @@ abstract class PkModel extends Model {
    */
   public static $unset_table_field_keys = [];
 
+
   public static $requiredArgs = [];
+
+  public static function getRequiredArgs() {
+    return static::combineAncestorAndSiblings("requiredArgs");
+  }
+  public static function getLoadRelations() {
+    return static::combineAncestorAndSiblings("load_relations");
+  }
 
 
   public static function getFieldNames() {
@@ -164,10 +176,12 @@ abstract class PkModel extends Model {
     return $fieldNameArr[$class];
   }
 
-  public static $methodsAsAttributeNames = [];
+  public static $methodsAsAttributeNames = ['a_day'];
+  public static $methodsAsAttributeNamesLonger = ['2_day'];
 
   public static function getMethodsAsAttributeNames() {
-    return static::$methodsAsAttributeNames;
+    return static::combineAncestorAndSiblings("methodsAsAttributeNames");
+                                               //methodsAsAttributeNames
   }
 
   /** Executes the methods listed in static::getMethodsAsAttributesNames() and
@@ -218,6 +232,7 @@ abstract class PkModel extends Model {
     return static::setCached($cacheKey, static::getAncestorArraysMerged('table_field_defs'));
   }
 
+  /** Only if a particular subclass wants to remove inherited fields */
   public static function _unsetTableFieldDefs($defs = []) {
     foreach (static::$unset_table_field_keys as $unset_key) {
       unset($defs[$unset_key]);
@@ -1017,25 +1032,54 @@ class $createclassname extends Migration {
     $this->RunExtraConstructors($attributes);
   }
 
+  public static $trimtraits = [
+'PkExtensions\Traits\UtilityMethodsTrait',
+'Illuminate\Database\Eloquent\Concerns\HasAttributes',
+'Illuminate\Database\Eloquent\Concerns\HasEvents',
+'Illuminate\Database\Eloquent\Concerns\HasGlobalScopes',
+'Illuminate\Database\Eloquent\Concerns\HasRelationships',
+'Illuminate\Database\Eloquent\Concerns\HasTimestamps',
+'Illuminate\Database\Eloquent\Concerns\HidesAttributes',
+'Illuminate\Database\Eloquent\Concerns\GuardsAttributes',
+'Illuminate\Notifications\HasDatabaseNotifications',
+'Illuminate\Notifications\RoutesNotifications',
+'Illuminate\Auth\Authenticatable',
+'Illuminate\Foundation\Auth\Access\Authorizable',
+'Illuminate\Auth\Passwords\CanResetPassword',
+'Illuminate\Notifications\Notifiable',
+];
+
   /** Calls all special trait constructor methods, which start with
    * ExtraConstructor[TraitName]
    * @param type $attributes
    */
-  public function RunExtraConstructors($attributes) {
-    #Too many methods, most models don't use traits. so,
-    #Assume only from Traits
-    $traitmethods = static::getTraitMethods();
-    $fnpre = 'ExtraConstructor';
-    //$methods = get_class_methods(static::class);
-    $constructors = [];
-    foreach ($traitmethods as $traitmethod) {
-      if (startsWith($traitmethod, $fnpre, false)) {
-        $constructors[] = $traitmethod;
+  public static function getExtraConstructors() {
+    $constructors = static::getCached('ExtraConstructors');
+    if ($constructors === null) {
+      pkdebug("Building constructors for : ".static::class);
+      #Too many methods, most models don't use traits. so,
+      #Assume only from Traits
+      $traitmethods = static::getTraitMethods(static::$trimtraits);
+      $fnpre = 'ExtraConstructor';
+      //$methods = get_class_methods(static::class);
+      $constructors = [];
+      foreach ($traitmethods as $traitmethod) {
+        if (startsWith($traitmethod, $fnpre, false)) {
+          $constructors[] = $traitmethod;
+        }
       }
+      static::setCached('ExtraConstructors', $constructors);
     }
-    pkdebug("Constructors? ", $constructors, "Methods:", $traitmethods, "This Class:", get_class($this), "Traits? ", static::getAllTraits());
-    foreach ($constructors as $constructor) {
-      $this->$constructor($attributes);
+    return $constructors;
+  }
+
+  public function RunExtraConstructors($attributes) {
+    $constructors = static::getExtraConstructors();
+    if ($constructors) {
+      pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
+      foreach ($constructors as $constructor) {
+        $this->$constructor($attributes);
+      }
     }
     return $attributes;
   }
@@ -1099,13 +1143,6 @@ class $createclassname extends Migration {
    * NOTE! ALSO USED FOR CASCADING DELETES!
    */
   public static $load_relations = [ /* 'items' => 'App\Models\Item' */];
-
-  /** Default, just returns the static setting.  */
-  public static function getLoadRelations() {
-    $classLoadRelations = static::getAncestorArraysMerged('load_relations');
-    $traitLoadRelations = static::getAncestorArraysMerged('_load_relations');
-    return array_merge($classLoadRelations, $traitLoadRelations);
-  }
 
   /** For many to many edits. Needless to say, any changes/deletions stop at
    * the pivot table and do NOT modify the other side of the "Many" relationship

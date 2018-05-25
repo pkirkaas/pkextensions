@@ -1835,13 +1835,19 @@ function removeStartStrIf($str, $test = '') {
  * @param string $haystack
  * @param string $needle
  * @param boolean $case - true for case sensitive (default), false for ci
+ * @param boolean $longer false - must the haystack be longer than the needle?
  * @return boolean - does haystack start with needle?
  */
-function startsWith($haystack, $needle, $case = true) {
+function startsWith($haystack, $needle, $case = true, $longer = false) {
   if ($case) {
-    return (strcmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
+    $res = (strcmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
+  } else {
+    $res = (strcasecmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
   }
-  return (strcasecmp(substr($haystack, 0, strlen($needle)), $needle) === 0);
+  if ($longer) {
+    $res = $res && (strlen($haystack) > strlen($needle));
+  }
+  return $res;
 }
 
 /**
@@ -3595,12 +3601,12 @@ function getTraits($oorc, $traitsusingtraits) {
   $hierarchy =  classHierarchy($oorc);
   $traits = [];
   foreach ($hierarchy as $class) {
-    $traits = array_merge($traits, class_uses($class)?:[]);
+    $traits = array_merge($traits, array_keys(class_uses($class)?:[]));
   }
   if ($traitsusingtraits) {
     $traits_to_search = $traits;
     while (!empty($traits_to_search)) {
-      $new_traits = class_uses(array_pop($traits_to_search))?:[];
+      $new_traits = array_keys(class_uses(array_pop($traits_to_search))?:[]);
       $traits = array_merge($new_traits, $traits);
       $traits_to_search = array_merge($new_traits, $traits_to_search);
     }
@@ -3650,19 +3656,32 @@ function usesTrait($traitName, $target, $useBaseName=true) {
 /** Returns the trait methods - if $trait is an array, 
  * all the methods for all the traits
  * @param string|array $trait
+ * @param array of traits to ignore/remove
  * @return array of methods
  */
-function traitMethods($traits) {
+function traitMethods($traits, $omittraits=[]) {
   if (!$traits) {
     return [];
   }
   if (is_string($traits)) {
     $traits = [$traits];
   }
+  $traits = array_diff($traits, $omittraits);
   $traitmethods = [];
   foreach ($traits as $trait) {
     $reflection = new ReflectionClass($trait);
-    $traitmethods = array_merge($traitmethods, $reflection->getMethods()); 
+    $traitmethods = array_merge($traitmethods,
+        array_map(function($ar) {return $ar->name;},($reflection->getMethods()))); 
   }
+  pkdebug("Trait Methods:", $traitmethods);
   return array_unique($traitmethods);
 }
+
+/*
+  175=>  ReflectionMethod:object(ReflectionMethod)#426 (2) {
+  ["name"]=>
+  string(17) "fillableFromArray"
+  ["class"]=>
+  string(54) "Illuminate\Database\Eloquent\Concerns\GuardsAttributes"
+ * 
+ */

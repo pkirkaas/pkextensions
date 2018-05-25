@@ -1,5 +1,6 @@
 <?php
 namespace PkExtensions\Traits;
+use Undefined;
 use Carbon\Carbon;
 use ReflectionClass;
 /** Common methods that might be useful in many class hierarchies. Like a 
@@ -61,13 +62,14 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     return getAllTraits($target);
   }
 
-  public static function getTraitMethods($target = null) {
+  public static function getTraitMethods($trimtraits=[],$target = null) {
     if (!$target) {
       $target = get_called_class();
     } else if (is_object($target)) {
       $target = get_class($target);
     }
     $traits = getDirectTraits($target);
+    $traits = array_diff($traits, $trimtraits);
     return traitMethods($traits);
   }
     
@@ -103,6 +105,26 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     static::$_cache[$class][$key] = $value;
     return $value;
   }
+
+  /** Automate all the caching - for "getting" functions */
+  public static function manageCache($key,$closure) {
+    if (!array_key_exists(static::class,static::$_cache)) {
+       static::setCached($key,$closure());
+    }
+    return keyVal($key, static::$_cache[static::class]);
+  }
+
+  public static function combineAncestorAndSiblings($prefix, $idx=false) {
+    $closure = function() use($prefix,$idx) {
+      $ancestors = static::getAncestorArraysMerged($prefix,1);
+      $siblings = static::getSiblingArraysMerged($prefix,1);
+      pkdebug('Class: ', static::class, "Prefix:", $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
+
+      return array_unique(array_merge($ancestors,$siblings));};
+    return static::manageCache($prefix, $closure());
+  }
+
+    
 
   /** To add dynamic closure methods to classes. Have to implement actually 
    * calling them in the __call() method of the classes themselves, though, like
@@ -223,6 +245,28 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     }
     $fullRetArr[$thisClass][$arrayName] = $mgArr;
     return $mgArr;
+  }
+
+  /** Similar to get ancestor arrays merged, but this merges static arrays that
+   * start with the same prefix - like $methodsAsAttributeNamesUploadTrait...
+   * @param string $prefix - the property has to start with that prefix
+   * @param boolean $idx - combine as indexed array or assoc.
+   * @param boolean $longer - does the property name have to be longer than prefix?
+   */
+  public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
+    $ref = new ReflectionClass(static::class);
+    $staticprops = $ref->getStaticProperties();
+    $tomerge = [];
+    foreach ($staticprops as $key => $val) {
+      if (startsWith($key, $prefix, false, $longer)) {
+        $tomerge[]=$val;
+      }
+    }
+    $merged = array_merge_array($tomerge);
+    if ($idx) {
+      $merged = array_unique($merged);
+    }
+    return $merged;
   }
 
   #Not doing it this way

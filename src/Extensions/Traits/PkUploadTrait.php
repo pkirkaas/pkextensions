@@ -1,7 +1,10 @@
 <?php
 namespace PkExtensions\Traits;
+use Illuminate\Http\UploadedFile;
+
+/** This is to be incuded by PkModels. The Pk
 /**
- * Supports uploads
+ * Supports uploads - to be used by Models. In turn, uses PkFileUploadService
  * @author pkirkaas
  */
 trait PkUploadTrait {
@@ -19,10 +22,10 @@ trait PkUploadTrait {
       'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
       ];
   }
+  public $uploadedFile;
 
-  public static $methodsAsAttributeNames = [
+  public static $methodsAsAttributeNamesPkUpload = [
       'url',
-
   ];
 
   public static $uploadTypesPkUploadTrait = [
@@ -41,9 +44,10 @@ trait PkUploadTrait {
 
   #What could be in here?
   public function ExtraConstructorUploadTrait($atts = []) {
+    $this->uploadedFile = keyVal('uploaded_file', $atts);
   }
 
-  public static $requiredAtts = ['relpath', 'mimetype'];
+  public static $requiredAttsPkUpload = ['relpath', 'mimetype'];
 
 
 
