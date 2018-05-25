@@ -50,6 +50,7 @@ use PkExtensions\PkCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Closure;
 use Schema;
+use ReflectionClass;
 //use App\Models\User;
 //use \Auth;
 use Illuminate\Support\Str;
@@ -1021,21 +1022,34 @@ class $createclassname extends Migration {
    * @param type $attributes
    */
   public function RunExtraConstructors($attributes) {
+    #Too many methods, most models don't use traits. so,
+    #Assume only from Traits
+    $classes = class_parents($this);
+    $classes[] = get_class($this);
+    
+    $traits = class_uses($this);
+    if (!$traits) {
+      pkdebug("No Traits for ! class: ".get_class($this));
+      return $attributes;
+    }
+    $traitmethods = [];
+    foreach ($traits as $trait) {
+      $reflection = new ReflectionClass($trait);
+      $traitmethods = array_merge($traitmethods, $reflection->getMethods()); 
+    }
     $fnpre = 'ExtraConstructor';
-    $methods = get_class_methods(static::class);
+    //$methods = get_class_methods(static::class);
     $constructors = [];
-    foreach ($methods as $method) {
-      if (startsWith($method, $fnpre, false)) {
-        $constructors[] = $method;
+    foreach ($traitmethods as $traitmethod) {
+      if (startsWith($traitmethod, $fnpre, false)) {
+        $constructors[] = $traitmethod;
       }
     }
-    pkdebug("Constructors? ", $constructors, "Methods:", $methods, "This Class:", get_class($this));
+    pkdebug("Constructors? ", $constructors, "Methods:", $traitmethods, "This Class:", get_class($this));
     foreach ($constructors as $constructor) {
       $this->$constructor($attributes);
     }
-    /*
-     * 
-     */
+    return $attributes;
   }
 
 
