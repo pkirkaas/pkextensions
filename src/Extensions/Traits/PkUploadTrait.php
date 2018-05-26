@@ -1,6 +1,8 @@
 <?php
 namespace PkExtensions\Traits;
+use PkExtensions\PkExceptionResponsive;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 /** This is to be incuded by PkModels. The Pk
 /**
@@ -11,6 +13,7 @@ trait PkUploadTrait {
   
   public static $table_field_defs_UploadTrait =  [
   'relpath'=>'string',
+  'storagepath'=>'string',
   'mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
   #Category, like, doc (text & pdf), media (audio, video)
   'cat' => ['type' => 'string', 'methods' => 'nullable'],
@@ -30,35 +33,47 @@ trait PkUploadTrait {
 
    ];
 
-  /** You have an uploaded file object - but it's not a model & not persistent.
-   * Let's set them up.
-   * @param UploadedFile $file
-   */
-  public function setUploadModelProperties(UploadedFile $file, $key=null) {
-    #Let's see what data we can get from it first:
-    $fileProperties = [
-        'storeresult' =>$file->store('public'),
-        'mimetype' => $file->getMimeType(),
-        'originalname' => $file->getClientOriginalName(),
-        'size' =>$file->getClientSize(),
-        'path' =>$file->path(),
-        'key' => $key,
-];
-    pkdebug("Uploaded File info: Array first:", $fileProperties, "Now from the file obj: ",$file);
+  #We need at least a file upload object
+  public function TraitConstructorPkUpload(&$args=[]) {
+    $file = keyVal('file', $args);
+    if (!$file instanceOf UploadedFile) {
+      throw new PkExceptionResponsive("Wrong type of upload");
+    }
+    $storeresult = $file->store('public');
+    $mimetype = $file->getMimeType();
+    $this->mimetype = $mimetype;
+    $this->storagepath = $storeresult;
+    $this->size =$file->getClientSize();
+    $this->mediatype= static::smimeMainType($mimetype);
+    $this->originalname = $file->getClientOriginalName();
+    $this->relpath=Storage::url($storeresult);
+    $this->key = $key;
+    $this->path =$file->path();
+  }
+
         
 
-  }
 
   /** Retrieves the file info from the request - both the keys & values.
    * @param int $num -default 0, the first key/val pair. If -1, all
    */
   public static function getFiles($num = 0) {
-    $files = request()->filesAll();
+    $files = request()->allFiles();
     if ($num < 0) {
       return $files;
     } 
     $keys = array_keys($files);
     return [$keys[$num], $files[$keys[$num]]];
+  }
+
+  public static function showFilePost() {
+    $firstset = static::getFiles();
+    return static::setUploadModelProperties($firstset[1], $firstset[0]);
+  }
+
+  public static function getInfo() {
+    $keyvalarr = static::getFiles();
+    return static::setUploadModelProperties($keyvalarr[1], $keyvalarr[0]);
   }
   
   /** Implementing classes can define their own upload types & combine them 
