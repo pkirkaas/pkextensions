@@ -121,11 +121,13 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
 
 //    $closure = function() use($prefix,$idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,$idx);
-      /*
       $siblings = static::getSiblingArraysMerged($prefix,1,1);
       pkdebug('Class: ', static::class, "Prefix:", $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
        if (is_array($ancestors) && $ancestors
            && is_array($siblings) && $siblings) {
+         pkdebug("Both ancestors & siblings exist - let's compare:
+           siblings: ", $siblings, "ancestores: ", $ancestors, "Merged: ",
+             array_merge($ancestors, $siblings));
           return array_merge($ancestors,$siblings);
         }
         if (is_array($ancestors) && $ancestors) {
@@ -135,13 +137,14 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
           return $siblings;
         }
         return false;
-      };
+     // };
     #$rescl = $closure();
     #pkdebug("Res Closure:", $rescl);
-    return static::manageCache($prefix, $closure);
+    //return static::manageCache($prefix, $closure);
+      /*
        * 
        */
-      return $ancestors;
+      //return $ancestors;
   }
 
     
@@ -275,8 +278,12 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @param boolean $longer - does the property name have to be longer than prefix?
    */
   public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
+    pkdebug("Getting Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
     $ref = new ReflectionClass(static::class);
     $staticprops = $ref->getStaticProperties();
+    pkdebug("The static props from reflection are: ", $staticprops,"
+      Maybe this is where I made my mistake? I didn't keep the keys
+      with the values? Or maybe I was really bad at combining the values...");
     $tomerge = [];
     foreach ($staticprops as $key => $val) {
       echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
