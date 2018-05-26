@@ -295,7 +295,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     //if ($idx) {
      // $merged = array_unique($merged);
     //}
-    return $merged;
+    //return $merged;
   }
 
   #Not doing it this way
