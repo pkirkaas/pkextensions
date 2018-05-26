@@ -9,37 +9,64 @@ use Illuminate\Http\UploadedFile;
  */
 trait PkUploadTrait {
   
-  public static function getTableFieldDefsExtraPkUpload() {
-     return  [
-      'relpath'=>'string',
-      'mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
-      #Category, like, doc (text & pdf), media (audio, video)
-      'cat' => ['type' => 'string', 'methods' => 'nullable'],
-      'mimetype'=>'string',
-      'size'=>'integer',
-      'originalname'=>'string',
+  public static $table_field_defs_UploadTrait =  [
+  'relpath'=>'string',
+  'mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
+  #Category, like, doc (text & pdf), media (audio, video)
+  'cat' => ['type' => 'string', 'methods' => 'nullable'],
+  'mimetype'=>'string',
+  'size'=>'integer',
+  'originalname'=>'string',
 
-      'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
-      ];
-  }
+  'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
+  ];
   public $uploadedFile;
 
   public static $methodsAsAttributeNamesPkUpload = [
       'url',
   ];
 
-  public static $uploadTypesPkUploadTrait = [
+  public static $upload_typesPkUploadTrait = [
 
    ];
 
+  /** You have an uploaded file object - but it's not a model & not persistent.
+   * Let's set them up.
+   * @param UploadedFile $file
+   */
+  public function setUploadModelProperties(UploadedFile $file, $key=null) {
+    #Let's see what data we can get from it first:
+    $fileProperties = [
+        'storeresult' =>$file->store('public'),
+        'mimetype' => $file->getMimeType(),
+        'originalname' => $file->getClientOriginalName(),
+        'size' =>$file->getClientSize(),
+        'path' =>$file->path(),
+        'key' => $key,
+];
+    pkdebug("Uploaded File info: Array first:", $fileProperties, "Now from the file obj: ",$file);
+        
+
+  }
+
+  /** Retrieves the file info from the request - both the keys & values.
+   * @param int $num -default 0, the first key/val pair. If -1, all
+   */
+  public static function getFiles($num = 0) {
+    $files = request()->filesAll();
+    if ($num < 0) {
+      return $files;
+    } 
+    $keys = array_keys($files);
+    return [$keys[$num], $files[$keys[$num]]];
+  }
   
   /** Implementing classes can define their own upload types & combine them 
    * with the default from the trait
    * @return complex array mapping keyed by upload type names to properties
    */
   public static function getUploadTypes() {
-    $ancestorUploadTypes = static::getAncestorArraysMerged('upload_types');
-    return array_merge($ancestorUploadTypes, static::$uploadTypesPkUploadTrait);
+    return static::combineAncestorAndSiblings("upload_types");
   }
 
   #What could be in here?
@@ -47,7 +74,7 @@ trait PkUploadTrait {
     $this->uploadedFile = keyVal('uploaded_file', $atts);
   }
 
-  public static $requiredAttsPkUpload = ['relpath', 'mimetype'];
+  public static $required_attsPkUpload = ['relpath', 'mimetype'];
 
 
 

@@ -1481,6 +1481,18 @@ function arrayish_keys_exist($keys, $arr = null) {
   return true;
 }
 
+/** Returns indexed array of two - the key & value, by default first,
+ * 
+ * @param array $arr
+ * @param int $idx - which key/val pair do you want? Default 0
+ */
+function keyvalpair($arr, $idx=0){
+  $keys = array_keys($arr);
+  $key = $keys[$idx];
+  return [$key, $arr[$key]];
+}
+
+
 /** Both ArrayObject & Laravel Collections implement ArrayAccess - but they
  * they DON'T have the same array clone:
  *     ElloquentCollection->toArray()

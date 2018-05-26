@@ -109,6 +109,9 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   /** Automate all the caching - for "getting" functions */
   public static function manageCache($key,$closure) {
     if (!array_key_exists(static::class,static::$_cache)) {
+      static::$_cache[static::class] = [];
+    }
+    if (!array_key_exists($key,static::$_cache[static::class])) {
        static::setCached($key,$closure());
     }
     return keyVal($key, static::$_cache[static::class]);
@@ -117,11 +120,15 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   public static function combineAncestorAndSiblings($prefix, $idx=false) {
     $closure = function() use($prefix,$idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,1);
-      $siblings = static::getSiblingArraysMerged($prefix,1);
+      $siblings = static::getSiblingArraysMerged($prefix,1,1);
       pkdebug('Class: ', static::class, "Prefix:", $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
 
+      //$ours = array_unique(array_merge($ancestors,$siblings));
+      //pkdebug("Inside, ours is:",$ours);
       return array_unique(array_merge($ancestors,$siblings));};
-    return static::manageCache($prefix, $closure());
+    $rescl = $closure();
+    pkdebug("Res Closure:", $rescl);
+    return static::manageCache($prefix, $closure);
   }
 
     

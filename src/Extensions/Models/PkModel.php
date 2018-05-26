@@ -161,7 +161,7 @@ abstract class PkModel extends Model {
   public static $requiredArgs = [];
 
   public static function getRequiredArgs() {
-    return static::combineAncestorAndSiblings("requiredArgs");
+    return static::combineAncestorAndSiblings("required_args");
   }
   public static function getLoadRelations() {
     return static::combineAncestorAndSiblings("load_relations");
@@ -241,9 +241,17 @@ abstract class PkModel extends Model {
   }
 
   public static function getTableFieldDefs() {
+    return array_merge(
+        static::combineAncestorAndSiblings("table_field_defs"),
+        static::getExtraTableFieldDefs());
+  }
+  /*
+  public static function getTableFieldDefs() {
     $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
     return static::_unsetTableFieldDefs($defs);
   }
+   * 
+   */
 
   /** Tries to return a description of the attribute for a label
    * If there is a 'desc' property for the attribute, return it.
@@ -1029,7 +1037,7 @@ class $createclassname extends Migration {
     $this->fillable($this->getAttributeNames());
     unset ($attributes['id']);
     parent::__construct($attributes);
-    $this->RunExtraConstructors($attributes);
+    $this->RunTraitConstructors($attributes);
   }
 
   public static $trimtraits = [
@@ -1050,17 +1058,17 @@ class $createclassname extends Migration {
 ];
 
   /** Calls all special trait constructor methods, which start with
-   * ExtraConstructor[TraitName]
+   * TraitConstructor[TraitName]
    * @param type $attributes
    */
-  public static function getExtraConstructors() {
-    $constructors = static::getCached('ExtraConstructors');
+  public static function getTraitConstructors() {
+    $constructors = static::getCached('TraitConstructors');
     if ($constructors === null) {
       pkdebug("Building constructors for : ".static::class);
       #Too many methods, most models don't use traits. so,
       #Assume only from Traits
       $traitmethods = static::getTraitMethods(static::$trimtraits);
-      $fnpre = 'ExtraConstructor';
+      $fnpre = 'TraitConstructor';
       //$methods = get_class_methods(static::class);
       $constructors = [];
       foreach ($traitmethods as $traitmethod) {
@@ -1068,13 +1076,13 @@ class $createclassname extends Migration {
           $constructors[] = $traitmethod;
         }
       }
-      static::setCached('ExtraConstructors', $constructors);
+      static::setCached('TraitConstructors', $constructors);
     }
     return $constructors;
   }
 
-  public function RunExtraConstructors($attributes) {
-    $constructors = static::getExtraConstructors();
+  public function RunTraitConstructors($attributes) {
+    $constructors = static::getTraitConstructors();
     if ($constructors) {
       pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
       foreach ($constructors as $constructor) {

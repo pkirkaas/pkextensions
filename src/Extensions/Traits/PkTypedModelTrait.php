@@ -36,8 +36,7 @@ trait PkTypedModelTrait {
    * 
    */
 
-  public static function getTableFieldDefsExtraTypedModel() {
-    return [
+  public static $table_field_defs_PkTyped = [
         /*
       #Like, 'App\Models\Profile'
       'owner_model'=> ['type' => 'string', 'methods' => 'nullable'],
@@ -51,7 +50,6 @@ trait PkTypedModelTrait {
       'subtype'=> ['type' => 'string', 'methods' => ['nullable','index']],
       'category'=> ['type' => 'string', 'methods' =>  'nullable'],
     ];
-  }
   /** Both validates and enhances the constructor arguments / atts */
   /*
   public static function OwnedModelTraitExtensionCheck($atts) {
