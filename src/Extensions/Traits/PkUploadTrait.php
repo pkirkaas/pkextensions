@@ -1,6 +1,6 @@
 <?php
 namespace PkExtensions\Traits;
-use PkExtensions\PkExceptionResponsive;
+use PkExtensions\PkExceptionResponsable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -37,7 +37,10 @@ trait PkUploadTrait {
   public function TraitConstructorPkUpload(&$args=[]) {
     $file = keyVal('file', $args);
     if (!$file instanceOf UploadedFile) {
-      throw new PkExceptionResponsive("Wrong type of upload");
+      //echo "\n\nType of File:  ".typeOf($file)."\n\n";
+          
+      //throw new PkExceptionResponsable("Wrong type of upload");
+      return;
     }
     $storeresult = $file->store('public');
     $mimetype = $file->getMimeType();
@@ -47,7 +50,7 @@ trait PkUploadTrait {
     $this->mediatype= static::smimeMainType($mimetype);
     $this->originalname = $file->getClientOriginalName();
     $this->relpath=Storage::url($storeresult);
-    $this->key = $key;
+    $this->key = keyVal('key',$args);
     $this->path =$file->path();
   }
 

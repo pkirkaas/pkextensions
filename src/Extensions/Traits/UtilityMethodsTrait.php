@@ -118,17 +118,30 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   }
 
   public static function combineAncestorAndSiblings($prefix, $idx=false) {
-    $closure = function() use($prefix,$idx) {
-      $ancestors = static::getAncestorArraysMerged($prefix,1);
+
+//    $closure = function() use($prefix,$idx) {
+      $ancestors = static::getAncestorArraysMerged($prefix,$idx);
+      /*
       $siblings = static::getSiblingArraysMerged($prefix,1,1);
       pkdebug('Class: ', static::class, "Prefix:", $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
-
-      //$ours = array_unique(array_merge($ancestors,$siblings));
-      //pkdebug("Inside, ours is:",$ours);
-      return array_unique(array_merge($ancestors,$siblings));};
-    $rescl = $closure();
-    pkdebug("Res Closure:", $rescl);
+       if (is_array($ancestors) && $ancestors
+           && is_array($siblings) && $siblings) {
+          return array_merge($ancestors,$siblings);
+        }
+        if (is_array($ancestors) && $ancestors) {
+          return $ancestors;
+        }
+        if (is_array($siblings) && $siblings) {
+          return $siblings;
+        }
+        return false;
+      };
+    #$rescl = $closure();
+    #pkdebug("Res Closure:", $rescl);
     return static::manageCache($prefix, $closure);
+       * 
+       */
+      return $ancestors;
   }
 
     
@@ -251,6 +264,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       $mgArr = array_unique($mgArr);
     }
     $fullRetArr[$thisClass][$arrayName] = $mgArr;
+    pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
     return $mgArr;
   }
 
@@ -265,14 +279,22 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     $staticprops = $ref->getStaticProperties();
     $tomerge = [];
     foreach ($staticprops as $key => $val) {
-      if (startsWith($key, $prefix, false, $longer)) {
+      echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
+      if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
         $tomerge[]=$val;
       }
     }
-    $merged = array_merge_array($tomerge);
-    if ($idx) {
-      $merged = array_unique($merged);
+    echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
+     
+    if (!count($tomerge)) {
+      return false;
     }
+    $merged = array_merge_array($tomerge);
+  echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
+  echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
+    //if ($idx) {
+     // $merged = array_unique($merged);
+    //}
     return $merged;
   }
 

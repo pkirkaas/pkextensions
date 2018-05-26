@@ -1161,9 +1161,19 @@ function is_simple($val) {
  * @return Array: Merged array of arrays
  */
 function array_merge_array($arrs = []) {
+  if (!is_array($arrs) || !count($arrs)) {
+    return [];
+  }
+  if (is_array($arrs) && (count($arrs) ===1)){
+    return $arrs;
+  }
   $res = [];
   foreach ($arrs as $arr) {
-    $res = array_merge($res, $arr);
+    if (!is_array($arr)) {
+      $res[] = $arr;
+    } else {
+      $res = array_merge($res, $arr);
+    }
   }
   return $res;
 }
