@@ -240,8 +240,8 @@ abstract class PkModel extends Model {
 
   public static function getTableFieldDefs() {
     //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
-    //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs(), static::getTableFieldDefsTrait());
-    $defs = static::_getTableFieldDefs();
+    $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs(), static::getTableFieldDefsTrait());
+    //$defs = static::_getTableFieldDefs();
     pkdebug("For class: ".static::class." Table Field Defs: ",$defs);
     return static::_unsetTableFieldDefs($defs);
   }

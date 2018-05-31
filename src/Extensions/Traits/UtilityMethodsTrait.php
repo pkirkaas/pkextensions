@@ -74,6 +74,11 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   }
     
 
+/** Does THIS SPECIFIC CLASS or used TRAIT define the method?
+ * NOT an Ancestor!
+ * @param string $method
+ * @return boolean
+ */
   public static function defines($method) {
       $class= static::class;
       if (!method_exists($class,$method)) {
@@ -297,14 +302,25 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @param boolean $longer - does the property name have to be longer than prefix?
    */
   public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
+    echo "Trying to get SIBLING arrays merged for: ".static::class."\n\n";
     $akey = $prefix."_sibling";
     $closure = function() use($prefix, $idx, $longer) {
       pkdebug("Getting Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
+      echo "\nTrying to get reflection class...\n";
       $ref = new ReflectionClass(static::class);
+      echo "\nGot reflection class, getting properties?...\n";
+      pkdebug("Trying to get properties..");
       $staticprops = $ref->getStaticProperties();
+      echo "\nDid I get the properties? Why Not?\n";
+      pkdebug("Still waiting for the properties...");
+      /*
       pkdebug("The static props from reflection are: ", $staticprops,"
         Maybe this is where I made my mistake? I didn't keep the keys
         with the values? Or maybe I was really bad at combining the values...");
+       * 
+       */
+      pkdebug("Not trying to print the static props");
+      echo("\nNot trying to print the static props\n");
       $tomerge = [];
       foreach ($staticprops as $key => $val) {
         echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
