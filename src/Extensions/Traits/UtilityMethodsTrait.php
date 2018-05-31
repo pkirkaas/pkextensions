@@ -87,35 +87,50 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       }
     }
   /** For caching results of methods that don't change. Keyed by 'key' & class
-   *
-   * @var array 
+   * @var array $_cache - by class, & key
    */
   public static $_cache = []; 
   
-  public static function getCached($key) {
-    $class = static::class;
-    if (array_key_exists($class,static::$_cache)) {
-      return keyVal($key, static::$_cache[$class]);
+  /** Get cached value for class/key - if callable provided, 
+   * run & set cache value if it doesn't exist 
+   * @param string $key
+   * @param callable $callable
+   * @return mixed
+   */
+  public static function getCached($key, $callable=null) {
+    if (!array_key_exists(static::class,static::$_cache)) {
+      static::$_cache[static::class] = [];
+    }
+    if (array_key_exists($key,static::$_cache[static::class])) {
+      return static::$_cache[static::class][$key];
+    }
+    if (is_callable($callable)) {
+      return static::setCached($key, call_user_func($callable));
     }
     return null;
   }
 
   public static function setCached($key,$value=null) {
-    $class = static::class;
-    static::$_cache[$class][$key] = $value;
-    return $value;
+    return static::$_cache[static::class][$key] = $value;
   }
 
-  /** Automate all the caching - for "getting" functions */
-  public static function manageCache($key,$closure) {
+  /** Automate all the caching - for "getting" functions 
+   * If keyval exists, return it - else set via closure &
+   * return
+   */
+  /*
+  public static function getSetCached($key,$closure) {
     if (!array_key_exists(static::class,static::$_cache)) {
       static::$_cache[static::class] = [];
     }
     if (!array_key_exists($key,static::$_cache[static::class])) {
-       static::setCached($key,$closure());
+       return static::setCached($key,$closure());
     }
-    return keyVal($key, static::$_cache[static::class]);
+    //return keyVal($key, static::$_cache[static::class]);
+    return static::getCached($key);
   }
+   * 
+   */
 
   public static function combineAncestorAndSiblings($prefix, $idx=false) {
 
@@ -220,55 +235,59 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @return Array: Merged array of hierarchy
    */
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
-    $retArr = [];
-    $convert = function($arr) use ($idx) {
-      if (is_string($idx)) {
-        return normalizeConfigArray($arr); 
-      } else {
-        return $arr;
+    $akey = $arrayName."_ancestor";
+    $closure = function() use($arrayName, $idx) {
+      $retArr = [];
+      $convert = function($arr) use ($idx) {
+        if (is_string($idx)) {
+          return normalizeConfigArray($arr); 
+        } else {
+          return $arr;
+        }
+      };
+      $thisClass = $class = static::class;
+      #All static, so cache results...
+      static $fullRetArr = [];
+      if (!array_key_exists($class, $fullRetArr)) {
+        $fullRetArr[$class] = [];
       }
+      if (!array_key_exists($arrayName, $fullRetArr[$class])) {
+        $fullRetArr[$class][$arrayName] = null;
+      }
+      if (is_array($fullRetArr[$class][$arrayName])) { #Already made it, it's empty
+        return $fullRetArr[$class][$arrayName];
+      }
+      //$fullRetArr[$class] = null;
+      #First, build array of arrays....
+      if (property_exists($class, $arrayName) && is_array($class::$$arrayName)) {
+        $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
+      }
+      while ($par = get_parent_class($class)) {
+        if (!property_exists($par, $arrayName) ||
+          ($par::$$arrayName === false) ) {#If a parent wants stop accension
+          break;
+        }
+        if (($tstArr =$par::$$arrayName) && is_array($tstArr) ) {
+          //$retArr[] = $par::$$arrayName;
+          $retArr[] = $convert($tstArr);
+        }
+        $class = $par;
+      }
+      if (!count($retArr)) {
+        return [];
+      }
+      #Now merge. Reverse order so child settings override ancestors...
+      $retArr = array_reverse($retArr);
+      $mgArr = call_user_func_array('array_merge', $retArr);
+      #Mainly to save the developer who respecifies 'id' in the derived direct
+      if (($idx === true) && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
+        $mgArr = array_unique($mgArr);
+      }
+      $fullRetArr[$thisClass][$arrayName] = $mgArr;
+      pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
+      return $mgArr;
     };
-    $thisClass = $class = static::class;
-    #All static, so cache results...
-    static $fullRetArr = [];
-    if (!array_key_exists($class, $fullRetArr)) {
-      $fullRetArr[$class] = [];
-    }
-    if (!array_key_exists($arrayName, $fullRetArr[$class])) {
-      $fullRetArr[$class][$arrayName] = null;
-    }
-    if (is_array($fullRetArr[$class][$arrayName])) { #Already made it, it's empty
-      return $fullRetArr[$class][$arrayName];
-    }
-    //$fullRetArr[$class] = null;
-    #First, build array of arrays....
-    if (property_exists($class, $arrayName) && is_array($class::$$arrayName)) {
-      $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
-    }
-    while ($par = get_parent_class($class)) {
-      if (!property_exists($par, $arrayName) ||
-         ($par::$$arrayName === false) ) {#If a parent wants stop accension
-        break;
-      }
-      if (($tstArr =$par::$$arrayName) && is_array($tstArr) ) {
-        //$retArr[] = $par::$$arrayName;
-        $retArr[] = $convert($tstArr);
-      }
-      $class = $par;
-    }
-    if (!count($retArr)) {
-      return [];
-    }
-    #Now merge. Reverse order so child settings override ancestors...
-    $retArr = array_reverse($retArr);
-    $mgArr = call_user_func_array('array_merge', $retArr);
-    #Mainly to save the developer who respecifies 'id' in the derived direct
-    if (($idx === true) && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
-      $mgArr = array_unique($mgArr);
-    }
-    $fullRetArr[$thisClass][$arrayName] = $mgArr;
-    pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
-    return $mgArr;
+    return static::getCached($akey, $closure);
   }
 
   /** Similar to get ancestor arrays merged, but this merges static arrays that
@@ -278,31 +297,35 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @param boolean $longer - does the property name have to be longer than prefix?
    */
   public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
-    pkdebug("Getting Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
-    $ref = new ReflectionClass(static::class);
-    $staticprops = $ref->getStaticProperties();
-    pkdebug("The static props from reflection are: ", $staticprops,"
-      Maybe this is where I made my mistake? I didn't keep the keys
-      with the values? Or maybe I was really bad at combining the values...");
-    $tomerge = [];
-    foreach ($staticprops as $key => $val) {
-      echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
-      if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
-        $tomerge[]=$val;
+    $akey = $prefix."_sibling";
+    $closure = function() use($prefix, $idx, $longer) {
+      pkdebug("Getting Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
+      $ref = new ReflectionClass(static::class);
+      $staticprops = $ref->getStaticProperties();
+      pkdebug("The static props from reflection are: ", $staticprops,"
+        Maybe this is where I made my mistake? I didn't keep the keys
+        with the values? Or maybe I was really bad at combining the values...");
+      $tomerge = [];
+      foreach ($staticprops as $key => $val) {
+        echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
+        if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
+          $tomerge[]=$val;
+        }
       }
-    }
-    echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
-     
-    if (!count($tomerge)) {
-      return false;
-    }
-    $merged = array_merge_array($tomerge);
-  echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
-  echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
-    //if ($idx) {
-     // $merged = array_unique($merged);
-    //}
-    return $merged;
+      echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
+      
+      if (!count($tomerge)) {
+        return false;
+      }
+      $merged = array_merge_array($tomerge);
+    echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
+    echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
+      //if ($idx) {
+      // $merged = array_unique($merged);
+      //}
+      return $merged;
+    };
+    return static::getCached($akey, $closure);
   }
 
   #Not doing it this way

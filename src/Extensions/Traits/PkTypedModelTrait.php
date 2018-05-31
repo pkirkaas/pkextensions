@@ -7,7 +7,7 @@ use PkExtensions\Models\PkModel;
  * behavior by type. Instead of making separate classes & tables for them all,
  * make a single class that can have different owner types
  * 
- * I've clevery extended PkModel to add the relationships hasOneTyped & hasManyTyped,
+ * I've cleverly extended PkModel to add the relationships hasOneTyped & hasManyTyped,
  * so you can use them like any other relationship definition:
  * 
  * //In Owner of typed class:

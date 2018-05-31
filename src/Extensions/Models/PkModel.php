@@ -129,7 +129,7 @@ abstract class PkModel extends Model {
     $prefix = 'display_value_fields';
 
     $closure = function () use ($prefix, $onlyrefs ) {
-      $displayValueFields = static::combineAncestorsAndSiblings('display_value_fields');
+      $displayValueFields = static::combineAncestorAndSiblings('display_value_fields');
       if ($onlyrefs) {
         $refarr = [];
         foreach ($display_value_fields as $key => $value) {
@@ -239,7 +239,10 @@ abstract class PkModel extends Model {
   }
 
   public static function getTableFieldDefs() {
-    $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
+    //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
+    //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs(), static::getTableFieldDefsTrait());
+    $defs = static::_getTableFieldDefs();
+    pkdebug("For class: ".static::class." Table Field Defs: ",$defs);
     return static::_unsetTableFieldDefs($defs);
   }
 
@@ -1030,6 +1033,7 @@ class $createclassname extends Migration {
     $this->RunExtraConstructors($attributes);
   }
 
+  /** Traits to ignore when looking for trait methods */
   public static $trimtraits = [
 'PkExtensions\Traits\UtilityMethodsTrait',
 'Illuminate\Database\Eloquent\Concerns\HasAttributes',
@@ -1052,7 +1056,25 @@ class $createclassname extends Migration {
    * @param type $attributes
    */
   public static function getExtraConstructors() {
-    $constructors = static::getCached('ExtraConstructors');
+    $cacheclosure = function() {
+      pkdebug("Building constructors for : ".static::class);
+      echo "\nIn The extra constructors closure...\n";
+      #Assume only from Traits
+      $traitmethods = static::getTraitMethods(static::$trimtraits);
+      $fnpre = 'ExtraConstructor';
+      $constructors = [];
+      foreach ($traitmethods as $traitmethod) {
+        if (startsWith($traitmethod, $fnpre, false)) {
+          $constructors[] = $traitmethod;
+        }
+      }
+      return $constructors;
+    };
+    static::getCached('ExtraConstructors', $cacheclosure);
+    pkdebug("Cache: ", static::$_cache);
+    var_dump(static::$_cache);
+    return static::getCached('ExtraConstructors', $cacheclosure);
+    /*
     if ($constructors === null) {
       pkdebug("Building constructors for : ".static::class);
       #Too many methods, most models don't use traits. so,
@@ -1069,6 +1091,8 @@ class $createclassname extends Migration {
       static::setCached('ExtraConstructors', $constructors);
     }
     return $constructors;
+     * 
+     */
   }
 
   public function RunExtraConstructors($attributes) {
@@ -1917,6 +1941,8 @@ class $createclassname extends Migration {
    * 'getTableFieldDefsExtra' then execute them and return all
    * the extra defined table field defs - for example, the BuildQueryTrait
    * would define getTableFieldsDefsExtraBuildQueryTrait();
+   * 
+   * BAD -= See below for alternative
    */
   public static function getExtraTableFieldDefs() {
     $fnpre = 'getTableFieldDefsExtra';
@@ -1938,6 +1964,16 @@ class $createclassname extends Migration {
     if (!$tfdefsets || !is_array($tfdefsets) || !count($tfdefsets)) return [];
     if (count($tfdefsets) === 1) return $tfdefsets[0];
     return call_user_func_array('array_merge', $tfdefsets);
+  }
+
+  /** 
+   * Get table field defs from trait properties, starting with
+   *  public static $table_field_defs_XXXX_trait =  [
+   */
+  public static function getTableFieldDefsTrait() {
+    $pre = "table_field_defs";
+    $props = static::getSiblingArraysMerged($pre);
+    return $props;
   }
 
   /**
