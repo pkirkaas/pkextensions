@@ -17,7 +17,7 @@ trait PkHasTypeModelTrait {
   public static function getTypedMemberDefs($key=null) {
     $defs =  static::getArraysMerged('typedMemberDefs');
     if ($key) {
-      return keyVal($key,$defs);
+      return keyVal($key,$defs)+['att_name'=>$key];
     }
     return $defs;
   }
@@ -27,7 +27,7 @@ trait PkHasTypeModelTrait {
    * @param string|array $params
    * @return Builder - in case we want more filtering
    */
-  public function getTypedMembers($params = null) {
+  public function getTypedMembersBuilder($params = []) {
     if (is_string ($params)) {
       $params = ['key'=>$params];
     }
@@ -44,19 +44,27 @@ trait PkHasTypeModelTrait {
     return $builder;
   }
 
+  public function getTypedMembers($params=[]) {
+    $builder = $this->getTypedMembersBuilder($params);
+    if (keyVal('single',$params)) {
+      return $builder->first();
+    }
+    return  $builder->get();
+  }
+
   /** The typed model must implement PkTypedModelTrait, & have an 
    * att_name property that's the key to this owner's typedMemberDefs
-   * @param type $typedModel
+   * @param typeModel $typedModel
    */
   public function addTypedMember($typedModel) {
     $att_name = $typedModel->att_name;
     $def = static::getTypedMemberDefs($att_name);
     if (!ne_array($def)) {
-      throw new \Exception("'$att_name' not a valid member");
+      throw new PkExceptionResponsable("'$att_name' not a valid member");
     }
     $model = $def['model'];
     if (! $typedModel instanceOf $model) {
-      throw new PkException("Wrong type of model for member");
+      throw new PkExceptionResponsable("Wrong type of model for member");
     }
     #Check all the properties meet the requirements
     $filterKeys = array_keys($model::getTypedFields());
@@ -64,7 +72,7 @@ trait PkHasTypeModelTrait {
     foreach ($filterKeys as $filterKey) {
       if (in_array($filterKey, $defKeys)) {
         if ($typedModel->$filterKey !== $def[$filterKey]) {
-          throw new PkException("Model didn't meet membership req");
+          throw new PkExceptionResponsable("Model didn't meet membership req");
         }
       }
     }
@@ -75,6 +83,21 @@ trait PkHasTypeModelTrait {
     }
     $typedModel->save();
     return $typedModel;
+  }
+
+  /*
+    'avatar' =>['model'=>'App\Models\ProfileUpload', 'type'=>'image','single'=>true,
+        'att_label'=>'Avatar', 'att_name'=>'avatar'
+        ],
+   * 
+   */
+  public function makeTypedMember($key,$params=[]) {
+    $def = static::getTypedMemberDefs($key);
+    $model = $def['model'];
+    $fk = keyVal('foreign_key', $def, $this->getForeignKey());
+    $params[$fk]=$this->id;
+    $typedMember = new $model(array_merge($def,$params));
+    return $typedMember
   }
 
 }

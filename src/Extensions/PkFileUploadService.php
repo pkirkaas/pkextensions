@@ -1,10 +1,12 @@
 <?php
 /** Mis-named 'upload' - also includes managing files from other external sources
  * like images from external URLs
+ * Knows NOTHING of Models, just processes uploads/copies, validates, stores,
+ * & returns array of file info
  */
 namespace PkExtensions;
 //use PkExtensions\Models\PkUploadModel;
-use PkExtentions\Traits\PkUploadTrait;
+//use PkExtentions\Traits\PkUploadTrait;
 //require_once (base_path('/vendor/stefangabos/zebra_image/Zebra_Image.php'));
 //use Zebra_Image;
 use Symfony\Component\HttpFoundation\File\File as SymphonyFile;
@@ -33,6 +35,7 @@ class PkFileUploadService {
       'pdf' => 'file|mimes:pdf',
       'doc' => 'file|mimes:pdf,txt,html',
   ];
+  /*
   public $path; #If upload succeeds, contains the full real path & name
   public $file; #If upload succeeds, contains the uploadedFile instance
   public $reldir; #Can be constructed with a reldir, or passed on upload
@@ -46,6 +49,8 @@ class PkFileUploadService {
   #maxx: maximum pixel width, or none if null
   #maxy: as above
   #quality: between 0-1, converted to appropriate val for jpg or png
+   * 
+   */
 
   /**
    * 
@@ -58,7 +63,8 @@ class PkFileUploadService {
    *   if assoc array, keyed: ['reldir'=>$strRelDir,'resize'=>[maxx,maxy,quality]
    * @return file
    */
-  public function __construct($types = null, $params = null) {
+    /*
+  public function __construct( $params = null) {
     pkdebug("Entering __construct, FileUploadService");
     if (is_array_indexed($params)) {
       $this->resize = $params;
@@ -76,6 +82,8 @@ class PkFileUploadService {
     }
     pkdebug("Leaving __construct, FileUploadService");
   }
+     * 
+     */
 
   /** If the mimetype is 'image/jpeg', the major type is "image"
    */
@@ -110,15 +118,24 @@ class PkFileUploadService {
     }
     return false;
   }
-  public function fetchFromUrl($href,  $validationStr = null, $params = null) {
+
+
+  public function fetchFromUrl($href,  $validationStr = null, $params = []) {
+    if (is_array($href)) {
+      $params = $href;
+    } else {
+      $params['url'] = $href;
+      $params['validationStr'] = $validationStr;
+    }
+    $href = $params['url'];
     $destpath =sys_get_temp_dir().'/'.uniqid("tfr-",1).'.tmp'; 
     $success = copy($href,$destpath);
     if (!$success || !file_exists($destpath)) {
       pkdebug ("Failed to fetch file from [$href] to [$destpath]");
       return false;
     }
-    $this->file = new PkFile($destpath);
-    return $this->processfile($this->file,$validationStr,$params);
+    $file = new PkFile($destpath);
+    return $this->processfile($file,$params);
   }
 
   /**
@@ -126,18 +143,54 @@ class PkFileUploadService {
    *allows one of those types, if no type, uploads anything. But still tries to determine
    * the mime type via PHP. 
    * is one of them, if 
-   * @param string $ctlname default "file" - the name of the FILE upload ctl
+   * @param string|int|null|array $ctl - if null, the first file. If string, the
+   *   key to the files array.  If -1, all files if Array, contains all params:
+   *    ctl - as above
+   *    url - if present, fetch from instead of upload from FILES
+   *    validationStr - 
+   *    types: null|string|array - the allowed major types
+   *    reldir - the relative dir (w. subdirs) to store the uploaded file in, or null
    * @param string $validationStr - the string of Validation rules for this file
-   * @reldir - the relative dir (w. subdirs) to store the uploaded file in, or null
-   * @return array ['relpath'=>(renamed, with guessed expension), 
-       'type', 'mimetype', originalname]
+   * @return single dim array if 1 file: 
+   *    ['relpath'=>(renamed, with guessed expension),
+   *     'type', 'mimetype', originalname]
+   *  or multi-dimensional array keyed by FILES keys
    * @throws Validation Exception 
    * 
    */
-  public function upload($ctlname='file', $types = null, $params = null) {
-    $request = request();
+  #$ctl should really be the assoc array of params - just backwards compat.
+  public function upload($ctl=null, $types = null, $params = []) {
+    if (is_array($ctl)) {
+      $params = $ctl;
+    } else {
+      $params['ctl']=$ctl;
+      $params['types']=$types;
+    }
+    if (array_key_exists('url',$params)) {
+      return $this->fetchFromUrl($params);
+    }
+    $allFiles = request()->allFiles();
     pkdebug("Entering upload, FileUploadService, req data:", request()->all());
-    $this->file = $request->file($ctlname);
+    $ctl = keyVal('ctl', $params);
+    if (!$ctl) { #Get the first
+      return $this->processFile(reset($allFiles), $params);
+    } else if (ne_string($ctl)) { #Get the named
+      return $this->processFile(keyVal($ctl,$allFiles), $params);
+    } else if ($ctl == -1) { #we want an array all files, keyed by name
+      $files = [];
+      foreach ($allFiles as $key=>$file) {
+        if ($res = $this->processFile($file,$params)) {
+          $files[$key] = $res;
+        }
+      }
+      return $files;
+    }
+  }
+
+    
+
+  /*
+    //$this->file = $request->file($ctl);
     //if (!$this->file instanceOf UploadedFile || !$this->file->isValid()) {
     if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
       //pkdebug("file: ", $file);
@@ -145,58 +198,55 @@ class PkFileUploadService {
     }
     return $this->processfile($this->file,$types,$params);
   }
+   * */
 
-  public function processfile($file=null, $types = null, $params = null) {
-    if ($file) {
-      $this->file = $file;
-    }
-    if ($types) {
-      $this->types = $types;
-    }
-    if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) // || !$this->file->isValid()
+  public function processfile($file,  $params = []) {
+    if (!($file instanceOf SymfonyFile)
+        || !$file->isValid()
         ) {
-      //pkdebug("file: ", $file);
       return false;
     }
-    pkdebug("This File: ", $this->file);
-    $this->type = static::isType($this->file, $this->types);
-    if (!$this->type) {
+    $types = keyVal('types', $params,'image'); #Allowed major file types
+    pkdebug("This File: ", $file);
+    $type = static::isType($file, $types);
+    if (!$type) {
       return false;
     }
-    $this->path =  $reldir = $resize = null;
-    if (is_array_assoc($params)) {
-      $this->resize = keyVal('resize', $params);
-      $this->reldir = keyVal('reldir');
-      $this->validationStr = keyVal('validationStr');
-    } 
-    if (ne_string($this->reldir)) {
-      $this->reldir = pktrailingslashit(pkleadingslashit($this->reldir));
+    $resize = keyVal('resize', $params);
+    $reldir = keyVal('reldir');
+    $validationStr = keyVal('validationStr',$params);
+    if (ne_string($reldir)) {
+      $reldir = pktrailingslashit(pkleadingslashit($reldir));
     } else {
-      $this->reldir = '';
+      $reldir = '';
     }
-    //pkdebug("in upload - w. ctl [$ctlname], vstr = $validationStr");
+    //pkdebug("in upload - w. ctl [$ctl], vstr = $validationStr");
     /*
     if ($validationStr) {
-      //$validator = Validator::make($request->all(), [$ctlname => $validationStr]);
+      //$validator = Validator::make($request->all(), [$ctl => $validationStr]);
       //$validator = Validator::make(['file'=>$this->file], ['file' => $validationStr]);
       //$validator->validate();
-      //PkValidator::validate($request,[$ctlname=>$validationStr]);
+      //PkValidator::validate($request,[$ctl=>$validationStr]);
     }
      * *
      */
-    $this->path = base_path('storage/app/' .
-       $this->file->store('public' . $this->reldir));
+    $path = base_path('storage/app/' .
+    $storagepath = $file->store('public' . $reldir));
     /**
     if ((PkUploadModel::smimeMainType($this->file->getMimeType()) === 'image') && $this->resize) {
       $this->resize($resize);
     }
      * 
      */
-    $ret = ['relpath' => $this->reldir . basename($this->path),
-        'mimetype' => $this->file->getMimeType(),
-        'size'=>$this->file->getSize(),
+    $ret = [
+        'relpath' => $reldir . basename($path),
+        'storagepath' => $storagepath,
+        'path' => $file->path,
+        'mimetype' => $file->getMimeType(),
+        'size'=>$file->getSize(),
         'originalname'=>$file->getClientOriginalName(),
-        'type' => $this->type,
+        'type' => $type,
+        'mediatype' => $type,
     ];
     return $ret;
   }

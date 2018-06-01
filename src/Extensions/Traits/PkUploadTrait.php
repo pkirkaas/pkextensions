@@ -1,8 +1,10 @@
 <?php
 namespace PkExtensions\Traits;
 use PkExtensions\PkExceptionResponsable;
+use PkExtensions\PkFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 /** This is to be incuded by PkModels. The Pk
 /**
@@ -33,25 +35,49 @@ trait PkUploadTrait {
 
    ];
 
-  #We need at least a file upload object
-  public function TraitConstructorPkUpload(&$args=[]) {
-    $file = keyVal('file', $args);
-    if (!$file instanceOf UploadedFile) {
-      //echo "\n\nType of File:  ".typeOf($file)."\n\n";
-          
-      //throw new PkExceptionResponsable("Wrong type of upload");
-      return;
+  /** Can accept a uploaded file object, or an array of file info 
+   * from PkFileUploadService
+   * 
+   * @param File|Array $args - either a file, or ['file'=$file] or 
+   * array of file details from PkFileUploadService
+   * @return constructor
+   * @throws PkExceptionResponsable
+   */
+  public function TraitConstructorPkUpload($args=[]) {
+    if ($args instanceOf SymfonyFile) {
+      $args = ['file'=>$args];
     }
-    $storeresult = $file->store('public');
-    $mimetype = $file->getMimeType();
-    $this->mimetype = $mimetype;
-    $this->storagepath = $storeresult;
-    $this->size =$file->getClientSize();
-    $this->mediatype= static::smimeMainType($mimetype);
-    $this->originalname = $file->getClientOriginalName();
-    $this->relpath=Storage::url($storeresult);
-    $this->key = keyVal('key',$args);
-    $this->path =$file->path();
+    $file = keyVal('file', $args);
+    if ($file) {
+      if (!$file instanceOf SymfonyFile) {
+        //echo "\n\nType of File:  ".typeOf($file)."\n\n";
+        throw new PkExceptionResponsable(
+          "Tried to upload object of type: ".getType($file));
+        return;
+      }
+      $storeresult = $file->store('public');
+      $mimetype = $file->getMimeType();
+      $this->mimetype = $mimetype;
+      $this->storagepath = $storeresult;
+      $this->size =$file->getClientSize();
+      $this->mediatype= static::smimeMainType($mimetype);
+      $this->originalname = $file->getClientOriginalName();
+      $this->relpath=Storage::url($storeresult);
+      $this->key = keyVal('key',$args);
+      $this->path =$file->path();
+    } else { #$args should be array of file info {
+      /*
+      $this->mimetype = $mimetype;
+      $this->storagepath = $storeresult;
+      $this->size =$file->getClientSize();
+      $this->mediatype= static::smimeMainType($mimetype);
+      $this->originalname = $file->getClientOriginalName();
+      $this->relpath=Storage::url($storeresult);
+      $this->key = keyVal('key',$args);
+      $this->path =$file->path();
+       * 
+       */
+    }
   }
 
         

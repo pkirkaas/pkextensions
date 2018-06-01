@@ -1,0 +1,38 @@
+<?php
+/*
+ * To combine TypedModel trait with UploadTrait. Unfortunately, models using
+ * this will have to explicitly use PkTypedModelTrait, because otherwise there
+ * are conflicts loading/using that trait twice
+ */
+namespace PkExtensions\Traits;
+use PkExtensions\PkUploadService;
+/** To compose Typed Model & Upload traits for co-functionality
+ * 
+ */
+
+trait PkTypedUploadTrait {
+  #Implementing classes:
+  #use PkTypedModelTrait;
+  use PkUploadTrait;
+
+  /** Makes a typed upload model instance from the $typedDef & file params
+   * 
+   * @param array $def - the typed model def - ex:
+   * 
+    'avatar' =>['model'=>'App\Models\ProfileUpload', 'type'=>'image','single'=>true,
+        'att_label'=>'Avatar'
+   * @param array $uploadparams
+   */
+  public static function makeUploadType($def, $uploadparams=[]) {
+    $uploadparams['types'] = keyVal('type',$uploadparams,keyVal('type',$def));
+    $uploadService = new PkUploadService();
+    $res = $uploadService($uploadparams);
+    $res['att_label']=keyVal('att_label',$def);
+    $uploadClass = $def['model'];
+    return new $uploadClass(array_merge($uploadparams,$res));
+  }
+  
+
+
+
+}

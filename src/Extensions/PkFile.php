@@ -9,6 +9,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 /**
  * Description of PkFile
