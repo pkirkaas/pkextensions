@@ -20,21 +20,10 @@ use PkExtensions\Models\PkModel;
 
 /** Geez, just so much easier to create, say "profile_id" in the implementing 
  * classes...., & function profile() {return $this->ownedBy(Profile::class);}
+ * If "owned", Owner should use PkHasTypedModelTrait to manage these
  */
 trait PkTypedModelTrait {
 
-  /*
-  public function getOwner() {
-    if (!$this->owner instanceOf PkModel) {
-      if (!$this->owner_id || !$this->owner_model) {
-        return null;
-      }
-      $this->owner = $this->owner_model::find($this->owner_id);
-    }
-    return $this->owner;
-  }
-   * 
-   */
 
   public static $table_field_defs_PkTyped = [
         /*
@@ -46,10 +35,17 @@ trait PkTypedModelTrait {
          */
       #Like 'avatar'; The "owner's" name for the attribute, in the relationship method
       'att_name'=> ['type' => 'string', 'methods' => ['nullable','index']],
+      'att_desc'=> ['type' => 'string', 'methods' => ['nullable',]],
+      'att_label'=> ['type' => 'string', 'methods' => ['nullable',]],
       'type'=> ['type' => 'string', 'methods' => ['nullable','index']],
       'subtype'=> ['type' => 'string', 'methods' => ['nullable','index']],
       'category'=> ['type' => 'string', 'methods' =>  'nullable'],
     ];
+
+  /** So additional traits (or implementing classes) can add type filter*/
+  public static function getTypedFields() {
+    return static::getArraysMerged('table_field_defs_PkTyped');
+  }
   /** Both validates and enhances the constructor arguments / atts */
   /*
   public static function OwnedModelTraitExtensionCheck($atts) {

@@ -84,7 +84,7 @@ trait PkUploadTrait {
    * @return complex array mapping keyed by upload type names to properties
    */
   public static function getUploadTypes() {
-    return static::combineAncestorAndSiblings("upload_types");
+    return static::getArraysMerged("upload_types");
   }
 
   #What could be in here?

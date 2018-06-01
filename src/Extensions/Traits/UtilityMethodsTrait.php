@@ -137,7 +137,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * 
    */
 
-  public static function combineAncestorAndSiblings($prefix, $idx=false) {
+  public static function getArraysMerged($prefix, $idx=false) {
+  //public static function combineAncestorAndSiblings($prefix, $idx=false) {
     $akey = $prefix.'_combined';
     $closure = function () use ($prefix, $idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,$idx);

@@ -129,7 +129,7 @@ abstract class PkModel extends Model {
     $prefix = 'display_value_fields';
 
     $closure = function () use ($prefix, $onlyrefs ) {
-      $displayValueFields = static::combineAncestorAndSiblings('display_value_fields');
+      $displayValueFields = static::getArraysMerged('display_value_fields');
       if ($onlyrefs) {
         $refarr = [];
         foreach ($display_value_fields as $key => $value) {
@@ -161,10 +161,10 @@ abstract class PkModel extends Model {
   public static $requiredArgs = [];
 
   public static function getRequiredArgs() {
-    return static::combineAncestorAndSiblings("requiredArgs");
+    return static::getArraysMerged("requiredArgs");
   }
   public static function getLoadRelations() {
-    return static::combineAncestorAndSiblings("load_relations");
+    return static::getArraysMerged("load_relations");
   }
 
 
@@ -178,7 +178,7 @@ abstract class PkModel extends Model {
 
   
   public static function getMethodsAsAttributeNames() {
-    return static::combineAncestorAndSiblings("methodsAsAttributeNames");
+    return static::getArraysMerged("methodsAsAttributeNames");
                                                //methodsAsAttributeNames
   }
 
@@ -1272,6 +1272,9 @@ class $createclassname extends Migration {
       if (!in_array($model->$keyName, array_keys($arrayKeys))) $model->delete();
       else $model->saveRelations($arrayKeys[$model->$keyName]);
     }
+  }
+  public function getForeignKey() {
+        return Str::snake(class_basename($this)).'_'.$this->getKeyName;
   }
 
   /**
