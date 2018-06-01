@@ -241,7 +241,9 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    */
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
     $akey = $arrayName."_ancestor";
-    $closure = function() use($arrayName, $idx) {
+    $closure = function() use($arrayName, $idx, $akey) {
+      pkdebug("Making Ancestor Arrays Merged for ".static::class.", akey: $akey");
+      echo ("\nMaking Ancestor Arrays Merged for ".static::class.", akey: $akey\n\n");
       $retArr = [];
       $convert = function($arr) use ($idx) {
         if (is_string($idx)) {
@@ -290,7 +292,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       }
       $fullRetArr[$thisClass][$arrayName] = $mgArr;
       pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
-      return $mgArr;
+      return $mgArr ?: [];
     };
     return static::getCached($akey, $closure);
   }
@@ -302,44 +304,45 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @param boolean $longer - does the property name have to be longer than prefix?
    */
   public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
-    echo "Trying to get SIBLING arrays merged for: ".static::class."\n\n";
+    //echo "Trying to get SIBLING arrays merged for: ".static::class."\n\n";
     $akey = $prefix."_sibling";
     $closure = function() use($prefix, $idx, $longer) {
-      pkdebug("Getting Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
-      echo "\nTrying to get reflection class...\n";
+      pkdebug("Making Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
+      echo ("\nMaking Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'\n\n");
+      //echo "\nTrying to get reflection class...\n";
       $ref = new ReflectionClass(static::class);
-      echo "\nGot reflection class, getting properties?...\n";
-      pkdebug("Trying to get properties..");
+      //echo "\nGot reflection class, getting properties?...\n";
+      //pkdebug("Trying to get properties..");
       $staticprops = $ref->getStaticProperties();
-      echo "\nDid I get the properties? Why Not?\n";
-      pkdebug("Still waiting for the properties...");
+      //echo "\nDid I get the properties? Why Not?\n";
+      //pkdebug("Still waiting for the properties...");
       /*
       pkdebug("The static props from reflection are: ", $staticprops,"
         Maybe this is where I made my mistake? I didn't keep the keys
         with the values? Or maybe I was really bad at combining the values...");
        * 
        */
-      pkdebug("Not trying to print the static props");
-      echo("\nNot trying to print the static props\n");
+      //pkdebug("Not trying to print the static props");
+      //echo("\nNot trying to print the static props\n");
       $tomerge = [];
       foreach ($staticprops as $key => $val) {
-        echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
+       // echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
         if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
           $tomerge[]=$val;
         }
       }
-      echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
+      //echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
       
       if (!count($tomerge)) {
-        return false;
+        return [];
       }
       $merged = array_merge_array($tomerge);
-    echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
-    echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
+    //echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
+    //echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
       //if ($idx) {
       // $merged = array_unique($merged);
       //}
-      return $merged;
+      return $merged ?: [];
     };
     return static::getCached($akey, $closure);
   }

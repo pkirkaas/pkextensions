@@ -1945,25 +1945,30 @@ class $createclassname extends Migration {
    * BAD -= See below for alternative
    */
   public static function getExtraTableFieldDefs() {
-    $fnpre = 'getTableFieldDefsExtra';
-    $methods = get_class_methods(static::class);
-    $tfmethods = [];
-    $tfdefsets = [];
-    foreach ($methods as $method) {
-      if (startsWith($method, $fnpre, false)) {
-        $tfmethods[] = $method;
+    $key = "ExtraTableFieldDefMethods";
+    $akey = $key."_methods";
+    $closure = function() use($key, $akey) {
+      $fnpre = 'getTableFieldDefsExtra';
+      $methods = get_class_methods(static::class);
+      $tfmethods = [];
+      $tfdefsets = [];
+      foreach ($methods as $method) {
+        if (startsWith($method, $fnpre, false)) {
+          $tfmethods[] = $method;
+        }
       }
-    }
-    if (!$tfmethods || !is_array($tfmethods) || !count($tfmethods)) return [];
-    foreach ($tfmethods as $tfmethod) {
-      $res = static::$tfmethod();
-      if ($res && is_array($res) && count($res)) {
-        $tfdefsets[] = $res;
+      if (!$tfmethods || !is_array($tfmethods) || !count($tfmethods)) return [];
+      foreach ($tfmethods as $tfmethod) {
+        $res = static::$tfmethod();
+        if ($res && is_array($res) && count($res)) {
+          $tfdefsets[] = $res;
+        }
       }
-    }
-    if (!$tfdefsets || !is_array($tfdefsets) || !count($tfdefsets)) return [];
-    if (count($tfdefsets) === 1) return $tfdefsets[0];
-    return call_user_func_array('array_merge', $tfdefsets);
+      if (!$tfdefsets || !is_array($tfdefsets) || !count($tfdefsets)) return [];
+      if (count($tfdefsets) === 1) return $tfdefsets[0];
+      return call_user_func_array('array_merge', $tfdefsets) ?: [];
+    };
+    return static::getCached($akey,$closure);
   }
 
   /** 
@@ -1972,7 +1977,7 @@ class $createclassname extends Migration {
    */
   public static function getTableFieldDefsTrait() {
     $pre = "table_field_defs";
-    $props = static::getSiblingArraysMerged($pre);
+    $props = static::getSiblingArraysMerged($pre) ?: [];
     return $props;
   }
 
