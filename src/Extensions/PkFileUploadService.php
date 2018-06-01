@@ -9,7 +9,7 @@ namespace PkExtensions;
 //use PkExtentions\Traits\PkUploadTrait;
 //require_once (base_path('/vendor/stefangabos/zebra_image/Zebra_Image.php'));
 //use Zebra_Image;
-use Symfony\Component\HttpFoundation\File\File as SymphonyFile;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\File;
 use PkExtensions\PkFile;
@@ -170,8 +170,8 @@ class PkFileUploadService {
       return $this->fetchFromUrl($params);
     }
     $allFiles = request()->allFiles();
-    pkdebug("Entering upload, FileUploadService, req data:", request()->all());
     $ctl = keyVal('ctl', $params);
+    pkdebug("Entering upload, FileUploadService, req data:", request()->all(), "PARAMS: ", $params);
     if (!$ctl) { #Get the first
       return $this->processFile(reset($allFiles), $params);
     } else if (ne_string($ctl)) { #Get the named
@@ -204,12 +204,14 @@ class PkFileUploadService {
     if (!($file instanceOf SymfonyFile)
         || !$file->isValid()
         ) {
+      pkdebug("Either wasn't symfony file, or wasn't valid. Type: ".typeOf($file));
       return false;
     }
     $types = keyVal('types', $params,'image'); #Allowed major file types
     pkdebug("This File: ", $file);
     $type = static::isType($file, $types);
     if (!$type) {
+      pkdebug("The filetype didn't match ", $types);
       return false;
     }
     $resize = keyVal('resize', $params);
@@ -220,7 +222,7 @@ class PkFileUploadService {
     } else {
       $reldir = '';
     }
-    //pkdebug("in upload - w. ctl [$ctl], vstr = $validationStr");
+    pkdebug("in upload - w. ctl [$ctl], vstr = $validationStr");
     /*
     if ($validationStr) {
       //$validator = Validator::make($request->all(), [$ctl => $validationStr]);
@@ -248,6 +250,7 @@ class PkFileUploadService {
         'type' => $type,
         'mediatype' => $type,
     ];
+    pkdebug("Returning from UploadService: ", $ret);
     return $ret;
   }
 

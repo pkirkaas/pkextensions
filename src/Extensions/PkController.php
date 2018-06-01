@@ -315,7 +315,7 @@ abstract class PkController extends Controller {
   public function _processFileUpload( $params=[]) { #$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
     $uploadmodel = keyVal('model',$params); #The type/instance to create
-    if (!$uploadmodel::usesTrait(PkUploadTrait)) {
+    if (!$uploadmodel::usesTrait(PkUploadTrait::class)) {
       throw new PkExceptionResponsable("No upload model provided");
     }
     $uploadService = new PkFileUploadService();
@@ -326,7 +326,7 @@ abstract class PkController extends Controller {
         return false;
       } #We have an owner & info
       $ownerModel = get_class($owner);
-      if ($ownerModel::usesTrait(PkHasTypedModelTrait)) {
+      if ($ownerModel::usesTrait(PkHasTypedModelTrait::class)) {
         $att_name = keyVal('att_name', $params);
         $def = $ownerModel::getTypedMemberDefs($att_name);
         $typedMember = $owner->makeTypedMember($att_name,

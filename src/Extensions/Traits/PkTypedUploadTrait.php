@@ -31,6 +31,9 @@ trait PkTypedUploadTrait {
     $res = $uploadService($uploadparams);
     $res['att_label']=keyVal('att_label',$def);
     $uploadClass = $def['model'];
+    $UC = new $uploadClass(array_merge($uploadparams,$res));
+    pkdebug("Uploaded Model Made:", $UC);
+    return $UC;
     return new $uploadClass(array_merge($uploadparams,$res));
   }
   

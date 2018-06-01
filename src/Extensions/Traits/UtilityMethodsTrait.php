@@ -114,10 +114,12 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @return mixed
    */
   public static function getCached($key, $callable=null) {
+    //pkdebug("Getting cached: key: [$key] for class: ".static::class);
     if (!array_key_exists(static::class,static::$_cache)) {
       static::$_cache[static::class] = [];
     }
     if (array_key_exists($key,static::$_cache[static::class])) {
+     // pkdebug("Returning:", static::$_cache[static::class][$key]);
       return static::$_cache[static::class][$key];
     }
     if (is_callable($callable)) {
@@ -149,12 +151,13 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    */
 
   public static function getArraysMerged($prefix, $idx=false) {
+    //pkdebug("Entering garmr for class: ".static::class."; prefix: [$prefix]");
   //public static function combineAncestorAndSiblings($prefix, $idx=false) {
     $akey = $prefix.'_combined';
     $closure = function () use ($prefix, $idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,$idx);
       $siblings = static::getSiblingArraysMerged($prefix,$idx);
-      //print_r(['siblings'=>$siblings, 'ancestors'=>$ancestors]);
+      //pkdebug(['class'=>static::class, 'prefix'=>$prefix, 'siblings'=>$siblings, 'ancestors'=>$ancestors]);
       //echo "For Class ".static::class."; [$prefix] returning: ";
       /*
       pkdebug('Merging ancsibs: Class: ', static::class, "Prefix:",
@@ -162,7 +165,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
        * *
        */
       if (ne_array($ancestors) && ne_array($siblings)) {
-        //print_r(['merged'=>array_merge($ancestors,$siblings)]);
+        //pkdebug(['merged'=>array_merge($ancestors,$siblings)]);
         /*
          pkdebug("Both ancestors & siblings exist - Merged: ",
              array_merge($ancestors, $siblings));
@@ -171,17 +174,18 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
           return array_merge($ancestors,$siblings);
         }
         if (ne_array($ancestors)) {
-        //print_r(['ancestors'=>$ancestors]);
+        //pkdebug(['ancestors'=>$ancestors]);
           return $ancestors;
         }
         if (ne_array($siblings)) {
-        //print_r(['siblings'=>$siblings]);
+        //pkdebug(['siblings'=>$siblings]);
           return $siblings;
         }
-        //echo "Empty Array: \n";
+        //pkdebug( "Empty Array: \n");
+
         return [];
     };
-    static::getCached($akey,$closure);
+    return static::getCached($akey,$closure);
   }
 
     
@@ -308,7 +312,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
         $mgArr = array_unique($mgArr);
       }
       $fullRetArr[$thisClass][$arrayName] = $mgArr;
-      pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
+      //pkdebug("After Ancestor Arrays Merged, RESULT:", $mgArr);
       return $mgArr ?: [];
     };
     return static::getCached($akey, $closure);

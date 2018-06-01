@@ -4,6 +4,7 @@
  */
 namespace PkExtensions\Traits;
 use PkExtensions\PkException;
+use PkExtensions\PkFileUploadService;
 use PkExtensions\PkExceptionResponsable;
 /**
  * @author pkirkaas
@@ -17,6 +18,10 @@ trait PkHasTypedModelTrait {
   public static function getTypedMemberDefs($key=null) {
     $defs =  static::getArraysMerged('typedMemberDefs');
     if ($key) {
+      $def = keyVal($key,$defs);
+      //pkdebug("TypedMemberDefs: Class: ".static::class."; Key: [$key], def: ",$def," defs: ", $defs, "Cache:", static::$_cache);
+
+      return $def;
       return keyVal($key,$defs)+['att_name'=>$key];
     }
     return $defs;
@@ -94,12 +99,13 @@ trait PkHasTypedModelTrait {
   public function makeTypedMember($key,$params=[]) {
     $def = static::getTypedMemberDefs($key);
     $model = $def['model'];
-    if ($model::usesTrait(PkUploadTrait)) {
-      $uploadService = new PkUploadService();
+    if ($model::usesTrait(PkUploadTrait::class)) {
+      $uploadService = new PkFileUploadService();
       $uploadArr = $uploadService->upload(array_merge($def,$params));
     } else {
       $uploadArr = [];
     }
+    pkdebug("UploadArr: ", $uploadArr, "def: ",$def, 'params', $params);
     $fk = keyVal('foreign_key', $def, $this->getForeignKey());
     $params[$fk]=$this->id;
     $typedMember = new $model(array_merge($uploadArr,$def,$params));
