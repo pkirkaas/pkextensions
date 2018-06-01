@@ -29,8 +29,12 @@ use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use Illuminate\Validation\ValidationException;
 use Illuminate\Validation\Validator;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkFileUploadService;
+use PkExtensions\PkExceptionResponsable;
 use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\Traits\PkUploadTrait;
+use PkExtensions\Traits\PkHasTypedModelTrait;
+use PkExtensions\Traits\PkTypedUploadTrait;
 use Illuminate\Http\UploadedFile;
 use Request;
 use Route as RouteFacade;
@@ -289,6 +293,71 @@ abstract class PkController extends Controller {
           " for att: [$attName] with ctlName: [$ctlName]");
     }
   }
+
+  /** Not an action, but a helper method for actual upload actions
+   * @param array $params - details on how to upload
+   * REQUIRED: 'model' -> the type of upload model to create
+   * 
+   * 
+   * OPTIONAL:
+   *   'owner' -> The owning object, if any.
+   *   'att_name' -> if uploaded is typed, the type
+   *   'type' -> General type - image/text/video - not required if att_name
+   *            
+   * @param type $pkmodel
+   * @param type $ctlName
+   * @param type $attName
+   * @
+   * @param type $validationStr
+   *  #$ctlName,$attName,$validationStr='image') {
+   * @return instance of PkUploadModelTrait
+   */
+  public function _processFileUpload( $params=[]) { #$ctlName,$attName,$validationStr='image') {
+    if (!$this->shouldProcessSubmit()) return;
+    $uploadmodel = keyVal('model',$params); #The type/instance to create
+    if (!$uploadmodel::usesTrait(PkUploadTrait)) {
+      throw new PkExceptionResponsable("No upload model provided");
+    }
+    $uploadService = new PkFileUploadService();
+    $uparr = $uploadService->upload($params);
+    $owner = keyVal('owner', $params); #PkModel instance to own upload, if any
+    if ($owner)  {
+      if ( !$owner instanceOf PkModel) {
+        return false;
+      } #We have an owner & info
+      $ownerModel = get_class($owner);
+      if ($ownerModel::usesTrait(PkHasTypedModelTrait)) {
+        $att_name = keyVal('att_name', $params);
+        $def = $ownerModel::getTypedMemberDefs($att_name);
+        $typedMember = $owner->makeTypedMember($att_name,
+            array_merge($params,$def));
+        $typedMember->save();
+        return $typedMember;
+      }
+    }
+  }
+
+
+
+
+
+    
+  /*
+
+    //if (static::usesTrait('PkUploadTrait', $uploadedFile)) {
+    if ($uploadedFile instanceOf UploadedFile) {
+      $path = $uploadedFile->store('public');
+      $baseName = basename($path);
+      $pkmodel->$attName = $baseName;
+      $pkmodel->save();
+      return $pkmodel;
+    } else {
+      pkdebug("No file uploaded to ".get_class($pkmodel).
+          " for att: [$attName] with ctlName: [$ctlName]");
+    }
+  }
+   * 
+   */
 
   /** Not an action - but checks if the POST/Submission is for an
    * array/collection of models without an owner. It does this by checking

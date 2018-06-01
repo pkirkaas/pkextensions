@@ -3650,29 +3650,44 @@ function hasTrait($oorc, $trait, $root = true) {
   }
  * 
  */
-  /** Checks if class "instanceOf" $traitname
+  /** Checks if class "instanceOf" $traitname, or all of [traitnames]
    * $target - default null, so for the current class. Else,
    * can be a classname or object instance
    * $useBaseName - default true - remove Namespace components
    */
 function usesTrait($traitName, $target, $useBaseName=true) {
-    if (is_object($target)) {
-      $target = get_class($target);
-    }
-    $traits = getTraits($target, 1);
-    if (!$traits) {
-      return false;
-    }
-    if (!$useBaseName) {
-      return in_array($traitName, $traits);
-    }
-    $traitName = strtolower(getBaseName($traitName));
-    foreach ($traits as $trait) {
-      if ($traitName === strtolower(getBaseName($trait))) {
-        return true;
-      }
-    }
+  if (is_object($target)) {
+    $target = get_class($target);
+  }
+  $targetTraits = getTraits($target, 1);
+  if (!$targetTraits) {
     return false;
+  }
+  if (ne_string($traitName)) {
+    $testTraits = [$traitName];
+  } else if (ne_array($traitName)) {
+    $testTraits = $traitName;
+  } else {
+    return false;
+  }
+  foreach ($testTraits as $key=>$testTrait) {
+    if ($useBaseName) {
+      $testTrait = getBaseName($testTrait);
+    }
+    $testTraits[$key] = strtolower($testTrait);
+  }
+  foreach($targetTraits as $key=>$targetTrait) {
+    if ($useBaseName) {
+      $targetTrait = getBaseName($targetTrait);
+    }
+    $targetTraits[$key] = strtolower($targetTrait);
+  }
+  foreach ($testTraits as $testTrait) {
+    if (!in_array($testTrait, $targetTraits, 1)) {
+        return false;
+    }
+  }
+  return true;
 }
 
 /** Returns the trait methods - if $trait is an array, 

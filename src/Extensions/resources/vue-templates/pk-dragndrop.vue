@@ -35,6 +35,7 @@ export default {
 
       };
     },
+    props: ['params'],
     methods: {
       onDrop: function(e) {
         e.stopPropagation();
@@ -71,6 +72,7 @@ export default {
         var fd = new FormData();
         fd.append('desc',this.desc);
         fd.append('file',this.file,this.file.name);
+        fd.append('params',this.params);
         var me = this;
         console.log("FD:", fd);
         axios.post('/ajax/upload',fd).then( response=> {

@@ -40,19 +40,30 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   }
 
   /** Checks if class "instanceOf" $traitname
+   * @param $triaitname string|array of strings
+   * If several trait, must match all
    * $target - default null, so for the current class. Else,
    * can be a classname or object instance
    * $useBaseName - default true - remove Namespace components
    */
   public static function usesTrait($traitName, $target = null, $useBaseName=true) {
+    if (ne_string($traitName)) {
+      $traits = [$traitName];
+    } else if (is_array($traitName)) {
+      $traits = $traitName;
+    } else {
+      throw new PkExceptionResponsable("Need valid Trait names");
+    }
+
     if (!$target) {
       $target = get_called_class();
     } else if (is_object($target)) {
       $target = get_class($target);
     }
-    return usesTrait($traitName, $target, $useBaseName);
+    return usesTrait($traits, $target, $useBaseName);
   }
 
+  /** Return all traits used by class */
   public static function getAllTraits($target =null) {
     if (!$target) {
       $target = get_called_class();

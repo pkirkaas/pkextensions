@@ -21,7 +21,9 @@ trait PkTypedUploadTrait {
    * 
     'avatar' =>['model'=>'App\Models\ProfileUpload', 'type'=>'image','single'=>true,
         'att_label'=>'Avatar'
-   * @param array $uploadparams
+   * @param array $uploadparams - whatever optional data for the upload type.
+   * OPTIONAL:
+   *   owner - instanceOf PkModel
    */
   public static function makeUploadType($def, $uploadparams=[]) {
     $uploadparams['types'] = keyVal('type',$uploadparams,keyVal('type',$def));

@@ -94,10 +94,16 @@ trait PkHasTypedModelTrait {
   public function makeTypedMember($key,$params=[]) {
     $def = static::getTypedMemberDefs($key);
     $model = $def['model'];
+    if ($model::usesTrait(PkUploadTrait)) {
+      $uploadService = new PkUploadService();
+      $uploadArr = $uploadService->upload(array_merge($def,$params));
+    } else {
+      $uploadArr = [];
+    }
     $fk = keyVal('foreign_key', $def, $this->getForeignKey());
     $params[$fk]=$this->id;
-    $typedMember = new $model(array_merge($def,$params));
-    return $typedMember;
+    $typedMember = new $model(array_merge($uploadArr,$def,$params));
+    return $this->addTypedMember($typedMember);
   }
 
 }
