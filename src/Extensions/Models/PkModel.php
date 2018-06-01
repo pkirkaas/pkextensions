@@ -178,7 +178,9 @@ abstract class PkModel extends Model {
 
   
   public static function getMethodsAsAttributeNames() {
-    return static::getArraysMerged("methodsAsAttributeNames");
+    $merged = static::getArraysMerged("methodsAsAttributeNames",true);
+    if (!$merged) $merged = [];
+    return $merged;
                                                //methodsAsAttributeNames
   }
 
@@ -1057,8 +1059,8 @@ class $createclassname extends Migration {
    */
   public static function getExtraConstructors() {
     $cacheclosure = function() {
-      pkdebug("Building constructors for : ".static::class);
-      echo "\nIn The extra constructors closure...\n";
+     // pkdebug("Building constructors for : ".static::class);
+     // echo "\nIn The extra constructors closure...\n";
       #Assume only from Traits
       $traitmethods = static::getTraitMethods(static::$trimtraits);
       $fnpre = 'ExtraConstructor';
@@ -1071,8 +1073,8 @@ class $createclassname extends Migration {
       return $constructors;
     };
     static::getCached('ExtraConstructors', $cacheclosure);
-    pkdebug("Cache: ", static::$_cache);
-    var_dump(static::$_cache);
+    //pkdebug("Cache: ", static::$_cache);
+    //var_dump(static::$_cache);
     return static::getCached('ExtraConstructors', $cacheclosure);
     /*
     if ($constructors === null) {
@@ -1273,8 +1275,9 @@ class $createclassname extends Migration {
       else $model->saveRelations($arrayKeys[$model->$keyName]);
     }
   }
+  
   public function getForeignKey() {
-        return Str::snake(class_basename($this)).'_'.$this->getKeyName;
+        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
   }
 
   /**

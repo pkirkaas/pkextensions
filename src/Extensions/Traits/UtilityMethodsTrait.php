@@ -143,19 +143,31 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     $closure = function () use ($prefix, $idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,$idx);
       $siblings = static::getSiblingArraysMerged($prefix,$idx);
+      //print_r(['siblings'=>$siblings, 'ancestors'=>$ancestors]);
+      //echo "For Class ".static::class."; [$prefix] returning: ";
+      /*
       pkdebug('Merging ancsibs: Class: ', static::class, "Prefix:",
           $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
+       * *
+       */
       if (ne_array($ancestors) && ne_array($siblings)) {
+        //print_r(['merged'=>array_merge($ancestors,$siblings)]);
+        /*
          pkdebug("Both ancestors & siblings exist - Merged: ",
              array_merge($ancestors, $siblings));
+         * 
+         */
           return array_merge($ancestors,$siblings);
         }
         if (ne_array($ancestors)) {
+        //print_r(['ancestors'=>$ancestors]);
           return $ancestors;
         }
         if (ne_array($siblings)) {
+        //print_r(['siblings'=>$siblings]);
           return $siblings;
         }
+        //echo "Empty Array: \n";
         return [];
     };
     static::getCached($akey,$closure);
@@ -236,8 +248,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   public static function getAncestorArraysMerged($arrayName, $idx = false) {
     $akey = $arrayName."_ancestor";
     $closure = function() use($arrayName, $idx, $akey) {
-      pkdebug("Making Ancestor Arrays Merged for ".static::class.", akey: $akey");
-      echo ("\nMaking Ancestor Arrays Merged for ".static::class.", akey: $akey\n\n");
+      //pkdebug("Making Ancestor Arrays Merged for ".static::class.", akey: $akey");
+      //echo ("\nMaking Ancestor Arrays Merged for ".static::class.", akey: $akey\n\n");
       $retArr = [];
       $convert = function($arr) use ($idx) {
         if (is_string($idx)) {
@@ -301,8 +313,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     //echo "Trying to get SIBLING arrays merged for: ".static::class."\n\n";
     $akey = $prefix."_sibling";
     $closure = function() use($prefix, $idx, $longer) {
-      pkdebug("Making Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
-      echo ("\nMaking Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'\n\n");
+      //pkdebug("Making Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
+      //echo ("\nMaking Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'\n\n");
       //echo "\nTrying to get reflection class...\n";
       $ref = new ReflectionClass(static::class);
       //echo "\nGot reflection class, getting properties?...\n";

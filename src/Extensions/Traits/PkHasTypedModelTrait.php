@@ -8,7 +8,7 @@ use PkExtensions\PkExceptionResponsable;
 /**
  * @author pkirkaas
  */
-trait PkHasTypeModelTrait {
+trait PkHasTypedModelTrait {
   /** If !$key, Returns the combined array definitions of typed members,
    * else the specific member def for $key ($att_name)
    * @param string|null $key
@@ -97,7 +97,7 @@ trait PkHasTypeModelTrait {
     $fk = keyVal('foreign_key', $def, $this->getForeignKey());
     $params[$fk]=$this->id;
     $typedMember = new $model(array_merge($def,$params));
-    return $typedMember
+    return $typedMember;
   }
 
 }
