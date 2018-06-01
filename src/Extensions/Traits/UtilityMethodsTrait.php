@@ -96,8 +96,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    */
   public static $_cache = []; 
   
-  /** Get cached value for class/key - if callable provided, 
-   * run & set cache value if it doesn't exist 
+  /** Get cached value for class/key - if key isn't set & 
+   * callable provided,  run & set cache class key value 
    * @param string $key
    * @param callable $callable
    * @return mixed
@@ -138,33 +138,26 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    */
 
   public static function combineAncestorAndSiblings($prefix, $idx=false) {
-
-//    $closure = function() use($prefix,$idx) {
+    $akey = $prefix.'_combined';
+    $closure = function () use ($prefix, $idx) {
       $ancestors = static::getAncestorArraysMerged($prefix,$idx);
-      $siblings = static::getSiblingArraysMerged($prefix,1,1);
-      pkdebug('Class: ', static::class, "Prefix:", $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
-       if (is_array($ancestors) && $ancestors
-           && is_array($siblings) && $siblings) {
-         pkdebug("Both ancestors & siblings exist - let's compare:
-           siblings: ", $siblings, "ancestores: ", $ancestors, "Merged: ",
+      $siblings = static::getSiblingArraysMerged($prefix,$idx);
+      pkdebug('Merging ancsibs: Class: ', static::class, "Prefix:",
+          $prefix,"Ancestors: ", $ancestors, "Siblings: ",$siblings);
+      if (ne_array($ancestors) && ne_array($siblings)) {
+         pkdebug("Both ancestors & siblings exist - Merged: ",
              array_merge($ancestors, $siblings));
           return array_merge($ancestors,$siblings);
         }
-        if (is_array($ancestors) && $ancestors) {
+        if (ne_array($ancestors)) {
           return $ancestors;
         }
-        if (is_array($siblings) && $siblings) {
+        if (ne_array($siblings)) {
           return $siblings;
         }
-        return false;
-     // };
-    #$rescl = $closure();
-    #pkdebug("Res Closure:", $rescl);
-    //return static::manageCache($prefix, $closure);
-      /*
-       * 
-       */
-      //return $ancestors;
+        return [];
+    };
+    static::getCached($akey,$closure);
   }
 
     
