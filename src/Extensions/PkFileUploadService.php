@@ -222,7 +222,7 @@ class PkFileUploadService {
     } else {
       $reldir = '';
     }
-    pkdebug("in upload - w. ctl [$ctl], vstr = $validationStr");
+    pkdebug("in upload - r");
     /*
     if ($validationStr) {
       //$validator = Validator::make($request->all(), [$ctl => $validationStr]);
@@ -243,7 +243,7 @@ class PkFileUploadService {
     $ret = [
         'relpath' => $reldir . basename($path),
         'storagepath' => $storagepath,
-        'path' => $file->path,
+        'path' => $file->path(),
         'mimetype' => $file->getMimeType(),
         'size'=>$file->getSize(),
         'originalname'=>$file->getClientOriginalName(),
