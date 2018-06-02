@@ -212,7 +212,6 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     }
   }
 
-
   public static function getDynamicMethod($name) {
     $class=static::class;
     if (array_key_exists($class, static::$dynamicMethods) &&

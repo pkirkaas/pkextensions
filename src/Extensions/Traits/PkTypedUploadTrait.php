@@ -6,6 +6,7 @@
  */
 namespace PkExtensions\Traits;
 use PkExtensions\PkUploadService;
+use PkExtensions\Traits\PkJsonFieldTrait;
 /** To compose Typed Model & Upload traits for co-functionality
  * 
  */
