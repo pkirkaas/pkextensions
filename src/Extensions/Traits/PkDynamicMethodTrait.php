@@ -32,7 +32,7 @@ trait PkDynamicMethodTrait {
     if ($methodfactoryclass) {
       $this->methodfactoryclass = $methodfactoryclass;
     }
-    if (is_class($this->methodfactoryclass)) {
+    if (class_exists($this->methodfactoryclass)) {
        new $this->methodfactoryclass($this);
     }
   }

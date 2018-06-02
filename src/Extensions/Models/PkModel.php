@@ -248,6 +248,12 @@ abstract class PkModel extends Model {
     return static::_unsetTableFieldDefs($defs);
   }
 
+  public static function getConversion($key) {
+    $def = keyVal($key,static::getTableFieldDefs());
+    if (!ne_array($def)) return false;
+    return keyVal('conversion', $def);
+  }
+
   /** Tries to return a description of the attribute for a label
    * If there is a 'desc' property for the attribute, return it.
    * Else, if there is a 'comment' property for the attribute, return it
@@ -278,6 +284,9 @@ abstract class PkModel extends Model {
    * @return string
    */
   public static function getTableName() {
+    return str_replace( '\\', '',
+        Str::snake(Str::plural(class_basename(static::class))));
+    /*
     static $tableNames = [];
     $class = static::class;
     if (array_key_exists($class, $tableNames)) return $tableNames[$class];
@@ -285,6 +294,8 @@ abstract class PkModel extends Model {
     $tablename = $instance->getTable();
     $tableNames[$class] = $tablename;
     return $tablename;
+     * 
+     */
   }
 
   /** Super flexible - can define a table field in static $table_field_defs = [
@@ -471,6 +482,7 @@ class $createclassname extends Migration {
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
+    echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
     return "Migration Table [$migrationfile] Created\n";
   }
 
@@ -720,6 +732,7 @@ class $createclassname extends Migration {
     return true;
   }
 
+  protected $guarded = [];
   public $allFillableOpts = [];
 
   /** Don't force using buildFillableOptions */
@@ -1030,6 +1043,7 @@ class $createclassname extends Migration {
    */
   public function __construct(array $attributes = []) {
     $this->fillable($this->getAttributeNames());
+    //$this->fillable($this->getFieldNames());
     unset ($attributes['id']);
     parent::__construct($attributes);
     $this->RunExtraConstructors($attributes);
@@ -1128,8 +1142,13 @@ class $createclassname extends Migration {
     if (in_array($key,static::getMethodsAsAttributeNames(),true)) {
       return $this->$key();
     }
-    return parent::__get($key);
+    $res = parent::__get($key);
+    if (($this->getConversion($key) !== 'array') || is_array($res)) {
+      return $res;
+    }
+    return json_decode($res,1) ?: [];
   }
+
     public function getAttribute($key) {
       if (!$key) return null;
       return parent::getAttribute($key);
@@ -1688,6 +1707,11 @@ class $createclassname extends Migration {
    * @throws Exception
    */
   public function save(array $opts = []) {
+    foreach ($this->getAttributes() as &$value) {
+      if (is_array($value)) {
+        $value = json_encode($value, static::$jsonopts);
+      }
+    }
     if ($this->useBuildFillableOptions) {
       foreach ($this->fillableOptions as $field => $value) {
         if (is_array($value)) {
