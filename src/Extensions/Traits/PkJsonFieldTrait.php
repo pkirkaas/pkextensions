@@ -42,7 +42,7 @@ trait PkJsonFieldTrait {
     //$this->initializeArray($keys);
   }
   public function save(array $opts = []) {
-    $this->structured = json_encode($this->structuredArr,static::$jsonopts);
+    $this->setAttribute('structured',  json_encode($this->structuredArr,static::$jsonopts));
     return parent::save($opts);
   }
 
