@@ -8,19 +8,42 @@ namespace PkExtensions\Traits;
  * @author pkirkaas
  */
 trait PkJsonFieldTrait {
+  public $structuredArr;
   public static $table_field_defs_JsonFieldTrait = [
-      'structured' => ['type' => 'mediumText', 'methods'=>['nullable'],'conversion'=> 'array'],
+      //'structured' => ['type' => 'mediumText', 'methods'=>['nullable'],'conversion'=> 'array'],
+      'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
       //'nosql' => ['type' => 'mediumText'],
       //'tstatt'=>['type'=>'string', 'methods'=>['default'=>"'hello'"]],
       //'keys' => ['type' => 'text', 'methods' => ['nullable']],
     ];
   #If $this->keys exists, only those are allowed for __set/__get
 
+  public function __get($name) {
+    if ($name !== 'structured') {
+      return parent::__get($name);
+    }
+    if (!$this->structuredArr) {
+      $this->structuredArr = json_decode($this->getAttribute('structured'),1);
+    }
+    return $this->structuredArr;
+  }
+  public function __set($name, $value) {
+    if ($name !== 'structured') {
+      return parent::__set($name,$value);
+    }
+    $this->structuredArr = $value;
+  }
+
   public function ExtraConstructorJsonField($atts = []) {
+    $this->structuredArr = json_decode($this->structured,1)?:[];
     pkdebug("In the extra constructor?");
   //  $this->casts = ['structured'=>'array', 'keys'=>'array']; 
     //$keys=keyVal('keys',$atts);
     //$this->initializeArray($keys);
+  }
+  public function save(array $opts = []) {
+    $this->structured = json_encode($this->structuredArr,static::$jsonopts);
+    return parent::save($opts);
   }
 
   /*
@@ -49,9 +72,9 @@ trait PkJsonFieldTrait {
     # ['title','weight','gender'=>'female','nationality'=>'american', 'race',..
     foreach ($keys as $idx=>$val) {
       if (is_int($idx) && ne_string($val)) {
-        $this->structured[$val]=null;
+        $this->structuredArr[$val]=null;
       } else if (ne_string($idx)) {
-        $this->structured[$idx]=$val;
+        $this->structuredArr[$idx]=$val;
       } else {
         throw new \Exception("Something wrong with key initialization");
       }
@@ -60,10 +83,10 @@ trait PkJsonFieldTrait {
   }
 
   public function getArrayVal($key, $default = null) {
-    return keyVal($key, $this->structured, $default);
+    return keyVal($key, $this->structuredArr, $default);
   }
   public function setArrayVal($key,$value) {
-    $this->structured[$key] = $value;
+    $this->structuredArr[$key] = $value;
     return $value;
   }
 

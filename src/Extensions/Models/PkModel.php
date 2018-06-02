@@ -1721,7 +1721,7 @@ class $createclassname extends Migration {
       }
     }
     if ($this->emptyStringToNull) $this->convertEmptyStringToNullForNumerics();
-    if ($this->cleanAllText) $this->hpureAllText();
+    //if ($this->cleanAllText) $this->hpureAllText();
 
     #Clean dangerous HTML from specified fields
     foreach (static::$escape_fields as $field) {
@@ -1775,6 +1775,7 @@ class $createclassname extends Migration {
   public function postCreate(Array $options = []) {
   }
 
+  /*
   public function hpureAllText() {
     $attributeDefs = $this->getAttributeDefs();
     foreach ($attributeDefs as $name => $type) {
@@ -1786,6 +1787,8 @@ class $createclassname extends Migration {
       }
     }
   }
+   * 
+   */
   /** When POSTING empty values, can't POST nulls, get converted to ''
    * No good for int & date types, even if they allow NULL, so convert to NULL
    * @param boolean $anddates: true - and dates?
