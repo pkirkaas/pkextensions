@@ -3,16 +3,16 @@
  * Until I do a better implementation - including this trait provideds an
  * array property "structuredArr", which can be used as a persistent array.
  * It maps to a table field "structured", mediumText, JSON encoded.
- * So, get/set/save "structured" as an array.
+ * So, get/set/save "structured" as an array. But access by $this->nosql().
  * Adds a single text field to a model, but used as JSON & provides some methods
  * for using it.
  * 
- * This seems to work -- access the JSON array by '$this->structured()' - & can
+ * This seems to work -- access the JSON array by '$this->nosql()' - & can
  * assign by:
-    $tstjson->structured()['tomoorowpple']="Horay desery";
+    $tstjson->nosql()['tomoorowpple']="Horay desery";
  * Can even get array as local var & assign by:
  * 
- *   $prat = &$tstjson->structured();
+ *   $prat = &$tstjson->nosql();
  *   $prat['akey'] = "A-Value";
  *   $tstjson->save();
  * 
@@ -25,44 +25,27 @@ namespace PkExtensions\Traits;
 trait PkJsonFieldTrait {
   //public $structuredArr;
   public static $table_field_defs_JsonFieldTrait = [
-      //'structured' => ['type' => 'mediumText', 'methods'=>['nullable'],'conversion'=> 'array'],
       'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
-      //'nosql' => ['type' => 'mediumText'],
-      //'tstatt'=>['type'=>'string', 'methods'=>['default'=>"'hello'"]],
-      //'keys' => ['type' => 'text', 'methods' => ['nullable']],
     ];
-  #If $this->keys exists, only those are allowed for __set/__get
 
-  /*
-  public function __get($name) {
-    if ($name !== 'structured') {
-      return parent::__get($name);
-    }
-    if (!$this->structuredArr) {
-      $this->structuredArr = json_decode($this->getAttribute('structured'),1);
-    }
-    return $this->structuredArr;
-  }
-  public function __set($name, $value) {
-    if ($name !== 'structured') {
-      return parent::__set($name,$value);
-    }
-    $this->structuredArr = $value;
-  }
-   * *
+  /**
+   * Get/Set the array from the underlying 'structured' string attribute.
+   * @param string|array|null $val - if null, return existing array
+   *    if string, try to json-encode to array & return
+   *    if array, set to 'structured' to array value & return (also empty array)
+   * @return array - 
    */
-  //public function &__get($name) {
-  /*
-  public function __get($name) {
-    if ($name !== 'structured') {
-      return parent::__get($name);
+  public function &nosql(&$val = null) {
+    if ($val) {
+      if (ne_string($val)) {
+        $newval = json_encode($val, 1);
+        $this->attributes['structured'] = $newval;
+      } else {
+        $this->attributes['structured'] = $val;
+      }
+      return $this->attributes['structured'];
     }
-   * 
-   */
-  //public function &narray() {
-    //$structured = $this->structured;
-    //if (ne_string($this->structured)) {
-  public function &structured() {
+
     if (empty($this->attributes['structured']) || !$this->attributes['structured']) {
       $this->attributes['structured'] = [];
     } else if (ne_string($this->attributes['structured'])) {
@@ -71,104 +54,73 @@ trait PkJsonFieldTrait {
     return $this->attributes['structured'];
   }
 
-
-   /*
-  public function __set($name, $value) {
-    if ($name !== 'structured') {
-      return parent::__set($name,$value);
-    }
-    $this->structuredArr = $value;
-  }
-    * */
-
-  /*
-  public function ExtraConstructorJsonField($atts = []) {
-    $this->structuredArr = json_decode($this->structured,1)?:[];
-    pkdebug("In the extra constructor?");
-  //  $this->casts = ['structured'=>'array', 'keys'=>'array']; 
-    //$keys=keyVal('keys',$atts);
-    //$this->initializeArray($keys);
-  }
-   * *
+  /** Can take a json encoded string or array as 'nosql' & initialize
+   * @param array $atts
    */
+  public function ExtraConstructorJsonField($atts = []) {
+    //$this->structuredArr = json_decode($this->structured,1)?:[];
+    $nosql = keyVal('nosql', $atts);
+    if ($nosql) {
+      $this->nosql($nosql);
+    }
+    return $atts;
+  }
   public function save(array $opts = []) {
-    if (is_array($this->getAttribute('structured'))){
-      $this->setAttribute('structured',  json_encode($this->getAttribute('structured'),static::$jsonopts));
+    if (array_key_exists('structured', $this->attributes) && 
+        is_array($this->attributes['structured'])){
+      $this->attributes['structured'] = 
+          json_encode($this->attributes['structured'],static::$jsonopts);
     }
     return parent::save($opts);
   }
-
-  /*
-  public function setStructuredAttribute($value) {
-    if (!$value) $value = [];
-    $this->attributes['structured'] = json_encode($value, static::$jsonopts);
-  }
-
-  public function getStructuredAttribute($value) {
-    $decoded = json_decode($value,true);
-    if (!$decoded) $decoded =[];
-    return $decoded;
-  }
-   * 
+  /** Initialize or add keys/vals to 'nosql'/'structured', & return 
+   * array keys
+   * @param string|array $keyArray - array of keys (w. opt values) to set/add
+   * @return array - existing & new keys
+   * @throws \Exception
    */
-  /*
-   * 
-   */
-    
-  public function initializeArray($keys) {
-    if (!ne_array($keys)) {
-      return;
-    }
+  public function arrayKeys($keyArray = []) {
     #Keys can be a mixed array, index w. key as value, AND associative with
-    #key as key & set to an initial value.
-    # ['title','weight','gender'=>'female','nationality'=>'american', 'race',..
-    foreach ($keys as $idx=>$val) {
-      if (is_int($idx) && ne_string($val)) {
-        $this->structuredArr[$val]=null;
-      } else if (ne_string($idx)) {
-        $this->structuredArr[$idx]=$val;
-      } else {
-        throw new \Exception("Something wrong with key initialization");
+    if (ne_string($keyArray)) {
+      $keyArray = [$keyArray];
+    }
+    if (ne_array($keyArray)) {
+      #key as key & set to an initial value.
+      # ['title','weight','gender'=>'female','nationality'=>'american', 'race',..
+      foreach ($keyArray as $idx=>$val) {
+        if (is_int($idx) && ne_string($val)) {
+          $this->nosql()[$val]=null;
+        } else if (ne_string($idx)) {
+          $this->nosql()[$idx]=$val;
+        } else {
+          throw new \Exception("Something wrong with key initialization");
+        }
       }
     }
-
+    return array_keys($this->nosql());
   }
 
+  /** These can set/get array key vals, even if the keys don't already exists*/
   public function getArrayVal($key, $default = null) {
-    return keyVal($key, $this->structuredArr, $default);
+    return keyVal($key, $this->nosql(), $default);
   }
   public function setArrayVal($key,$value) {
-    $this->structuredArr[$key] = $value;
+    $this->nosql()[$key] = $value;
     return $value;
   }
 
-  /*
+  /** These can only get/set key values if they already exist */
   public function __get($name) {
-    if ($name === 'structured') {
+    if (!in_array($name, $this->arrayKeys(),1)) {
       return parent::__get($name);
     }
-    if (in_array($name, array_keys($this->structured), 1)) {
-      $structured = $this->structured;
-      return keyVal($name,$structured);
-    //  return $this->structured[$name];
-    }
-    return parent::__get($name);
+    return $this->nosql()[$name];
   }
 
   public function __set($name, $value) {
-    if ($name === 'structured') {
-      return parent::__set($name,$value);
-    }
-    /*
-    if (ne_array($this->keys) &&  !in_array($name,$this->keys,1)) {
+    if (!in_array($name, $this->arrayKeys(),1)) {
       return parent::__set($name, $value);
     }
-     * 
-    $structured = $this->structured;
-    $structured[$name] = $value;
-    $this->structured = $structured;
-    return  $this->structured;
-    //return  ($this->structured)[$name]=$value;
+    return $this->nosql()[$name] = $value;
   }
-  */
 }
