@@ -1165,7 +1165,7 @@ function array_merge_array($arrs = []) {
     return [];
   }
   if (is_array($arrs) && (count($arrs) ===1)){
-    return $arrs;
+    return $arrs[0];
   }
   $res = [];
   foreach ($arrs as $arr) {

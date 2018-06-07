@@ -242,10 +242,30 @@ abstract class PkModel extends Model {
 
   public static function getTableFieldDefs() {
     //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
-    $defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs(), static::getTableFieldDefsTrait());
+    $closure = function() {
+
+      /* Eventually...
+      $defs = array_merge(
+        static::_getTableFieldDefs(), 
+        static::getExtraTableFieldDefs(), 
+        static::getTableFieldDefsTrait()
+        );
+       * 
+       */
+      // Debugging:
+      $_gtbd = static::_getTableFieldDefs();
+      $extrad = static:: getExtraTableFieldDefs(); 
+      $ttbd =   static::getTableFieldDefsTrait();
+      $defs = array_merge($_gtbd, $extrad, $ttbd);
+      pkdebug("For class: ".static::class." Table Field Defs: ",
+          ['_gtbd'=> $_gtbd, 'extrad'=> $extrad, 'ttbd'=>$ttbd, '\n\nAll Defs:'=>$defs]);
+          
+          
+      return $defs;
+    };
+    return static::getCached('tableFieldDefs', $closure);
     //$defs = static::_getTableFieldDefs();
-    pkdebug("For class: ".static::class." Table Field Defs: ",$defs);
-    return static::_unsetTableFieldDefs($defs);
+    //return static::_unsetTableFieldDefs($defs);
   }
 
   public static function getConversion($key) {

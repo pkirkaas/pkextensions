@@ -351,14 +351,14 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
           $tomerge[]=$val;
         }
       }
-      //echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
+      echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";
       
       if (!count($tomerge)) {
         return [];
       }
       $merged = array_merge_array($tomerge);
-    //echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
-    //echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
+    echo "\n\nSURVIVED THAT! Array to merge: ";print_r($tomerge);
+    echo "  Merged Result: "; print_r($merged); echo "  ". static::class ."\n\n";
       //if ($idx) {
       // $merged = array_unique($merged);
       //}

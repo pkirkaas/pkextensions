@@ -1,14 +1,29 @@
 <?php
 /*
+ * Until I do a better implementation - including this trait provideds an
+ * array property "structuredArr", which can be used as a persistent array.
+ * It maps to a table field "structured", mediumText, JSON encoded.
+ * So, get/set/save "structured" as an array.
  * Adds a single text field to a model, but used as JSON & provides some methods
  * for using it.
+ * 
+ * This seems to work -- access the JSON array by '$this->structured()' - & can
+ * assign by:
+    $tstjson->structured()['tomoorowpple']="Horay desery";
+ * Can even get array as local var & assign by:
+ * 
+ *   $prat = &$tstjson->structured();
+ *   $prat['akey'] = "A-Value";
+ *   $tstjson->save();
+ * 
+ *   Will save the array as JSON in the field 'structured'
  */
 namespace PkExtensions\Traits;
 /**
  * @author pkirkaas
  */
 trait PkJsonFieldTrait {
-  public $structuredArr;
+  //public $structuredArr;
   public static $table_field_defs_JsonFieldTrait = [
       //'structured' => ['type' => 'mediumText', 'methods'=>['nullable'],'conversion'=> 'array'],
       'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
@@ -18,6 +33,7 @@ trait PkJsonFieldTrait {
     ];
   #If $this->keys exists, only those are allowed for __set/__get
 
+  /*
   public function __get($name) {
     if ($name !== 'structured') {
       return parent::__get($name);
@@ -33,7 +49,39 @@ trait PkJsonFieldTrait {
     }
     $this->structuredArr = $value;
   }
+   * *
+   */
+  //public function &__get($name) {
+  /*
+  public function __get($name) {
+    if ($name !== 'structured') {
+      return parent::__get($name);
+    }
+   * 
+   */
+  //public function &narray() {
+    //$structured = $this->structured;
+    //if (ne_string($this->structured)) {
+  public function &structured() {
+    if (empty($this->attributes['structured']) || !$this->attributes['structured']) {
+      $this->attributes['structured'] = [];
+    } else if (ne_string($this->attributes['structured'])) {
+      $this->attributes['structured'] = json_decode($this->attributes['structured'],1);
+    } 
+    return $this->attributes['structured'];
+  }
 
+
+   /*
+  public function __set($name, $value) {
+    if ($name !== 'structured') {
+      return parent::__set($name,$value);
+    }
+    $this->structuredArr = $value;
+  }
+    * */
+
+  /*
   public function ExtraConstructorJsonField($atts = []) {
     $this->structuredArr = json_decode($this->structured,1)?:[];
     pkdebug("In the extra constructor?");
@@ -41,8 +89,12 @@ trait PkJsonFieldTrait {
     //$keys=keyVal('keys',$atts);
     //$this->initializeArray($keys);
   }
+   * *
+   */
   public function save(array $opts = []) {
-    $this->setAttribute('structured',  json_encode($this->structuredArr,static::$jsonopts));
+    if (is_array($this->getAttribute('structured'))){
+      $this->setAttribute('structured',  json_encode($this->getAttribute('structured'),static::$jsonopts));
+    }
     return parent::save($opts);
   }
 
