@@ -36,27 +36,29 @@ trait PkJsonFieldTrait {
    * @return array - 
    */
   public function &nosql(&$val = null) {
-    if ($val) {
+    if ($val) { #Set structured
       if (ne_string($val)) {
         $newval = json_encode($val, 1);
         $this->attributes['structured'] = $newval;
       } else {
         $this->attributes['structured'] = $val;
       }
-      return $this->attributes['structured'];
-    }
-
-    if (empty($this->attributes['structured']) || !$this->attributes['structured']) {
-      $this->attributes['structured'] = [];
+    } else if (($val === []) ||
+       empty($this->attributes['structured']) || 
+        !$this->attributes['structured']) {
+    #Otherwise, clear it (if $val === null) or return it as array
+        $this->attributes['structured'] = [];
     } else if (ne_string($this->attributes['structured'])) {
-      $this->attributes['structured'] = json_decode($this->attributes['structured'],1);
+      $this->attributes['structured'] = 
+          json_decode($this->attributes['structured'],1);
     } 
-    return $this->attributes['structured'];
+    return $this->attributes['structured']; #Should be an array
   }
 
   /** Can take a json encoded string or array as 'nosql' & initialize
    * @param array $atts
    */
+  /*
   public function ExtraConstructorJsonField($atts = []) {
     //$this->structuredArr = json_decode($this->structured,1)?:[];
     $nosql = keyVal('nosql', $atts);
@@ -65,22 +67,38 @@ trait PkJsonFieldTrait {
     }
     return $atts;
   }
+   * 
+   */
   public function save(array $opts = []) {
-    if (array_key_exists('structured', $this->attributes) && 
-        is_array($this->attributes['structured'])){
+    /*
+    if (array_key_exists('structured', $this->attributes) ) {
+     if (is_array($this->attributes['structured'])){
       $this->attributes['structured'] = 
           json_encode($this->attributes['structured'],static::$jsonopts);
+     } else if (ne_string($this->attributes['structured'])) 
     }
+     * 
+     */
+    $this->structured = 'Goodbye';
+    $this->attributes['structured'] = 'Hello';
+    unset($opts['structured']);
+    pkdebug("Class: ".static::class, "Object:", $this);
+    $opts['structured'] = 'In Opts';
     return parent::save($opts);
   }
   /** Initialize or add keys/vals to 'nosql'/'structured', & return 
    * array keys
    * @param string|array $keyArray - array of keys (w. opt values) to set/add
+   * @param boolean - default false - add keys/vals. Else, replace all.
    * @return array - existing & new keys
    * @throws \Exception
    */
-  public function arrayKeys($keyArray = []) {
+  public function arrayKeys($keyArray = [], $replace = false) {
     #Keys can be a mixed array, index w. key as value, AND associative with
+    if ($replace) {
+      $val = [];
+      $this->nosql($val);
+    }
     if (ne_string($keyArray)) {
       $keyArray = [$keyArray];
     }
@@ -97,6 +115,7 @@ trait PkJsonFieldTrait {
         }
       }
     }
+    return null;
     return array_keys($this->nosql());
   }
 
@@ -118,7 +137,9 @@ trait PkJsonFieldTrait {
   }
 
   public function __set($name, $value) {
-    if (!in_array($name, $this->arrayKeys(),1)) {
+    if ( !in_array($name,$this->keyvals))
+
+    if (!is_array($this->arrayKeys()) || !in_array($name, $this->arrayKeys(),1)) {
       return parent::__set($name, $value);
     }
     return $this->nosql()[$name] = $value;

@@ -502,7 +502,7 @@ class $createclassname extends Migration {
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
-    //echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
+    echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
     return "Migration Table [$migrationfile] Created\n";
   }
 
