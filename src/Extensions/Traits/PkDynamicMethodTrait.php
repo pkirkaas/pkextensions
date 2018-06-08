@@ -33,17 +33,20 @@ trait PkDynamicMethodTrait {
       $this->methodfactoryclass = $methodfactoryclass;
     }
     if (class_exists($this->methodfactoryclass)) {
-       new $this->methodfactoryclass($this);
+       $factory = new $this->methodfactoryclass($this);
+       $factory->setMethodsAndProps();
     }
   }
+  
   public static $table_field_defs_DynamicType = [
     'instancetype' => ['type' => 'string', 'methods' => 'nullable'],
     'methodfactoryclass' => ['type' => 'string', 'methods' => 'nullable'],
   ];
 
 
+  /*
   public function getInstanceMethod($name) {
-    return keyVal($name, $this->instanceMethods);
+    return keyVal(strtolower($name), $this->instanceMethods);
   }
 
   public function callInstanceMethod($name,$args=[]) {
@@ -51,6 +54,8 @@ trait PkDynamicMethodTrait {
     if (!$method) return null;
     return $method($args);
   }
+   * 
+   */
 
   /*
   public $methodNames;

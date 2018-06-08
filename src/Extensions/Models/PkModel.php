@@ -1099,7 +1099,7 @@ class $createclassname extends Migration {
       $fnpre = 'ExtraConstructor';
       $constructors = [];
       foreach ($traitmethods as $traitmethod) {
-        if (startsWith($traitmethod, $fnpre, false)) {
+        if (startsWith($traitmethod, $fnpre, false,true)) {
           $constructors[] = $traitmethod;
         }
       }

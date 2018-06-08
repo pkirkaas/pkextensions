@@ -1411,16 +1411,20 @@ function &insert_into_arrayBAD($keys, $value, & $arr = null, $unset = false) {
   'mustang' =>
   array (size=1)
   'engine' => string '351 Cleavland' (length=13)
+ * 
+ * Can also just RETURN the value at the path without changing the array 
  * @param array $keys: Sequence/depth of keys
  * @param Mixed $value: Whatever value to assign to the location
  * @param array|NULL $arr -- Optional array to add to or create 
  * @param boolean $unset (optional): If value is null, default is to create
+ * @param boolean $fetch (optional): If true, just try to return value
+ * 
  * the entry with a null value. If $unset==true, unset the key if it exists.
  * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
  * @return Array: Array with value set at appropriate vector. If called with
  * $retar = &insert_into_array(.... $arr);, $retar will be a reference to $arr
  */
-function &insert_into_array($keys, $value, &$arr = null, $unset = false) {
+function &insert_into_array($keys,$value,&$arr=null,$unset=false,$fetch=false) {
   if (!is_array($keys)) {
     $keys = [$keys];
   }
@@ -1438,6 +1442,9 @@ function &insert_into_array($keys, $value, &$arr = null, $unset = false) {
       $x = & $x[$keyval];
     }
   }
+  if ($fetch) {
+    return $x;
+  }
   if ($unset) {
     array_pop($y);
   } else {
@@ -1445,6 +1452,27 @@ function &insert_into_array($keys, $value, &$arr = null, $unset = false) {
   }
   //$x = $value;
   return $arr;
+}
+/** Maybe better for fetching. So obviously $arr is required*/
+/* @param keys, $arr as avove
+ * @return: REFERENCE to the value, so like it it's an array it can
+ * be modifiled.
+ */
+function &fetch_from_array($keys,Array &$arr) {
+  if (!is_array($keys)) {
+    $keys = [$keys];
+  }
+  $x = & $arr;
+  $y = &$x;
+  foreach ($keys as $keyval) {
+    $y = &$x;
+    if (is_object($x)) {
+      $x = &$x->$keyval;
+    } else {
+      $x = & $x[$keyval];
+    }
+  }
+  return $x;
 }
 
 /**

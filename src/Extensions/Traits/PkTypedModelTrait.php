@@ -1,4 +1,21 @@
 <?php
+/** Actually, maybe better called "OwnedModelTrait" - it is "owned" by another
+ * model (which could use the "PkHasTypedModelTrait" to manage this.)
+ * This can be one to many or one to one - like ProfileUploads, could be several
+ * types, all belong to the same profile. All the implementing/using/owned class
+ * needs to do is specify the foreign key & relationship -- like:
+ * 
+
+class ProfileUpload extends PkModel {
+  use PkTypedUploadTrait;
+  public static $table_field_defs_ExtraProfileItemTrait = [
+      'profile_id' => ['type' => 'integer', 'methods' => ['index']],
+    ];
+
+  public function profile() {
+    return $this->belongsTo('App\Models\Profile');
+  }
+ */
 namespace PkExtensions\Traits;
 use PkExtensions\PkException;
 use PkExtensions\Models\PkModel;
@@ -14,6 +31,8 @@ use PkExtensions\Models\PkModel;
     public function avatar() {
       return $this->hasOneTyped('avatar');
     }
+ * 
+ * The using/implementing class just has to specify the relationship & foreign key,
 
  * @author pkirk
  */
