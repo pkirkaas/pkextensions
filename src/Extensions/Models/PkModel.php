@@ -257,10 +257,8 @@ abstract class PkModel extends Model {
       $extrad = static:: getExtraTableFieldDefs(); 
       $ttbd =   static::getTableFieldDefsTrait();
       $defs = array_merge($_gtbd, $extrad, $ttbd);
-      pkdebug("For class: ".static::class." Table Field Defs: ",
-          ['_gtbd'=> $_gtbd, 'extrad'=> $extrad, 'ttbd'=>$ttbd, '\n\nAll Defs:'=>$defs]);
-          
-          
+      //pkdebug("For class: ".static::class." Table Field Defs: ",
+          //['_gtbd'=> $_gtbd, 'extrad'=> $extrad, 'ttbd'=>$ttbd, "\n\nAll Defs:"=>$defs]);
       return $defs;
     };
     return static::getCached('tableFieldDefs', $closure);
@@ -347,7 +345,7 @@ abstract class PkModel extends Model {
      * (This is going to be in vendors/pkirkaas/PkEx..../Models dir
      */
 
-    pkdebug("Incoming field def:", $fielddefs);
+    //pkdebug("Incoming field def:", $fielddefs);
     $changestr = '';
     $indices = ['index', 'unique', 'primary'];
     if ($change) $changestr = '->change()';
@@ -356,7 +354,7 @@ abstract class PkModel extends Model {
     //foreach (static::$table_field_defs as $fieldName => $def) {
     foreach ($fielddefs as $fieldName => $def) {
       $type = null;
-      pkdebug("Defs for '$fieldName',", $def);
+      //pkdebug("Defs for '$fieldName',", $def);
       $methodChain = '';
       if (is_string($def))
           $out.="$spaces\$table->$def('$fieldName')$changestr;\n";
@@ -365,7 +363,7 @@ abstract class PkModel extends Model {
         if (array_key_exists('type',$def)) {
           $type = keyVal('type', $def, 'integer');
         } else { #Column def could be just a value in the def array
-          pkdebug("FieldName: $fieldName;  dfvvals", $defvals);
+          //pkdebug("FieldName: $fieldName;  dfvvals", $defvals);
           foreach ($eloquentMigrationColumnDefs as $emd) {
             if (in_array($emd,$defvals,1)) {
               $type = $emd;
@@ -1062,6 +1060,7 @@ class $createclassname extends Migration {
    * @param array $attributes
    */
   public function __construct(array $attributes = []) {
+    $this->casts = $this->getInstanceArraysMerged('casts');
     $this->fillable($this->getAttributeNames());
     //$this->fillable($this->getFieldNames());
     unset ($attributes['id']);

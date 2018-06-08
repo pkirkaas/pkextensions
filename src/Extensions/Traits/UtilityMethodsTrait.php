@@ -187,6 +187,25 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     };
     return static::getCached($akey,$closure);
   }
+  
+  public static function getInstanceArraysMerged($prefix, $idx=false) {
+    //pkdebug("Entering garmr for class: ".static::class."; prefix: [$prefix]");
+  //public static function combineAncestorAndSiblings($prefix, $idx=false) {
+    $akey = $prefix.'_combined';
+    $closure = function () use ($prefix, $idx) {
+      $ancestors = static::getInstanceAncestorArraysMerged($prefix,$idx);
+      $siblings = static::getInstanceSiblingArraysMerged($prefix,$idx);
+      if (ne_array($ancestors) && ne_array($siblings)) {
+          return array_merge($ancestors,$siblings);
+      } else if (ne_array($ancestors)) {
+        return $ancestors;
+      } else if (ne_array($siblings)) {
+          return $siblings;
+      }
+      return [];
+    };
+    return static::getCached($akey,$closure);
+  }
 
     
 
@@ -430,7 +449,46 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * values REPLACE the ancestor key values
    */
   //  DO I NEED THIS?
-  public function getInstanceAncestorArraysMerged($arrayName, $idx=false) {
+  public static function getInstanceAncestorArraysMerged($arrayName, $idx=false) {
+    $akey = $arrayName."_InstanceAncestors";
+    $closure = function() use($arrayName, $idx, $akey) {
+      $thisClass = $class = static::class;
+      #First, build array of arrays....
+      $refClass = new ReflectionClass($class);
+      $defAtts = $refClass->getDefaultProperties();
+      //$retArr[] = $class::$$arrayName; #Deliberate double $$
+      $attArr = keyVal($arrayName,$defAtts,[]);
+      if (!is_array( $attArr)) {
+        return $attArr;
+      }
+      $retArr[] = $attArr;
+      while ($par = get_parent_class($class)) {
+        $refClass = new ReflectionClass($par);
+        $defAtts = $refClass->getDefaultProperties();
+        $parAtt = keyVal($arrayName,$defAtts,[]);
+        if ($parAtt === false) {#If a parent wants stop accension
+          break;
+        }
+        if (($tstArr = $parAtt) && is_array($tstArr) ) {
+          $retArr[] = $tstArr;
+        }
+        $class = $par;
+      }
+      #Now merge. Reverse order so child settings override ancestors...
+      $retArr = array_reverse($retArr);
+      $mgArr = call_user_func_array('array_merge', $retArr);
+      #Mainly to save the developer who respecifies 'id' in the derived direct
+      if ($idx && is_array($mgArr)) { #Indexed array, return only unique values. For 'possessionDirectDefs'
+        $mgArr = array_unique($mgArr);
+      }
+      return $mgArr;
+    };
+    return static::getCached($akey, $closure);
+  }
+
+  /** Mostly for casts */
+  /*
+  public static function getInstanceSiblingArraysMergedX($arrayName, $idx = false) {
     $thisClass = $class = static::class;
     #First, build array of arrays....
     $refClass = new ReflectionClass($class);
@@ -462,6 +520,34 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     }
     return $mgArr;
   }
+   * 
+   */
+  public static function getInstanceSiblingArraysMerged($prefix, $idx=false, $longer=1) {
+    //echo "Trying to get SIBLING arrays merged for: ".instance::class."\n\n";
+    $akey = $prefix."_siblingInstance";
+    $closure = function() use($prefix, $idx, $longer) {
+      $ref = new ReflectionClass(static::class);
+      $propsArr = $ref->getDefaultProperties();
+      $tomerge = [];
+      foreach ($propsArr as $key => $val) {
+        if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
+          $tomerge[]=$val;
+        }
+      }
+      if (!count($tomerge)) {
+        return [];
+      }
+      $merged = array_merge_array($tomerge);
+      return $merged ?: [];
+    };
+    return static::getCached($akey, $closure);
+  }
+
+
+
+
+
+
 
 
   /** Gets the time difference between 2 dates, using defaults
