@@ -51,7 +51,7 @@ abstract class PkController extends Controller {
         $this->me = Auth::user();
         return $next($request);
     });
-    $this->mkSubMenu();
+    //$this->mkSubMenu();
     /*
     $submenu = $this->mkSubMenu();
     if ($submenu) {
@@ -74,25 +74,36 @@ abstract class PkController extends Controller {
   public $submenu_class;
 
   public function mkSubMenu($args = null) { #Override as desired
+    /** Links look like this:
+     *     <li class='nav-item'>
+      <a href="http://local.mentalhealthman/client/viewprofile/260" class="nav-link small-nav m-l-1 m-r-1" style="color:#88f;" data-tootik="View Client Profile &amp; Print New Intake Form">Emily M May : </a>
+    </li>
+
+     */
     $submenu = null;
     if ($this->submenu_literal) {
       $submenu = $this->submenu_literal;
     } else {
       $ptr = new PkHtmlPainter();
-      $links = [];
-      $routeArrs = $this->allSubmenuRouteArrs();
-      if ($routeArrs) { #Assumes array of findable routes, with params
-        $routeName = RouteFacade::getCurrentRoute()->getName();
-        foreach ($routeArrs as $route) {
-          if ($routeName == $route) {
-            continue;
+      $links = keyVal('links',$args,[]);
+      pkdebug("In mksub, linkks:",$links);
+      if (!$links) {
+        $routeArrs = $this->allSubmenuRouteArrs();
+        if ($routeArrs) { #Assumes array of findable routes, with params
+          $routeName = RouteFacade::getCurrentRoute()->getName();
+          foreach ($routeArrs as $route) {
+            if ($routeName == $route) {
+              continue;
+            }
+            $links[] = PkHtml::linkRouteDefault($route, [], $this->submenu_link_class);
           }
-          $links[] = PkHtml::linkRouteDefault($route, [], $this->submenu_link_class);
         }
-        $submenu = $ptr->mkBsMenu($links,$this->submenu_opts);
       }
+      $submenu = $ptr->mkBsMenu($links,$this->submenu_opts).' ';
     }
+    pkdebug("Submenu", $submenu);
     view()->share('sub_menu',$submenu);
+    //view()->share('sub_menu',"<h1>ARE YOU NUTTS?</h1>");
   }
 
   public static $errorMsgBag; #The error messages, if any. Try static first

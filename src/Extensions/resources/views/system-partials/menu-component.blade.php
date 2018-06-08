@@ -27,6 +27,10 @@
       </ul>
       </div>
     </nav>
-    <?php if (!empty($sub_menu)) echo $sub_menu; ?>
+    <?php if (!empty($sub_menu)) {
+      echo $sub_menu;
+      //pkdebug("In menu-component blade - submenu",$sub_menu);
+    }
+      ?>
     </div>
     <?php if (!Auth::user()) pkview("forms.DropLoginRegisterDialog")?>

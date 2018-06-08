@@ -71,12 +71,24 @@ body .navbar {
 //$nav-item-after-nav-item-margin-left: .5rem !default;
 $nav-item-hpad: .25em !default;
 $pk-nav-nav-link-margin-top: 5px !default;
-//$pk-top-menu-height: 40px !default;
+$pk-top-menu-height: 40px !default;
+$pk-nav-sub-nav-menu-height: 35px !default;
 $pk-top-menu-nav-link-margin-top: 0 !default;
 //$pk-top-menu-font-size: .8rem !default;
 $pk-top-menu-font-size: 1rem !default;
+$menus-wrapper-height: $pk-top-menu-height +  $pk-nav-sub-nav-menu-height !default;
+.menus-wrapper {
+  height: $menus-wrapper-height;
+  border: solid blue 1px;
+}
+body nav.pk-nav-sub-nav {
+  position: fixed;
+  top: $pk-top-menu-height;
+  height: $pk-nav-sub-nav-menu-height;
+}
 body nav.navbar.pk-top-menu {
   position: fixed;
+  height: $pk-top-menu-height;
   font-size: $pk-top-menu-font-size;
   width: 100%;
   top: 0;

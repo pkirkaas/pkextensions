@@ -345,6 +345,32 @@ class PkHtmlPainter extends PkHtmlRenderer {
     return $this->injectTpl($hr->$tag($ps, keyVal('attributes', $res)), $ps_tpl, $ps_key);
   }
 
+  /**MkBsMenu below assumes menu-formed links - this builds them
+   * @param idx_array $linkatts - each linkatt assoc array can have several
+   * components - each link att can have:
+   * ['url','params', 'label', 'atts' (array of atts, or if string, just class)
+   */
+  public function mkLinks($linkatts, $opts=[]) {
+    $links = [];
+    foreach ($linkatts as $linkatt) {
+      $tag = "a";
+      $url = keyVal('url', $linkatt);
+      if (!$url) $tag = 'div';
+      $params=keyVal('params', $linkatt);
+      $label = keyVal('label',$linkatt);
+      $atts = keyVal('atts', $linkatt);
+      if (is_string($atts)) {
+        $atts=['class'=>" $atts "];
+      }
+      if ($url) {
+        $atts['href']=$url.$params;
+      }
+      $atts['class'] = keyVal('class',$atts) . " nav-link small-nav ";
+      $links[]  = PkRenderer::$tag($label, $atts)->__toString();
+    }
+    return $links;
+  }
+
   public function mkBsMenu($links = [], $opts = []) {
     $nav_class = keyVal('nav_class', $opts, 'pk-nav sub-nav');
     $nav_ul_class = keyVal('nav_ul_class', $opts, 'flex-row');
