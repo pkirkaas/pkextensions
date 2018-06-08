@@ -690,6 +690,9 @@ function pkdebugOut($str, $logpath = null) {
     //$logpath =  WP_CONTENT_DIR.'/app.log';
     //$logpath = $_SERVER['DOCUMENT_ROOT'] . '/logs/app.log';
     if (!$logpath) $logpath = appLogPath();
+    if (isCli()) {
+      echo ("The logpath: [$logpath]");
+    }
     if (PkLibConfig::$isWarning) {
       if (PkLibConfig::$warnLogDir) {
         $warnpath = PkLibConfig::$warnLogDir . '/' . PkLibConfig::$warnLogName;
@@ -3738,10 +3741,13 @@ function traitMethods($traits, $omittraits=[]) {
     $traitmethods = array_merge($traitmethods,
         array_map(function($ar) {return $ar->name;},($reflection->getMethods()))); 
   }
-  pkdebug("Trait Methods:", $traitmethods);
+  //pkdebug("Trait Methods:", $traitmethods);
   return array_unique($traitmethods);
 }
-
+function isJson($string) {
+ json_decode($string);
+ return (json_last_error() == JSON_ERROR_NONE);
+}
 /*
   175=>  ReflectionMethod:object(ReflectionMethod)#426 (2) {
   ["name"]=>

@@ -10,9 +10,9 @@ use PkExtensions\Traits\PkDynamicPropsMethodsTrait;
 class PkDynamicFactory {
  // public $builders;
   public $instance;
-  public function __constructor($instance) {
+  public function __construct($instance) {
   //  $this->builders = $this->makeBuilderArray();
-    $this->instance = instance;
+    $this->instance = $instance;
     /*
     if (!$instance->instancetype || 
         !in_array($instance->instancetype, $this->getInstanceTypes(),1)) {
@@ -40,10 +40,13 @@ class PkDynamicFactory {
    * */
   public function setMethodsAndProps() {
     $fnm = $this->getFieldsAndMethods();
+    //pkecho ("In set Methods, props are:", $fnm);
     $keys = $fnm['keys'];
     $methods = $fnm['methods'];
+    //pkecho("keys",$keys,'methods',$methods);
     $this->instance->arrayKeys($keys);
     $this->instance->addInstanceMethod($methods);
+    $this->instance->typename = $fnm['name'];
   }
   //Override. Keyed first by type ('professional' or 'social'),
   //then method names, then closures */

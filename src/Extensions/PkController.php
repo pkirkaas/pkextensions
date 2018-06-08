@@ -51,10 +51,14 @@ abstract class PkController extends Controller {
         $this->me = Auth::user();
         return $next($request);
     });
+    $this->mkSubMenu();
+    /*
     $submenu = $this->mkSubMenu();
     if ($submenu) {
       view()->share('sub_menu',$submenu);
     }
+     * 
+     */
   }
 
 
@@ -64,28 +68,31 @@ abstract class PkController extends Controller {
   }
   public $submenu_literal; #If exists, just use it, as pure HTML
   public $submenu_routearr; #If exists, build submenu from routes, using descs
+  public $submenu_itemarr; #If exists, build submenu from routes, using descs
   public $submenu_opts; #If exists, use for PkHtmlPainter::mkBsMenu
   public $submenu_link_class='nav-link';
   public $submenu_class;
 
   public function mkSubMenu($args = null) { #Override as desired
+    $submenu = null;
     if ($this->submenu_literal) {
-      return $this->submenu_literal;
-    }
-    $ptr = new PkHtmlPainter();
-    $links = [];
-    $routeArrs = $this->allSubmenuRouteArrs();
-    if ($routeArrs) { #Assumes array of findable routes, with params
-      $routeName = RouteFacade::getCurrentRoute()->getName();
-      foreach ($routeArrs as $route) {
-        if ($routeName == $route) {
-          continue;
+      $submenu = $this->submenu_literal;
+    } else {
+      $ptr = new PkHtmlPainter();
+      $links = [];
+      $routeArrs = $this->allSubmenuRouteArrs();
+      if ($routeArrs) { #Assumes array of findable routes, with params
+        $routeName = RouteFacade::getCurrentRoute()->getName();
+        foreach ($routeArrs as $route) {
+          if ($routeName == $route) {
+            continue;
+          }
+          $links[] = PkHtml::linkRouteDefault($route, [], $this->submenu_link_class);
         }
-        $links[] = PkHtml::linkRouteDefault($route, [], $this->submenu_link_class);
+        $submenu = $ptr->mkBsMenu($links,$this->submenu_opts);
       }
-      return $ptr->mkBsMenu($links,$this->submenu_opts);
     }
-    return null;
+    view()->share('sub_menu',$submenu);
   }
 
   public static $errorMsgBag; #The error messages, if any. Try static first

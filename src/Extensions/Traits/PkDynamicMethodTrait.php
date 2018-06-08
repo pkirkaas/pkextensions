@@ -20,6 +20,7 @@ trait PkDynamicMethodTrait {
     }
   }
   public function ExtraConstructorDynamicMethods($atts = []) {
+    //pkecho ("IN Extra Constructor");
     $this->instancetype = keyVal('instancetype',$atts);
     #A method factory class just needs to be construted with $this,
     #then examines $this->instancetype and add the instanceMethods for that type
@@ -32,8 +33,12 @@ trait PkDynamicMethodTrait {
     if ($methodfactoryclass) {
       $this->methodfactoryclass = $methodfactoryclass;
     }
+    //pkecho ("In Build Instance - methodfactoryclass:", $this->methodfactoryclass);
     if (class_exists($this->methodfactoryclass)) {
        $factory = new $this->methodfactoryclass($this);
+       //$factory->instance = $this;
+      // pkecho("Factory", $factory);
+      // print_r(['The factory Instance:'=>$factory]);
        $factory->setMethodsAndProps();
     }
   }
@@ -41,6 +46,7 @@ trait PkDynamicMethodTrait {
   public static $table_field_defs_DynamicType = [
     'instancetype' => ['type' => 'string', 'methods' => 'nullable'],
     'methodfactoryclass' => ['type' => 'string', 'methods' => 'nullable'],
+    'typename' => ['type' => 'string', 'methods' => 'nullable'],
   ];
 
 
@@ -69,10 +75,12 @@ trait PkDynamicMethodTrait {
 
   public function __call($method, $args=[]) {
     if (!$this->instanceMethods ||
-        !in_array(strtolower($method),array_keys($this->instanceMethods,1))) {
-      return parent::__call($method,$args);
+        !in_array(strtolower($method),array_keys($this->instanceMethods),1)) {
+       return parent::__call($method,$args);
+    } else {
+      pkdebug("The method: $method");
+      return call_user_func_array($this->instanceMethods[strtolower($method)], $args);
     }
-    return call_user_func_array($this->instanceMethods[strtolower($method)], $args);
   }
 
 }

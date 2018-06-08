@@ -44,21 +44,34 @@ trait PkJsonFieldTrait {
     $structuredatt = keyVal('structured',$atts,[]);
     $this->setStructured(["From the Constructor"=>"add a bit"]);
     $this->setStructured($structuredatt);
-    print_r(['Constructured'=>$this->structured]);
+    //print_r(['Constructured'=>$this->structured]);
     if (ne_array($keys)) {
       $this->arrayKeys($keys);
     }
     return $atts;
   }
 
-  public function initStructured() {
-    $av = $this->getAttributeValue('structured');
-    if (!is_array($av)) {
-      $av = [];
+  public function getAttValAsArray($attname) {
+    $value = $this->getAttributeFromArray($attname);
+    if (!is_array($value)) {
+      $value=json_decode($value,1);
     }
-    $this->setAttribute('structured',$av);
+    if (!$value) {
+      $value=[];
+    }
+    $this->$attname = $value;
+    return $this->$attname;
+    }
+  public function initStructured() {
+    //$av = $this->getAttributeValue('structured');
+    return $this->getAttValAsArray('structured');
+    //$av = $this->structured;
+    //if (!is_array($av)) {
+     // $av = [];
+    //}
+    //$this->setAttribute('structured',$av);
     //print_r (['av'=>$av]);
-    return $this->getAttributeValue('structured');;
+    //return $this->getAttributeValue('structured');;
   }
 
   /** Returns the valuer for the key or array of keys to depth
@@ -67,10 +80,11 @@ trait PkJsonFieldTrait {
    * @return mixed - whatever is there, or null.
    */
   public function getPathValue($keys) {
-    return fetch_from_array($keys, $this->getAttributeValue('structured'));
+    return fetch_from_array($keys,$this->getAttValAsArray('structured') );
   }
+
   public function insertAt($keys,$value)  {
-    $resarr = &insert_into_array($keys,$value,$this->getAttributeValue('structured'));
+    $resarr = &insert_into_array($keys,$value,$this->getAttValAsArray('structured'));
     $this->structured = $resarr;
     return $resarr;
   }
@@ -79,20 +93,34 @@ trait PkJsonFieldTrait {
     if (!is_array($value) || (!ne_array($value) && $merge)) {
       return $this->structured;
     }
-    $struct = $this->getAttributeValue('structured');
-    print_r(["In SetStructured, struct"=>$struct,"value"=>$value]);
+    $struct = $this->structured;
+    //print_r(["In SetStructured, struct"=>$struct,"value"=>$value]);
     if (!$merge || !ne_array($struct)) {
        $this->structured = $value;
     } else if (ne_array($struct)) {
-        $this->structured = 
-          array_merge($struct, $value);
-        print_r(["Merged:"=>$this->structured, 'underlying:'=>$this->attributes['structured']]);
+        $this->structured = array_merge($struct, $value);
+     //   print_r(["Merged:"=>$this->structured, 'underlying:'=>$this->attributes['structured']]);
     } else {
         //print_r (['this->structured:'=>$this->getAttributeValue('structured')]);
         $this->structured = [];
     }
+    //print_r(["LEaving set structuredn, structured:"=> $this->structured]);
     return $this->structured;
   }
+
+  /*
+  public function __set($key,$value) {
+    if ($key === 'structured') {
+      $this->attributes['structured'] = json_encode($value,static::$jsonopts);
+    }
+    return parent::__set($key, $value);
+  }
+   * 
+   * @param type $keyArray
+   * @param type $replace
+   * @return type
+   * @throws \Exception
+   */
 
   public function arrayKeys($keyArray = [], $replace = false) {
     $this->initStructured();
@@ -130,28 +158,21 @@ trait PkJsonFieldTrait {
         $this->setStructured($addArr, ! $replace);
       }
     }
-    $struct = $this->getAttributeValue('structured');
-    if (!$struct) {
-      print_r(["Struct:",$struct]);
-    }
-    /*
-    if (!keyVal('structured',$this->attributes)) {
-      $this->structured = [];
-    }
-     * 
-     */
+    $struct = $this->structured;
     return is_array($struct)? array_keys($struct):[];
   }
   /** These can set/get array key vals, even if the keys don't already exists*/
   public function getArrayVal($key, $default = null) {
-    return keyVal($key, $this->getAttributeValue('structured'), $default);
+    return keyVal($key, $this->getAttValAsArray('structured'), $default);
   }
 
   public function setArrayVal($key,$value) {
-    if (!$this->getAttributeValue('structured')) {
+    if (!$this->getAttValAsArray('structured')) {
       $this->structured = [];
     }
-    $this->structured[$key] = $value;
+    $structured = $this->getAttValAsArray('structured');
+    $structured[$key] = $value;
+    $this->setAttribute('structured',  $structured);
     return $value;
   }
   /*
@@ -160,10 +181,13 @@ trait PkJsonFieldTrait {
 
   /** These can only get/set key values if they already exist */
   public function __get($name) {
+    if ($name === 'structured') {
+      return json_decode($this->attributes['structured'],1);
+    }
     if (!in_array($name, $this->arrayKeys(),1)) {
       return parent::__get($name);
     }
-    return keyVal($name,$this->getAttributeValue('structured'));
+    return keyVal($name,$this->getAttValAsArray('structured'));
   }
   /*
    * 
@@ -172,10 +196,17 @@ trait PkJsonFieldTrait {
   public function __set($name, $value) {
     //if ( !in_array($name,$this->arrayKeys(),1))
 
+    if ($name === 'structured') {
+      $this->attributes['structured'] = json_encode($value,static::$jsonopts);
+      return parent::__set($name,$value);
+    }
     if (!is_array($this->arrayKeys()) || !in_array($name, $this->arrayKeys(),1)) {
       return parent::__set($name, $value);
     }
-    return $this->structured[$name] = $value;
+    $structured = $this->structured;
+    $structured[$key] = $value;
+    $this->structured = $structured;
+    return $this->structured[$name];
   }
 
   /** Can take a json encoded string or array as 'nosql' & initialize
@@ -193,6 +224,13 @@ trait PkJsonFieldTrait {
       $this->arrayKeys($keys);
     }
     return $atts;
+  }
+   * 
+   */
+  /*
+  public function save(array $opts = []) {
+    print_r(["On saving, this-structured:"=>$this->structured]);
+    return parent::save($opts);
   }
    * 
    */

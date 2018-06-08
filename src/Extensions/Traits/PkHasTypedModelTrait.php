@@ -39,8 +39,9 @@ trait PkHasTypedModelTrait {
     $key = $params['key'];
     $def = static::getTypedMemberDefs($key);
     $model=$def['model'];
+    $att_name = $def['att_name'];
     $filterKeys = array_keys($model::getTypedFields());
-    $builder=$model::where($this->getForeignKey(),$this->id);
+    $builder=$model::where($this->getForeignKey(),$this->id)->where('att_name',$att_name);
     foreach ($params as $filter=>$val) {
       if (in_array($filter, $filterKeys,1)) {
         $builder->where($filter,$val);
@@ -51,7 +52,12 @@ trait PkHasTypedModelTrait {
 
   public function getTypedMembers($params=[]) {
     $builder = $this->getTypedMembersBuilder($params);
-    if (keyVal('single',$params)) {
+    if (is_string ($params)) {
+      $params = ['key'=>$params];
+    }
+    $key = $params['key'];
+    $def = static::getTypedMemberDefs($key);
+    if (keyVal('single',$def)) {
       return $builder->first();
     }
     return  $builder->get();

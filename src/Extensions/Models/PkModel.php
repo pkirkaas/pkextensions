@@ -127,9 +127,12 @@ abstract class PkModel extends Model {
    */
   public static function getDisplayValueFields($onlyrefs = false) {
     $prefix = 'display_value_fields';
+    if ($onlyrefs) $skey=$prefix."_onlyrefs";
+    else $skey = $prefix . "_norefs";
 
     $closure = function () use ($prefix, $onlyrefs ) {
-      $displayValueFields = static::getArraysMerged('display_value_fields');
+      $display_value_fields = static::getArraysMerged('display_value_fields');
+      pkdebug("Display value fields:", $display_value_fields);
       if ($onlyrefs) {
         $refarr = [];
         foreach ($display_value_fields as $key => $value) {
@@ -137,16 +140,18 @@ abstract class PkModel extends Model {
             $refarr[$key] = $value;
           }
         }
+        pkdebug("Only refs, refarr:", $refarr);
+        return $refarr;
       }
-      return $refarr;
       if (!$display_value_fields ||
         !count($display_value_fields)) {
         return [];
       }
+      $normalized = normalizeConfigArray($display_value_fields);
+      if (is_array($normalized)) return array_keys($normalized);
+      return [];
     };
-    $normalized = normalizeConfigArray($display_value_fields);
-    if (is_array($normalized)) return array_keys($normalized);
-    return [];
+    return static::getCached($skey, $closure);
   }
 
 
@@ -1165,7 +1170,12 @@ class $createclassname extends Migration {
     if (($this->getConversion($key) !== 'array') || is_array($res)) {
       return $res;
     }
-    return json_decode($res,1) ?: [];
+    if (is_array($res)) {
+      return $res;
+    } else if (is_scalar($res)) {
+      return json_decode($res,1) ?: [];
+    }
+    return null;
   }
 
     public function getAttribute($key) {
@@ -1587,6 +1597,7 @@ class $createclassname extends Migration {
   public function displayValue($fieldName) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
+    pkdebug ("refmaps", $refmaps, "cache:", static::$_cache);
     #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
     $rc = $refmaps[$fieldName];
     #$rc can be a String classname that implements PkDisplayValueInterface or a closure/runnable, OR
