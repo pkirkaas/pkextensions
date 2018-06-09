@@ -81,7 +81,7 @@ $menus-wrapper-height: $pk-top-menu-height +  $pk-nav-sub-nav-menu-height !defau
   height: $menus-wrapper-height;
   border: solid blue 1px;
 }
-body nav.pk-nav-sub-nav {
+body nav.pk-nav.sub-nav {
   position: fixed;
   top: $pk-top-menu-height;
   height: $pk-nav-sub-nav-menu-height;

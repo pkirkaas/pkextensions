@@ -22,13 +22,15 @@ function offsetContent() {
   //var topmenu = $('.pk-top-menu');
     //<nav class="navbar  navbar-expand-md navbar-inverse bg-inverse pk-top-menu main-menu no-print">
   var topmenu = $('nav.pk-top-menu');
+
+  var submenu = $('body nav.pk-nav.sub-nav');
     //<div class="menus-wrapper">
   var menuwrap = $('div.menus-wrapper');
   var tmpos = topmenu.css('position');
   var wrppos = menuwrap.css('position');
   if ((tmpos === 'fixed') || (tmpos === 'absolute') ||
       (wrppos === 'fixed') || (wrppos === 'absolute')) {
-    $('.content-main').offset({top: topmenu.outerHeight()});
+    $('.content-main').offset({top: topmenu.outerHeight()+submenu.outerHeight()});
   } else {
     $('.content-main').css('top', 0);
   }
