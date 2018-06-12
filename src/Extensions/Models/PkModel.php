@@ -174,12 +174,21 @@ abstract class PkModel extends Model {
 
 
   public static function getFieldNames() {
+    $closure = function() {
+      return array_keys(static::getTableFieldDefs());
+    };
+
+    return static::getCached('tableFieldNames', $closure);
+  }
+  /*
     static $fieldNameArr = [];
     $class = static::class;
     if (array_key_exists($class, $fieldNameArr)) return $fieldNameArr[$class];
     $fieldNameArr[$class] = array_keys(static::getTableFieldDefs());
     return $fieldNameArr[$class];
   }
+   * *
+   */
 
   
   public static function getMethodsAsAttributeNames() {
@@ -653,8 +662,10 @@ class $createclassname extends Migration {
    * class, without needing an instance.
    * @return array of table field names.
    */
+  
   public static function getStaticAttributeNames() {
-    return array_keys(static::getStaticAttributeDefs());
+    return static::getFieldNames();
+    //return array_keys(static::getStaticAttributeDefs());
     # If problem w. getting attribute defs ...
     /*
       if (array_key_exists(static::class,static::$attributeNameArr)) {
@@ -669,13 +680,18 @@ class $createclassname extends Migration {
    * and column data types as values
    * @return Array
    */
+    #Fix this for both inheritance & NOT instantiating an empty instance
   public static function getStaticAttributeDefs() {
+    pkdebug("Don't want to call this EVER!");
     if (array_key_exists(static::class, static::$attributeDefinitionArr)) {
       return static::$attributeDefinitionArr[static::class];
     }
     $instance = new Static();
     return $instance->getAttributeDefs();
   }
+  /*
+   * 
+   */
 
   /** Returns the object if it is an instance of the Model class, and has
    * been instantiated; else null. So can set <tt>$var = Amodel::instantiated($var)</tt>
