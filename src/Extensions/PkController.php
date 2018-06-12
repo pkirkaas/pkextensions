@@ -86,7 +86,6 @@ abstract class PkController extends Controller {
     } else {
       $ptr = new PkHtmlPainter();
       $links = keyVal('links',$args,[]);
-      pkdebug("In mksub, linkks:",$links);
       if (!$links) {
         $routeArrs = $this->allSubmenuRouteArrs();
         if ($routeArrs) { #Assumes array of findable routes, with params
@@ -101,9 +100,7 @@ abstract class PkController extends Controller {
       }
       $submenu = $ptr->mkBsMenu($links,$this->submenu_opts).' ';
     }
-    pkdebug("Submenu", $submenu);
     view()->share('sub_menu',$submenu);
-    //view()->share('sub_menu',"<h1>ARE YOU NUTTS?</h1>");
   }
 
   public static $errorMsgBag; #The error messages, if any. Try static first
