@@ -1,6 +1,8 @@
 <?php
 namespace PkExtensions;
 use PkRenderer;
+### Danger Will Robinson! static::getRefArr() only works if static::$refArr is set!
+### Have to fix that....
 /**
  * Abstract class mapping keys to descriptions
  * Subclasses generally just need to create a static $refArray of integers to descriptions
@@ -110,6 +112,16 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       $ret[] = "<option value='$key' $selected $tip>$display</option>\n";
     }
     return $ret;
+  }
+
+/*Just like above, except returns just idx array of assoc arrays, for Vue select
+ * @return array like: [
+ *   ['value'=>$value1, 'label'=>$label1],
+ *   ['value'=>$value2, 'label'=>$label2],
+
+ *  */
+  public static function mkVueSelectArray($null=true) {
+      return static::mkIdxRefArr($null);
   }
 
 
@@ -407,6 +419,16 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     }
     if ($max_label && is_string($max_label)) $result[PHP_INT_MAX] = $max_label;
     return $result;
+  }
+
+  /** Only works if there is a refArr. */
+  public static function mkIdxRefArray($null=1, $keylabel='value', $valuelabel='label') {
+    $refarr = static::getRefArr($null);
+    $ret = [];
+    foreach ($refarr as $key=>$value) {
+      $ret = [$keylabel=>$key, $valuelabel=>$value];
+    }
+    return $ret;
   }
 
 }
