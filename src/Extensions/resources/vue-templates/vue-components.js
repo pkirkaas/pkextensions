@@ -211,33 +211,105 @@ Vue.component('text-input',{
   props:['lblclass', 'label', 'value','name','inputclass','wrapclass'],
 });
 
+
+
+
+/*** Make my own input components for inclusion in arrays***/
+
 // Actually, if in a v-for, prop should be an object, so
-Vue.component('text-input-arr',{
+Vue.component('pk-input-arr',{
+  type: 'input',
   template: `
-  <div :class="txtinp.wrapclass">
-    <div :class="txtinp.lblclass">{{txtinp.label}}<input type="text" v-model="txtinp.value"
-    :name="txtinp.name" :class="txtinp.inputclass"
+  <div :class="inpopt.wrapclass">
+    <div :class="inpopt.lblclass">{{inpopt.label}}<input :type="inpopt.type" v-model="inpopt.value"
+    :name="inpopt.name" :class="inpopt.inputclass"
     class='border' ></div></div>`,
 
-  props:['txtinp'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  created: function() {
+    if (!this.inpopt.type) {
+      this.inpopt.type = 'text';
+    }
+  },
   methods: {
   },
 
 });
 
+/** Checkbox */
+Vue.component('pk-check-arr', {
+  inptype: 'checkbox',
+  template: `
+  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
+  <input type="checkbox" :name="inpopt.name" :class="inpopt.inputclass"
+      :value="inpopt.value" v-model="inpopt.checked/>
+    class='border' ></div></div>
+`,
+  props: ['inpopt'],
+  created: function() {
+    if (!this.inpopt.value) {
+      this.inpopt.value = 1;
+    }
+  },
+    /*
+    if (!this.inpopt.truevalue) {
+      this.inpopt.truvalue = 1;
+    } 
+    if (!this.inpopt.falsevalue) {
+      this.inpopt.falsevalue = 0;
+    }
+    */
 
-Vue.component('text-input-form',{
+});
+
+/** Select */
+Vue.component('pk-select-arr', {
+  inptype: 'select',
+  template: `
+  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
+  <select :name="inpopt.name" :class="inpopt.inputclass" v-model="inpopt.value">
+    <option v-for="(option, idx) in inpopt.options" :value="option.value">
+        {{option.label}}
+    </option>
+  </select>
+
+    class='border' ></div></div>
+`,
+  props: ['inpopt'],
+
+});
+
+/*
+Vue.component('pk-input-arr',{
+  type: 'input',
+  template: `
+  <div :class="inpopt.wrapclass">
+    <div :class="inpopt.lblclass">{{inpopt.label}}<input type="text" v-model="inpopt.value"
+    :name="inpopt.name" :class="inpopt.inputclass"
+    class='border' ></div></div>`,
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  methods: {
+  },
+});
+*/
+
+
+/** Takes an array or object of multiple input options (type, name, value)
+ * & iterates through to build a multi-input div, that can be submitted.
+ */
+Vue.component('pk-input-form',{
   template: `
   <div :class="formopts.class" class="mini-input-form">
-    <div v-for='(txtinp, idx) in txtinps'>
-      <text-input-arr :txtinp="txtinp"></text-input-arr>
+    <div v-for='(inpopt, idx) in inpopts'>
+      <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>
+      <pk-check-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+      <pk-input-arr v-else="inpopt.inptype = 'input'" :inpopt="inpopt"></pk-input-arr>
+
     </div>
     <button @click='submit'>{{formopts.save}}</button>
     <button @click='close'>Cancel</button></div>
   </div>`,
-
-
-  props:['txtinps', 'formopts'],
+  props:['inpopts', 'formopts'],
   //txtinps: obj array of  'lblclass', 'label', 'value','name','inputclass','wrapclass'
   //formopts: formopts
   methods: {

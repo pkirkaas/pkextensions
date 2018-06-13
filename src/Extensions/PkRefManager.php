@@ -422,11 +422,11 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
   /** Only works if there is a refArr. */
-  public static function mkIdxRefArray($null=1, $keylabel='value', $valuelabel='label') {
+  public static function mkIdxRefArr($null=1, $keylabel='value', $valuelabel='label') {
     $refarr = static::getRefArr($null);
     $ret = [];
     foreach ($refarr as $key=>$value) {
-      $ret = [$keylabel=>$key, $valuelabel=>$value];
+      $ret[] = [$keylabel=>$key, $valuelabel=>$value];
     }
     return $ret;
   }
