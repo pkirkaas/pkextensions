@@ -2437,6 +2437,38 @@ class $createclassname extends Migration {
         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ); 
   }
 
+  /** @param array $atts - where att names can be keys or indexed
+   * values. If just idexed array of key names, returns ass arr of
+   * $key=>$value. If already $key=>$val, sets it & returns the same as
+   * confirmation. But of course, can be mixed. Should I bother with
+   * that now?
+   * @param array $atts
+   */
+  public function getSetAtts($atts=[], $save=false) {
+    $ouratts = static::getFieldNames();
+    $emptykeys = [];
+    $setatts = [];
+    foreach ($atts as $key=>$val) {
+      if (is_int($key) && ne_string($val) && in_array($val,$ouratts,1)) {
+        $emptykeys[]=$val;
+      } else if (ne_string($key) && in_array($key,$ouratts,1)) {
+        $setatts[$key]=$val;
+      }
+    }
+
+    foreach ($setatts as $key=>$val) {
+      $this->$key=$val;
+    }
+    foreach ($emptykeys as $key) {
+      $setatts[$key] = $this->$key;
+    }
+    if ($save) {
+      $this->save();
+    }
+    return $setatts;
+  }
+
+
 
 
   //  This section for diagonosing the current DB

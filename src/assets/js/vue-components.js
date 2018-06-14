@@ -220,10 +220,10 @@ Vue.component('text-input',{
 Vue.component('pk-input-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass">
-    <div :class="inpopt.lblclass">{{inpopt.label}}<input :type="inpopt.type" v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass"
-    class='border' ></div></div>`,
+  <div :class="inpopt.wrapclass" class='border' >
+    <div :class="inpopt.lblclass">{{inpopt.label}}</div><input :type="inpopt.type" v-model="inpopt.value"
+    :name="inpopt.name" :class="inpopt.inputclass" >
+</div>`,
 
   props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
   created: function() {
@@ -237,13 +237,13 @@ Vue.component('pk-input-arr',{
 });
 
 /** Checkbox */
-Vue.component('pk-check-arr', {
+Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
-  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
+  <div :class="inpopt.wrapclass" class='border'> <div :class="inpopt.lblclass">{{inpopt.label}}</div>
   <input type="checkbox" :name="inpopt.name" :class="inpopt.inputclass"
-      :value="inpopt.value" v-model="inpopt.checked/>
-    class='border' ></div></div>
+      :value="inpopt.value" v-model="inpopt.checked"/>
+    </div>
 `,
   props: ['inpopt'],
   created: function() {
@@ -266,16 +266,20 @@ Vue.component('pk-check-arr', {
 Vue.component('pk-select-arr', {
   inptype: 'select',
   template: `
-  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
-  <select :name="inpopt.name" :class="inpopt.inputclass" v-model="inpopt.value">
-    <option v-for="(option, idx) in inpopt.options" :value="option.value">
+  <div :class="inpopt.wrapclass" class="border">
+    <div :class="inpopt.lblclass">{{inpopt.label}}</div>
+    <select :name="inpopt.name" :class="inpopt.inputclass"
+          v-model="inpopt.value">
+    <option v-for="(option, idx) in inpopt.selopts" :key="idx" :value="option.value">
         {{option.label}}
     </option>
   </select>
-
-    class='border' ></div></div>
+    </div>
 `,
   props: ['inpopt'],
+  created: function() {
+    console.log("The passed inpopt:", this.inpopt);
+  },
 
 });
 
