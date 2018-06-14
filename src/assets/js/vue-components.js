@@ -302,7 +302,7 @@ window.Vue.component('pk-input-form',{
   <div :class="formopts.class" class="mini-input-form">
     <div v-for='(inpopt, idx) in inpopts'>
       <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>
-      <pk-check-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+      <pk-checkbox-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
       <pk-input-arr v-else="inpopt.inptype = 'input'" :inpopt="inpopt"></pk-input-arr>
 
     </div>

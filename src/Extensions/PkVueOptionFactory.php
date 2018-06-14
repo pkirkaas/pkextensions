@@ -45,6 +45,7 @@ Class PkVueOptionFactory {
   
   public function makeControlOptArray($params) {
     $controls = keyVal('controls', $params);
+    $asjson = keyVal('asjson',$params,1);
     $normalized = [];
     foreach ($controls as $name=>$control) {
       $control['params']['name'] = $name;
@@ -55,6 +56,9 @@ Class PkVueOptionFactory {
     $ret = [];
     foreach ($normalized as $name=>$control) {
       $ret[$name] = $this->applyMethodToCtl($control);
+    }
+    if ($asjson) {
+      $ret=json_encode($ret,static::$jsonopts);
     }
     return $ret;
 
