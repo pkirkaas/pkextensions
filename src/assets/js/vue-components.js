@@ -236,6 +236,27 @@ Vue.component('pk-input-arr',{
 
 });
 
+/** Textarea */
+Vue.component('pk-textarea-arr', {
+  inptype: 'textarea',
+  template: `
+  <div :class="inpopt.wrapclass" class='border'> <div :class="inpopt.lblclass">{{inpopt.label}}</div>
+  <textarea :name="inpopt.name" :class="inpopt.textareaclass"
+      :value="inpopt.value" v-model="value"></textarea>
+    </div>
+`,
+  props: ['inpopt'],
+    /*
+    if (!this.inpopt.truevalue) {
+      this.inpopt.truvalue = 1;
+    } 
+    if (!this.inpopt.falsevalue) {
+      this.inpopt.falsevalue = 0;
+    }
+    */
+
+});
+
 /** Checkbox */
 Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
@@ -303,10 +324,13 @@ Vue.component('pk-input-arr',{
  */
 window.Vue.component('pk-input-form',{
   template: `
-  <div :class="formopts.class" class="mini-input-form">
+  <div :class="formopts.class" :style="formopts.style" class="mini-input-form">
+  <div :style="formopts.titlestyle" v-html='formopts.title'></div>
+  
     <div v-for='(inpopt, idx) in inpopts'>
       <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>
       <pk-checkbox-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+      <pk-textarea-arr v-else-if="inpopt.inptype === 'textarea'" :inpopt="inpopt"></pk-textarea-arr>
       <pk-input-arr v-else="inpopt.inptype = 'input'" :inpopt="inpopt"></pk-input-arr>
 
     </div>
