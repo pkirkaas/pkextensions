@@ -242,7 +242,7 @@ Vue.component('pk-textarea-arr', {
   template: `
   <div :class="inpopt.wrapclass" class='border'> <div :class="inpopt.lblclass">{{inpopt.label}}</div>
   <textarea :name="inpopt.name" :class="inpopt.textareaclass"
-      :value="inpopt.value" v-model="value"></textarea>
+      v-model="inpopt.value"></textarea>
     </div>
 `,
   props: ['inpopt'],
@@ -329,8 +329,11 @@ window.Vue.component('pk-input-form',{
   
     <div v-for='(inpopt, idx) in inpopts'>
       <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>
-      <pk-checkbox-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+
       <pk-textarea-arr v-else-if="inpopt.inptype === 'textarea'" :inpopt="inpopt"></pk-textarea-arr>
+
+      <pk-checkbox-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+
       <pk-input-arr v-else="inpopt.inptype = 'input'" :inpopt="inpopt"></pk-input-arr>
 
     </div>
