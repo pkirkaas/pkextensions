@@ -7,9 +7,10 @@
       "email": "paul.kirkaas@gmail.com"
     }
   ],
+  "minimum-stability": "dev",
   "require": {
     "php": ">7",
-    "laravelcollective/html": "5.*",
+    "laravelcollective/html": ">5",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
     "eventviva/php-image-resize": "*"
