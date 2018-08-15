@@ -253,11 +253,12 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    *   
    * @var type 
    */
-  //public static $dynamicMethods=[];
+  public static $dynamicMethods=[];
 
 
   /**
   @param Array $methods - assoc array ['name1'=>$closure1, 'name2'=>closure2,.]
+  */
   public static function addDynamicMethod(Array $methods) {
     foreach ($methods as $name=>$closure) {
       static::$dynamicMethods[static::class][$name]=$closure;
@@ -277,7 +278,6 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     array_unshift($args, $this);
     return call_user_func_array([static::getDynamicMethod($name),'call'],$args);
   }
-     */
 
   /** If any method wants to stop static::getAncestorMethodResultsMerged() from
    * continuing up the ancestor chain, it sets this flag TRUE. 
