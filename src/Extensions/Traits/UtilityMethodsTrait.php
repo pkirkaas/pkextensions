@@ -39,6 +39,39 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     return $res;
   }
 
+  // God, really thought I did this. Take a associative array of names -> closures,
+     //assing the closures to this, key them by name & put them the array, then
+     ////implement __call
+  //public $newmethods = [];
+  /** $closures has to an associatiave array of names to closures. Assign $this
+   * to the closure each time. Also has to be called on each construction, 
+   * because can't be persistested.
+   * @param assoc array $closures
+   */
+  //public $closures;
+  /*
+  public function assignMethods($closures = null) {
+    if (!$closures) {
+      $closures = $this->closures;
+    }
+    if ($closures instanceOf PkExtenstions\PkClosuresInterface) {
+      if (is_class($closures)) {
+        $closures = new $closures($this);
+      }
+      $closures = $closures->generate($this);
+    }
+    foreach ($closures as $name=>$closure) {
+      $this->newmethods[$name]= $closure->bindTo($this,$this);
+    }
+  }
+  public function __call($method, $args) {
+    if (in_array($method, array_keys($this->newmethods),1)) {
+      return call_user_func_array($this->newmethods[$method],$args);
+    }
+    return parent::__call($method, $args);
+  }
+   * 
+   */
   /** Checks if class "instanceOf" $traitname
    * @param $triaitname string|array of strings
    * If several trait, must match all
@@ -220,11 +253,11 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    *   
    * @var type 
    */
-  public static $dynamicMethods=[];
+  //public static $dynamicMethods=[];
+
 
   /**
   @param Array $methods - assoc array ['name1'=>$closure1, 'name2'=>closure2,.]
-   */
   public static function addDynamicMethod(Array $methods) {
     foreach ($methods as $name=>$closure) {
       static::$dynamicMethods[static::class][$name]=$closure;
@@ -244,6 +277,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     array_unshift($args, $this);
     return call_user_func_array([static::getDynamicMethod($name),'call'],$args);
   }
+     */
 
   /** If any method wants to stop static::getAncestorMethodResultsMerged() from
    * continuing up the ancestor chain, it sets this flag TRUE. 

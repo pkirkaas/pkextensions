@@ -14,28 +14,106 @@ namespace PkExtensions\Traits;
  */
 trait PkDynamicMethodTrait {
   public $instanceMethods=[];
-  public  function addInstanceMethod(Array $methods) {
+  public $methodfactory;
+  public $methods;
+
+  public  function addInstanceMethods($methods=null,$params=[]) {
+    if (!$methods && !$this->methodFactoryClass) {
+      return;
+    }
+    if (is_class($methods)) {
+      $this->methodFactoryClass = $methods;
+      $methods = new $methods($this, $params);
+    }
+    if (is_object($methods)) {
+      $closures = $methods->getClosures($this,$params);
+    }
+      if (
+        $methods = new $this->methodFactoryClass($this,$params);
+      } 
+
+    }
+    if (is_class($methods) && implements(
+          $methods = new $this->methodFactoryClass($this, $params);
+        }
+    }
+    if (!$methods) {
+      return;
+    }
+    if ($methods instanceOf PkExtensions\PkMethodGeneratorInterface) {
+      if (is_class($methods)) {
+        $this->methodFactoryClass = $methods;
+        $methods = new $methods($this);
+        $methods = $methods->generateMethods($this);
+
     foreach ($methods as $name=>$closure) {
       $this->instanceMethods[strtolower($name)]=$closure->bindTo($this);
     }
   }
+
+  public function assignMethods($closures = null) {
+    if ($closures && !$this->closures) {
+      $this->closures = $closures;
+    }
+    if ($closures instanceOf PkExtenstions\PkClosuresInterface) {
+      if (is_class($closures)) {
+        $closures = new $closures($this);
+      }
+      $closures = $closures->generate($this);
+    }
+    if (!$closures) {
+    }
+    foreach ($closures as $name=>$closure) {
+      $name = strtolower($name);
+      $this->instanceMethods[$name]= $closure->bindTo($this,$this);
+    }
+  }
+
+  public function __call($method, $args=[]) {
+    $name = strtolower($method);
+    if (!$this->instanceMethods ||
+        !in_array($name,array_keys($this->instanceMethods),1)) {
+       return parent::__call($method,$args);
+    } else {
+      pkdebug("The method: $method");
+      return call_user_func_array($this->instanceMethods[$name], $args);
+    }
+  }
+  /*
+  public function __call($method, $args) {
+    if (in_array($method, array_keys($this->newmethods),1)) {
+      return call_user_func_array($this->newmethods[$method],$args);
+    }
+    return parent::__call($method, $args);
+  }
+   * 
+   */
   public function ExtraConstructorDynamicMethods($atts = []) {
     //pkecho ("IN Extra Constructor");
-    $this->instancetype = keyVal('instancetype',$atts);
+    $methodfactory = unsetret($atts,'methodfactory');
+    if (is_class($methodfactory)) {
+      $this->methodfactory = $methodfactory;
+    }
+    //$this->closures = unsetret($atts,'closures');
     #A method factory class just needs to be construted with $this,
     #then examines $this->instancetype and add the instanceMethods for that type
-    $this->methodfactoryclass = keyVal('methodfactoryclass',$atts);
-    $this->buildInstanceMethods();
+    //$this->methodfactoryclass = unsetret($atts,'methodfactoryclass');
+    $methodfactory = unsetret($atts,'methodfactory');
+    $this->buildInstanceMethods($this->closures);
     #Can be used by builders to determine what instanceMethods to add
   }
 
-  public function buildInstanceMethods($methodfactoryclass=null) {
-    if ($methodfactoryclass) {
-      $this->methodfactoryclass = $methodfactoryclass;
+  public function buildInstanceMethods($arg=null) {
+    if (!$arg) {
+      if ($this->closures) {
+        return $this->assignMethods($this->closures);
+      }
     }
-    //pkecho ("In Build Instance - methodfactoryclass:", $this->methodfactoryclass);
-    if (class_exists($this->methodfactoryclass)) {
-       $factory = new $this->methodfactoryclass($this);
+    if ($arg instanceOf PkExtenstions\PkClosuresInterface) {
+      $this->methodfactory = $methodfactory;
+    }
+    if (class_exists($this->methodfactory)) {
+       $factory = new $this->methodfactory($this);
        //$factory->instance = $this;
       // pkecho("Factory", $factory);
       // print_r(['The factory Instance:'=>$factory]);
@@ -73,14 +151,5 @@ trait PkDynamicMethodTrait {
   }
    */
 
-  public function __call($method, $args=[]) {
-    if (!$this->instanceMethods ||
-        !in_array(strtolower($method),array_keys($this->instanceMethods),1)) {
-       return parent::__call($method,$args);
-    } else {
-      pkdebug("The method: $method");
-      return call_user_func_array($this->instanceMethods[strtolower($method)], $args);
-    }
-  }
 
 }

@@ -220,8 +220,8 @@ Vue.component('text-input',{
 Vue.component('pk-input-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass" class='border' >
-    <div :class="inpopt.lblclass">{{inpopt.label}}</div><input :type="inpopt.type" v-model="inpopt.value"
+  <div class="v-wrap v-input" :class="inpopt.wrapclass" class='border' >
+    <div class="v-lbl" :class="inpopt.lblclass">{{inpopt.label}}</div><input class="v-inp" :type="inpopt.type" v-model="inpopt.value"
     :name="inpopt.name" :class="inpopt.inputclass" >
 </div>`,
 
@@ -240,8 +240,9 @@ Vue.component('pk-input-arr',{
 Vue.component('pk-textarea-arr', {
   inptype: 'textarea',
   template: `
-  <div :class="inpopt.wrapclass" class='border'> <div :class="inpopt.lblclass">{{inpopt.label}}</div>
-  <textarea :name="inpopt.name" :class="inpopt.textareaclass"
+  <div class="v-wrap v-textarea" :class="inpopt.wrapclass" class='border'>
+  <div class="v-label" :class="inpopt.lblclass">{{inpopt.label}}</div>
+  <textarea class="v-inp v-ta" :name="inpopt.name" :class="inpopt.textareaclass"
       v-model="inpopt.value"></textarea>
     </div>
 `,
@@ -261,8 +262,9 @@ Vue.component('pk-textarea-arr', {
 Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
-  <div :class="inpopt.wrapclass" class='border'> <div :class="inpopt.lblclass">{{inpopt.label}}</div>
-  <input type="checkbox" :name="inpopt.name" :class="inpopt.inputclass"
+  <div class="v-wrap v-check" :class="inpopt.wrapclass" class='border'> <div class="v-label" :class="inpopt.lblclass">{{inpopt.label}}</div>
+  <input type="hidden" value="0" :name="inpopt.name"
+  <input type="checkbox" class="v-input v-check" :name="inpopt.name" :class="inpopt.inputclass"
       :value="inpopt.value" v-model="inpopt.checked"/>
     </div>
 `,
@@ -287,9 +289,9 @@ Vue.component('pk-checkbox-arr', {
 Vue.component('pk-select-arr', {
   inptype: 'select',
   template: `
-  <div :class="inpopt.wrapclass" class="border">
-    <div :class="inpopt.lblclass">{{inpopt.label}}</div>
-    <select :name="inpopt.name" :class="inpopt.inputclass"
+  <div :class="inpopt.wrapclass" class="v-wrap border sel-wrap">
+    <div class="v-lablel sel-label" :class="inpopt.lblclass">{{inpopt.label}}</div>
+    <select class="v-sel v-inp" :name="inpopt.name" :class="inpopt.inputclass"
           v-model="inpopt.value">
     <option v-for="(option, idx) in inpopt.selopts" :key="idx" :value="option.value">
         {{option.label}}
@@ -304,28 +306,16 @@ Vue.component('pk-select-arr', {
 
 });
 
-/*
-Vue.component('pk-input-arr',{
-  type: 'input',
-  template: `
-  <div :class="inpopt.wrapclass">
-    <div :class="inpopt.lblclass">{{inpopt.label}}<input type="text" v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass"
-    class='border' ></div></div>`,
-  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
-  methods: {
-  },
-});
-*/
-
 
 /** Takes an array or object of multiple input options (type, name, value)
  * & iterates through to build a multi-input div, that can be submitted.
+ * 
+ * Each component (wrapper, input, label has a standard class name - vue can dymically add additional classes - but we can preset them by making them childrend of the form classes, which we can customize.
  */
 window.Vue.component('pk-input-form',{
   template: `
-  <div :class="formopts.class" :style="formopts.style" class="mini-input-form">
-  <div :style="formopts.titlestyle" v-html='formopts.title'></div>
+  <div :class="formopts.class" :style="formopts.style" class="vue-input-sect">
+  <div class="v-f-title" :class="formopts.title-class" :style="formopts.titlestyle" v-html='formopts.title'></div>
   
     <div v-for='(inpopt, idx) in inpopts'>
       <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>

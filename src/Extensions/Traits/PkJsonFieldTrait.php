@@ -37,21 +37,51 @@ trait PkJsonFieldTrait {
   public static $table_field_defs_JsonFieldTrait = [
       'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
       'jsontype' => ['type' => 'string', 'methods'=>['nullable']],
+      'schema' => ['type' => 'string', 'methods'=>['nullable']],
+      'keys' => ['type' => 'string', 'methods'=>['nullable']],
     ];
+  public static $jsonfields = ['structured', 'schema', 'keys'];
+
+  public static function getJsonFields() {
+    return static::getArraysMerged('jsonfields');
+  }
+
+  public static function getJsonTblFields($atts=null) {
+    $valid = static::getFieldNames(static::getJsonFields());
+    if (ne_string($atts)) {
+      $atts = [$atts];
+    }
+    if (!$atts || !is_array($atts)) {
+      return $valid;
+    }
+    return array_intersect($valid,$atts);
+  }
+
+
   public function ExtraConstructorJsonField($atts = []) {
+    $this->init();
+
+    /*
     $this->initStructured();
+
+
+
+
     $keys = keyVal('keys',$atts,$this->keys);
-    $structuredatt = keyVal('structured',$atts,[]);
-    $this->setStructured(["From the Constructor"=>"add a bit"]);
+    if (ne_string($keys)) {
+      $this->keys = json_decode($keys,1);
+    }
+      $structured = keyVal('structured',$atts,[]);
     $this->setStructured($structuredatt);
     //print_r(['Constructured'=>$this->structured]);
     if (ne_array($keys)) {
       $this->arrayKeys($keys);
     }
+     * */
     return $atts;
   }
 
-  public function getAttValAsArray($attname) {
+  public function getAttValAsArray($attname='structured') {
     $value = $this->getAttributeFromArray($attname);
     if (!is_array($value)) {
       $value=json_decode($value,1);
@@ -62,16 +92,15 @@ trait PkJsonFieldTrait {
     $this->$attname = $value;
     return $this->$attname;
     }
-  public function initStructured() {
-    //$av = $this->getAttributeValue('structured');
-    return $this->getAttValAsArray('structured');
-    //$av = $this->structured;
-    //if (!is_array($av)) {
-     // $av = [];
-    //}
-    //$this->setAttribute('structured',$av);
-    //print_r (['av'=>$av]);
-    //return $this->getAttributeValue('structured');;
+
+  public function init($atts=null) {
+    foreach (static::getJsonTblFields($atts) as $jfield) {
+      if (!isset($this->$jfield) || !$this->$jfield) {
+        $this->$jfield = [];
+      } else if (!is_array($this->$jfield)) {
+        $this->$jfield = json_decode($this->$jfield,1);
+      }
+    }
   }
 
   /** Returns the valuer for the key or array of keys to depth
@@ -79,33 +108,33 @@ trait PkJsonFieldTrait {
    * @param string|idx_array $keys - the path down the array
    * @return mixed - whatever is there, or null.
    */
-  public function getPathValue($keys) {
-    return fetch_from_array($keys,$this->getAttValAsArray('structured') );
+  public function getPathValue($keys,$jsonfld='structured'){
+    return fetch_from_array($keys,$this->getAttValAsArray($jsonfld) );
   }
 
-  public function insertAt($keys,$value)  {
-    $resarr = &insert_into_array($keys,$value,$this->getAttValAsArray('structured'));
-    $this->structured = $resarr;
+  public function insertAt($keys,$value,$field=null,$jsonfield='structured')  {
+    $resarr = &insert_into_array($keys,$value,$this->getAttValAsArray($jsonfield));
+    //$this->$field = $resarr;
     return $resarr;
   }
    
-  public function setStructured(Array $value = [], $merge=true) {
+  public function setJsonField(Array $value = [], $merge=true,$jsonfld='structured') {
     if (!is_array($value) || (!ne_array($value) && $merge)) {
-      return $this->structured;
+      return $this->$jsonfld;
     }
-    $struct = $this->structured;
+    $struct = $this->$jsonfld;
     //print_r(["In SetStructured, struct"=>$struct,"value"=>$value]);
     if (!$merge || !ne_array($struct)) {
-       $this->structured = $value;
+       $this->$jsonfld = $value;
     } else if (ne_array($struct)) {
-        $this->structured = array_merge($struct, $value);
+        $this->$jsonfld = array_merge($struct, $value);
      //   print_r(["Merged:"=>$this->structured, 'underlying:'=>$this->attributes['structured']]);
     } else {
         //print_r (['this->structured:'=>$this->getAttributeValue('structured')]);
-        $this->structured = [];
+        $this->$jsonfld = [];
     }
     //print_r(["LEaving set structuredn, structured:"=> $this->structured]);
-    return $this->structured;
+    return $this->$jsonfld;
   }
 
   /*

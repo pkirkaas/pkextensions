@@ -173,12 +173,22 @@ abstract class PkModel extends Model {
   }
 
 
-  public static function getFieldNames() {
+  /** If no args, returns all the valid field for the table.
+   * If fields, return only the ones that are in the table.
+   * @param null|string|array $fields
+   * @return array
+   */
+  public static function getFieldNames($fields=null) {
     $closure = function() {
       return array_keys(static::getTableFieldDefs());
     };
 
-    return static::getCached('tableFieldNames', $closure);
+    $valid = static::getCached('tableFieldNames', $closure);
+    if (ne_string($fields)) {
+      $fields = [$fields];
+    }
+    if (!$fields) return $valid;
+    return array_intersect($fields, $valid);
   }
   /*
     static $fieldNameArr = [];
