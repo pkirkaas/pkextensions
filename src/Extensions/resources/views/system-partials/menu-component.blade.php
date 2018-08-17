@@ -33,4 +33,4 @@
     }
       ?>
     </div>
-    <?php if (!Auth::user()) pkview("forms.DropLoginRegisterDialog")?>
+    <?php if (!empty($no_user) && !Auth::user()) pkview("forms.DropLoginRegisterDialog")?>
