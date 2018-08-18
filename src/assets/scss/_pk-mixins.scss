@@ -25,6 +25,9 @@ $grid-gutter-width:          1.875rem !default; // 30px
   }
 }
 */
+
+//Just a function to translate different size units
+//to a standard
 @function breakpoint($sz) {
   @if type-of($sz) == string {
     $sz: map-get($grid-breakpoints, $sz)
@@ -53,6 +56,17 @@ $grid-gutter-width:          1.875rem !default; // 30px
   .btn {
     margin-left: 0; } }
 */
+/* OR can you inlude a bunch of class declarations 
+   in a media mixin & just do it once? but I guess you could do that
+   anyway....
+
+
+@include below-bp(200) {
+  .
+}
+
+
+
 // Can take a BS 'sz' ('xs', 'sm', etc)
 @mixin above-bp($sz) {
   $breakpoint: breakpoint($sz);

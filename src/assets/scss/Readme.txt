@@ -1,22 +1,22 @@
 13-May-17
-Sites styled AFTER now use this "assets/scss" folder. 
+Sites styled AFTER now use this "assets/scss" folder 
 Sites styled BEFORE use the legacy "assets/css" folder
 
 Some useful classes:
-.pre-wrap
+pre-wrap
 
 From mk-spacing:
 Font (N=-50 -> 50)
-  Size: fsN, f-sN, large, x-large, xx-large 
+  Size: fs-N, f-sN, large, x-large, xx-large 
   Weight: fwN (N = 1 -> 9)
   Families: oswald, lato, roboto, open-sans, montserrat, raleway, droid-sans, s-sans-pro
 
 
 Div Dimensions:
-  hN, heightN, minhN, min-hN, min-heightN, maxhN, etc.
+  hN, heightN, minhN, min-hN, min-heightN, maxhN, etc
   widthN, wN, minwN, minw-N, maxwN, maxw-N, min-widthN
 
-.min-line-height - empty div minimum 1 line height
+min-line-height - empty div minimum 1 line height
 
 (x = t (top), b (bottom), l (left), r (right), v (vertical), h (horizontal)
 Padding:
@@ -44,29 +44,29 @@ Positioning:
   absolute, relative, fixed
 
 Tables: 
-  No Borders: table.no-borders
-  Collapsed: table.pk-tbl
+  No Borders: tableno-borders
+  Collapsed: tablepk-tbl
 
-Zooms: .z1, .z2, etc increase zoom by 1.1, 1.2, etc
-   .z-1, .z-2 to .9, .8
+Zooms: z1, z2, etc increase zoom by 11, 12, etc
+   z-1, z-2 to 9, 8
 
 Headings:
-  .template-heading
-  .page-template .page-title, .page-template .page-title.inverse
-  .page-template .page-subtitle, .page-template .page-subtitle.inverse
+  template-heading
+  page-template page-title, page-template page-titleinverse
+  page-template page-subtitle, page-template page-subtitleinverse
   shN, shrN, shbN, shibN, shirN (N = -5 -> 20)
 
 Bunch of Avatar classes - in 'sitestyles'
 
 Flexing:
-.flex-wrap - wraps contained flex items
-.flex-center - tries to center everything
-.flex-between: Evenly spaces content
+flex-wrap - wraps contained flex items
+flex-center - tries to center everything
+flex-between: Evenly spaces content
 
 
 Fonts:
-.oswald .lato .roboto .open-sans .montserrat .raleway 
-.droid-sans .s-sans-pro 
+oswald lato roboto open-sans montserrat raleway 
+droid-sans s-sans-pro 
 
 
 
