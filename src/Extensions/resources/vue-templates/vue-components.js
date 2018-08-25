@@ -241,24 +241,13 @@ Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
-  <input type="checkbox" :name="inpopt.name" :class="inpopt.inputclass"
-      :value="inpopt.value" v-model="inpopt.checked"/>
+  <input type="checkbox" :value="inpopt.value" :name="inpopt.name" :class="inpopt.inputclass"
+       v-model="inpopt.checked"  @change="inpopt.value = +!inpopt.value" />
     </div></div>
 `,
   props: ['inpopt'],
   created: function() {
-    if (!this.inpopt.value) {
-      this.inpopt.value = 1;
-    }
   },
-    /*
-    if (!this.inpopt.truevalue) {
-      this.inpopt.truvalue = 1;
-    } 
-    if (!this.inpopt.falsevalue) {
-      this.inpopt.falsevalue = 0;
-    }
-    */
 
 });
 

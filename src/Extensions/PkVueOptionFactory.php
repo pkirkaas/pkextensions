@@ -288,8 +288,11 @@ function mkStyleAndClass($props = []) {
     $params['value']=$value;
     #Careful here, selopts will be a class, maybe in differenc namespace
     if (is_subclass_of($selopts,PkRefManager::class)) {
-      $params['selopts'] = $selopts::mkVueSelectArray($nullopt);
+      $params['options'] = $selopts::mkVueSelectArray($nullopt);
+    } else {
+      pkdebug("Whoops, no selopts for params:",$params);
     }
+    unset($params['selopts']);
     return $params;
   }
   
@@ -339,6 +342,7 @@ function mkStyleAndClass($props = []) {
         
     $name = keyVal('name',$params);
     $value = keyVal('value',$params);
+    //$params['checked'] = !!$value;
     $instance = keyVal('instance',$params);
     $nullopt = keyVal('nullopt',$params);
     $labelprop = keyVal('labelprop',$params,80); 
@@ -350,6 +354,7 @@ function mkStyleAndClass($props = []) {
         $value = $instance->$name;
       }
     }
+    $params['checked'] = !!$value;
     $params['value']=$value;
     return $params;
   }
