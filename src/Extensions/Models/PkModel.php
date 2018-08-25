@@ -1117,6 +1117,7 @@ class $createclassname extends Migration {
 'Illuminate\Notifications\Notifiable',
 ];
 
+
   /** Calls all special trait constructor methods, which start with
    * ExtraConstructor[TraitName]
    * @param type $attributes
@@ -1160,6 +1161,11 @@ class $createclassname extends Migration {
      * 
      */
   }
+
+
+
+
+
 
   public function RunExtraConstructors($attributes) {
     $constructors = static::getExtraConstructors();
@@ -1763,6 +1769,7 @@ class $createclassname extends Migration {
    * @throws Exception
    */
   public function save(array $opts = []) {
+    $this->RunExtraMethods("_save", $opts);
     foreach ($this->getAttributes() as &$value) {
       if (is_array($value)) {
         $value = json_encode($value, static::$jsonopts);

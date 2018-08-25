@@ -33,7 +33,8 @@ namespace PkExtensions\Traits;
 trait PkJsonFieldTrait {
   //public $structuredArr;
   //public $keys = []; #Set in implementing methods
-  protected $casts_JsonField = ['structured'=>'array'];
+  protected $casts_JsonField = ['structured'=>'array', 'keys'=>'array', 'schema'=>'array'];
+  //protected $casts = ['structured'=>'array'];
   public static $table_field_defs_JsonFieldTrait = [
       'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
       'jsontype' => ['type' => 'string', 'methods'=>['nullable']],
@@ -103,19 +104,24 @@ trait PkJsonFieldTrait {
     }
   }
 
-  /** Returns the valuer for the key or array of keys to depth
+  /** Returns the value for the key or array of keys to depth
    * 
    * @param string|idx_array $keys - the path down the array
    * @return mixed - whatever is there, or null.
    */
   public function getPathValue($keys,$jsonfld='structured'){
-    return fetch_from_array($keys,$this->getAttValAsArray($jsonfld) );
+    $json = $this->$jsonfld;
+    return fetch_from_array($keys, $json);
   }
 
-  public function insertAt($keys,$value,$field=null,$jsonfield='structured')  {
-    $resarr = &insert_into_array($keys,$value,$this->getAttValAsArray($jsonfield));
+  public function &insertAt($keys,$value)  {
+    $structured = $this->structured;
+    insert_into_array($keys,$value,$structured);
+    $this->structured = $structured;
+    return $structured;
+    //$resarr = &insert_into_array($keys,$value,$this->getAttValAsArray($jsonfield));
     //$this->$field = $resarr;
-    return $resarr;
+    //return $resarr;
   }
    
   public function setJsonField(Array $value = [], $merge=true,$jsonfld='structured') {

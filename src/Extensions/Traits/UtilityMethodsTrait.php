@@ -742,4 +742,55 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     return false;
   }
 
+
+  /** Calls all special trait additional methods, which start with
+   * ExtraConstructor[TraitName]
+   * @param string $fnpre - the prefix of the extra trait methods to call, like ..
+   * "ExtraConstructors" or "_save"
+   */
+  public static function getExtraMethods($fnpre) {
+    $cacheclosure = function() use ($fnpre) {
+     // pkdebug("Building constructors for : ".static::class);
+     // echo "\nIn The extra constructors closure...\n";
+      #Assume only from Traits
+      $traitmethods = static::getTraitMethods(static::$trimtraits);
+      //$fnpre = 'ExtraConstructor';
+      $methods = [];
+      foreach ($traitmethods as $traitmethod) {
+        if (startsWith($traitmethod, $fnpre, false,true)) {
+          $methods[] = $traitmethod;
+        }
+      }
+      return $methods;
+    };
+
+    //static::getCached('ExtraMethods'.$fnpre, $cacheclosure);
+    return static::getCached('ExtraMethods'.$fnpre, $cacheclosure);
+  }
+
+
+
+
+
+/** Great way to add trait methods to default methods - just call the
+ * the trait methods like "_saveSpecialTrait()"
+ * Then in the class that implements the trait, and already has a save method,
+ * just call "$this->RunExtraMethods('_save', $opts);"
+ * @param string $fnpre - the prefix of the methods to call
+ * @param mixed $attributes - argument to send to methods
+ * @return mixed - the attributes
+ */
+  public function RunExtraMethods($fnpre,$attributes = null) {
+    $methods = static::getExtraMethods($fnpre);
+    if ($methods) {
+      //pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
+      foreach ($methods as $method) {
+        $this->$method($attributes);
+      }
+    }
+    return $attributes;
+  }
+
+
+
 }

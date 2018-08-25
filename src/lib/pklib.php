@@ -1421,13 +1421,16 @@ function &insert_into_arrayBAD($keys, $value, & $arr = null, $unset = false) {
  * @param array|NULL $arr -- Optional array to add to or create 
  * @param boolean $unset (optional): If value is null, default is to create
  * @param boolean $fetch (optional): If true, just try to return value
+ * @param boolean $append (optional): If true, append the value to the array
+      of the keys. If no value for keys, make array & append. If $keys value is
+      scalar, throw exception.
  * 
  * the entry with a null value. If $unset==true, unset the key if it exists.
  * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
  * @return Array: Array with value set at appropriate vector. If called with
  * $retar = &insert_into_array(.... $arr);, $retar will be a reference to $arr
  */
-function &insert_into_array($keys,$value,&$arr=null,$unset=false,$fetch=false) {
+function &insert_into_array($keys,$value,&$arr=null,$unset=false,$fetch=false,$append=false) {
   if (!is_array($keys)) {
     $keys = [$keys];
   }
@@ -1450,6 +1453,14 @@ function &insert_into_array($keys,$value,&$arr=null,$unset=false,$fetch=false) {
   }
   if ($unset) {
     array_pop($y);
+  } else if ($append) {
+    if (is_scalar($x)) {
+      throw new Exception("In append, keyVal: ".
+         print_r($keys,1). " is scalar: ".print_r($x,1));
+    } else if (!$x) {
+      $x = [];
+    }
+    array_push($x, $value);
   } else {
     $x = $value;
   }
