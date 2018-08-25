@@ -10,11 +10,12 @@
 //Vue.component('pk-dragndrop',PkDragndrop);
 
 
+
 /**
  * Extends Vue - whatever element has css class 'vueroot' will have a pkVue 
  * template appended/inserted to it, so don't need to specify a unique ID in
  * the page or template in the page  - happens automatically if the constructor
- * args contain 'appendTemplate' as a string of a vue template. 
+ * arg contain 'appendTemplate' as a string of a vue template. 
  * If arg.placement ==  'after', vue is placed AFTER the element, else within
  */
 class pkVue extends Vue {constructor(arg){
@@ -30,11 +31,51 @@ class pkVue extends Vue {constructor(arg){
       delete arg.appendtemplate;
       delete arg.placement;
     }
+    // Make a data function that initializes the keys to {}; for ajax
+    //Keys should be an array. Maybe refactor to give structure.
+    if (arg.keys) {
+      var mixin = {}
+      mixin.data = {};
+      for (var i=0 ; i<arg.keys.length ; i++) {
+        mixin.data[arg.keys[i] ] = {};
+      }
+      console.log("In construct, arg:",arg);
+      if (arg.ajax) { //Should have the arguments to initialize data
+        var ajax = arg.ajax;
+        var  init = function() {
+          var self = this;
+          console.log("In mounted init");
+          var method = ajax.method || 'get';
+          var url = ajax.url;
+          var params = ajax.params || {};
+          axios[method](url,{params:params})
+            .then(resp=>{
+              for (var i=0 ; i<arg.keys.length; i++) {
+                self[arg.keys[i] ] = resp.data[arg.keys[i]];
+              }
+            })
+            .catch(error=>{ console.log("Ajax Failed: URL", url,"params:", params, "result:", error);});
+      };
+      mixin.mounted = init;
+      if (!arg.mixin) {
+        arg.mixin = [];
+      }
+      arg.mixin.push(mixin);
+    }
     super(arg);
     console.log("In pkVue constructor");
-  }}
+  }
+}} ;
+
+/** Use like: to initialize from AJAX
+    var vg = new pkVue({
+      el: '#vue-home',
+      keys: ['text','arrs','anajax'],
+      ajax: {url: '/ajax', params: {action: 'test'}},
+});
+*/
 
 
 window.pkVue = pkVue;
 
-window.Vue.component('pk-dragndrop', require('./pk-dragndrop.vue'));
+//window.Vue.component('pk-dragndrop', require('./pk-dragndrop.vue'));
