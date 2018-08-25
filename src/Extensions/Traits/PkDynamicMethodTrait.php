@@ -6,46 +6,63 @@
  * roles. Also provides an empty method used in the constructor, that can be
  * overridden by implenting classes to add methods based on the instances type.
  * 
+ * Obviously I had some grand plan here, but not implemented - just 
+ * 
  */
 
 namespace PkExtensions\Traits;
+use PkExtensions\PkException;
 /**
  * @author pkirkaas
  */
 trait PkDynamicMethodTrait {
-  public $instanceMethods=[];
+  public $instanceMethods=[]; //Assoc array of method name => closure
   public $methodfactory;
+  public $methodFactoryClass;
   public $methods;
 
   public  function addInstanceMethods($methods=null,$params=[]) {
     if (!$methods && !$this->methodFactoryClass) {
       return;
     }
-    if (is_class($methods)) {
+    /*
+    if (class_exists($methods)) {
       $this->methodFactoryClass = $methods;
       $methods = new $methods($this, $params);
     }
+
     if (is_object($methods)) {
       $closures = $methods->getClosures($this,$params);
     }
+     * *
+     */
+    /* //???? What am I doing here?
       if (
         $methods = new $this->methodFactoryClass($this,$params);
       } 
 
     }
-    if (is_class($methods) && implements(
+     * 
+    if (class_exists($methods) && implements(
           $methods = new $this->methodFactoryClass($this, $params);
         }
     }
+     */
     if (!$methods) {
       return;
     }
+    /*
     if ($methods instanceOf PkExtensions\PkMethodGeneratorInterface) {
-      if (is_class($methods)) {
+      if (class_exists($methods)) {
         $this->methodFactoryClass = $methods;
         $methods = new $methods($this);
         $methods = $methods->generateMethods($this);
+     * 
+     */
 
+    if (!is_array_assoc($methods)) {
+      throw new PkException(["Invalid methods for 'addInstanceMethods':",$methods]);
+    }
     foreach ($methods as $name=>$closure) {
       $this->instanceMethods[strtolower($name)]=$closure->bindTo($this);
     }
@@ -56,7 +73,7 @@ trait PkDynamicMethodTrait {
       $this->closures = $closures;
     }
     if ($closures instanceOf PkExtenstions\PkClosuresInterface) {
-      if (is_class($closures)) {
+      if (class_exists($closures)) {
         $closures = new $closures($this);
       }
       $closures = $closures->generate($this);
@@ -91,15 +108,19 @@ trait PkDynamicMethodTrait {
   public function ExtraConstructorDynamicMethods($atts = []) {
     //pkecho ("IN Extra Constructor");
     $methodfactory = unsetret($atts,'methodfactory');
-    if (is_class($methodfactory)) {
+    if (class_exists($methodfactory)) {
       $this->methodfactory = $methodfactory;
+    }
+
+    $methods = unsetret($atts,'methods');
+    if (is_array_assoc($methods)) {
+      $this->addInstanceMethods($methods);
     }
     //$this->closures = unsetret($atts,'closures');
     #A method factory class just needs to be construted with $this,
     #then examines $this->instancetype and add the instanceMethods for that type
     //$this->methodfactoryclass = unsetret($atts,'methodfactoryclass');
-    $methodfactory = unsetret($atts,'methodfactory');
-    $this->buildInstanceMethods($this->closures);
+    //$this->buildInstanceMethods($this->closures);
     #Can be used by builders to determine what instanceMethods to add
   }
 

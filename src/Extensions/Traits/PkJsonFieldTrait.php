@@ -152,7 +152,8 @@ trait PkJsonFieldTrait {
    */
 
   public function arrayKeys($keyArray = [], $replace = false) {
-    $this->initStructured();
+    // Might have to re-create initStructured below....
+    //$this->initStructured();
     #Keys can be a mixed array, index w. key as value, AND associative with
     if ($replace || !keyVal('structured',$this->attributes)) {
       $this->structured = [];
