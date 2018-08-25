@@ -237,13 +237,13 @@ Vue.component('pk-input-arr',{
 });
 
 /** Checkbox */
-Vue.component('pk-check-arr', {
+Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
   <input type="checkbox" :name="inpopt.name" :class="inpopt.inputclass"
-      :value="inpopt.value" v-model="inpopt.checked/>
-    class='border' ></div></div>
+      :value="inpopt.value" v-model="inpopt.checked"/>
+    </div></div>
 `,
   props: ['inpopt'],
   created: function() {
@@ -272,8 +272,7 @@ Vue.component('pk-select-arr', {
         {{option.label}}
     </option>
   </select>
-
-    class='border' ></div></div>
+    </div></div>
 `,
   props: ['inpopt'],
 
@@ -284,7 +283,7 @@ Vue.component('pk-input-arr',{
   type: 'input',
   template: `
   <div :class="inpopt.wrapclass">
-    <div :class="inpopt.lblclass">{{inpopt.label}}<input type="text" v-model="inpopt.value"
+    <div :class="inpopt.label<input type="text" v-model="inpopt.value"
     :name="inpopt.name" :class="inpopt.inputclass"
     class='border' ></div></div>`,
   props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
@@ -299,10 +298,10 @@ Vue.component('pk-input-arr',{
  */
 window.Vue.component('pk-input-form',{
   template: `
-  <div :class="formopts.class" class="mini-input-form">
+  <div :class="formopts.frmclass" class="mini-input-form">
     <div v-for='(inpopt, idx) in inpopts'>
       <pk-select-arr v-if="inpopt.inptype === 'select'" :inpopt="inpopt"></pk-select-arr>
-      <pk-check-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
+      <pk-checkbox-arr v-else-if="inpopt.inptype === 'checkbox'" :inpopt="inpopt"></pk-checkbox-arr>
       <pk-input-arr v-else="inpopt.inptype = 'input'" :inpopt="inpopt"></pk-input-arr>
 
     </div>
