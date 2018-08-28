@@ -79,3 +79,8 @@ class pkVue extends Vue {constructor(arg){
 window.pkVue = pkVue;
 
 //window.Vue.component('pk-dragndrop', require('./pk-dragndrop.vue'));
+
+import PkDragndrop from './app/resources/vue-components/pk-dragndrop.vue';
+import PkShowimage from './app/resources/vue-components/pk-showimage.vue';
+window.Vue.component('pk-dragndrop',PkDragndrop);
+window.Vue.component('pk-showimage',PkShowimage);
