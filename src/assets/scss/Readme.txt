@@ -54,6 +54,7 @@ Headings:
   template-heading
   page-template page-title, page-template page-titleinverse
   page-template page-subtitle, page-template page-subtitleinverse
+  'sh -> "site heading' r = red, b=blue, i=inverse, n=size
   shN, shrN, shbN, shibN, shirN (N = -5 -> 20)
 
 Bunch of Avatar classes - in 'sitestyles'
