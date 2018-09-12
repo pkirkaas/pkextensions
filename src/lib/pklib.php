@@ -3736,7 +3736,7 @@ function usesTrait($traitName, $target, $useBaseName=true) {
  * all the methods for all the traits
  * @param string|array $trait
  * @param array of traits to ignore/remove
- * @return array of methods
+ * @return array of methods implemented by the named traits
  */
 function traitMethods($traits, $omittraits=[]) {
   if (!$traits) {

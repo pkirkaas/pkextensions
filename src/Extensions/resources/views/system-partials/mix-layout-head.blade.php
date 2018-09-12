@@ -9,7 +9,9 @@ use PkExtensions\PopAtts;
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <link rel='stylesheet' href='/mixed/fonts/google-fonts.css' />
+    <!--
     <script language="javascript" src="{{asset('/mixed/js/app.js')}}"></script>
+    -->
     <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
     <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
     <!--
@@ -22,7 +24,9 @@ use PkExtensions\PopAtts;
      */?>
     <title>{{SITE_NAME}}</title>
     <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
+    <!--
     <link href="{{ asset('/mixed/css/app.css') }}" rel="stylesheet">
+    -->
     <!--
     <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">
     <link href="{{ asset('/mixed/css/sassed.css') }}" rel="stylesheet">

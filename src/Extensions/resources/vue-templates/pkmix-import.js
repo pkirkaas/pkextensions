@@ -9,10 +9,10 @@
 //window.Vue.component('pk-dragndrop', require('./.vue'));
 //Vue.component('pk-dragndrop',PkDragndrop);
 
-window.axios = require('axios');
-window.Vue = require('vue');
-import Popper from 'popper.js';
-window.Popper = Popper;
+//window.axios = require('axios');
+//window.Vue = require('vue');
+//import Popper from 'popper.js';
+//window.Popper = Popper;
 /**
  * Extends Vue - whatever element has css class 'vueroot' will have a pkVue 
  * template appended/inserted to it, so don't need to specify a unique ID in
@@ -20,7 +20,8 @@ window.Popper = Popper;
  * arg contain 'appendTemplate' as a string of a vue template. 
  * If arg.placement ==  'after', vue is placed AFTER the element, else within
  */
-class pkVue extends Vue {constructor(arg){
+/*
+class pkVue extends window.Vue {constructor(arg){
     if (arg.appendtemplate) {
       var uid ='uid-'+elid(); // Make random unique ID
       var vueroot = "vueroot";
@@ -68,6 +69,7 @@ class pkVue extends Vue {constructor(arg){
     console.log("In pkVue constructor");
   }
 }} ;
+*/
 
 /** Use like: to initialize from AJAX
     var vg = new pkVue({
@@ -78,14 +80,13 @@ class pkVue extends Vue {constructor(arg){
 */
 
 
-window.pkVue = pkVue;
+window.PkVue = require('./pkvue.js');
 
 //window.Vue.component('pk-dragndrop', require('./pk-dragndrop.vue'));
 
 //import PkDragndrop from './app/resources/vue-components/pk-dragndrop.vue';
 //import PkShowimage from './app/resources/vue-components/pk-showimage.vue';
-import PkDragndrop from './pk-dragndrop.vue';
-import PkShowimage from './pk-showimage.vue';
-pk-showimage.vue
-window.Vue.component('pk-dragndrop',PkDragndrop);
-window.Vue.component('pk-showimage',PkShowimage);
+//import PkDragndrop from 'pk-dragndrop.vue';
+//import PkShowimage from 'pk-showimage.vue';
+//window.Vue.component('pk-dragndrop',PkDragndrop);
+//window.Vue.component('pk-showimage',PkShowimage);

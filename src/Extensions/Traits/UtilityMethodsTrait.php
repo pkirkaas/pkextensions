@@ -119,7 +119,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     
 
 /** Does THIS SPECIFIC CLASS or used TRAIT define the method?
- * NOT an Ancestor!
+ * NOT an Ancestor of the Class or used Traits!
  * @param string $method
  * @return boolean
  */
