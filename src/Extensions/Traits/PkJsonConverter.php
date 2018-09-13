@@ -20,7 +20,7 @@ trait PkJsonConverter {
    * @param PkModel||array of -  $model
    * @param indexed array $atts -- attribute categories to attribute names,
    * like ['display'=>['name','age','title'], 'key'=>'id', 'private'=>['phone',... etc.
-   * BUT Always return at least the key->id
+   * BUT Always return at least the key->id and the classname
    * @return complex array with the requested info
    */
   public static function modelsToAtts($model, $atts=[]) {
@@ -43,7 +43,7 @@ trait PkJsonConverter {
     if (!$model instanceOf PkModel) {
       throw new PkException("Wrong argument to modelsToAtts");
     }
-    $result = ["id"=>$model->id];
+    $result = ["id"=>$model->id, 'classname'=>get_class($model)];
     foreach ($atts as $type=>$props) {
       if (is_scalar($props)) {
         if (is_int($type)) {

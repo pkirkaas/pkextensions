@@ -15,6 +15,71 @@
  */
 ///!!!!!!!!!!!!!!!!!  NOTE THIS VERSION IS DEPRECATED (HENCE XCVUE) -- LATEST BELOW 
 window.PkVue = require('./pkvue.js');
+
+window.CVue = PkVue.extend({
+  me: 'Base CVue',
+  selector: '.cvue-anchor', //Can be overridden
+  data: function() {return this.$options.initdata;},
+  initdata: {},
+  cvues: [],
+  methods: {
+    isMounted: function(prt) {
+      if (!prt) {
+        return this._isMounted;
+      } else {
+        if (this._isMounted) {
+//          console.log ("The Component is MOUNTED");
+
+        } else {
+    //      console.log ("Pooh NOT Component is MOUNTED");
+        }
+      }
+    },
+    me: function() {return this.$options.me;},
+    //el ALWAYS has to be a DOM element
+    mount: function(el, sel) {
+      if(!this.isMounted()) {
+        this.$mount();
+      }
+     // console.log("IN Mount, this.data:", this.$options.initdata);
+      if (this instanceof CVue) {
+      //  console.log("This is a cvue:",this);
+      } else {
+       // console.log("This is NOT a cvue:",this);
+      }
+
+    //  console.log("sel ", sel,"topsel: ",this.$options.selector);
+      selector = sel || this.$options.selector;
+      el = el || Document;
+     // console.log("Appd Child to selector:" + selector + " and el: ", this.$el);
+      el.querySelector(selector).appendChild(this.$el);
+      return;
+    },
+    mountAll: function(item,sel) { //each cv is either a cvue, a selector:cvu, or array
+      if(!this.isMounted()) {
+        this.$mount();
+      }
+      this.mount(item,sel);
+      var el = this.$el;
+      //console.log("CVUES:",this.$options.cvues);
+      var self = this;
+      if (Array.isArray(this.$options.cvues) && this.$options.cvues.length) {
+        this.$options.cvues.forEach(function (cv) {
+       //   console.log("This: is about to monthis ",  cv);
+            cv.mount(el);
+        });
+      }
+    },
+    destroy: function() {
+      var ctree = this;
+      while (!ctree.$parent instanceof CVue) {
+        ctree = ctree.$parent;
+      }
+      ctree.$el.remove();
+    }
+  }
+  });
+
 var XCVue = PkVue.extend({
   me: 'Base CVue',
   pselector: '.cvue-anchor', //Can be overridden
@@ -85,71 +150,6 @@ var XCVue = PkVue.extend({
     }
   }
   });
-
-const CVue = PkVue.extend({
-  me: 'Base CVue',
-  selector: '.cvue-anchor', //Can be overridden
-  data: function() {return this.$options.initdata;},
-  initdata: {},
-  cvues: [],
-  methods: {
-    isMounted: function(prt) {
-      if (!prt) {
-        return this._isMounted;
-      } else {
-        if (this._isMounted) {
-//          console.log ("The Component is MOUNTED");
-
-        } else {
-    //      console.log ("Pooh NOT Component is MOUNTED");
-        }
-      }
-    },
-    me: function() {return this.$options.me;},
-    //el ALWAYS has to be a DOM element
-    mount: function(el, sel) {
-      if(!this.isMounted()) {
-        this.$mount();
-      }
-     // console.log("IN Mount, this.data:", this.$options.initdata);
-      if (this instanceof CVue) {
-      //  console.log("This is a cvue:",this);
-      } else {
-       // console.log("This is NOT a cvue:",this);
-      }
-
-    //  console.log("sel ", sel,"topsel: ",this.$options.selector);
-      selector = sel || this.$options.selector;
-      el = el || Document;
-     // console.log("Appd Child to selector:" + selector + " and el: ", this.$el);
-      el.querySelector(selector).appendChild(this.$el);
-      return;
-    },
-    mountAll: function(item,sel) { //each cv is either a cvue, a selector:cvu, or array
-      if(!this.isMounted()) {
-        this.$mount();
-      }
-      this.mount(item,sel);
-      var el = this.$el;
-      //console.log("CVUES:",this.$options.cvues);
-      var self = this;
-      if (Array.isArray(this.$options.cvues) && this.$options.cvues.length) {
-        this.$options.cvues.forEach(function (cv) {
-       //   console.log("This: is about to monthis ",  cv);
-            cv.mount(el);
-        });
-      }
-    },
-    destroy: function() {
-      var ctree = this;
-      while (!ctree.$parent instanceof CVue) {
-        ctree = ctree.$parent;
-      }
-      ctree.$el.remove();
-    }
-  }
-  });
-
 
 const BigImg = CVue.extend({
   template: `<div class='border p-5 m5' style='max-width: 100%; max-height: 100%;'>
@@ -565,6 +565,9 @@ window.Vue.component('responsive-column', {
   </div>
 `,
  */
+/** Part of turning tables on their side, so big container is column, contain
+ * many rows, eche row contains mini-columnt again.
+ */
 window.Vue.component('responsive-table', {
   name: 'responsive-table',
 //CVue.component('responsive-table', {
@@ -631,8 +634,11 @@ window.Vue.component('responsive-table', {
   <div class=" d-lg-none">Only BELOW width</div>
 */
 
-//'fields' is an array of objects,
-//each of which contains info about the item, including possible delete buttons, 
+//'rowdata' is an array of objects containing information about each cell
+//'rowdefaults' - object with default values for each cell, if not given 
+// 'bp' = the breakpoint to change the row.`
+// The first is probably special, since it is the row headings/labels
+// each of which contains info about the item, including possible delete buttons, 
 // the ID of the object, and the label for the item.
 // First row might just be labels if no data
 // 'bp' is xs, sm, md, lg, xl
@@ -649,12 +655,22 @@ window.Vue.component('responsive-row', {
   
   </div>
   `,
-  props: ['label','fields','rcolcls',
-    'lblcls','fldcls', 'bp', 'rcolcls'],
+  props: ['rowdata','rowdefs', 'bp'],
   computed: {
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
     show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
+  },
+
+  /** Mergin each row object in the array with the "default" object */
+  data: function() {
+    var datarr = [];
+    rowdata.forEach(function(rowobj, idx) {
+      dataarr.push(Object.assign({},this.rowdefs,this.rowobj));
+      });
+    return rowdatarr;
+  },
+  }
     /*
     clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
     clc_lbl_bg: function() {
@@ -693,9 +709,16 @@ window.Vue.component('responsive-row', {
       <responsive-column v-for="(coldtm,idx) in cmp_coldata"
           :label="coldtm.label" :fields="coldtm.fields"
          :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
-         :rowcls="coldtm.rowcls"></responsive-column>
+         :rowcls="coldtm.rowcls"></responsive-row>
   </div>
-`,
+How will we present the get the data: ,
+rowobj: With all the options to specify how the row is built.
+  Which labels, which fields, which order, and optional extra
+  components like delete button. The first may be only labels & formatting if 
+  there is no actual data.
+  datanames and values as an array of objs to preserve order.
+
+
  */
 window.Vue.component('c-responsive-table', {
 //CVue.component('responsive-table', {
