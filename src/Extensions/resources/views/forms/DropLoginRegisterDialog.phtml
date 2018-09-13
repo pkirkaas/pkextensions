@@ -97,6 +97,7 @@ $(function () {
     $('div.login-register-dialog').css('opacity',1);
     
     $(".log-reg-pop").on("click hover mouseover", function () {
+      console.log("Devent to show login reg dialog");
       setundermenu('div.login-register-dialog');
       $('div.demo-dialog').hide();
       $('div.login-register-dialog').show();
@@ -218,5 +219,10 @@ $(function () {
 </div>
 </div>
 </div>
+
+<!-- The menu item, so it doesn't need to be also icnluded -->
+
+  <li class="nav-item nav-text log-reg-pop">Login/Sign Up</li>
+`
   <!--
   -->

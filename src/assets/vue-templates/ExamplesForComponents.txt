@@ -1,0 +1,109 @@
+How to use the table & column components to make flex tables.
+
+Some CSSS:
+
+<style>
+.fldcls,
+.lblcls {
+  display: inline-block;
+  padding: .5em;
+  text-align: center;
+  font-weight: bold;
+  color: blue;
+  flex-grow: 1;
+  align-self: stretch;
+  border: solid white 1px;
+  background-color: #fdd;
+  overflow-y: auto;
+}
+.headcls {
+  display: block;
+  background-color: #bcf;
+  width: 100%;
+  flex-basis: 100%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  color: white;
+  text-align: center;
+  padding: .5em;
+  border: solid #aaa 1px;
+}
+.fldcls {
+  font-weight: normal;
+  color: #444;
+  border: solid #ddd 1px;
+  background-color: #eef;
+}
+
+.rowcls {
+  border: solid #88f 1px;
+  display: flex;
+  margin: 0;
+  padding: 0;
+  background-color: #afa;
+  flex-grow: 1;
+  flex-basis: 100%;
+  flex-shrink: 1;
+}
+
+.colcls {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  padding: 0;
+  background-color: #fbf;
+}
+
+.tblcls {
+  border: solid green 2px;
+  margin: 1em;
+  background-color: #e9e;
+  padding: 3px;
+}
+</style>
+
+//Building the data for the components:
+<?php /* Get some data for Vue */
+$officers = $borrower->officers;
+$officerDetails [];
+$nfields=[];
+$tfields=[];
+$dfields=[];
+foreach ($officers as $off) {
+  $officerDetails[]=[
+      'id'=>['value'=>$off->id,'label'=>"ID"],
+      'name'=>['value'=>$off->name, 'label'=>'Officer Name'],
+      'title'=>['value'=>$off->title, 'label'=>'Title'],
+      'desc'=>['value'=>$off->desc, 'label'=>'Description'],
+      ];
+  $nfields[]=$off->name;
+  $tfields[]=$off->title;
+  $dfields[]=$off->desc;
+
+}
+$datarr = [ 
+  "tbldata" => [
+    'tblcls'=>' tblcls ',
+    'head' => "Current Officers",
+    'headcls' => "headcls",
+    "coldefs" => [
+        'lblcls'=>'lblcls',
+        'colcls' => 'colcls col-md-4',
+        "rowcls" => " rowcls",
+        //"rowcls" => " rowcls col-md-4",
+        "fldcls" => " fldcls ",
+        "bp" => "md",
+      ],
+    "coldata" => [
+      [ 'label'=>"Officer Name", 'fields'=>$nfields,],
+      [ 'label'=>"Title", 'fields'=>$tfields],
+      [ 'label'=>"Description", 'fields'=>$dfields ],
+        
+        ],
+      "officerdata" => $officerDetail
+    ]
+    ];
+$datajson =json_encode($datarr);
+?>

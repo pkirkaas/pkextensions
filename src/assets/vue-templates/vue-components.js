@@ -1,3 +1,4 @@
+'use strict';
 /** Smaller Vue components that don't require an entire *.vue page template */
 
 /** CVue instances will be created new for each use.
@@ -13,7 +14,7 @@
  * @type type
  */
 ///!!!!!!!!!!!!!!!!!  NOTE THIS VERSION IS DEPRECATED (HENCE XCVUE) -- LATEST BELOW 
-var XCVue = Vue.extend({
+var XCVue = PkVue.extend({
   me: 'Base CVue',
   pselector: '.cvue-anchor', //Can be overridden
   data: function() {return Object.assign(this.$options.defaultdata,
@@ -84,7 +85,7 @@ var XCVue = Vue.extend({
   }
   });
 
-const CVue = Vue.extend({
+const CVue = PkVue.extend({
   me: 'Base CVue',
   selector: '.cvue-anchor', //Can be overridden
   data: function() {return this.$options.initdata;},
@@ -203,7 +204,7 @@ const FormPopup = CVue.extend({
     //
     //
 // Actually, if in a v-for, prop should be an object, so see below
-Vue.component('text-input',{
+CVue.component('text-input',{
   template: `
   <div :class="wrapclass">
     <div :class="lblclass">{{label}}<input type="text" :value="value"
@@ -217,7 +218,7 @@ Vue.component('text-input',{
 /*** Make my own input components for inclusion in arrays***/
 
 // Actually, if in a v-for, prop should be an object, so
-Vue.component('pk-input-arr',{
+CVue.component('pk-input-arr',{
   type: 'input',
   template: `
   <div :class="inpopt.wrapclass">
@@ -237,7 +238,7 @@ Vue.component('pk-input-arr',{
 });
 
 /** Checkbox */
-Vue.component('pk-checkbox-arr', {
+CVue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
@@ -252,7 +253,7 @@ Vue.component('pk-checkbox-arr', {
 });
 
 /** Select */
-Vue.component('pk-select-arr', {
+CVue.component('pk-select-arr', {
   inptype: 'select',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
@@ -268,7 +269,7 @@ Vue.component('pk-select-arr', {
 });
 
 /*
-Vue.component('pk-input-arr',{
+CVue.component('pk-input-arr',{
   type: 'input',
   template: `
   <div :class="inpopt.wrapclass">
@@ -285,7 +286,7 @@ Vue.component('pk-input-arr',{
 /** Takes an array or object of multiple input options (type, name, value)
  * & iterates through to build a multi-input div, that can be submitted.
  */
-window.Vue.component('pk-input-form',{
+CVue.component('pk-input-form',{
   template: `
   <div :class="formopts.frmclass" class="mini-input-form">
     <div v-for='(inpopt, idx) in inpopts'>
@@ -325,7 +326,7 @@ window.Vue.component('pk-input-form',{
   }
 });
 
-Vue.component('small-txt', {
+CVue.component('small-txt', {
   template: `
   <div :class='colclass'>
     <div :class='mxtxtclass' @click='clicked'>{{content}}</div>
@@ -341,7 +342,7 @@ Vue.component('small-txt', {
   props: ['content', 'title', 'colclass']
 });
 
-Vue.component('tiny-img', {
+CVue.component('tiny-img', {
   template: `
   <div :class='colclass'>
     <img :src='url' :class='mximgclass' @click='clicked'>
@@ -361,7 +362,7 @@ Vue.component('tiny-img', {
 });
 
 /** A button to invite a friend, send a message, etc */
-Vue.component('profile-btn', {
+CVue.component('profile-btn', {
   template: `
   <div :class='mxcolclass'>
     <a :class='mxbtnclass' :data-tootik="tootik" :href='href' :text="label">{{label}}</a> 
@@ -431,7 +432,7 @@ const MessageBody = ContactBody.extend ({
 });
 
 /** Another button to invite a friend, send a message, etc - but for a popup*/
-Vue.component('contact-btn', {
+CVue.component('contact-btn', {
   popups: {message: MessageBody, invite:InviteBody},
   template: `
     <button class='popup-btn btn btn-success' :data-tootik="tootik" @click.prevent='submit'>{{label}}</button>
@@ -457,12 +458,12 @@ Vue.component('contact-btn', {
 });
 
 /*
-Vue.component('invite-btn', {
+CVue.component('invite-btn', {
   extends: contact-btn,
 */
-Vue.component('invite-btn', {
+CVue.component('invite-btn', {
 //const InviteBtn =  {
-  extends: Vue.component('contact-btn'),
+  extends: CVue.component('contact-btn'),
   contact_type: {
     label: "Friend",
     tootik: "Send a Friend Invitation",
@@ -471,10 +472,10 @@ Vue.component('invite-btn', {
   }
   });
 
-//Vue.component('invite-btn',new InviteBtn());
+//CVue.component('invite-btn',new InviteBtn());
 
-Vue.component('message-btn', {
-  extends: Vue.component('contact-btn'),
+CVue.component('message-btn', {
+  extends: CVue.component('contact-btn'),
   contact_type: {
     label: "Message",
     tootik: "Send a message",
@@ -484,6 +485,131 @@ Vue.component('message-btn', {
 });
 
 
+/********************  Reactive Tables ************************/
+//Two components - the frame, that may hold any number of columns
+//The column - which has a header/label & number of values below it,
+//but below a certain width, each field has the label next to it (
+// Or above it? Has to be both configurable, and work with bs4
+/*
+  <div class="d-none d-lg-inline-block">Only above width</div>
+  <div class=" d-lg-none">Only BELOW width</div>
+*/
+
+//'label' prop is a single value. 'fields' is an array
+// 'bp' is xs, sm, md, lg, xl
+window.Vue.component('responsive-column', {
+//CVue.component('responsive-column', {
+  name: 'responsive-column',
+  template: `<div :class="colcls">
+  <div :class="rowcls+' '+ show_bg_flex">
+    <div :class="lblcls" v-html="label"></div>
+  </div>
+  <div v-for="(field,idx) in fields" :class="rowcls">
+     <div :class="show_sm + ' '+ lblcls" v-html="label"></div>
+     <div :class="fldcls" v-html="field"></div>
+  </div>
+  
+  </div>
+  `,
+  props: ['label','fields','colcls',
+    'lblcls','fldcls', 'bp', 'rowcls'],
+  computed: {
+    show_sm: function() {return  " d-"+this.bp+"-none ";},
+    show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
+    show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
+    /*
+    clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
+    clc_lbl_bg: function() {
+      var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
+      console.log("lblg", lblbg);
+      return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
+    */
+  }
+});
+
+/** 
+ * Composes a responsive table from responsive-columns
+ * Props - single prop object:
+ * tbldata: Object:
+ *    head:Table Header
+ *    headcls: Head CSS  class
+ *    tblcls: Table Class
+ *    coldefs: Object - column defaults - for coldata entries, unless they exist
+ *          like: lblcls, bp, rowcls, fldcls 
+ *    coldata: array of prop objects for responsive-column above - each el:
+ *        label: Column Label
+ *        fields: array - field values
+ *        (opt, or in tbldata.coldefs)
+ *        bp - breakpoint for when to label each field
+ *        rowcls- column row class
+ *        lblcls - label class
+ *        fldcls - field class
+ *        
+ *   
+ */
+/*
+ * 
+  template: `
+  <div :class='tbldata.tblcls' class="row">
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
+          :label="coldtm.label" :fields="coldtm.fields"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+  </div>
+`,
+ */
+window.Vue.component('responsive-table', {
+//CVue.component('responsive-table', {
+/**
+  template: `
+  <div :class='tbldata.tblcls'>
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+  <div class='row'>
+   
+      <responsive-column  v-for="(coldtm,idx) in cmp_coldata" :label="coldtm.label" :fields="coldtm.fields"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+    
+    </div>
+  </div>
+`,
+  */
+  template: `
+  <div :class='tbldata.tblcls' class="row">
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
+          :label="coldtm.label" :fields="coldtm.fields" :colcls="coldtm.colcls"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+  </div>
+`,
+  //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
+  props: ['tbldata'],
+  computed: {
+    //Iterate over coldata & add defaults if they exist
+    cmp_coldata: function() {
+      if (!this.tbldata.coldefs) {
+        console.log("\n\nNo coldefs in tbldata\ntbldata:", this.tbldsata);
+        return this.tbldata.coldata;
+      }
+      var tbldata = this.tbldata;
+      this.tbldata.coldata.forEach(function(coldtm,idx) {
+        for (var aprop in tbldata.coldefs) {
+          if (!coldtm[aprop]) {
+            coldtm[aprop] = tbldata.coldefs[aprop];
+          }
+        }
+      });
+      console.log("\nEnhanced coldefs:\n",this.tbldata.coldata);
+      return this.tbldata.coldata;
+    }
+  },
+  methods: {
+    cmpval: function(valname) { //Returns the 
+    }
+  },
+  });
 
 
 
@@ -492,10 +618,12 @@ Vue.component('message-btn', {
 
 
 
+
+/******************** END  Reactive Tables ************************/
 /**
  * 
  *  This didn't work at all
-Vue.component('lqp-interest-inp', {
+CVue.component('lqp-interest-inp', {
   template: `<div class='lqp-interest-item'>
 <input type='text' id='interest_id' name='interest_id' @change='announce' v-model='interest_id'>
 <input type='text' id='interest' class='ac-interest' name='interest' value=''>
@@ -521,7 +649,7 @@ methods: {
 */
 /*
 
-Vue.component('blog-post-form', {
+CVue.component('blog-post-form', {
   template: `<div class='blog-post-wrap'>
   <form class='wysiwyg' @submit.prevent="onSubmit">
   <input type='hidden' name='id' value="id">
@@ -590,7 +718,7 @@ Vue.component('blog-post-form', {
 
 */
 
-Vue.component('tabs', {
+CVue.component('tabs', {
     template: `
         <div>
             <div class="tabs">
@@ -626,7 +754,7 @@ Vue.component('tabs', {
 });
 
 
-Vue.component('tab', {
+CVue.component('tab', {
     template: `
         <div v-show="isActive"><slot></slot></div>
     `,
@@ -652,3 +780,5 @@ Vue.component('tab', {
         this.isActive = this.selected;
     },
 });
+
+module.exports = CVue;
