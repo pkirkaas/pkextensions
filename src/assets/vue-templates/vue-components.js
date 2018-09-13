@@ -14,6 +14,7 @@
  * @type type
  */
 ///!!!!!!!!!!!!!!!!!  NOTE THIS VERSION IS DEPRECATED (HENCE XCVUE) -- LATEST BELOW 
+window.PkVue = require('./pkvue.js');
 var XCVue = PkVue.extend({
   me: 'Base CVue',
   pselector: '.cvue-anchor', //Can be overridden
@@ -486,6 +487,11 @@ CVue.component('message-btn', {
 
 
 /********************  Reactive Tables ************************/
+
+//Two Versions - the first runs the data down the columns - the
+//second runs them across the rows, which seems to make more sense
+
+//FIRST SET - Columns in a Row
 //Two components - the frame, that may hold any number of columns
 //The column - which has a header/label & number of values below it,
 //but below a certain width, each field has the label next to it (
@@ -560,6 +566,7 @@ window.Vue.component('responsive-column', {
 `,
  */
 window.Vue.component('responsive-table', {
+  name: 'responsive-table',
 //CVue.component('responsive-table', {
 /**
   template: `
@@ -611,6 +618,138 @@ window.Vue.component('responsive-table', {
   },
   });
 
+//////////////////  End Column Based Tables ///////////////
+
+
+//////////////////  Start Row Based Tables ///////////////
+//Two components - the frame, that may hold any number of rows,
+//The row - which has a header/label & number of values below it,
+//but below a certain width, each field has the label next to it (
+// Or above it? Has to be both configurable, and work with bs4
+/*
+  <div class="d-none d-lg-inline-block">Only above width</div>
+  <div class=" d-lg-none">Only BELOW width</div>
+*/
+
+//'fields' is an array of objects,
+//each of which contains info about the item, including possible delete buttons, 
+// the ID of the object, and the label for the item.
+// First row might just be labels if no data
+// 'bp' is xs, sm, md, lg, xl
+window.Vue.component('responsive-row', {
+  name: 'responsive-row',
+  template: `<div :class="rrowcls">
+  <div :class="rrowowcls+' '+ show_bg_flex">
+    <div :class="lblcls" v-html="label"></div>
+  </div>
+  <div v-for="(field,idx) in fields" :class="rcolcls">
+     <div :class="show_sm + ' '+ lblcls" v-html="label"></div>
+     <div :class="fldcls" v-html="field"></div>
+  </div>
+  
+  </div>
+  `,
+  props: ['label','fields','rcolcls',
+    'lblcls','fldcls', 'bp', 'rcolcls'],
+  computed: {
+    show_sm: function() {return  " d-"+this.bp+"-none ";},
+    show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
+    show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
+    /*
+    clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
+    clc_lbl_bg: function() {
+      var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
+      console.log("lblg", lblbg);
+      return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
+    */
+  }
+});
+
+/** 
+ * Composes a responsive table from responsive-columns
+ * Props - single prop object:
+ * tbldata: Object:
+ *    head:Table Header
+ *    headcls: Head CSS  class
+ *    tblcls: Table Class
+ *    coldefs: Object - column defaults - for coldata entries, unless they exist
+ *          like: lblcls, bp, rowcls, fldcls 
+ *    coldata: array of prop objects for responsive-column above - each el:
+ *        label: Column Label
+ *        fields: array - field values
+ *        (opt, or in tbldata.coldefs)
+ *        bp - breakpoint for when to label each field
+ *        rowcls- column row class
+ *        lblcls - label class
+ *        fldcls - field class
+ *        
+ *   
+ */
+/*
+ * 
+  template: `
+  <div :class='tbldata.tblcls' class="row">
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
+          :label="coldtm.label" :fields="coldtm.fields"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+  </div>
+`,
+ */
+window.Vue.component('c-responsive-table', {
+//CVue.component('responsive-table', {
+/**
+  template: `
+  <div :class='tbldata.tblcls'>
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+  <div class='row'>
+   
+      <responsive-column  v-for="(coldtm,idx) in cmp_coldata" :label="coldtm.label" :fields="coldtm.fields"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+    
+    </div>
+  </div>
+`,
+  */
+  template: `
+  <div :class='tbldata.tblcls' class="row">
+    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
+      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
+          :label="coldtm.label" :fields="coldtm.fields" :colcls="coldtm.colcls"
+         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
+         :rowcls="coldtm.rowcls"></responsive-column>
+  </div>
+`,
+  //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
+  props: ['tbldata'],
+  computed: {
+    //Iterate over coldata & add defaults if they exist
+    cmp_coldata: function() {
+      if (!this.tbldata.coldefs) {
+        console.log("\n\nNo coldefs in tbldata\ntbldata:", this.tbldsata);
+        return this.tbldata.coldata;
+      }
+      var tbldata = this.tbldata;
+      this.tbldata.coldata.forEach(function(coldtm,idx) {
+        for (var aprop in tbldata.coldefs) {
+          if (!coldtm[aprop]) {
+            coldtm[aprop] = tbldata.coldefs[aprop];
+          }
+        }
+      });
+      console.log("\nEnhanced coldefs:\n",this.tbldata.coldata);
+      return this.tbldata.coldata;
+    }
+  },
+  methods: {
+    cmpval: function(valname) { //Returns the 
+    }
+  },
+  });
+
+//////////////////  End Column Based Tables ///////////////
 
 
 
@@ -781,4 +920,4 @@ CVue.component('tab', {
     },
 });
 
-module.exports = CVue;
+module.exports = PkVue;
