@@ -699,18 +699,20 @@ window.Vue.component('responsive-table', {
 // First row might just be labels if no data
 // 'bp' is xs, sm, md, lg, xl
 */
+  //<div :class="rowcls + show_bg_flex_lbl + block_below">
 window.Vue.component('resp-row', {
   name: 'resp-row',
   template: `
-  <div :class="rowcls + show_bg_flex_lbl">
+  <div :class="rowcls + show_bg_flex_lbl + display_below">
     <div v-for="(celldata,idx) in cmp_celldataarr"
         :class="celldata.cellcls" :style="celldata.cellstyle">
       <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
       <div :class="celldata.fldcls" v-html="celldata.field"></div>
     </div>
-    <div v-if="del" :class="del.cellcls" :style="del.cellstyle">
+    <div v-if="del.id" :class="del.cellcls" :style="del.cellstyle">
        <delete-btn :params="del"></delete-btn>
     </div>
+    <div v-else-if="del" :class="del.cellcls" :style="del.cellstyle"></div>
   
   </div>
   `,
@@ -718,6 +720,16 @@ window.Vue.component('resp-row', {
   computed: {
     rowcls: function() {return this.rowinfo.rowcls || ' rt-rowcls ';},
     show_sm: function() {return  " d-"+this.bp+"-none ";},
+    //show_sm_block: function(){return  " d-"+this.bp+"-block ";},
+    display_below: function(){
+      if (this.rowinfo.islbl) {
+        return  " d-none-below-"+this.bp + " ";
+      } else {
+        return  " d-block-below-"+this.bp + " ";
+      }
+    },
+    block_below: function(){return  " d-block-below-"+this.bp + " ";},
+    none_below: function(){return  " d-none-below-"+this.bp + " ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
     show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
     show_bg_flex_lbl: function() {
@@ -729,7 +741,7 @@ window.Vue.component('resp-row', {
     },
     del: function() {
       var del = this.rowinfo.delete;
-      if (!del) {
+      if (del === 'undefined') {
         return false;
       }
       var celldatadefs = this.celldefaults();
@@ -825,6 +837,7 @@ window.Vue.component('resp-tbl', {
         :rowinfo="rowdata.rowinfo"
         :bp="bp">
     </resp-row>
+    <div v-if="tbldata.foot" :class="footcls" v-html="tbldata.foot"></div>
     
   </div>
 `,
