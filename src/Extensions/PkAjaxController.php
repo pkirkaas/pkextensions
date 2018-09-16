@@ -197,6 +197,12 @@ abstract class PkAjaxController extends PkController {
     return $this->jsonsuccess("Deleted");
   }
 
+  /** Saves a PK Model & Relations
+   * 
+   */
+  public function save() {
+  }
+
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
    * 
    */

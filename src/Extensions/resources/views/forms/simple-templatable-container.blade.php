@@ -21,9 +21,7 @@ if (!empty($params) && is_array($params)) {
   $params = $default_params;
 }
 $delete_button = "<div class='$delete_reqclass {$params['delete_class']}'>{$params['delete_content']}</div>\n";
-$new_item_button = "<div class='$new_item_reqclass {$params['new_item_class']}'>{$params['new_item_content']}</div>\n";
 $params['delete_button'] = keyVal('delete_button',$params,$delete_button);
-$params['new_item_button'] = keyVal('new_item_button',$params,$new_item_button);
 /**
  This is simpler (only one level) one-to-many Blade Form Template Container.
  If the top level model is "Cart" which has many "Items":
@@ -62,7 +60,16 @@ $params['new_item_button'] = keyVal('new_item_button',$params,$new_item_button);
     @endforeach
   @endif
 
-<?php /*
+
+
+
+<?php
+
+$idx++;
+$new_item_button = "<div data-itemcount='$idx' class='$new_item_reqclass {$params['new_item_class']}'>{$params['new_item_content']}</div>\n";
+$params['new_item_button'] = keyVal('new_item_button',$params,$new_item_button);
+
+/*
   <div class='js btn {{$params['new_item_class']}}'  data-itemcount='{{++$idx}}'>{!!$params['new_item_content']!!}</div>
   */ ?>
   {!!$params['new_item_button']!!}

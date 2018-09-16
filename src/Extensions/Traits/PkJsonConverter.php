@@ -78,7 +78,7 @@ trait PkJsonConverter {
    * [['celldatarr'=>$celldataarr,'rowinfo'=>$rowinfo],..]
    * 
    */
-  public static function structForVueRespTbl($model,$atts=[]){
+  public static function structForVueRespRows($model,$atts=[],$rowinfo=[]){
     if (is_array_idx($atts)) {
       $fields = $atts;
       $celldata=null;
@@ -113,9 +113,15 @@ trait PkJsonConverter {
     if ($celldata) {
       $first = reset($celldata);
       if (array_key_exists('label',$first)) {
-        $retarr[]=static::mkRowData($celldata,$celldata,['islbl'=>true]);
+        if (keyVal('new',$rowinfo)) {
+          $newrow = static::mkRowData(['display'=>$celldata+['delete'=>$delete]]
+              ,$celldata,$rowinfo);
+          unset($rowinfo['new']);
+        }
+        $retarr[]=static::mkRowData(['display'=>$celldata],$celldata,['islbl'=>true]);
       }
     }
+    $rowinfo['cnt']=0;
     foreach ($mdldata as $mdldtm) {
       //pkdebug("mldtm:",$mdldtm);
       if ($delete) {
@@ -127,8 +133,10 @@ trait PkJsonConverter {
         $mdldtm['display']['delete'] = $delete;
       }
       pkdebug("mldtm:",$mdldtm);
-      $retarr[] = static::mkRowData($mdldtm['display'],$celldata);
+      $retarr[] = static::mkRowData($mdldtm,$celldata,$rowinfo);
+      $rowinfo['cnt']++;
     }
+    $retarr[] = $newrow;
     return $retarr;
     
   }
@@ -145,19 +153,37 @@ trait PkJsonConverter {
    */
   public static function mkRowData($atts,$celldata=[],$rowinfo=[]) {
     $celldataarr = [];
-    foreach ($atts as $key => $val) {
+    $id = keyVal('id',$atts);
+    $classname=keyVal('classname',$atts);
+    $isnew = keyVal('new',$rowinfo);
+    foreach ($atts['display'] as $key => $val) {
       if (keyVal('islbl',$rowinfo)) {
-        $val = keyVal('label',$atts[$key]);
-        //pkdebug("islbl DOES exist:", $rowinfo, "CellData:",$celldata,"VAL", $val);
-      } else {
-        //pkdebug("islbl does NOTTT exist:", $rowinfo);
+        $val = keyVal('label',$atts['display'][$key]);
       }
       if ($key === 'delete') {
         $rowinfo['delete']=$val ;
+        $rowinfo['id'] = $id;
+        $rowinfo['classname'] = $classname;
         continue;
+      }
+      //pkdebug("Atts:",$atts,"celldata", $celldata);
+      $input = keyVal('input',$celldata[$key]);
+      if ($input) {
+        $cnt = keyVal('cnt',$rowinfo,0);
+        $name = keyVal('relation',$rowinfo)."[$cnt][$key]";
+        $placeholder = keyVal('placeholder',$celldata[$key],
+            keyVal('label',$celldata[$key]));
+        if ($isnew) {
+          $val=null;
+        }
+        $val = "<input type='$input' value='$val' name='$name'placeholder='$placeholder'/>";
+      }
+      if (keyVal('islbl',$rowinfo)) {
+        $val = keyVal('label',$atts['display'][$key]);
       }
       $celldataarr[] = keyVal($key,$celldata,[]) + ['field'=>$val];
     }
+    pkdebug("Actual celldataarr:", $celldataarr);
     return ['celldataarr'=>$celldataarr, 'rowinfo'=>$rowinfo];
   }
 }

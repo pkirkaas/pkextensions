@@ -43,6 +43,7 @@ Route::any('auth/logout', ['as' => 'auth_logout',
 
 //Ajax Routes for common PkAjaxController
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
+Route::any('ajax/save', ['as' => 'ajax_save', 'uses'=> 'AjaxController@save']);
 Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
 Route::any('test', ['as' => 'test',  function() { ## Just echos the submitted data
     $data = Request::all();

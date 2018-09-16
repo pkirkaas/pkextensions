@@ -238,6 +238,21 @@ CVue.component('pk-input-arr',{
 
 });
 
+/** 
+ * Bare input element
+ */
+window.Vue.component('pk-input',{
+  name: 'pk-input',
+  template: `
+  <input :type="type" v-model="inpopt.value" :placeholder="inpopt.placeholder"
+     :name="inpopt.name" :class="inpopt.inpcls" />
+  `,
+  props:['inpopt'],
+  computed: {
+    type: function() {return this.inpopt.type || 'text';},
+  }
+});
+
 /** Checkbox */
 CVue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
@@ -492,7 +507,7 @@ CVue.component('message-btn', {
  *   btncls - default: btn-cls
  *   url - default: /ajax/delete
  *   cascade - default: false
- *   delfromdom - ??
+ *   delfromdom - the row class to remove - eg, '.rt-rowcls'
  */
 Vue.component('delete-btn', {
   name: 'delete-btn',
@@ -503,10 +518,21 @@ Vue.component('delete-btn', {
 `,
   props:['params'],
   computed: {
-    btncls: function (){return this.params.btncls || " btn-cls ";},
+    btncls: function (){return this.params.btncls || " pkmvc-button ";},
   },
   methods: {
     del: function() {
+      var delfromdom=this.params.delfromdom;
+      if (delfromdom && !(typeof delfromdom === 'string')) {
+        delfromdom = ".js-resp-row";
+      }
+      if (!this.params.classname || !this.params.id) {
+        if (delfromdom) {
+          $(this.$el).closest(delfromdom).remove();
+        }
+        return;
+      }
+
       var url = this.params.url || "/ajax/delete";
       var params = {
         model: this.params.classname,
@@ -514,6 +540,9 @@ Vue.component('delete-btn', {
         cascade: this.params.cascade,
       };
       axios.post(url,params).then(response=> {
+        if (delfromdom) {
+          $(this.$el).closest(delfromdom).remove();
+        }
         console.log("\nDelete Success w. response:\n", response);
       }).catch(error=>{
         console.log("\nDelete Failed w. error:\n", error);
@@ -522,6 +551,47 @@ Vue.component('delete-btn', {
     },
   }
 }); 
+
+/** NEW button for PkModels - DOESN'T CREATE VIA AJAX - just in the DOM
+ * -- still have to save/POST
+ * @props params
+ */
+Vue.component('new-btn', {
+  name: 'new-btn',
+  template: `
+   <button :class="btncls"
+      @click.stop="create()">
+      New</button>
+`,
+  props:['params'],
+  computed: {
+    btncls: function (){return this.params.btncls || " pkmvc-button ";},
+  },
+  methods: {
+    create: function() {
+      console.log("Trying to create new row");
+      /*
+      var delfromdom=this.params.delfromdom;
+      var url = this.params.url || "/ajax/delete";
+      var params = {
+        model: this.params.classname,
+        id: this.params.id,
+        cascade: this.params.cascade,
+      };
+      axios.post(url,params).then(response=> {
+        if (delfromdom) {
+          $(this.$el).closest(delfromdom).remove();
+        }
+        console.log("\nDelete Success w. response:\n", response);
+      }).catch(error=>{
+        console.log("\nDelete Failed w. error:\n", error);
+      });
+      */
+        
+    },
+  }
+}); 
+
 
 
 /********************  Reactive Tables ************************/
@@ -703,13 +773,15 @@ window.Vue.component('responsive-table', {
 window.Vue.component('resp-row', {
   name: 'resp-row',
   template: `
-  <div :class="rowcls + show_bg_flex_lbl + display_below">
+  <div class="js-resp-row" :class="rowcls + show_bg_flex_lbl + display_below">
+    <input type='hidden' name='id' :value="rowinfo.id" />
+    <input type='hidden' name='model' :value="rowinfo.classname" />
     <div v-for="(celldata,idx) in cmp_celldataarr"
         :class="celldata.cellcls" :style="celldata.cellstyle">
       <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
       <div :class="celldata.fldcls" v-html="celldata.field"></div>
     </div>
-    <div v-if="del.id" :class="del.cellcls" :style="del.cellstyle">
+    <div v-if="del.id || del.delfromdom" :class="del.cellcls" :style="del.cellstyle">
        <delete-btn :params="del"></delete-btn>
     </div>
     <div v-else-if="del" :class="del.cellcls" :style="del.cellstyle"></div>
@@ -782,32 +854,6 @@ window.Vue.component('resp-row', {
       return celldatadefs;
     }
   },
-
-  /** Mergin each cell object in the array with both the:
-   * the passed rowinfo.celldefs object, AND the general component
-   * cell default object. Priority in that order */
-  /*
-  data: function() {
-    var celldatadefs = {
-      cellcls: " rt-cellcls ",
-      fldcls: " rt-fldcls ",
-      lblcls: " rt-lblcls "
-    };
-    var datarr = [];
-    celldataarr.forEach(function(celldata, idx) {
-      dataarr.push(Object.assign({},celldatadefs, this.rowinfo.celldefs,celldata));
-      });
-    return {cmp_celldataarr:dataarr};
-  },
-  */
-    /*
-    clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
-    clc_lbl_bg: function() {
-      var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
-      console.log("lblg", lblbg);
-      return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
-  }
-    */
 });
 
 ///////////////////  Table that uses resp-rows above
@@ -823,6 +869,7 @@ window.Vue.component('resp-row', {
  *     rowdataarr: array of row objects containing data for each resp-row:
  *      celldataarr: the cell data array for the row
  *      rowinfo
+ *    new - opt - array required to make new row
  *        
  *   
  */
@@ -830,20 +877,48 @@ window.Vue.component('resp-tbl', {
   name: 'resp-tbl',
 //CVue.component('responsive-table', {
   template: `
-  <div :class='tblcls'>
+  <div :class='tblcls' class="js-resp-tbl">
     <div v-if="tbldata.head" :class="headcls" v-html="tbldata.head"></div>
-    <resp-row v-for="(rowdata,idx) in rowdataarr"
+    <resp-row v-for="(rowdata,idx) in rowdataarr" v-if="!rowdata.rowinfo.new"
         :celldataarr="rowdata.celldataarr"
         :rowinfo="rowdata.rowinfo"
         :bp="bp">
     </resp-row>
+    <div v-if="newbtn" >
+       <button class="pkmvc-button" @click.stop="addrow()">New</button>
+    </div>
     <div v-if="tbldata.foot" :class="footcls" v-html="tbldata.foot"></div>
     
   </div>
 `,
+       //<new-btn :params="newbtn"> </new-btn>
   //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
   props: ['tbldata'],
+  methods: {
+    addrow: function() {
+      //var lblrow = Object.assign({},this.rowdataarr[this.rowdataarr.length-1]);
+      var lblrow = _.cloneDeep(this.rowdataarr[this.rowdataarr.length-1]);
+      console.log("ADD ROW lblrow:",lblrow);
+      /*
+      lblrow.celldataarr.forEach(function(celldata, idx) {
+        celldata.field = null;
+      });
+      */
+      lblrow.rowinfo.islbl=false;
+      lblrow.rowinfo.new=false;
+      console.log("ADD ROW lblrow:",lblrow);
+
+      this.tbldata.rowdataarr.push(lblrow);
+    },
+  },
+
   computed: {
+    newbtn: function() {
+      if (!this.tbldata.newbtn) {
+        return null;
+      }
+      return this.tbldata.newbtn;
+    },
     rowdataarr: function() {
       var rowdataarr = [];
       var me = this;
@@ -855,47 +930,8 @@ window.Vue.component('resp-tbl', {
     bp: function() {return  this.tbldata.bp || "md";},
     headcls: function() {return this.tbldata.headclass || "rt-headcls";},
     tblcls: function() {return this.tbldata.tblclass || "rt-tblcls";},
-  }
+  },
 
-  /*
-  data: function() {
-    var rowdataarr = [];
-    this.tbldata.rowdataarr.forEach(function(rowdata,idx) {
-      rowdataarr.push(Object.assign({}, {rowinfo:tbldata.rowinfo},rowdata));
-    });
-    return {
-      bp: this.tbldata.bp || "md",
-      headcls: this.tbldata.headclass || "rt-headcls",
-      tblcls: this.tbldata.tblclass || "rt-tblcls",
-      rowdataarr: rowdataarr,
-    }
-  },
-  */
-  /*
-  computed: {
-    //Iterate over coldata & add defaults if they exist
-    cmp_coldata: function() {
-      if (!this.tbldata.coldefs) {
-        console.log("\n\nNo coldefs in tbldata\ntbldata:", this.tbldsata);
-        return this.tbldata.coldata;
-      }
-      var tbldata = this.tbldata;
-      this.tbldata.coldata.forEach(function(coldtm,idx) {
-        for (var aprop in tbldata.coldefs) {
-          if (!coldtm[aprop]) {
-            coldtm[aprop] = tbldata.coldefs[aprop];
-          }
-        }
-      });
-      console.log("\nEnhanced coldefs:\n",this.tbldata.coldata);
-      return this.tbldata.coldata;
-    }
-  },
-  methods: {
-    cmpval: function(valname) { //Returns the 
-    }
-  },
-  */
   });
 
 //////////////////  End Column Based Tables ///////////////
