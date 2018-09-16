@@ -1098,6 +1098,9 @@ function getAsArray($val) {
  *   If $consecutive == false, returns the array with integerish keys converted
  *   to integers
  */
+function is_array_idx($array, $sequential = true) {
+  return is_array_indexed($array,$sequential);
+}
 function is_array_indexed($array, $sequential = true) {
   if (!is_array($array) || !sizeOf($array)) {
     return false;

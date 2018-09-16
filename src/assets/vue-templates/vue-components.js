@@ -534,6 +534,7 @@ window.Vue.component('responsive-column', {
 });
 
 /** 
+ * (NOTE: Superceded by resp-tbl & resp-row below, for row-based tables!)
  * Composes a responsive table from responsive-columns
  * Props - single prop object:
  * tbldata: Object:
@@ -634,119 +635,121 @@ window.Vue.component('responsive-table', {
   <div class=" d-lg-none">Only BELOW width</div>
 */
 
-//'rowdata' is an array of objects containing information about each cell
-//'rowdefaults' - object with default values for each cell, if not given 
+/**
+ * Shows a row of Labels/Data in the table -- included by resp-tbl
+  'celldataarr' is an array of objects containing information about each cell
+      field: Value to Display in the cell
+      label: Label for the cell, if small viewport
+      lblcls: Label CSS for the cell, if small viewport
+      fldcls: Field CSS Class
+      cellcls: Cell CSS (if small viewport, so includes both label & field
+  'rowinfo' - object w. whole-row data:
+      celldefs: object with default values for each cell, if not given  
+      rowcls: The CSS class of the row
+      islbl: Is a lable row?
+  bp:  xs, sm, md, lg, xl
+      
 // 'bp' = the breakpoint to change the row.`
 // The first is probably special, since it is the row headings/labels
 // each of which contains info about the item, including possible delete buttons, 
 // the ID of the object, and the label for the item.
 // First row might just be labels if no data
 // 'bp' is xs, sm, md, lg, xl
-window.Vue.component('responsive-row', {
-  name: 'responsive-row',
-  template: `<div :class="rrowcls">
-  <div :class="rrowowcls+' '+ show_bg_flex">
-    <div :class="lblcls" v-html="label"></div>
-  </div>
-  <div v-for="(field,idx) in fields" :class="rcolcls">
-     <div :class="show_sm + ' '+ lblcls" v-html="label"></div>
-     <div :class="fldcls" v-html="field"></div>
+*/
+window.Vue.component('resp-row', {
+  name: 'resp-row',
+  template: `
+  <div :class="rowinfo.rowcls + show_bg_flex_lbl">
+  <div v-for="(celldata,idx) in cmp_celldataarr" :class="celldata.cellcls">
+     <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
+     <div :class="celldata.fldcls" v-html="celldata.field"></div>
   </div>
   
   </div>
   `,
-  props: ['rowdata','rowdefs', 'bp'],
+  props: ['celldataarr','rowinfo', 'bp'],
   computed: {
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
     show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
+    show_bg_flex_lbl: function() {
+      if (this.rowinfo.islbl) {
+        return  " d-none d-"+this.bp+"-flex ";
+      } else {
+        return " ";
+      }
+    }
   },
 
-  /** Mergin each row object in the array with the "default" object */
+  /** Mergin each cell object in the array with both the:
+   * the passed rowinfo.celldefs object, AND the general component
+   * cell default object. Priority in that order */
   data: function() {
+    var celldatadefs = {
+      cellcls: " rt-cellcls ",
+      fldcls: " rt-fldcls ",
+      lblcls: " rt-lblcls "
+    };
     var datarr = [];
-    rowdata.forEach(function(rowobj, idx) {
-      dataarr.push(Object.assign({},this.rowdefs,this.rowobj));
+    celldataarr.forEach(function(celldata, idx) {
+      dataarr.push(Object.assign({},celldatadefs, this.rowinfo.celldefs,celldata));
       });
-    return rowdatarr;
+    return {cmp_celldataarr:dataarr};
   },
-  }
     /*
     clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
     clc_lbl_bg: function() {
       var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
       console.log("lblg", lblbg);
       return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
-    */
   }
+    */
 });
 
+///////////////////  Table that uses resp-rows above
 /** 
- * Composes a responsive table from responsive-columns
- * Props - single prop object:
- * tbldata: Object:
- *    head:Table Header
- *    headcls: Head CSS  class
- *    tblcls: Table Class
- *    coldefs: Object - column defaults - for coldata entries, unless they exist
- *          like: lblcls, bp, rowcls, fldcls 
- *    coldata: array of prop objects for responsive-column above - each el:
- *        label: Column Label
- *        fields: array - field values
- *        (opt, or in tbldata.coldefs)
- *        bp - breakpoint for when to label each field
- *        rowcls- column row class
- *        lblcls - label class
- *        fldcls - field class
+ * Composes a responsive table from responsive rows
+ * Props - 
+ *   tbldata: object containing the table data:
+ *     head:Table Header
+ *     headcls: Head CSS  class
+ *     tblcls: Table Class
+ *     bp:  xs, sm, md, lg, xl
+ *     rowinfo: (Overridden in rowdataarr)
+ *     rowdataarr: array of row objects containing data for each resp-row:
+ *      celldataarr: the cell data array for the row
+ *      rowinfo
  *        
  *   
  */
-/*
- * 
-  template: `
-  <div :class='tbldata.tblcls' class="row">
-    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
-      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
-          :label="coldtm.label" :fields="coldtm.fields"
-         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
-         :rowcls="coldtm.rowcls"></responsive-row>
-  </div>
-How will we present the get the data: ,
-rowobj: With all the options to specify how the row is built.
-  Which labels, which fields, which order, and optional extra
-  components like delete button. The first may be only labels & formatting if 
-  there is no actual data.
-  datanames and values as an array of objs to preserve order.
-
-
- */
-window.Vue.component('c-responsive-table', {
+window.Vue.component('resp-tbl', {
 //CVue.component('responsive-table', {
-/**
   template: `
-  <div :class='tbldata.tblcls'>
-    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
-  <div class='row'>
-   
-      <responsive-column  v-for="(coldtm,idx) in cmp_coldata" :label="coldtm.label" :fields="coldtm.fields"
-         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
-         :rowcls="coldtm.rowcls"></responsive-column>
+  <div :class='tblcls'>
+    <div v-if="tbldata.head" :class="headcls" v-html="tbldata.head"></div>
+    <resp-row v-for="(rowdata,idx) in rowdataarr"
+        :celldataarr="rowdata.celldataarr"
+        :rowinfo="rowdata.rowinfo"
+        :bp="bp">
+    </resp-row>
     
-    </div>
-  </div>
-`,
-  */
-  template: `
-  <div :class='tbldata.tblcls' class="row">
-    <div :class="tbldata.headcls" v-html="tbldata.head"></div>
-      <responsive-column v-for="(coldtm,idx) in cmp_coldata"
-          :label="coldtm.label" :fields="coldtm.fields" :colcls="coldtm.colcls"
-         :lblcls="coldtm.lblcls" :fldcls="coldtm.fldcls" :bp="coldtm.bp"
-         :rowcls="coldtm.rowcls"></responsive-column>
   </div>
 `,
   //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
   props: ['tbldata'],
+  data: function() {
+    var rowdataarr = [];
+    this.tbldata.rowdataarr.forEach(function(rowdata,idx) {
+      rowdataarr.push(Object.assign({}, {rowinfo:tbldata.rowinfo},rowdata));
+    });
+    return {
+      bp: this.tbldata.bp || "md",
+      headcls: this.tbldata.headclass || "rt-headcls",
+      tblcls: this.tbldata.tblclass || "rt-tblcls",
+      rowdataarr: rowdataarr,
+    }
+  },
+  /*
   computed: {
     //Iterate over coldata & add defaults if they exist
     cmp_coldata: function() {
@@ -770,6 +773,7 @@ window.Vue.component('c-responsive-table', {
     cmpval: function(valname) { //Returns the 
     }
   },
+  */
   });
 
 //////////////////  End Column Based Tables ///////////////

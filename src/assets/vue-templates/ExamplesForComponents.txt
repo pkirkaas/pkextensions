@@ -3,8 +3,8 @@ How to use the table & column components to make flex tables.
 Some CSSS:
 
 <style>
-.fldcls,
-.lblcls {
+.rt-fldcls,
+.rt-lblcls {
   display: inline-block;
   padding: .5em;
   text-align: center;
@@ -16,7 +16,7 @@ Some CSSS:
   background-color: #fdd;
   overflow-y: auto;
 }
-.headcls {
+.rt-headcls {
   display: block;
   background-color: #bcf;
   width: 100%;
@@ -28,14 +28,14 @@ Some CSSS:
   padding: .5em;
   border: solid #aaa 1px;
 }
-.fldcls {
+.rc-fldcls {
   font-weight: normal;
   color: #444;
   border: solid #ddd 1px;
   background-color: #eef;
 }
 
-.rowcls {
+.rt-rowcls {
   border: solid #88f 1px;
   display: flex;
   margin: 0;
@@ -46,6 +46,8 @@ Some CSSS:
   flex-shrink: 1;
 }
 
+.rt-cellcls {
+}
 .colcls {
   display: flex;
   flex-direction: column;
@@ -56,7 +58,7 @@ Some CSSS:
   background-color: #fbf;
 }
 
-.tblcls {
+.rt-tblcls {
   border: solid green 2px;
   margin: 1em;
   background-color: #e9e;
