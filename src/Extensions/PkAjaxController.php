@@ -201,6 +201,8 @@ abstract class PkAjaxController extends PkController {
    * 
    */
   public function save() {
+    $data = request()->all();
+    pkdebug("IN Ajax Save, data:", $data);
   }
 
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}

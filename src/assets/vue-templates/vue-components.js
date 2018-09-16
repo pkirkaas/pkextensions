@@ -512,13 +512,15 @@ CVue.component('message-btn', {
 Vue.component('delete-btn', {
   name: 'delete-btn',
   template: `
-   <button :class="btncls"
+   <div :class="btncls"
       @click.stop="del()">
-      Delete</button>
+      Delete</div>
 `,
   props:['params'],
   computed: {
-    btncls: function (){return this.params.btncls || " pkmvc-button ";},
+    btncls: function (){
+      console.log("Btn class param:", this.params);
+      return this.params.btncls || " pkmvc-button inline ";},
   },
   methods: {
     del: function() {
@@ -565,7 +567,9 @@ Vue.component('new-btn', {
 `,
   props:['params'],
   computed: {
-    btncls: function (){return this.params.btncls || " pkmvc-button ";},
+    btncls: function (){
+      console.log("Btn class param:", this.params);
+      return this.params.btncls || " pkmvc-button inline ";},
   },
   methods: {
     create: function() {
@@ -774,7 +778,7 @@ window.Vue.component('resp-row', {
   name: 'resp-row',
   template: `
   <div class="js-resp-row" :class="rowcls + show_bg_flex_lbl + display_below">
-    <input type='hidden' name='id' :value="rowinfo.id" />
+    <input type='hidden' :name='id_name' :value="rowinfo.id" />
     <input type='hidden' name='model' :value="rowinfo.classname" />
     <div v-for="(celldata,idx) in cmp_celldataarr"
         :class="celldata.cellcls" :style="celldata.cellstyle">
@@ -790,6 +794,10 @@ window.Vue.component('resp-row', {
   `,
   props: ['celldataarr','rowinfo', 'bp'],
   computed: {
+    id_name: function() {
+      console.log("This rowinfo:", this.rowinfo);
+      return this.rowinfo.relation+'['+this.rowinfo.cnt+'][id]';
+    },
     rowcls: function() {return this.rowinfo.rowcls || ' rt-rowcls ';},
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     //show_sm_block: function(){return  " d-"+this.bp+"-block ";},
@@ -833,7 +841,7 @@ window.Vue.component('resp-row', {
   methods: {
     celldefaults: function() {
       var cnt = this.celldataarr.length;
-      if (this.rowinfo.delete) {
+      if ('delete' in this.rowinfo) {
         cnt++;
       }
       var pc = 100/cnt;
@@ -878,6 +886,7 @@ window.Vue.component('resp-tbl', {
 //CVue.component('responsive-table', {
   template: `
   <div :class='tblcls' class="js-resp-tbl">
+    <input type='hidden' :name='tbldata.relation'>
     <div v-if="tbldata.head" :class="headcls" v-html="tbldata.head"></div>
     <resp-row v-for="(rowdata,idx) in rowdataarr" v-if="!rowdata.rowinfo.new"
         :celldataarr="rowdata.celldataarr"
@@ -885,7 +894,10 @@ window.Vue.component('resp-tbl', {
         :bp="bp">
     </resp-row>
     <div v-if="newbtn" >
-       <button class="pkmvc-button" @click.stop="addrow()">New</button>
+       <div class="pkmvc-button inline" @click.stop="addrow()">New</div>
+    </div>
+    <div v-if="savebtn" >
+       <div class="pkmvc-button inline" @click.stop="submit()">Save</div>
     </div>
     <div v-if="tbldata.foot" :class="footcls" v-html="tbldata.foot"></div>
     
@@ -895,24 +907,48 @@ window.Vue.component('resp-tbl', {
   //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
   props: ['tbldata'],
   methods: {
+    submit: function(ev) {
+      var fd = new FormData(this.$el);
+      var jqints = $(this.$el).find(':input');
+      jqints.each(function(idx, el) {
+        var $el = $(el);
+        fd.append($el.attr('name'), $el.val());
+      });
+      console.log ("This El:", this.$el,"The formdata to post:", fd, "jqints", jqints);
+
+      //var url = this.formopts.url; 
+      var me = this;
+      axios.post(this.savebtn.url, fd).then(response=> {
+        console.log("The response was:", response);
+      });
+    },
     addrow: function() {
       //var lblrow = Object.assign({},this.rowdataarr[this.rowdataarr.length-1]);
-      var lblrow = _.cloneDeep(this.rowdataarr[this.rowdataarr.length-1]);
-      console.log("ADD ROW lblrow:",lblrow);
-      /*
-      lblrow.celldataarr.forEach(function(celldata, idx) {
-        celldata.field = null;
+      //var cnt = this.rowdataarr.length-1;
+      var cnt = this.tbldata.rowdataarr.length-1;
+      var lblrow = _.cloneDeep(this.rowdataarr[0]);
+      lblrow.celldataarr.forEach(function(celldata,idx) {
+        celldata.field = celldata.field.replace(/__CNT_TPL__/g, cnt-1);
       });
-      */
+      lblrow.rowinfo.cnt = cnt-1;
       lblrow.rowinfo.islbl=false;
       lblrow.rowinfo.new=false;
       console.log("ADD ROW lblrow:",lblrow);
-
       this.tbldata.rowdataarr.push(lblrow);
     },
   },
 
   computed: {
+    savebtn: function() {
+      var savebtn = this.tbldata.savebtn;
+      if (!savebtn) {
+        return null;
+      }
+      return {
+        url: savebtn.url || '/ajax/save',
+      }
+
+    },
     newbtn: function() {
       if (!this.tbldata.newbtn) {
         return null;

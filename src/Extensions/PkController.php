@@ -239,6 +239,7 @@ abstract class PkController extends Controller {
       }
      */
     $data = Request::all();
+    //pkdebug("processSubmit POST data:", $data, "pkmodel:", $pkmodel);
     if ($pkmodel instanceOf PkModel) {
       if (is_array($inits))
           foreach ($inits as $key => $val) {

@@ -114,7 +114,7 @@ trait PkJsonConverter {
       $first = reset($celldata);
       if (array_key_exists('label',$first)) {
         if (keyVal('new',$rowinfo)) {
-          $newrow = static::mkRowData(['display'=>$celldata+['delete'=>$delete]]
+          $retarr[] = static::mkRowData(['display'=>$celldata+['delete'=>$delete]]
               ,$celldata,$rowinfo);
           unset($rowinfo['new']);
         }
@@ -136,7 +136,7 @@ trait PkJsonConverter {
       $retarr[] = static::mkRowData($mdldtm,$celldata,$rowinfo);
       $rowinfo['cnt']++;
     }
-    $retarr[] = $newrow;
+    //$retarr[] = $newrow;
     return $retarr;
     
   }
@@ -154,8 +154,8 @@ trait PkJsonConverter {
   public static function mkRowData($atts,$celldata=[],$rowinfo=[]) {
     $celldataarr = [];
     $id = keyVal('id',$atts);
-    $classname=keyVal('classname',$atts);
     $isnew = keyVal('new',$rowinfo);
+    $classname=keyVal('classname',$atts,keyVal('classname',$rowinfo));
     foreach ($atts['display'] as $key => $val) {
       if (keyVal('islbl',$rowinfo)) {
         $val = keyVal('label',$atts['display'][$key]);
@@ -169,14 +169,19 @@ trait PkJsonConverter {
       //pkdebug("Atts:",$atts,"celldata", $celldata);
       $input = keyVal('input',$celldata[$key]);
       if ($input) {
-        $cnt = keyVal('cnt',$rowinfo,0);
+        if ($isnew) {
+          $cnt='__CNT_TPL__';
+        } else {
+          $cnt = keyVal('cnt',$rowinfo,0);
+        }
         $name = keyVal('relation',$rowinfo)."[$cnt][$key]";
         $placeholder = keyVal('placeholder',$celldata[$key],
             keyVal('label',$celldata[$key]));
         if ($isnew) {
           $val=null;
         }
-        $val = "<input type='$input' value='$val' name='$name'placeholder='$placeholder'/>";
+        $val = "<input class='rt-inp' type='$input' value='$val' name='$name'
+          placeholder='$placeholder'/>";
       }
       if (keyVal('islbl',$rowinfo)) {
         $val = keyVal('label',$atts['display'][$key]);
