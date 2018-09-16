@@ -485,6 +485,44 @@ CVue.component('message-btn', {
   }
 });
 
+/** AJAX delete button for PkModels
+ * @props params
+ *   classname - required
+ *   id - required
+ *   btncls - default: btn-cls
+ *   url - default: /ajax/delete
+ *   cascade - default: false
+ *   delfromdom - ??
+ */
+Vue.component('delete-btn', {
+  name: 'delete-btn',
+  template: `
+   <button :class="btncls"
+      @click.stop="del()">
+      Delete</button>
+`,
+  props:['params'],
+  computed: {
+    btncls: function (){return this.params.btncls || " btn-cls ";},
+  },
+  methods: {
+    del: function() {
+      var url = this.params.url || "/ajax/delete";
+      var params = {
+        model: this.params.classname,
+        id: this.params.id,
+        cascade: this.params.cascade,
+      };
+      axios.post(url,params).then(response=> {
+        console.log("\nDelete Success w. response:\n", response);
+      }).catch(error=>{
+        console.log("\nDelete Failed w. error:\n", error);
+      });
+        
+    },
+  }
+}); 
+
 
 /********************  Reactive Tables ************************/
 
@@ -644,6 +682,11 @@ window.Vue.component('responsive-table', {
       fldcls: Field CSS Class
       cellcls: Cell CSS (if small viewport, so includes both label & field
   'rowinfo' - object w. whole-row data:
+      delete: {Required: classname: model, id:id 
+          optional: url:'/ajax/delete", btncls:'btn-cls', cascade:false,
+          delfromdom:??  -- all other celldata opts
+
+
       celldefs: object with default values for each cell, if not given  
       rowcls: The CSS class of the row
       islbl: Is a lable row?
@@ -659,16 +702,21 @@ window.Vue.component('responsive-table', {
 window.Vue.component('resp-row', {
   name: 'resp-row',
   template: `
-  <div :class="rowinfo.rowcls + show_bg_flex_lbl">
-  <div v-for="(celldata,idx) in cmp_celldataarr" :class="celldata.cellcls">
-     <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
-     <div :class="celldata.fldcls" v-html="celldata.field"></div>
-  </div>
+  <div :class="rowcls + show_bg_flex_lbl">
+    <div v-for="(celldata,idx) in cmp_celldataarr"
+        :class="celldata.cellcls" :style="celldata.cellstyle">
+      <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
+      <div :class="celldata.fldcls" v-html="celldata.field"></div>
+    </div>
+    <div v-if="del" :class="del.cellcls" :style="del.cellstyle">
+       <delete-btn :params="del"></delete-btn>
+    </div>
   
   </div>
   `,
   props: ['celldataarr','rowinfo', 'bp'],
   computed: {
+    rowcls: function() {return this.rowinfo.rowcls || ' rt-rowcls ';},
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
     show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
@@ -678,12 +726,55 @@ window.Vue.component('resp-row', {
       } else {
         return " ";
       }
+    },
+    del: function() {
+      var del = this.rowinfo.delete;
+      if (!del) {
+        return false;
+      }
+      var celldatadefs = this.celldefaults();
+      var deldata = Object.assign({},celldatadefs,this.rowinfo.celldefs, del);
+      return deldata;
+    },
+    cmp_celldataarr: function() {
+      var celldatadefs = this.celldefaults();
+      var dataarr = [];
+      var me = this;
+      this.celldataarr.forEach(function(celldata, idx) {
+        dataarr.push(Object.assign({},celldatadefs, me.rowinfo.celldefs,celldata));
+      });
+      return dataarr;
+    },
+  },
+  methods: {
+    celldefaults: function() {
+      var cnt = this.celldataarr.length;
+      if (this.rowinfo.delete) {
+        cnt++;
+      }
+      var pc = 100/cnt;
+      var style = " flex-basis:"+pc+"%; ";
+      if (this.rowinfo.islbl) {
+        var fldclass = " rt-fldcls rt-lblcls ";
+      } else {
+        var fldclass = " rt-fldcls ";
+      }
+      
+      var celldatadefs = {
+        cellcls: " rt-cellcls ",
+        fldcls: fldclass,
+        lblcls: " rt-lblcls ",
+        rowcls: " rt-rowcls ",
+        cellstyle: style,
+      };
+      return celldatadefs;
     }
   },
 
   /** Mergin each cell object in the array with both the:
    * the passed rowinfo.celldefs object, AND the general component
    * cell default object. Priority in that order */
+  /*
   data: function() {
     var celldatadefs = {
       cellcls: " rt-cellcls ",
@@ -696,6 +787,7 @@ window.Vue.component('resp-row', {
       });
     return {cmp_celldataarr:dataarr};
   },
+  */
     /*
     clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
     clc_lbl_bg: function() {
@@ -723,6 +815,7 @@ window.Vue.component('resp-row', {
  *   
  */
 window.Vue.component('resp-tbl', {
+  name: 'resp-tbl',
 //CVue.component('responsive-table', {
   template: `
   <div :class='tblcls'>
@@ -737,6 +830,21 @@ window.Vue.component('resp-tbl', {
 `,
   //props: ['head', 'headcls', 'coldata', 'tbldata','tblcls'],
   props: ['tbldata'],
+  computed: {
+    rowdataarr: function() {
+      var rowdataarr = [];
+      var me = this;
+      this.tbldata.rowdataarr.forEach(function(rowdata,idx) {
+        rowdataarr.push(Object.assign({}, {rowinfo:me.tbldata.rowinfo},rowdata));
+      });
+      return rowdataarr;
+    },
+    bp: function() {return  this.tbldata.bp || "md";},
+    headcls: function() {return this.tbldata.headclass || "rt-headcls";},
+    tblcls: function() {return this.tbldata.tblclass || "rt-tblcls";},
+  }
+
+  /*
   data: function() {
     var rowdataarr = [];
     this.tbldata.rowdataarr.forEach(function(rowdata,idx) {
@@ -749,6 +857,7 @@ window.Vue.component('resp-tbl', {
       rowdataarr: rowdataarr,
     }
   },
+  */
   /*
   computed: {
     //Iterate over coldata & add defaults if they exist

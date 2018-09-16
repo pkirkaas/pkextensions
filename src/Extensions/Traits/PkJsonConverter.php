@@ -72,6 +72,7 @@ trait PkJsonConverter {
    * @param (idx or assoc) array $atts -
    * if indexed ['name','age','rank'], return values w/o labels
    * if assoc ['name'=>"Name", 'age'=>"Age",], keys are fields & values labels
+   * if assoc assoc: ['name'=>['label'=>"Name",'cellstyle'=>"flex-basis: 25%; ", 'age'=>"Age",], keys are fields & values labels
    * 
    * @return array of arrays of row data, as 
    * [['celldatarr'=>$celldataarr,'rowinfo'=>$rowinfo],..]
@@ -80,20 +81,53 @@ trait PkJsonConverter {
   public static function structForVueRespTbl($model,$atts=[]){
     if (is_array_idx($atts)) {
       $fields = $atts;
-      $labels=null;
+      $celldata=null;
+      $delete=null;
     } else if (is_array_assoc($atts)) {
+
+      $celldata = [];
+      foreach ($atts as $key => $val) {
+        if (is_string($val)) {
+          $celldata[$key]=['label'=>$val];
+        } else if (is_array_assoc($val) ) {
+          $celldata[$key]= $val;
+        } else if (is_bool($val)) {
+          $celldata[$key]= [$val];
+        } else {
+          throw new \Exception ("Invalid att");
+        }
+      }
+      $delete = unsetret($atts,'delete');
+      /*
+      if ($delete && is_scalar($delete)) {
+        $delete = ['delete'=>[$delete]];
+      }
+       * 
+       */
       $fields = array_keys($atts);
-      $labels = $atts;
     } else {
       throw new \Exception("Invalid atts");
     }
     $mdldata = static::modelsToAtts($model,['display'=>$fields]);
     $retarr = [];
-    if ($labels) {
-      $retarr[]=static::mkRowData($labels,[],['islbl'=>true]);
+    if ($celldata) {
+      $first = reset($celldata);
+      if (array_key_exists('label',$first)) {
+        $retarr[]=static::mkRowData($celldata,$celldata,['islbl'=>true]);
+      }
     }
     foreach ($mdldata as $mdldtm) {
-      $retarr[] = static::mkRowData($mdldtm['display'],$labels);
+      //pkdebug("mldtm:",$mdldtm);
+      if ($delete) {
+        if (is_scalar($delete)) {
+          $delete = [$delete];
+        }
+        $delete['classname']=$mdldtm['classname'];
+        $delete['id']=$mdldtm['id'];
+        $mdldtm['display']['delete'] = $delete;
+      }
+      pkdebug("mldtm:",$mdldtm);
+      $retarr[] = static::mkRowData($mdldtm['display'],$celldata);
     }
     return $retarr;
     
@@ -109,10 +143,20 @@ trait PkJsonConverter {
    *    'rowinfo'=>$rowinfo
    *   ]
    */
-  public static function mkRowData($atts,$labels=[],$rowinfo=[]) {
+  public static function mkRowData($atts,$celldata=[],$rowinfo=[]) {
     $celldataarr = [];
     foreach ($atts as $key => $val) {
-      $celldataarr[] = ['field'=>$val,'label'=>keyVal($key,$labels)];
+      if (keyVal('islbl',$rowinfo)) {
+        $val = keyVal('label',$atts[$key]);
+        //pkdebug("islbl DOES exist:", $rowinfo, "CellData:",$celldata,"VAL", $val);
+      } else {
+        //pkdebug("islbl does NOTTT exist:", $rowinfo);
+      }
+      if ($key === 'delete') {
+        $rowinfo['delete']=$val ;
+        continue;
+      }
+      $celldataarr[] = keyVal($key,$celldata,[]) + ['field'=>$val];
     }
     return ['celldataarr'=>$celldataarr, 'rowinfo'=>$rowinfo];
   }

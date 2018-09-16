@@ -78,7 +78,7 @@ abstract class PkAjaxController extends PkController {
   }
 
   public function jsonerror($resp = [], $status=500,
-      $headers=['HTTP/1.1 499 Custom AJAX Request Error Message'],
+      $headers=['HTTP/1.1 499 PkCustom AJAX Request Error Message'],
       $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
     if ($resp instanceOf \Exception) {
       $resp = $resp->__toString;
@@ -99,7 +99,12 @@ abstract class PkAjaxController extends PkController {
   public function error($msg = null) {
     //http_response_code(499);
     //http_response_code(401);
-    header('HTTP/1.1 499 Custom AJAX Request Error Message');
+    if (is_string($msg)) {
+      $custom_msg="PkAjax Error: ".$msg;
+    } else {
+      $custom_msg = "PkAjax Error";
+    }
+    header("HTTP/1.1 499 $custom_msg");
     if (!is_array($msg)) {
       $msg=['error'=>$msg];
     }
@@ -173,17 +178,22 @@ abstract class PkAjaxController extends PkController {
   }
 
   public function delete() { //Delete anything you own
-      return $this->error("You cant do that!");
+     // return $this->error("You cant do that!");
     $data = request()->all();
+    pkdebug("IN Ajax Delete, data:", $data);
     $model = keyVal('model', $data);
     $id = to_int(keyVal('id', $data));
     $cascade = keyVal('cascade', $data);
     $me = Auth::user();
     $item = $model::find($id);
+    pkdebug("Item:", $item);
+    /*
     if (!$me->owns($item)) {
       return $this->error("Can't delete that $model");
     }
+     */
     $item->delete($cascade);
+    pkdebug("It's gone?");
     return $this->jsonsuccess("Deleted");
   }
 
