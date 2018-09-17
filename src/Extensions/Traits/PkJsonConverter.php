@@ -67,6 +67,14 @@ trait PkJsonConverter {
     return $result;
   }
 
+
+  public static function structForVueRespTbl(
+      $model,$atts=[],$rowinfo=[], $tbldata = []) {
+    $tbldata['relation']=keyVal('relation',$rowinfo);
+    $tbldata['rowdataarr'] = static::structForVueRespRows($model, $atts, $rowinfo);
+    return ['tbldata'=>$tbldata];
+  }
+
   /* Structures model data for use in Vue resp-tbl
    * @param PkModel|PkModel array - $model 
    * @param (idx or assoc) array $atts -
@@ -76,6 +84,9 @@ trait PkJsonConverter {
    * 
    * @return array of arrays of row data, as 
    * [['celldatarr'=>$celldataarr,'rowinfo'=>$rowinfo],..]
+   * 
+   * !! if celldata.width is set, that column will get a fixed pixel width
+   * and the the others will share any extra
    * 
    */
   public static function structForVueRespRows($model,$atts=[],$rowinfo=[]){

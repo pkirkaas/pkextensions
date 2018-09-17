@@ -520,7 +520,7 @@ Vue.component('delete-btn', {
   computed: {
     btncls: function (){
       console.log("Btn class param:", this.params);
-      return this.params.btncls || " pkmvc-button inline ";},
+      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";},
   },
   methods: {
     del: function() {
@@ -795,7 +795,7 @@ window.Vue.component('resp-row', {
   props: ['celldataarr','rowinfo', 'bp'],
   computed: {
     id_name: function() {
-      console.log("This rowinfo:", this.rowinfo);
+      //console.log("This rowinfo:", this.rowinfo);
       return this.rowinfo.relation+'['+this.rowinfo.cnt+'][id]';
     },
     rowcls: function() {return this.rowinfo.rowcls || ' rt-rowcls ';},
@@ -826,6 +826,7 @@ window.Vue.component('resp-row', {
       }
       var celldatadefs = this.celldefaults();
       var deldata = Object.assign({},celldatadefs,this.rowinfo.celldefs, del);
+      deldata.cellstyle=" width: 50px; "
       return deldata;
     },
     cmp_celldataarr: function() {
@@ -833,19 +834,38 @@ window.Vue.component('resp-row', {
       var dataarr = [];
       var me = this;
       this.celldataarr.forEach(function(celldata, idx) {
+        if (celldata.width) {
+          celldata.cellstyle= " width:"+celldata.width+"px; ";
+        }
         dataarr.push(Object.assign({},celldatadefs, me.rowinfo.celldefs,celldata));
       });
+      console.log("In cmp_celldata, dataarr:", dataarr);
+
       return dataarr;
     },
   },
   methods: {
     celldefaults: function() {
-      var cnt = this.celldataarr.length;
+      var cnt = 0;
+      var offset = 0;
+      this.celldataarr.forEach(function(celldata,idx) {
+        console.log("In CellDefaults, celldata:",celldata);
+        if (celldata.width) {
+          offset += celldata.width;
+        } else {
+          cnt++
+        }
+      });
+      //var cnt = this.celldataarr.length;
       if ('delete' in this.rowinfo) {
-        cnt++;
+        //offset = " "+60/cnt+"px ";
+        offset += 60;
       }
+      console.log("after iter: cnt:",cnt,"offset",offset);
+      offset = " "+offset/cnt+"px ";
       var pc = 100/cnt;
-      var style = " flex-basis:"+pc+"%; ";
+      var style = " flex-basis: calc("+pc+"% - "+offset+"); ";
+      //var style = " flex-basis: "+pc+"%; ";
       if (this.rowinfo.islbl) {
         var fldclass = " rt-fldcls rt-lblcls ";
       } else {

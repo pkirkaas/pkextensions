@@ -24,26 +24,4 @@ use PkExtensions\PopAtts;
      */?>
     <title>{{SITE_NAME}}</title>
     <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
-    <!--
-    <link href="{{ asset('/mixed/css/app.css') }}" rel="stylesheet">
-    -->
-    <!--
-    <link href="{{ asset('/gulped/css/stylesheets.css') }}" rel="stylesheet">
-    <link href="{{ asset('/mixed/css/sassed.css') }}" rel="stylesheet">
-    -->
-      <?php /*
-    <script>
-      // Only Chrome & Opera pass the error object.
-      window.onerror = function (message, file, line, col, error) {
-        console.log(message, "from", error.stack);
-      };
-      // Only Chrome & Opera have an error attribute on the event.
-      window.addEventListener("error", function (e) {
-        console.log(e.error.message, "from", e.error.stack);
-      });
-    </script>
-       * 
-       */ ?>
-    <!--
-    -->
     {!!PopAtts::jsInit()!!}

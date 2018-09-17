@@ -5,16 +5,21 @@
 }
 .rt-inp {
   width: 100%;
+  padding-left: .5em;
+  background-color: rgba(255, 255, 200, 0.4);
+  border: solid #bbb 1px;
+  border-radius: 3px;
 }
 .rt-fldcls,
 .rt-lblcls {
   display: inline-block;
-  padding: .5em;
+  padding: .25em;
   text-align: center;
   font-weight: bold;
   color: blue;
   flex-grow: 1;
-  flex-basis: 50%;
+  flex-shrink: 1;
+  //flex-basis: 50%;
   align-self: stretch;
   overflow-y: auto;
   width: 100%;
@@ -22,6 +27,7 @@
 div .rt-lblcls {
   font-weight: bold;
   color: blue;
+  padding-bottom: 0;
 }
 .rt-fldcls {
   font-weight: normal;
@@ -36,8 +42,10 @@ div .rt-lblcls {
   color: white;
   text-align: center;
   padding: .5em;
+  font-size: larger;
+  font-weight: 600;
   border: solid #aaa 1px;
-  background-color: #bcf;
+  background-color: #88f;
 }
 
 .rt-rowcls {
@@ -55,8 +63,12 @@ div .rt-lblcls {
 }
 
 .rt-tblcls {
-  border: solid green 2px;
-  margin: 1em;
+  border: solid #bbb 1px;
+  border-radius: .5em;
+  /*
+  margin: .5em;
+  */
+  margin: 0;
   padding: 3px;
   display: flex;
   flex-direction: column;
