@@ -32,6 +32,8 @@ Vue.component('data-label-pair', {
  *   val: the value
  *   input: type of input: text, select, checkbox, etc
  *   inpparams: esp. for select
+ *     allownull: Can the select be empty? false|true|string
+ *     options: object of select opts {val:display, val:display...
  *   placeholder - opt
  *   inpcls - input css class - opt
  *   width: opt - width in px
@@ -187,7 +189,7 @@ window.Vue.component('resp-row', {
       <div :class="show_sm + ' '+ celldata.lblcls" v-html="celldata.label"></div>
       <div :class="celldata.fldcls" v-html="celldata.field"></div>
     </div>
-    <div v-if="del.id || del.delfromdom" :class="del.cellcls" :style="del.cellstyle">
+    <div v-if="del && (del.id || del.delfromdom)" :class="del.cellcls" :style="del.cellstyle">
        <delete-btn :params="del"></delete-btn>
     </div>
     <div v-else-if="del" :class="del.cellcls" :style="del.cellstyle"></div>

@@ -77,7 +77,17 @@ trait PkJsonConverter {
 
 
   public static function structForVueRespTbl(
-      $model,$atts=[],$rowinfo=[], $tbldata = []) {
+      $model,$atts=[],$rowinfo=[], $tbldata = [],$input=true) {
+    $input = keyVal('input',$tbldata,$input);
+    $rowinfo['input']=$input;
+    if (!$input) {
+      unset($tbldata['newbtn']);
+      unset($rowinfo['new']);
+    }
+    if(keyVal('newbtn',$tbldata) && $input) {
+      $rowinfo['new']=true;
+    }
+    $rowinfo['input']=$input;
     $tbldata['relation']=keyVal('relation',$rowinfo);
     $tbldata['rowdataarr'] = static::structForVueRespRows($model, $atts, $rowinfo);
     return ['tbldata'=>$tbldata];
@@ -98,6 +108,7 @@ trait PkJsonConverter {
    * 
    */
   public static function structForVueRespRows($model,$atts=[],$rowinfo=[]){
+    $input = keyVal('input', $rowinfo);
     if (is_array_idx($atts)) {
       $fields = $atts;
       $celldata=null;
@@ -132,18 +143,18 @@ trait PkJsonConverter {
     if ($celldata) {
       $first = reset($celldata);
       if (array_key_exists('label',$first)) {
-        if (keyVal('new',$rowinfo)) {
+        if (keyVal('new',$rowinfo) && $input) {
           $retarr[] = static::mkRowData(['display'=>$celldata+['delete'=>$delete]]
               ,$celldata,$rowinfo);
-          unset($rowinfo['new']);
         }
+        unset($rowinfo['new']);
         $retarr[]=static::mkRowData(['display'=>$celldata],$celldata,['islbl'=>true]);
       }
     }
     $rowinfo['cnt']=0;
     foreach ($mdldata as $mdldtm) {
       //pkdebug("mldtm:",$mdldtm);
-      if ($delete) {
+      if ($input && $delete) {
         if (is_scalar($delete)) {
           $delete = [$delete];
         }
@@ -171,6 +182,12 @@ trait PkJsonConverter {
    *   ]
    */
   public static function mkRowData($atts,$celldata=[],$rowinfo=[]) {
+    $input = keyVal('input',$rowinfo);
+    if (!$input) {
+      unset($rowinfo['new']);
+      unset($atts['display']['delete']);
+      unset($celldata['input']);
+    }
     $celldataarr = [];
     $id = keyVal('id',$atts);
     $isnew = keyVal('new',$rowinfo);
@@ -186,22 +203,27 @@ trait PkJsonConverter {
         continue;
       }
       //pkdebug("Atts:",$atts,"celldata", $celldata);
-      $input = keyVal('input',$celldata[$key]);
+
       if ($input) {
-        if ($isnew) {
-          $cnt='__CNT_TPL__';
-        } else {
-          $cnt = keyVal('cnt',$rowinfo,0);
+        $input = keyVal('input',$celldata[$key]);
+        if ($input) {
+          if ($isnew) {
+            $cnt='__CNT_TPL__';
+          } else {
+            $cnt = keyVal('cnt',$rowinfo,0);
+          }
+          $name = keyVal('relation',$rowinfo)."[$cnt][$key]";
+          $placeholder = keyVal('placeholder',$celldata[$key],
+              keyVal('label',$celldata[$key]));
+          if ($isnew) {
+            $val=null;
+          }
+          $val = "<input class='rt-inp' type='$input' value='$val' name='$name'
+            placeholder='$placeholder'/>";
         }
-        $name = keyVal('relation',$rowinfo)."[$cnt][$key]";
-        $placeholder = keyVal('placeholder',$celldata[$key],
-            keyVal('label',$celldata[$key]));
-        if ($isnew) {
-          $val=null;
-        }
-        $val = "<input class='rt-inp' type='$input' value='$val' name='$name'
-          placeholder='$placeholder'/>";
       }
+
+
       if (keyVal('islbl',$rowinfo)) {
         $val = keyVal('label',$atts['display'][$key]);
       }
