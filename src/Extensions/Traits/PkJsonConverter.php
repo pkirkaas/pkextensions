@@ -20,12 +20,16 @@ trait PkJsonConverter {
   
   public static $modeldata;//Assoc arr of fieldnames to values
   //Map of field names to values, done by modelToAtts
+
+  public static $tableflddefs;
   
   public static $modelfldfmts;// Array of fldnames to input defs, size, class, etc
   //Has to be done manually & individually crafted
 
   //$modeldata & modelfldfmts woven together
   public static $modelflddets;
+  public static $modelinstance;
+  public static $modelclass;
 
   /** 
    * Initializes the field names & values. Depends on implenting class to 
@@ -33,7 +37,23 @@ trait PkJsonConverter {
    * @param PkModel $model
    */
   public static function initModelInfo(PkModel $model) {
-    static::$modelfields = $model
+    static::$modeldata = $model->getTableFieldAttributes();
+    static::$modelfields = array_keys(static::$modeldata);
+    static::$tableflddefs = $model->getTableFieldDefs();
+    static::$modelinstance=$model;
+    static::$modelclass = get_class($model);
+
+    pkdebug(
+    "modeldata = ",
+    static::$modeldata,
+    "modelfields = ",
+    static::$modelfields,
+    "tableflddefs = ",
+    static::$tableflddefs,
+    "modelinstance=",
+    static::$modelinstance,
+    "modelclass = ",
+    static::$modelclass);
   }
 
   /** Makes either a select input component, or the display value for the val

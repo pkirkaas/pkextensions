@@ -632,22 +632,20 @@ class $createclassname extends Migration {
    */
   public function getTableFieldAttributes($key = null) {
     $attributeNames = $this->getAttributeNames();
+    if (!$key) {
+      $key = $attributeNames;
+    }
     //if ($this instanceof \App\Models\Borrower) pkdebug("AttributeNames:", $attributeNames);
-    $retarr = [];
     if (is_scalar($key)) {
       if (in_array($key, $attributeNames)) return $this->$key;
       else return null;
     } else if (is_array($key)) { #Return a assoc array of keys/values
+      $retarr = [];
       foreach ($key as $att) {
         if (in_array($att,$attributeNames,1)) {
           $retarr[$att]=$this->$att;
         }
       } 
-      return $retarr;
-    } else if (!$key) { #Return them all 
-      foreach ($attributeNames as $attributeName) {
-        $retarr[$attributeName] = $this->$attributeName;
-      }
       return $retarr;
     }
   }
@@ -1228,14 +1226,6 @@ class $createclassname extends Migration {
       return parent::getAttributeValue($key);
     }
 
-    /** Gets values for all attributenames in array - if empty,
-     * gets ALL attributes (flat from table) & values
-     * @param type $keys
-     */
-    public function getAttributeValues($keys=[]) {
-      if (!$keys) {
-        $keys = $this->
-    }
 
   public function __call($method, $args = []) {
     #First see if it's a dynamic method in this class...
