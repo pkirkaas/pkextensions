@@ -17,9 +17,9 @@
  *      name
  *    & paramaters necessary
  * */
-Vue.component('data-item',{
+window.Vue.component('data-item',{
   template: `
-    <div :class="class" :style="style" v-html="content"></div>
+    <div :class="itmcls" :style="style" v-html="content"></div>
   `,
   props: ['params'],
   computed: {
@@ -38,17 +38,17 @@ Vue.component('data-item',{
       return style + stylewidth;
     },
     itmcls: function() {
-      if (this.params.type === label) {
+      if (this.params.type === 'label') {
         return this.params.itmcls | " rt-lblcls ";
       } else {
-        return this.params.itmcls | " rt-valcls ";
+        return this.params.itmcls | " rt-fldcls ";
       }
     },
     content: function() {
       var input = this.params.input;
       var value = this.params.value || this.params.val;
       var map = this.params.map;
-      if ( this.params.type === label) {
+      if ( this.params.type === 'label') {
         return value;
       }
       if (!input) {
@@ -61,12 +61,14 @@ Vue.component('data-item',{
         if (typeof input === 'string') {//Just text inp, inp is name
           input = {
             type:"text",
-            name:this.params.input,
+            name: input,
             val: value,
           }
-        } else { // Has to be an object to have enough info
+        } else if (typeof input === 'object') {// Must be object to have enough info
           input.val = input.val || input.value || value;
           input.options = map;
+        } else {
+          throw "Input invalid type";
         }
         return Vue.buildInput(input);
       }
@@ -119,7 +121,7 @@ Vue.buildInput = function(params) {
   var placeholder = params.placeholder;
   var inpcls = params.inpcls + defcls ;
   var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
-          placeholder+'" '+ param.inpatts + ' ';
+          placeholder+'" '+ params.inpatts + ' ';
   var type = params.type;
   if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';

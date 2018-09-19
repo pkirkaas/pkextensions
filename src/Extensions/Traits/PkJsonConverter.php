@@ -2,12 +2,37 @@
 /*
  * Base trait to make it easier to structure to & from JSON responses,
  * possibly update objects, respond with the modified data, etc. 
+ * Builds data arrays for Vue components - tables, individual elements, for
+ * data input or display 
  * 
+ *DON'T FORGET TO CALL: 
+  static::initModelInfo(PkModel $model);
+  TO INITIALIZE WITH YOUR BASE MODEL
+ * 
+ * Then can make some base controls, value & labels, for Vue (& regular HTML)
+     mkLbl($lbl, $opts=[]) - makes a Vue label, formatted as in $opts
+ *   mkDefLbl($fld, $opts) - default label from field def, formatted as in $opts 
+     getInpCtl($fld,$opts=[],$input=true): Either input, or just data, formatted
+ * 
+ * All can be used with vue component 
+ *    <data-item :params="json_encode($res above)</data-item> 
+ *  
+ * The tables are used like:
+ * 
+  <div class="col-md-6" id="vueofficertbl">
+      <resp-tbl :tbldata="tbldata"></resp-tbl>
+  </div>
+ * 
+var officertbl = new  Vue({
+  el: '#vueofficertbl',
+  data: <?=json_encode($officertbl)?>,
+  });
  */
 
 namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
 use PkExtensions\PkRefManager;
+use PkForm;
 /**
  *
  * @author pkirkaas
@@ -88,37 +113,100 @@ trait PkJsonConverter {
     return $label;
   }
 
+  /**
+   * Just for Vue
+   */
+  public static function mkDefLbl($fld,$opts=[]) {
+    $lbl = static::getFldLbl($fld);
+    return static::mkLbl($lbl,$opts);
+  }
+
+  public static function mkLbl($lbl, $opts=[]) {
+    $opts['type']='label';
+    $opts['value']=$lbl;
+    return $opts;
+  }
+
   /** Make an input control from the field name & def & opts
    * @param string $fld - the field to make a ctrl for
    * @param assoc array $opts
    *   'target'=>string "vue"(default)|"html" - if vue, array else HTML String
    *   'label'=>boolean|string - if false, none, if true, from def, if string use that
+   *   'input'=>boolean|mixed - if true, default input, if string or array, custom,
+   *       if false, just display data. Still have to work for selects, though
    *@return array for Vue or HTML String for direct display
    */
-  public static function getInpCtl($fld,$opts=[]) {
+  public static function getInpCtl($fld,$opts=[], $input = true) {
     $vue = 'html' !== keyVal('target',$opts);
     if ($vue) {
       $target = [];
     } else {
       $target = "\n";
     }
+    $input = keyVal('input',$opts,$input);
+    unset($opts['input']);
     $def = static::$tableflddefs[$fld];
     $val = keyVal($fld,static::$modeldata);
     $display = keyVal('display',$def);
     if (is_array($display)) {
       $ref = keyVal('ref', $display);
+    } else {
+      $ref = null;
     }
-    $type = keyVal('type',$def);
-    if ($ref) {
+    if (!$input) {
+      if ($ref) {
+        $val = keyVal($val,$ref::getKeyValArr());
+      }
       if ($vue) {
-        $target = [
-          
-      $input='select';
-      $ref::
-      
+        return [
+          'value'=>$val,
+          'type'=>'datum'
+          ] + $opts;
+      } else { #html
+        return $val;
+      }
     }
-
-
+    //$fldtype = keyVal('type',$def);
+    if ($ref) { //It's a select
+      if ($vue) {
+        return [
+          'value'=>$val,
+          'type'=>'datum',
+          'map'=>$ref::getKeyValArr(),
+          'name'=>$fld,
+          'input'=>'select',
+          ] + $opts;
+      } else { #It's HTML - let's make it anyway...
+        return $ref::makeSelect($fld,true,$val);
+      }
+    } else { #Not a ref, so not a select. Get the input type:
+      $inptype = static::$typestoinp[$def['type']];
+      if (($inptype === 'boolean') || ($inptype === "checkbox")) {
+        if ($vue) {
+          return [
+            'name'=>$fld,
+            'value'=>$val,
+            'input'=>'boolean',
+          ] + $opts;
+        } else { #HTML String
+          return PkForm::boolean($fld, $val==1);
+        }
+      } else { # Whatever else
+        if ($vue) {
+          return [
+            'name'=>$fld,
+            'value'=>$val,
+            'input'=>$inptype,
+          ] + $opts;
+        } else { #HTML
+          if ($inptype === 'textarea') {
+            return PkForm::textarea($fld,$val);
+          } else { #Another kind of input
+            return PkForm::input($inptype, $fld, $val);
+          }
+        }
+      }
+    }
   }
 
   /** Makes either a select input component, or the display value for the val
