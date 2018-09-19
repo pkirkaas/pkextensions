@@ -31,6 +31,17 @@ trait PkJsonConverter {
   public static $modelinstance;
   public static $modelclass;
 
+  /*But fields that have 'display'=>'ref'=>....]] are selects */
+  public static $typestoinp = [
+      'string'=>'text',
+      'integer'=>'text',
+      'string'=>'text',
+      'date'=>'date',
+      'boolean'=>'checkbox',
+      'text'=>'textarea'
+      ];
+
+
   /** 
    * Initializes the field names & values. Depends on implenting class to 
    * provide the input types & definitions & labels
@@ -43,6 +54,7 @@ trait PkJsonConverter {
     static::$modelinstance=$model;
     static::$modelclass = get_class($model);
 
+    /*
     pkdebug(
     "modeldata = ",
     static::$modeldata,
@@ -54,6 +66,59 @@ trait PkJsonConverter {
     static::$modelinstance,
     "modelclass = ",
     static::$modelclass);
+     * 
+     */
+  }
+
+  public static function getFldLbl($fld) {
+    $def = static::$tableflddefs[$fld];
+    $display = keyVal('display', $def);
+    $label = '';
+    if (is_string($display)) {
+      $label = $display;
+    } else if (is_array($display)) {
+      $label= keyVal('label', $display);
+    }
+    if (!$display) {
+      $label = uc_first($fld);
+    }
+    if (!$label) {
+      $label = uc_first($fld);
+    }
+    return $label;
+  }
+
+  /** Make an input control from the field name & def & opts
+   * @param string $fld - the field to make a ctrl for
+   * @param assoc array $opts
+   *   'target'=>string "vue"(default)|"html" - if vue, array else HTML String
+   *   'label'=>boolean|string - if false, none, if true, from def, if string use that
+   *@return array for Vue or HTML String for direct display
+   */
+  public static function getInpCtl($fld,$opts=[]) {
+    $vue = 'html' !== keyVal('target',$opts);
+    if ($vue) {
+      $target = [];
+    } else {
+      $target = "\n";
+    }
+    $def = static::$tableflddefs[$fld];
+    $val = keyVal($fld,static::$modeldata);
+    $display = keyVal('display',$def);
+    if (is_array($display)) {
+      $ref = keyVal('ref', $display);
+    }
+    $type = keyVal('type',$def);
+    if ($ref) {
+      if ($vue) {
+        $target = [
+          
+      $input='select';
+      $ref::
+      
+    }
+
+
   }
 
   /** Makes either a select input component, or the display value for the val

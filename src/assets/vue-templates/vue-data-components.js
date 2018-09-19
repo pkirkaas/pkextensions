@@ -9,10 +9,12 @@
  *  value: 
  *  itmcls: CSS class
  *  width: opt - if int/intish, #px, if string, used as is
- *  
+ *  map: opt - val=>display - if input, select opts, 
  *  input: what kind & how to build it -
  *    if just string, assume type is 'text' & string is 'name' 
- *    otherwise, object with type (text, select, checkbox, etc)
+ *    otherwise, object with
+ *      type (text, select, checkbox, etc)
+ *      name
  *    & paramaters necessary
  * */
 Vue.component('data-item',{
@@ -43,20 +45,30 @@ Vue.component('data-item',{
       }
     },
     content: function() {
-      if (!this.params.input || this.params.type === label) {
-        return this.params.value;
-      } else { // Now have to build input
-        if (typeof this.params.input === 'string') {
-          var inpparams = {
+      var input = this.params.input;
+      var value = this.params.value || this.params.val;
+      var map = this.params.map;
+      if ( this.params.type === label) {
+        return value;
+      }
+      if (!input) {
+         if ( map) {
+            return map[value];
+          } else {
+            return value;
+          }
+      } else { // It is an input
+        if (typeof input === 'string') {//Just text inp, inp is name
+          input = {
             type:"text",
             name:this.params.input,
-            val: this.params.value
+            val: value,
           }
-        } else {
-          var inpparams = this.params.input;
-          inpparams.val = inpparams.val || inpparams.value || this.params.value;
+        } else { // Has to be an object to have enough info
+          input.val = input.val || input.value || value;
+          input.options = map;
         }
-        return Vue.buildInput(inpparams);
+        return Vue.buildInput(input);
       }
     }
   },
@@ -109,15 +121,15 @@ Vue.buildInput = function(params) {
   var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
           placeholder+'" '+ param.inpatts + ' ';
   var type = params.type;
-  if (reginptypes.indexOf(type) !== -1){
+  if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
   } else if (type === 'select') { // Need inpparams for select:
     //allownull: default: false - if string, the string display for empty
-    var allownull = params.inpparams.allownull === false ? false :
-            params.inpparams.allownull || true;
-    var options = params.inpparams.options;
+    var allownull = params.allownull === false ? false :
+            params.allownull || true;
+    var options = params.options;
     //options: object keyed by value=>display
-    var inp = '<select '+cmnatts + '>\n';
+    var inp = '\n<select '+cmnatts + '>\n';
     var selected = "";
     if (allownull) {
       if (!val) {
@@ -141,6 +153,8 @@ Vue.buildInput = function(params) {
     var checked = val===checkedval ? " checked " : "";
     inp += '<input type="checkbox" value="'+htmlEncode(checkedval)+'" '+checked+'/>\n';
     return inp;
+  } else if (type === 'textarea') { 
+    var inp = '\n<textarea '+cmnatts +'>'+val+'</textarea>\n';
   } else {
     throw "Unhandled input type ["+type+"]";
   }
