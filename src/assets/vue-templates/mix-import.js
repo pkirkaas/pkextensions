@@ -36,7 +36,7 @@ class pkVue extends Vue {constructor(arg){
     // Make a data function that initializes the keys to {}; for ajax
     //Keys should be an array. Maybe refactor to give structure.
     if (arg.keys) {
-      var mixin = {}
+      var mixin = {};
       mixin.data = {};
       for (var i=0 ; i<arg.keys.length ; i++) {
         mixin.data[arg.keys[i] ] = {};
@@ -86,6 +86,6 @@ window.pkVue = pkVue;
 //import PkShowimage from './app/resources/vue-components/pk-showimage.vue';
 import PkDragndrop from './pk-dragndrop.vue';
 import PkShowimage from './pk-showimage.vue';
-pk-showimage.vue
+pk-showimage.vue;
 window.Vue.component('pk-dragndrop',PkDragndrop);
 window.Vue.component('pk-showimage',PkShowimage);

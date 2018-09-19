@@ -196,7 +196,7 @@ const FormPopup = CVue.extend({
       this.destroy();
     },
     submit: function(event) {
-    },
+    }
   }
 });
 //Try making reusable inputs
@@ -210,7 +210,7 @@ CVue.component('text-input',{
   <div :class="wrapclass">
     <div :class="lblclass">{{label}}<input type="text" :value="value"
     :name="name" :class="inputclass" class='border bg-444' placeholder="Come on, Dish!"></div></div>`,
-  props:['lblclass', 'label', 'value','name','inputclass','wrapclass'],
+  props:['lblclass', 'label', 'value','name','inputclass','wrapclass']
 });
 
 
@@ -234,7 +234,7 @@ CVue.component('pk-input-arr',{
     }
   },
   methods: {
-  },
+  }
 
 });
 
@@ -249,7 +249,7 @@ window.Vue.component('pk-input',{
   `,
   props:['inpopt'],
   computed: {
-    type: function() {return this.inpopt.type || 'text';},
+    type: function() {return this.inpopt.type || 'text';}
   }
 });
 
@@ -264,7 +264,7 @@ CVue.component('pk-checkbox-arr', {
 `,
   props: ['inpopt'],
   created: function() {
-  },
+  }
 
 });
 
@@ -280,7 +280,7 @@ CVue.component('pk-select-arr', {
   </select>
     </div></div>
 `,
-  props: ['inpopt'],
+  props: ['inpopt']
 
 });
 
@@ -337,7 +337,7 @@ CVue.component('pk-input-form',{
 
     close: function(ev) {
       console.log("Cancelled Update");
-    },
+    }
 
   }
 });
@@ -391,7 +391,7 @@ CVue.component('profile-btn', {
       mxcolclass:this.colclass
     };
   },
-  props: ['profile','label','baseurl', 'tootik', 'btnclass','colclass'],
+  props: ['profile','label','baseurl', 'tootik', 'btnclass','colclass']
 });
 
 const ContactBody = CVue.extend ({
@@ -520,7 +520,7 @@ Vue.component('delete-btn', {
   computed: {
     btncls: function (){
       console.log("Btn class param:", this.params);
-      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";},
+      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";}
   },
   methods: {
     del: function() {
@@ -539,7 +539,7 @@ Vue.component('delete-btn', {
       var params = {
         model: this.params.classname,
         id: this.params.id,
-        cascade: this.params.cascade,
+        cascade: this.params.cascade
       };
       axios.post(url,params).then(response=> {
         if (delfromdom) {
@@ -549,8 +549,7 @@ Vue.component('delete-btn', {
       }).catch(error=>{
         console.log("\nDelete Failed w. error:\n", error);
       });
-        
-    },
+    }
   }
 }); 
 
@@ -569,7 +568,7 @@ Vue.component('new-btn', {
   computed: {
     btncls: function (){
       console.log("Btn class param:", this.params);
-      return this.params.btncls || " pkmvc-button inline ";},
+      return this.params.btncls || " pkmvc-button inline ";}
   },
   methods: {
     create: function() {
@@ -592,7 +591,7 @@ Vue.component('new-btn', {
       });
       */
         
-    },
+    }
   }
 }); 
 
@@ -634,7 +633,7 @@ window.Vue.component('responsive-column', {
   computed: {
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
-    show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";},
+    show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";}
     /*
     clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
     clc_lbl_bg: function() {
@@ -731,7 +730,7 @@ window.Vue.component('responsive-table', {
   methods: {
     cmpval: function(valname) { //Returns the 
     }
-  },
+  }
   });
 
 //////////////////  End Column Based Tables ///////////////
@@ -826,7 +825,7 @@ window.Vue.component('resp-row', {
       }
       var celldatadefs = this.celldefaults();
       var deldata = Object.assign({},celldatadefs,this.rowinfo.celldefs, del);
-      deldata.cellstyle=" width: 50px; "
+      deldata.cellstyle=" width: 50px; ";
       return deldata;
     },
     cmp_celldataarr: function() {
@@ -842,7 +841,7 @@ window.Vue.component('resp-row', {
       console.log("In cmp_celldata, dataarr:", dataarr);
 
       return dataarr;
-    },
+    }
   },
   methods: {
     celldefaults: function() {
@@ -853,7 +852,7 @@ window.Vue.component('resp-row', {
         if (celldata.width) {
           offset += celldata.width;
         } else {
-          cnt++
+          cnt++;
         }
       });
       //var cnt = this.celldataarr.length;
@@ -877,11 +876,11 @@ window.Vue.component('resp-row', {
         fldcls: fldclass,
         lblcls: " rt-lblcls ",
         rowcls: " rt-rowcls ",
-        cellstyle: style,
+        cellstyle: style
       };
       return celldatadefs;
     }
-  },
+  }
 });
 
 ///////////////////  Table that uses resp-rows above
@@ -955,7 +954,7 @@ window.Vue.component('resp-tbl', {
       lblrow.rowinfo.new=false;
       console.log("ADD ROW lblrow:",lblrow);
       this.tbldata.rowdataarr.push(lblrow);
-    },
+    }
   },
 
   computed: {
@@ -965,8 +964,8 @@ window.Vue.component('resp-tbl', {
         return null;
       }
       return {
-        url: savebtn.url || '/ajax/save',
-      }
+        url: savebtn.url || '/ajax/save'
+      };
 
     },
     newbtn: function() {
@@ -985,8 +984,8 @@ window.Vue.component('resp-tbl', {
     },
     bp: function() {return  this.tbldata.bp || "md";},
     headcls: function() {return this.tbldata.headclass || "rt-headcls";},
-    tblcls: function() {return this.tbldata.tblclass || "rt-tblcls";},
-  },
+    tblcls: function() {return this.tbldata.tblclass || "rt-tblcls";}
+  }
 
   });
 
@@ -1158,7 +1157,7 @@ CVue.component('tab', {
 
     mounted() {
         this.isActive = this.selected;
-    },
+    }
 });
 
 module.exports = PkVue;

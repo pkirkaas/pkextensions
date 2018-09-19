@@ -42,11 +42,12 @@ function offsetContent() {
  * @param {type} over
  * @returns {undefined}
  */
-function setundermenu(item, over) {
+//function setundermenu(item, over) {
+window.setundermenu = function(item, over) {
   over = over || 0;
   var top = 0;
   if ($(window).width() > over) {
     top =  $("nav.navbar.pk-top-menu.main-menu").outerHeight();
   }
   jQuerify(item).css('top', top);
-}
+};

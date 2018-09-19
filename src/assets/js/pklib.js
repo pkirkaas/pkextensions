@@ -117,7 +117,7 @@ $(function () {
           class: "btn-cancel",
         click: function () {
           $(this).dialog('destroy');
-        },
+        }
       }
     ]
   };
@@ -714,7 +714,7 @@ function deleteClosest(element, selector) {
  * @returns {Number}
  */
 function roundTo2Decimals(numberToRound) {
-  return Math.round(numberToRound * 100) / 100
+  return Math.round(numberToRound * 100) / 100;
 }
 
 /**
