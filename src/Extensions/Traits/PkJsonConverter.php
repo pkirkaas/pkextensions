@@ -14,6 +14,34 @@ use PkExtensions\PkRefManager;
  */
 trait PkJsonConverter {
   use UtilityMethodsTrait;
+  
+  public static $modelfields;//idx array of model field names
+  //Just the list of fields. Easy, but enter
+  
+  public static $modeldata;//Assoc arr of fieldnames to values
+  //Map of field names to values, done by modelToAtts
+  
+  public static $modelfldfmts;// Array of fldnames to input defs, size, class, etc
+  //Has to be done manually & individually crafted
+
+  //$modeldata & modelfldfmts woven together
+  public static $modelflddets;
+
+  /** 
+   * Initializes the field names & values. Depends on implenting class to 
+   * provide the input types & definitions & labels
+   * @param PkModel $model
+   */
+  public static function initModelInfo(PkModel $model) {
+    static::$modelfields = $model
+  }
+
+  /** Makes either a select input component, or the display value for the val
+   * 
+   */
+  public static function mkSelect($ref,$val,$input=true, $forvue=true) {
+  }
+
   /**
    * Takes a PkModel or array of PkModels, and a keyed array of attribute types
    * to indexed arrays of attribute names.
@@ -27,11 +55,6 @@ trait PkJsonConverter {
    * @return complex array with the requested info
    */
 
-  /** Makes either a select input component, or the display value for the val
-   * 
-   */
-  public static function mkSelect($ref,$val,$input=true, $forvue=true) {
-  }
 
 
   public static function modelsToAtts($model, $atts=[]) {
@@ -75,7 +98,33 @@ trait PkJsonConverter {
     return $result;
   }
 
+  ///////////  Below for rows of 1-1 - name, ssn, address...(input & display) ////
 
+  /**
+   * 
+   * @param idx array $rowdata array of row items - labels & fields
+   *   ['type'=>'label'|'datum',
+   *    'value'=>
+   *     // Different for fields & lbls
+   *     (if fld) 'name'=>$name, 'value'=>$val, 'inptype'=>text|checkbox|select, etc
+   *     inp
+   * @param type $input
+   */
+  static function mkRow($rowdata,$input=true) {
+    $resarr = [];
+    foreach ($rowdata as $key => $item) {
+      if (!$input) {
+        unset($item['input']);
+      }
+      $resarr[] = $item;
+    }
+    return $resarr;
+  }
+
+
+
+
+  /////////////////   Below for Tables (1 to many) of data (input & display)
   public static function structForVueRespTbl(
       $model,$atts=[],$rowinfo=[], $tbldata = [],$input=true) {
     $input = keyVal('input',$tbldata,$input);

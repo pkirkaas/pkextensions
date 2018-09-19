@@ -626,22 +626,30 @@ class $createclassname extends Migration {
 
   /** Gets only the table field attribute or attributes - eg, ->user_id, but not
    * a User model instance. If $key not defined, just return nulls.
-   * @param string|null $key - the table field name, or null for all
+   * @param string|array|null $key - the table field name, or null for all
    * @return scalar|null|array - if $key given, the value (or null) - if 
    * no $key, an array of the table field names => values. 
    */
   public function getTableFieldAttributes($key = null) {
     $attributeNames = $this->getAttributeNames();
     //if ($this instanceof \App\Models\Borrower) pkdebug("AttributeNames:", $attributeNames);
-    if ($key) {
+    $retarr = [];
+    if (is_scalar($key)) {
       if (in_array($key, $attributeNames)) return $this->$key;
       else return null;
+    } else if (is_array($key)) { #Return a assoc array of keys/values
+      foreach ($key as $att) {
+        if (in_array($att,$attributeNames,1)) {
+          $retarr[$att]=$this->$att;
+        }
+      } 
+      return $retarr;
+    } else if (!$key) { #Return them all 
+      foreach ($attributeNames as $attributeName) {
+        $retarr[$attributeName] = $this->$attributeName;
+      }
+      return $retarr;
     }
-    $retarr = [];
-    foreach ($attributeNames as $attributeName) {
-      $retarr[$attributeName] = $this->$attributeName;
-    }
-    return $retarr;
   }
 
   public function hasTableField($fieldName) {
@@ -1218,6 +1226,15 @@ class $createclassname extends Migration {
     public function getAttributeValue($key) {
       if (!$key) return null;
       return parent::getAttributeValue($key);
+    }
+
+    /** Gets values for all attributenames in array - if empty,
+     * gets ALL attributes (flat from table) & values
+     * @param type $keys
+     */
+    public function getAttributeValues($keys=[]) {
+      if (!$keys) {
+        $keys = $this->
     }
 
   public function __call($method, $args = []) {

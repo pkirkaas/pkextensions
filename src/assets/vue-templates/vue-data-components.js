@@ -3,6 +3,64 @@
  * Compose to make forms
  */
 
+/** Could be a label, or data field - if data-field, just display or input 
+ *@params: 
+ *  type: label, datum
+ *  value: 
+ *  itmcls: CSS class
+ *  width: opt - if int/intish, #px, if string, used as is
+ *  
+ *  input: what kind & how to build it -
+ *    if just string, assume type is 'text' & string is 'name' 
+ *    otherwise, object with type (text, select, checkbox, etc)
+ *    & paramaters necessary
+ * */
+Vue.component('data-item',{
+  template: `
+    <div :class="class" :style="style" v-html="content"></div>
+  `,
+  props: ['params'],
+  computed: {
+    type: function() {return this.params.type;},
+    style: function() {if (this.params.width) {
+      var style = this.params.style;
+      if (is_intish(this.params.width)) {
+        var width=this.params.width+'px ';
+      }
+      else if (typeof params.width === 'string')
+        var width = params.width;
+      }
+      if (typeof width === 'string') {
+        var stylewidth = ' width: '+width;
+      }
+      return style + stylewidth;
+    },
+    itmcls: function() {
+      if (this.params.type === label) {
+        return this.params.itmcls | " rt-lblcls ";
+      } else {
+        return this.params.itmcls | " rt-valcls ";
+      }
+    },
+    content: function() {
+      if (!this.params.input || this.params.type === label) {
+        return this.params.value;
+      } else { // Now have to build input
+        if (typeof this.params.input === 'string') {
+          var inpparams = {
+            type:"text",
+            name:this.params.input,
+            val: this.params.value
+          }
+        } else {
+          var inpparams = this.params.input;
+          inpparams.val = inpparams.val || inpparams.value || this.params.value;
+        }
+        return Vue.buildInput(inpparams);
+      }
+    }
+  },
+});
 
 Vue.component('data-label-pair', {
   name: 'data-label-pair',
