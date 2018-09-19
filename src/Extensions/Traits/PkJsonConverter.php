@@ -137,6 +137,8 @@ trait PkJsonConverter {
    *@return array for Vue or HTML String for direct display
    */
   public static function getInpCtl($fld,$opts=[], $input = true) {
+    $opts['name'] = $fld;
+    //pkdebug("opts:",$opts);
     $vue = 'html' !== keyVal('target',$opts);
     if ($vue) {
       $target = [];
@@ -193,6 +195,14 @@ trait PkJsonConverter {
         }
       } else { # Whatever else
         if ($vue) {
+          /*
+          pkdebug("About return:", [
+            'name'=>$fld,
+            'value'=>$val,
+            'input'=>$inptype,
+          ] + $opts);
+           * 
+           */
           return [
             'name'=>$fld,
             'value'=>$val,
@@ -384,7 +394,7 @@ trait PkJsonConverter {
         $delete['id']=$mdldtm['id'];
         $mdldtm['display']['delete'] = $delete;
       }
-      pkdebug("mldtm:",$mdldtm);
+      //pkdebug("mldtm:",$mdldtm);
       $retarr[] = static::mkRowData($mdldtm,$celldata,$rowinfo);
       $rowinfo['cnt']++;
     }
@@ -451,7 +461,6 @@ trait PkJsonConverter {
       }
       $celldataarr[] = keyVal($key,$celldata,[]) + ['field'=>$val];
     }
-    pkdebug("Actual celldataarr:", $celldataarr);
     return ['celldataarr'=>$celldataarr, 'rowinfo'=>$rowinfo];
   }
 }

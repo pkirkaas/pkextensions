@@ -45,7 +45,9 @@ window.Vue.component('data-item',{
       }
     },
     content: function() {
+      console.log("In Content - params:",this.params);
       var input = this.params.input;
+      var name = this.params.name;
       var value = this.params.value || this.params.val;
       var map = this.params.map;
       if ( this.params.type === 'label') {
@@ -60,8 +62,8 @@ window.Vue.component('data-item',{
       } else { // It is an input
         if (typeof input === 'string') {//Just text inp, inp is name
           input = {
-            type:"text",
-            name: input,
+            type: input,
+            name: name,
             val: value,
           }
         } else if (typeof input === 'object') {// Must be object to have enough info
@@ -113,16 +115,18 @@ Vue.component('data-label-pair', {
  *   inpatts: opt - arbitrary string of attributes to apply to the string
  */
 Vue.buildInput = function(params) {
+  console.log("Paramas", params);
   var reginptypes = ['text','password','color','date','datetime-local', 'email',
     'month', 'number', 'range', 'search', 'tel', 'time', 'url', 'week'];
   var defcls = " rt-inp ";
   var name = params.name;
   var val = params.val;
-  var placeholder = params.placeholder;
+  var placeholder = params.placeholder || '';
   var inpcls = params.inpcls + defcls ;
   var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
           placeholder+'" '+ params.inpatts + ' ';
   var type = params.type;
+  console.log("Build Input: params:",params,"cmnatts:",cmnatts);
   if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
   } else if (type === 'select') { // Need inpparams for select:
