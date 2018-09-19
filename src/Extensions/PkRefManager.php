@@ -49,6 +49,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
 /** See function getOptionList below for more option definition
   * makes a full select box control for the current reference item.
   @param $name - string or array of "select" attributes. If just string, assumed
+  @param boolean|string - is an empty option valid? If false, no, if true,
+ *    yes, but description is blank, if string, the string is desplayed for no value
   to be ['name'=>$name]
   @return - Render wrapped HTML select box for this refence class
   */
@@ -83,7 +85,12 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
 
     $ret = [];
     if ($null) {
-      $ret[]="<option>$null</option>\n";
+      if (!$current) {
+        $selected = ' selected '; 
+      } else {
+        $selected = ' ';
+      }
+      $ret[]="<option $selected>$null</option>\n";
     }
     foreach (static::$refArr as $key => $target) {
       if (is_array_indexed($target)) {

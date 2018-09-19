@@ -7,13 +7,13 @@
 
 namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkRefManager;
 /**
  *
  * @author pkirkaas
  */
 trait PkJsonConverter {
   use UtilityMethodsTrait;
-
   /**
    * Takes a PkModel or array of PkModels, and a keyed array of attribute types
    * to indexed arrays of attribute names.
@@ -26,6 +26,14 @@ trait PkJsonConverter {
    * 
    * @return complex array with the requested info
    */
+
+  /** Makes either a select input component, or the display value for the val
+   * 
+   */
+  public static function mkSelect($ref,$val,$input=true, $forvue=true) {
+  }
+
+
   public static function modelsToAtts($model, $atts=[]) {
     if (!$model || (is_arrayish($model) && !count($model))) {
       return [];
