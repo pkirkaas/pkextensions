@@ -116,16 +116,41 @@ trait PkJsonConverter {
   /**
    * Just for Vue
    */
-  public static function mkDefLbl($fld,$opts=[]) {
-    $lbl = static::getFldLbl($fld);
-    return static::mkLbl($lbl,$opts);
+  public static function mkDefLbl($fld,$opts=[], $extra=[]) {
+    $lbl = keyVal('label',$opts, static::getFldLbl($fld));
+    return static::mkLbl($lbl,$opts, $extra=[]);
   }
 
-  public static function mkLbl($lbl, $opts=[]) {
+  /**
+   * Make an array of data for a Vue label
+   * @param string $lbl - the label
+   * @param assoc array $opts - the standard options
+   * @param assoc array|string $extra - any values replace the values in $opts, EXCEPT
+   *   for 'itmcls' which is appended. If is string, assumed class
+   */
+  public static function mkLbl($lbl, $opts=[], $extra=[]) {
+    if ($extra) {
+      if (is_string($extra)) {
+        $extra = ['itmcls'=>$extra];
+      }
+      $extra['itmcls'] = keyVal('itmcls',$extra,' ').' '.keyVal('itmcls',$opts);
+      $opts = array_merge($opts, $extra);
+    }
     $opts['type']='label';
     $opts['value']=$lbl;
     return $opts;
   }
+
+  /** Makes an input array & label array, using the default label value, or what
+   * is in $lblopts.
+   * @return assoc array [$fld=>[array-fld-data], $fldlbl=>[array-label-data]] '
+   * Just add it to the rest of the array you return
+   */
+  public static function mkInpLblPair($fld,$fldopts=[],$fldextra=[],
+      $lblopts=[],$lblextra=[]) {
+    return [$fld=>static::mkInpCtl($fld,$fldopts,$fldextra),
+            "{$fld}lbl" => static::mkDefLbl($fld,$lblopts,$lblextra)];
+      }
 
   /** Make an input control from the field name & def & opts
    * @param string $fld - the field to make a ctrl for
@@ -134,9 +159,20 @@ trait PkJsonConverter {
    *   'label'=>boolean|string - if false, none, if true, from def, if string use that
    *   'input'=>boolean|mixed - if true, default input, if string or array, custom,
    *       if false, just display data. Still have to work for selects, though
+   *    'itmcls' is the css class of the input wrapper
+   *    'inpcls' is the css class of the input
+   * @param assoc array $extra - any values replace the values in $opts, EXCEPT
+   *   for 'itmcls' which is appended
    *@return array for Vue or HTML String for direct display
    */
-  public static function mkInpCtl($fld,$opts=[], $input = true) {
+  public static function mkInpCtl($fld,$opts=[], $extra=[], $input = true) {
+    if ($extra) {
+      if (is_string($extra)) {
+        $extra = ['itmcls'=>$extra];
+      }
+      $extra['itmcls'] = keyVal('itmcls',$extra,' ').' '.keyVal('itmcls',$opts);
+      $opts = array_merge($opts, $extra);
+    }
     $opts['name'] = $fld;
     //pkdebug("opts:",$opts);
     $vue = 'html' !== keyVal('target',$opts);
@@ -177,6 +213,7 @@ trait PkJsonConverter {
     }
     //$fldtype = keyVal('type',$def);
     if ($ref) { //It's a select
+      pkdebug("The Map:",$ref::getKeyValArr());
       if ($vue) {
         return [
           'value'=>$val,

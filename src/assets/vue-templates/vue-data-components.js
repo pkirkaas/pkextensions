@@ -65,10 +65,12 @@ window.Vue.component('data-item',{
             type: input,
             name: name,
             val: value,
+            options: map,
           }
         } else if (typeof input === 'object') {// Must be object to have enough info
           input.val = input.val || input.value || value;
           input.options = map;
+          console.log("In the component, map:", map);
         } else {
           throw "Input invalid type";
         }
@@ -115,7 +117,7 @@ Vue.component('data-label-pair', {
  *   inpatts: opt - arbitrary string of attributes to apply to the string
  */
 Vue.buildInput = function(params) {
-  console.log("Paramas", params);
+  //console.log("Paramas", params);
   var reginptypes = ['text','password','color','date','datetime-local', 'email',
     'month', 'number', 'range', 'search', 'tel', 'time', 'url', 'week'];
   var defcls = " rt-inp ";
@@ -126,18 +128,24 @@ Vue.buildInput = function(params) {
   var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
           placeholder+'" '+ params.inpatts + ' ';
   var type = params.type;
-  console.log("Build Input: params:",params,"cmnatts:",cmnatts);
+  //console.log("Build Input: params:",params,"cmnatts:",cmnatts);
   if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
   } else if (type === 'select') { // Need inpparams for select:
-    //allownull: default: false - if string, the string display for empty
-    var allownull = params.allownull === false ? false :
-            params.allownull || true;
+    console.log("IN Bld Inp; Params:",params,'val',val);
+    //allownull: default: true - if string, the string display for empty
+    var allownull = params.allownull; //Trueish, falseish, or a string placeholder
+    if (allownull === undefined) {
+      allownull = true;
+    }
     var options = params.options;
     //options: object keyed by value=>display
     var inp = '\n<select '+cmnatts + '>\n';
     var selected = "";
     if (allownull) {
+      if (typeof allownull !== 'string') {
+        allownull='';
+      }
       if (!val) {
         selected = " selected ";
       }
@@ -145,7 +153,7 @@ Vue.buildInput = function(params) {
       selected = '';
     }
     for (var key in options) {
-      if (options[key] === val) {
+      if (key === val) {
         selected = " selected ";
       }
       inp += '  <option value="'+key+'" '+selected+'>'+options[key]+'</options>\n';
