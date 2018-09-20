@@ -167,6 +167,9 @@ containing block needs to be positioned relatively*/
 .align-flex-items-start {
   align-items: flex-start;
 }
+.h-flex { //Just to be consistent
+  display: flex;
+}
 .v-flex {
   display: flex;
   flex-direction: column;
@@ -174,6 +177,16 @@ containing block needs to be positioned relatively*/
 .f-center, .flex-center {
   display: flex;
   justify-content: center;
+}
+
+.fi-fixed {
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.fi-resize {
+  flex-grow: 1;
+  flex-shrink: 1;
 }
 
 .f-between, .flex-between {
@@ -396,6 +409,9 @@ div.error-popup-box.ui-dialog-content {
   white-space: pre-wrap;
 }
 
+
+/**************   HERE IS WHERE TO PUT ALL VARIED MEDIA SIZE OPTS ***********/
+
 //Try to make useful media size classes for all breakpoints
 //Using my mixins above-bp, below-bp, between-bps
 
@@ -404,6 +420,17 @@ div.error-popup-box.ui-dialog-content {
     @include below-bp($bp) {
       display: block !important;
       //display: block;
+    }
+  }
+  .d-block-within-below-#{$bp} {
+    @include below-bp($bp) {
+      flex-wrap: wrap !important;
+    }
+  }
+  .d-block-within-below-#{$bp} > div {
+    @include below-bp($bp) {
+      display: block !important;
+      width: 100% !important;
     }
   }
   .d-none-below-#{$bp} {

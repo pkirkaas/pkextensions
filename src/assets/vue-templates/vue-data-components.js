@@ -39,13 +39,13 @@ window.Vue.component('data-item',{
     },
     itmcls: function() {
       if (this.params.type === 'label') {
-        return this.params.itmcls | " rt-lblcls ";
+        return this.params.itmcls + " rt-lblcls ";
       } else {
-        return this.params.itmcls | " rt-fldcls ";
+        return this.params.itmcls + " rt-fldcls ";
       }
     },
     content: function() {
-      console.log("In Content - params:",this.params);
+      //console.log("In Content - params:",this.params);
       var input = this.params.input;
       var name = this.params.name;
       var value = this.params.value || this.params.val;
@@ -72,7 +72,7 @@ window.Vue.component('data-item',{
         } else {
           throw "Input invalid type";
         }
-        return Vue.buildInput(input);
+        return Vue.buildInput(Object.assign({},this.params,input));
       }
     }
   },

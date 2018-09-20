@@ -12,7 +12,7 @@ Font (N=-50 -> 50)
   Families: oswald, lato, roboto, open-sans, montserrat, raleway, droid-sans, s-sans-pro
 
 
-Div Dimensions:
+Div Dimensions: (Where N is 1/3rem; max 90N/30rem)
   hN, heightN, minhN, min-hN, min-heightN, maxhN, etc
   widthN, wN, minwN, minw-N, maxwN, maxw-N, min-widthN
 
@@ -59,10 +59,34 @@ Headings:
 
 Bunch of Avatar classes - in 'sitestyles'
 
+RESPONSIVE (for each bp):
+d-block-below-#{$bp} - display block below BP
+
+d-block-within-below-#{$bp} > div 
+d-block-within-below-#{$bp} 
+  //Better - put on the wrapping flex container, applies all divs within
+
+CAN COMBINE IN A ROW CONTAINING FIXED WIDTH LABEL & stretching inputs:
+<div class="h-flex d-block-within-below-md">
+  <div class="fi-fixed w60">...</div>
+  <div class="fi-resize">...</div>
+  <div class="fi-resize">...</div>
+</div>
+
+
+d-none-below-#{$bp} //Hide below
+
+
 Flexing:
+v-flex - flex, direction column
+h-flex - flex, normal, row
 flex-wrap - wraps contained flex items
 flex-center - tries to center everything
 flex-between: Evenly spaces content
+
+fi-XXX are flex-item classes
+fi-fixed: grow, shrink 0. Set a width as well.
+fi-resize: grow, shrink 1
 
 
 Fonts:

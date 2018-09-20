@@ -311,7 +311,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 /* Makes a bunch of left/right margins/paddings */
 //These are REM - so absolute across the site.
 @mixin mk-spacing {
-  @for $i from 0 through 75 {
+  @for $i from 0 through 90 {
     $sz: if($i!=0, -$i, 0);
     $offset: $i/3 * 1rem;
     $eoffset: $i/3 * 1em;
@@ -337,7 +337,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     .maxh#{$sz}, .maxh-#{$sz},   .max-height#{$sz} {max-height: $offset !important;}
     .width#{$sz}, .w#{$sz}  {width: $offset !important;}
     
-    .hw#{$sz}, .wh#{sz} {width: $offset !important; height: $offset !important;}
+    .hw#{$sz}, .wh#{$sz} {width: $offset !important; height: $offset !important;}
     .minw#{$sz}, .minw-#{$sz}, .min-width#{$sz} {min-width: $offset !important;}
     .maxw#{$sz}, .maxw-#{$sz}, .max-width#{$sz} {max-width: $offset !important;}
     //Paddings

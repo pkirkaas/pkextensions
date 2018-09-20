@@ -12,7 +12,7 @@
  * Then can make some base controls, value & labels, for Vue (& regular HTML)
      mkLbl($lbl, $opts=[]) - makes a Vue label, formatted as in $opts
  *   mkDefLbl($fld, $opts) - default label from field def, formatted as in $opts 
-     getInpCtl($fld,$opts=[],$input=true): Either input, or just data, formatted
+     mkInpCtl($fld,$opts=[],$input=true): Either input, or just data, formatted
  * 
  * All can be used with vue component 
  *    <data-item :params="json_encode($res above)</data-item> 
@@ -136,7 +136,7 @@ trait PkJsonConverter {
    *       if false, just display data. Still have to work for selects, though
    *@return array for Vue or HTML String for direct display
    */
-  public static function getInpCtl($fld,$opts=[], $input = true) {
+  public static function mkInpCtl($fld,$opts=[], $input = true) {
     $opts['name'] = $fld;
     //pkdebug("opts:",$opts);
     $vue = 'html' !== keyVal('target',$opts);
@@ -145,6 +145,12 @@ trait PkJsonConverter {
     } else {
       $target = "\n";
     }
+    $defaults = [
+        'placeholder'=>static::getFldLbl($fld),
+        'title'=>static::getFldLbl($fld),
+        ];
+  
+    $opts = $opts + $defaults;
     $input = keyVal('input',$opts,$input);
     unset($opts['input']);
     $def = static::$tableflddefs[$fld];
@@ -155,6 +161,7 @@ trait PkJsonConverter {
     } else {
       $ref = null;
     }
+    pkdebug("Fld Opts:", $opts);
     if (!$input) {
       if ($ref) {
         $val = keyVal($val,$ref::getKeyValArr());
