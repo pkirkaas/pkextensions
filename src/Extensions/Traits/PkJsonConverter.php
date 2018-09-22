@@ -263,11 +263,47 @@ trait PkJsonConverter {
     }
   }
 
-  /** Makes either a select input component, or the display value for the val
-   * 
-   */
-  public static function mkSelect($ref,$val,$input=true, $forvue=true) {
-  }
+
+
+
+
+/////////////////    Step out from this being tied to single model instance //////
+
+/**
+ * Makes jsonable arrays for vue to turn into tables (for input)
+ * @param assoc array $params
+ *   'tableinfo': about the table - classname, who does it belong to,
+       $classname - string, does it have New, Head, Foot, etc,
+ *  'rowinfo' - not related to indivudual fields/cells, but about the row in 
+ *       general - does it have delete? 
+    'cellinfo'=>assoc arr of field names to all the info
+ *           we need about THAT CELL TYPE - input type, formatting, label, etc.
+ *           NOT the values
+ *   'atts' - indx array of assoc arrays of fldnm=>value
+ */
+public static function mkVueTbl($params=[]) {
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   /**
    * Takes a PkModel or array of PkModels, and a keyed array of attribute types
@@ -450,7 +486,7 @@ trait PkJsonConverter {
   /**
    * Takes a single array of row cell data, & formats it for vue resp-row
    * @param array $atts - in the form ['fnm1'=>'val1', 'fnm2'=>'val2',...]
-   * @param array $labels - ['fnm1'=>'lbl1', 'fnm2'=>'lbl2',...]
+   * @param array $celldata - ['fnm1'=>['label'=>'lbl1','input'=>[.... 'fnm2'=>'lbl2',...]
    * @param array $rowinfo - for now, either empty or ['islbl'=>true]
    * @return assoc array:
    *   ['celldataarr'=>[['field'=>'val1','label'='lbl1'],['field'=>'val2', ...]],
@@ -494,8 +530,14 @@ trait PkJsonConverter {
           if ($isnew) {
             $val=null;
           }
+          #Let's say if field is string, the component just outputs it -
+          #but if object, constructs something from it
+          #$val comes from this specific row/entry, but $celldata is about
+          #all these types of cells - so it has input type, options if select,
+          # etc. $val just comes from this $att.
           $val = "<input class='rt-inp' type='$input' value='$val' name='$name'
             placeholder='$placeholder'/>";
+          //$val = static::
         }
       }
 

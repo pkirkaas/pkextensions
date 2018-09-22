@@ -12,9 +12,10 @@ Font (N=-50 -> 50)
   Families: oswald, lato, roboto, open-sans, montserrat, raleway, droid-sans, s-sans-pro
 
 
-Div Dimensions: (Where N is 1/3rem; max 90N/30rem)
-  hN, heightN, minhN, min-hN, min-heightN, maxhN, etc
+Div Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
+  h-N, height-N, minh-N, min-h-N, min-heightN, maxhN, etc
   widthN, wN, minwN, minw-N, maxwN, maxw-N, min-widthN
+
 
 min-line-height - empty div minimum 1 line height
 
