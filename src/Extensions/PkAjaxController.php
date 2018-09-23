@@ -48,68 +48,68 @@ abstract class PkAjaxController extends PkController {
    * This way, we can set up automatic handlers if we like
    */
 
-    //return response()->json($data = [], $status = 200, array $headers = [], $options = 0);
-  public function jsonsuccess($resp = [], $status=200, $headers=[],
-      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES) {
-    if (!is_array($resp)) {
-      $resp=['msg'=>$resp];
-    }
-    $resp['status'] = keyVal('status',$resp,true);
-    //pkdebug("Success, resp:",$resp); 
-    return response()->json($resp, $status, $headers, $options);
-  }
+
+  ################  HAVE TO STANDARDIZE AJAX RESPONSES!  ############
   /**
+   * Laravel response()->json($data, $status, $headers, $options):
+     * @param  mixed  $data
+     * @param  int    $status
+     * @param  array  $headers
+     * @param  int    $options
    */
-  public function xjsonsuccess($msg = []) {
-    http_response_code(200); 
-    if (!is_array($msg)) {
-      if (!is_scalar($msg)) {
-        pkdebug("Bad Message:",$msg);
-        $msg=['success'=>'true', 'error'=>"Message Type"];
-      } else {
-        $msg=['data'=>$msg];
-      }
-    }
-    if (!is_array($msg)) {
-      pkdebug("Bad Message:",$msg);
-      $msg=['success'=>true, 'error'=>"Message Type"];
-    }
-    die(json_encode($msg,$this->jsonopts));
-  }
 
-  public function jsonerror($resp = [], $status=500,
-      $headers=['HTTP/1.1 499 PkCustom AJAX Request Error Message'],
-      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
-    if ($resp instanceOf \Exception) {
-      $resp = $resp->__toString;
+  /** Both ->success & ->error call jsonresponse, which returns Laravel/Symfony
+   * JSON response object
+   * 
+   * @param mixed $data - JSONABLE - appears as response.data: if string,
+   *    response.data: "string", else the json_encoded value
+   * @param int|string|boolean|array $status - default: 200/OK. If true, 200.
+   *    if false, 499. If int, that value. If array, [statusCode=>statusText]
+   * @param array $headers
+   * @param int|boolean $options - json_encode integer options. If true/1, make
+   * default JSON Opts as defined in UtilityMethodsTrait
+   * @return Laravel/Symfony Response Object - if Axios, if successful,
+   *   in then(response) : if error, in catch(error=>error.response) 
+   * {
+        data: The JSON encoded Response, or just string if just string
+        status: integer- the status
+        statusText: the status text (can customize as above)
+        config: object - Configuration, including XSRF token
+        request: the original request
+        headers: the response headers
     }
-    if (!is_array($resp)) {
-      $resp=['msg'=>$resp];
-    }
-    $resp['status'] = keyVal('status',$resp,false);
-    return response()->json($resp, $status, $headers, $options);
-  }
-
-    
-
-  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
-   * sets the response code to 499 - my custom error code, handled by jQuery
-   * @param string|array $msg
    */
-  public function error($msg = null) {
-    //http_response_code(499);
-    //http_response_code(401);
-    if (is_string($msg)) {
-      $custom_msg="PkAjax Error: ".$msg;
+  public function jsonresponse($data=null,$status=200,$headers=[],$options=true) {
+    if (($options === true) || ($options === 1)) { #Default JSON opts - PrettyPrint
+      $options = static::$jsonopts;
+    }
+    $statusText = false;
+    //header('content-type: application/json');
+    if ($status === true) {
+      $statusCode = 200;
+    } else if ($status === false) {
+      $statusCode = 499;
+    } else if (is_array($status)) { # [statusCode=>statusString]
+      $statusCode = key($status);
+      $statusText = $status[$statusCode];
     } else {
-      $custom_msg = "PkAjax Error";
+      $statusCode = $status;
     }
-    header("HTTP/1.1 499 $custom_msg");
-    if (!is_array($msg)) {
-      $msg=['error'=>$msg];
+    $response = response($data,$statusCode,$headers, $options);
+    if ($statusText) {
+      $response->setStatusCode($statusCode, $statusText);
     }
-    die(json_encode($msg));
+    return $response;
   }
+
+  public function success($data="",$status=200,$headers=[],$options=true) {
+    return $this->jsonresponse($data,$status,$headers,$options);
+  }
+
+  public function error($data='',$status=499,$headers=[],$options=true) {
+    return $this->jsonresponse($data,$status,$headers,$options);
+  }
+
 /** For Vue or JS or jQuery calls to request model attribute values to 
    * populate templates.
    * Params: 
@@ -170,11 +170,11 @@ abstract class PkAjaxController extends PkController {
       }
     }
     if (!$res) {
-      return $this->jsonsuccess([]);
+      return $this->success();
     }
     #$res should be a PKModel or PkCollection of PkModels
     //pkdebug("The Res Atts:",$res->getCustomAttributes());
-    return $this->jsonsuccess($res->getCustomAttributes());
+    return $this->success($res->getCustomAttributes());
   }
 
   public function delete() { //Delete anything you own
@@ -194,22 +194,24 @@ abstract class PkAjaxController extends PkController {
      */
     $item->delete($cascade);
     pkdebug("It's gone?");
-    return $this->jsonsuccess("Deleted");
+    return $this->success("Deleted");
   }
 
   /** Saves a PK Model & Relations
    * 
    */
+  /*
   public function save() {
     $data = request()->all();
     pkdebug("IN Ajax Save, data:", $data);
   }
+   * 
+   */
 
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
    * 
    */
   public function refinfo() {
-    $jsonopts = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS;
     $data = request()->all();
     $refclass = keyVal('refclass', $data); #Just the base Model name
     $namespace = keyVal('namespace', $data, "App\\References\\"); #Just the base Model name
@@ -220,8 +222,8 @@ abstract class PkAjaxController extends PkController {
     $json = json_encode($res, $jsonopts );
     $fail = static::json_error();
     if (!$fail) {
-      return $this->jsonsuccess($res);
-      return $this->jsonsuccess(['refs'=>$json]);
+      return $this->success($res);
+      //return $this->jsonsuccess(['refs'=>$json]);
     }
     return $this->error($fail);
   }
@@ -249,7 +251,7 @@ abstract class PkAjaxController extends PkController {
       $builder->$method(...$params);
     }
     $result = $builder->get()->getCustomAttributes();
-    return $this->jsonsuccess($result);
+    return $this->success($result);
   }
 
 
@@ -258,7 +260,7 @@ abstract class PkAjaxController extends PkController {
    */
   public function authenticate() {
   if ($me = Auth::user() ) { //Already logged in, return details
-    return $this->jsonsuccess(['user_id'=>$me->id]);
+    return $this->success(['user_id'=>$me->id]);
   } #Not logged in - do we have the credentials?
     $data = request()->all();
   }
@@ -276,6 +278,108 @@ abstract class PkAjaxController extends PkController {
      pkdebug("Uploaded: ", $uploaded);
      return $uploaded;
    }
+
+
+  ///////////////////  LEGACY ONLY!!!  Use Above going forward! //////////////////////
+  public function jsonsuccess($resp = [], $status=200, $headers=[],
+      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES) {
+    if (!is_array($resp)) {
+      $resp=['msg'=>$resp];
+    }
+    $resp['status'] = keyVal('status',$resp,true);
+    //pkdebug("Success, resp:",$resp); 
+    return response()->json($resp, $status, $headers, $options);
+  }
+  /**
+   */
+  public function xjsonsuccess($msg = []) {
+    http_response_code(200); 
+    if (!is_array($msg)) {
+      if (!is_scalar($msg)) {
+        pkdebug("Bad Message:",$msg);
+        $msg=['success'=>'true', 'error'=>"Message Type"];
+      } else {
+        $msg=['data'=>$msg];
+      }
+    }
+    if (!is_array($msg)) {
+      pkdebug("Bad Message:",$msg);
+      $msg=['success'=>true, 'error'=>"Message Type"];
+    }
+    die(json_encode($msg,$this->jsonopts));
+  }
+
+  public function jsonerror($resp = [], $status=500,
+      $headers=['HTTP/1.1 499 PkCustom AJAX Request Error Message'],
+      $options = JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS) {
+    if ($resp instanceOf \Exception) {
+      $resp = $resp->__toString;
+    }
+    if (!is_array($resp)) {
+      $resp=['msg'=>$resp];
+    }
+    $resp['status'] = keyVal('status',$resp,false);
+    return response()->json($resp, $status, $headers, $options);
+  }
+
+    
+
+  /** Some simple AJAX helpers */
+  public function ajax_header($args = null) {
+    header('content-type: application/json');
+  }
+
+  /** An AJAX controller just has to call $this->ajaxsuccess($msg);
+   * If it's a complicated msg, send an array; else a string. This
+   * will arrify it, json it, & die
+   * @param string|array $msg
+   */
+  public function ajaxsuccess($msg = []) {
+    if (!is_array($msg)) {
+      $msg=['success'=>$msg];
+    }
+      die(json_encode($msg));
+  }
+
+  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
+   * sets the response code to 499 - my custom error code, handled by jQuery
+   * @param string|array $msg
+   */
+  public function ajaxerror($msg = []) {
+    //http_response_code(499);
+    //http_response_code(401);
+    header('HTTP/1.1 499 Custom AJAX Request Error Message');
+    if (!is_array($msg)) {
+      $msg=['error'=>$msg];
+    }
+      die(json_encode($msg));
+  }
+
+
+  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
+   * sets the response code to 499 - my custom error code, handled by jQuery
+   * @param string|array $msg
+   */
+  /*
+  public function error($msg = null) {
+    //http_response_code(499);
+    //http_response_code(401);
+    if (is_string($msg)) {
+      $custom_msg="PkAjax Error: ".$msg;
+    } else {
+      $custom_msg = "PkAjax Error";
+    }
+    header("HTTP/1.1 499 $custom_msg");
+    if (!is_array($msg)) {
+      $msg=['error'=>$msg];
+    }
+    die(json_encode($msg));
+  }
+   * *
+   */
+
+/////////////////  END  LEGACY //////////////////
+
 }
 
 

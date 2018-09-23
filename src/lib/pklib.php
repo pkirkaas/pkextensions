@@ -216,6 +216,35 @@ function pkdebug() {
   //return (keyVal(0, $args));
 }
 
+/** Like pkdebug, except adds time of call & ms since last call, for
+ * performance debugging
+ */
+function pkdbgtm() { 
+  static $previous = 0;
+  if (!$previous) {
+    $previous = microtime(true); #float 
+  }
+  $current = microtime(true);
+  $diff = $current - $previous;
+  $msdiff = intval($diff * 1000);
+  $previous = $current;
+  $currsec = intval($current);
+  $currms = intval(($current - $currsec) * 1000);
+  $currsecstr = date("i:s",$currsec);
+  $currtmstr=$currsecstr.".".$currms;
+  $msgstr = "Called At: $currtmstr - $msdiff ms since last";
+
+  $args = func_get_args();
+  array_unshift($args,$msgstr);
+  $out = call_user_func_array("pkdebug_base", $args);
+  pkdebugOut($out);
+  return false;
+  
+
+  
+  
+}
+
 /** Take a stab to Try to get function/method/file this function was called from
  * Not always right because debug_backtrace is inconsistent.
  * Not top priority now - but useful for DB logging
@@ -342,6 +371,7 @@ function callingFrame($exclusions) {
 
 $starttime = 0;
 $startframe = [];
+
 function startTime($msg=null) {
   if (ne_string($msg)) {
     $msg = ['startmsg' => $msg];

@@ -132,7 +132,7 @@ abstract class PkModel extends Model {
 
     $closure = function () use ($prefix, $onlyrefs ) {
       $display_value_fields = static::getArraysMerged('display_value_fields');
-      pkdebug("Display value fields:", $display_value_fields);
+      //pkdebug("Display value fields:", $display_value_fields);
       if ($onlyrefs) {
         $refarr = [];
         foreach ($display_value_fields as $key => $value) {
@@ -140,7 +140,7 @@ abstract class PkModel extends Model {
             $refarr[$key] = $value;
           }
         }
-        pkdebug("Only refs, refarr:", $refarr);
+        //pkdebug("Only refs, refarr:", $refarr);
         return $refarr;
       }
       if (!$display_value_fields ||
@@ -432,7 +432,7 @@ abstract class PkModel extends Model {
         #index, for example, could be in "methods", with args, or just a value
         #in the def array
         $standaloneModifiers = ['primary','index','unique','nullable','unsigned','useCurrent',];
-        pkdebug("DefVals for $fieldName:",$defvals);
+        //pkdebug("DefVals for $fieldName:",$defvals);
         foreach($standaloneModifiers as $sam) {
           if (in_array($sam,$defvals,true) && !in_array($sam,$usedMethods,1)) {
             $methodChain.=  "->$sam()";
@@ -1636,7 +1636,7 @@ class $createclassname extends Migration {
   public function displayValue($fieldName) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
-    pkdebug ("refmaps", $refmaps, "cache:", static::$_cache);
+    //pkdebug ("refmaps", $refmaps, "cache:", static::$_cache);
     #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
     $rc = $refmaps[$fieldName];
     #$rc can be a String classname that implements PkDisplayValueInterface or a closure/runnable, OR

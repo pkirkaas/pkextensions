@@ -634,7 +634,7 @@ trait BuildQueryTrait {
         $query = $this->$customQueryMethod($query, $critset['crit'], $critset['val'], $critset['param']);
       }
     }
-    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
+    pkdbgtm("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
         "Query to SQL:", $query->toSql());
     return $query;
   }

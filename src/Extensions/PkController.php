@@ -390,6 +390,7 @@ abstract class PkController extends Controller {
   /**
    * THIS IS NOT AN ACTION - The route('error') should lead to an action, by 
    * default, the "displayerror" action below...
+   * NOTE: Overridden in PkAjaxController!
    * Redirects to error report page
    * @param string $msg - the error to report
    * @return Redirect Response
@@ -441,38 +442,6 @@ abstract class PkController extends Controller {
     if ($lc) return to_lower($controllerName);
     return $controllerName;
   }
-
-  /** Some simple AJAX helpers */
-  public function ajax_header($args = null) {
-    header('content-type: application/json');
-  }
-
-  /** An AJAX controller just has to call $this->ajaxsuccess($msg);
-   * If it's a complicated msg, send an array; else a string. This
-   * will arrify it, json it, & die
-   * @param string|array $msg
-   */
-  public function ajaxsuccess($msg = []) {
-    if (!is_array($msg)) {
-      $msg=['success'=>$msg];
-    }
-      die(json_encode($msg));
-  }
-
-  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
-   * sets the response code to 499 - my custom error code, handled by jQuery
-   * @param string|array $msg
-   */
-  public function ajaxerror($msg = []) {
-    //http_response_code(499);
-    //http_response_code(401);
-    header('HTTP/1.1 499 Custom AJAX Request Error Message');
-    if (!is_array($msg)) {
-      $msg=['error'=>$msg];
-    }
-      die(json_encode($msg));
-  }
-
   /**
    * Directly renders data into a PHTML template
    * Uses the same view paths as Blade, but assumes PHTML
