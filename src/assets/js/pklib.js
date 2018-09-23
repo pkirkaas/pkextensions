@@ -274,17 +274,17 @@ $(function () {
 
     var ajaxparamarr =['Model','Id','Modfield'];
     ajaxparamarr.forEach(function(element) {
-      console.log("In ForEach, element:",element);
+      //console.log("In ForEach, element:",element);
       ajaxdata[element.toLowerCase()] = data['param'+element];
     });
-    console.log("Ajax Data:",ajaxdata,"data",data);
+    //console.log("Ajax Data:",ajaxdata,"data",data);
     if (action==='get') {
       url = '/ajax/modelattributes';
     }
     window.axios.post(url,ajaxdata).
       then(response=>{
         var result = response.data[response.data.modfield];
-        console.log("Response data:",response.data,"Result:",result,"Format:", format);
+        //console.log("Response data:",response.data,"Result:",result,"Format:", format);
         $target.htmlFormatted(result,format);
       }).
       catch(error=>{
@@ -292,8 +292,11 @@ $(function () {
       });
               /*
     */
-    }
-  window.js_get_set_ajax($('.js-mod-ajax'),'get');
+    };
+  $('.js-mod-ajax').each(function(idx,el) {
+    window.js_get_set_ajax($(el),'get');
+  });
+  //window.js_get_set_ajax($('.js-mod-ajax'),'get');
   });
 /*
   $('body').on('click', '.js-mod-ajax', function (event) {
@@ -679,7 +682,7 @@ $(function () {
  */
 jQuery.fn.extend({
   htmlFormatted: function (content,format) {
-    console.log("In HTMLFormatted, content",content,"Format",format);
+    //console.log("In HTMLFormatted, content",content,"Format",format);
     //console.log("Formatters:", this.formatters);
     if (format) {
       var formatted = this.formatters[format](this,content,true);
@@ -698,7 +701,7 @@ jQuery.fn.extend({
   formatters: {
     currency: function (jqobj, content, force) {
       if (jqobj.hasClass('jq-format-currency') || force) {
-        console.log("In currency formatter, content:",content);
+        //console.log("In currency formatter, content:",content);
         var num = toNumber(content);
         if (isNaN(num)) {
           console.error('Invalid Number: ', content);
@@ -724,7 +727,7 @@ jQuery.fn.extend({
       return false;
     },
     checkbox: function(jqobj,content, force) {
-      console.log("In checkbox formatter, content:",content);
+      //console.log("In checkbox formatter, content:",content);
       if (jqobj.hasClass('jq-format-checkbox') || force) {
         if (content) {
           jqobj.html( '&#9745;');

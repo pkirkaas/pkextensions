@@ -486,10 +486,48 @@ trait BuildQueryTrait {
     //$newcol = $this->filterOnMethods($collection);
 
     $newcol = $this->filterOnMatch($collection);
+    $nnewcol = $this->filterOnClosures($newcol);
     //$sza = count($newcol);
     //pkdebug("SXA:  $sza");
-    return $newcol;
+    return $nnewcol;
   }
+
+
+  /**
+   * Just an indexed array of closures to run on the collection, simpler
+   * than filterOnMatch
+   * @var array 
+   */
+  public $closureFilters=[];
+  public function filterOnClosures($collection) {
+    if (method_exists($this,'buildClosureFilters')) {
+      $this->buildClosureFilters();
+    }
+    if (!$this->closureFilters) {
+      return $collection;
+    }
+    if ($this->closureFilters instanceOf \Closure) {
+      $this->closureFilters = [$this->closureFilters];
+    }
+    if (!is_array($this->closureFilters)) {
+      throw new PkException("Invalid Type for this->closureFilters:",
+          $this->closureFilters);
+    }
+    $cfrs = $this->closureFilters; 
+    $subcol = $collection->reject(function ($item) use ($cfrs) {
+      $failed = false;
+      foreach($cfrs as  $cfr) { #A Closure
+        if (!$cfr($item)) {
+          $failed = true;
+          break;  
+        }
+      }
+      return $failed;
+    });
+    return $subcol;
+  }
+
+
 
   /** Return an Eloquent Query Builder Instance for "property" comparisons, AND
    * should build a PkMatch filter for method comparisons, to be applied AFTER

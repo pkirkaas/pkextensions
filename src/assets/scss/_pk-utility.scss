@@ -43,8 +43,8 @@ $inner-border-spread: 1px !default;
 .italic { font-style: italic; }
 .bold { font-weight: bold ! important; }
 
-.float-left, .floatleft { float: left ! important; }
-.float-right, .floatrignt { float: right ! important; }
+.float-left, .floatleft, .fleft { float: left ! important; }
+.float-right, .floatright, .fright { float: right ! important; }
 
 .block { display: block ! important; }
 .inline { display: inline-block ! important; }
