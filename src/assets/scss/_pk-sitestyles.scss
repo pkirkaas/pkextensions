@@ -161,6 +161,14 @@ body div div form div select.pk-inp {
    }
 }
 
+.inp-dollar {
+  text-align: right;
+}
+/*
+.inp-dollar::before {
+  content: '$';
+}
+*/
 
 .pk-dollar-value {
   display: inline-block;

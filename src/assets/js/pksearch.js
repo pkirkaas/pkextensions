@@ -9,7 +9,7 @@
 
 
 $(function () {
-  disableDontCares();
+  //disableDontCares();
   $('body').on('change', 'form.search .search-crit', function (event) {
     var target = event.currentTarget;
     disableDontCare(target);
@@ -18,11 +18,19 @@ $(function () {
 });
 
 
+//console.log("After ready");
+$(window).on('load', function() {
+  console.log("Window loaded");
+  disableDontCares();
+});
+
 /** For all Search Criteria Controls that are set to "Don't Care", disable
  * matching Search Value control
  */
 function disableDontCares() {
   $('form.search .search-crit').each( function() {
+   // console.log("About to disable don't cares for ",this);
+
       disableDontCare(this);
   });
 }
@@ -33,6 +41,11 @@ function disableDontCares() {
  */
 function disableDontCare(target) {
   var paired_val_ctl = getCousins('.search-crit-val-pair','.search-val',target);
+  /*
+  if (!paired_val_ctl.length) {
+    return;
+  }
+  */
   var search_crit_val = $(target).val();
   // if (!search_crit_val) Doesn't work???
   if (search_crit_val == 0) {
@@ -42,12 +55,15 @@ function disableDontCare(target) {
     } else {
       $(paired_val_ctl).val('');
     }
+    console.log("Disable don't care for: ",paired_val_ctl);
+    $(paired_val_ctl).inputmask('remove');
     $(paired_val_ctl).attr('disabled',true);
     $(paired_val_ctl).attr('title','Select a criteria to enter a value');
     $(paired_val_ctl).addClass('disabled');
     $(paired_val_ctl).closest('div.multiselect').addClass('disabled');
     $(paired_val_ctl).closest('div.multiselect').attr('disabled',true);
     $(paired_val_ctl).removeClass('enabled');
+    $(paired_val_ctl).inputmask('remove');
   } else {
     $(paired_val_ctl).attr('title','');
     $(paired_val_ctl).attr('disabled',false);
@@ -55,6 +71,10 @@ function disableDontCare(target) {
     $(paired_val_ctl).closest('div.multiselect').removeClass('disabled');
     $(paired_val_ctl).closest('div.multiselect').attr('disabled',false);
     $(paired_val_ctl).addClass('enabled');
+    if ($(paired_val_ctl).hasClass('inputmask-dollars')) {
+      //console.log("Has class inputmask-dollars");
+      $(paired_val_ctl).inputmask('currency',{digits:0});
+    }
   }
 }
 
