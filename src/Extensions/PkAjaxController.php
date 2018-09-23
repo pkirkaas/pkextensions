@@ -22,28 +22,6 @@ abstract class PkAjaxController extends PkController {
     if (method_exists(get_parent_class(),'__construct')) {
       parent::__construct($args);
     }
-    $this->middleware(function ($request, $next) {
-      //pkdebug("The Request:",$request);
-      //pkdebug("No Request:",$request->toString());
-      $reqinfo=$request->toArray();
-      $reqinfo['url'] = $request->fullUrl();
-      pkdebug("Is Request Ajax?",$request->is('ajax'),"ReqInfo:",$reqinfo);
-          return $next($request);
-    });
-    #Add generic AJAX exception handling
-    /*
-    $this->middleware(function ($request, $next) {
-        try {
-          return $next($request);
-        } catch (\Exception $e) {
-          $data = request()->all();
-          $data += ['error'=>'exception', 'exception'=>$e->getMessage()];
-          return $this->error($data);
-        }
-    });
-     * 
-     */
-    //pkdebug("This App:", app());
     $this->data = request()->all();
     if (class_exists('App\Models\User')) {
       $this->me = Auth::user();
@@ -139,6 +117,44 @@ abstract class PkAjaxController extends PkController {
 
   public function error($data='',$status=499,$headers=[],$options=true) {
     return $this->jsonresponse($data,$status,$headers,$options);
+  }
+
+  /** Toggles a PkModel boolean field
+   * @param id = the instance ID
+   * @param model = the model class
+   * @param modfield - the field to toggle
+   * @return - the instance attributes, with $instance[togglefield] = $togglefield;
+   */
+  public function toggle() {
+    $model = $this->data['model'];
+    $id = $this->data['id'];
+    $modfield =  $this->data['modfield'];
+    $instance = $model::find($id);
+    $instance->$modfield = !$instance->$modfield;
+    $instance->save();
+    $instance->modfield = $modfield;
+    return $this->success($instance);
+  }
+
+  /** 
+   * Sets an instance field (or array of fields?)
+   * @param id = the instance ID
+   * @param model = the model class
+   * @param modfield - the field to set
+   * @param value - the value to set it to
+   * @return - the instance attributes, with $instance[setfield] = $setfield;
+   * 
+   */
+  public function set() {
+    $model = $this->data['model'];
+    $id = $this->data['id'];
+    $modfield =  $this->data['modfield'];
+    $value = keyVal('value',$this->data,'');
+    $instance = $model::find($id);
+    $instance->$modfield = $value;
+    $instance->save();
+    $instance->modfield=$modfield;
+    return $this->success($instance);
   }
 
   /** Simpler than attributes (below) - just for 1 model, 1 instance, uses

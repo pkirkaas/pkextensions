@@ -240,6 +240,43 @@ $(function () {
     });
   });
 
+/**
+ * Sets or Toggles Field
+ * @param data-param-model - the model
+ * @param data-param-id - the ID
+ * @param data-param-modfield - the field to modify
+ * @param data-param-set - the value to set it to, or 'toggle' to toggle
+ * @param data-param-format - optional - how to display it?
+ *     Like checkbox or other formatting options
+ * @result - sets the HTML of the target to the value set
+ */
+  $('body').on('click', '.js-mod-ajax', function (event) {
+    var $target = $(event.target);
+    var data = $(event.target).data();
+    var set =  data.param-set;
+    if (set === 'toggle') {
+      var format = data.param-format || 'checkbox';
+      var url = '/ajax/toggle'
+      var ajaxdata = {};
+    } else {
+      var format = data.param-format;
+      var url = '/ajax/set'
+      var ajaxdata = {value:set};
+    }
+
+    var ajaxparamarr =['model','id','modfield'];
+    ajaxparamarr.forEach(function() {
+      ajaxdata[this] = data['param-'+this];
+    });
+    axios.post(url,ajaxdata).
+      then(response=>{
+        var result = response.data.modfield;
+        $target.htmlFormatted(result,format);
+      }).
+      catch(error=>{
+        console.error(error.response);
+      });
+  });
 
   /** This serves both creating multiple new instances before submitting when
    * itemcount is implemented, AND, just creating a single new instance from the
@@ -580,20 +617,34 @@ $(function () {
 });
 
 /**
- * Add some formatters to jQuery
+ * Add some formatters to jQuery - sets this.html
+ * to the formatted content
+ * The format can be explicitly set as the format param,
+ * OR, can be specified by this class
+ * @param content - the content to display
+ * @param format - opt - the formatter to use, else look for 
+ *   CSS class, like 'jq-format-currency'
+ * @result - sets this.html to the formatted content
  */
 jQuery.fn.extend({
-  htmlFormatted: function (content) {
+  htmlFormatted: function (content,format) {
     //console.log("Formatters:", this.formatters);
+    if (format) {
+      var formatted = this.formatters[format](this,content,true);
+      this.html(formatted);
+      return;
+    }
+
     for (var formatter in this.formatters) {
       if (this.formatters[formatter](this, content))
         return true;
     }
     this.html(content);
+    return;
   },
   formatters: {
-    currency: function (jqobj, content) {
-      if (jqobj.hasClass('jq-format-currency')) {
+    currency: function (jqobj, content, force) {
+      if (jqobj.hasClass('jq-format-currency') || force) {
         var num = toNumber(content);
         if (isNaN(num)) {
           console.error('Invalid Number: ', content);
@@ -617,6 +668,16 @@ jQuery.fn.extend({
         return true;
       }
       return false;
+    },
+    checkbox: function(jqobj,content, force) {
+      if (jqobj.hasClass('jq-format-checkbox') || force) {
+        if (content) {
+          jqobj.html( '&#9745');
+        } else {
+          jqobj.html( '&#9744;');
+        }
+        return true;
+      }
     }
   },
   addFormatter: function (name, formatter) {

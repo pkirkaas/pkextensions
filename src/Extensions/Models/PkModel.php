@@ -734,6 +734,7 @@ class $createclassname extends Migration {
     return static::instantiated($this);
   }
 
+
   /**
    * Checks to see if the $arg is instantiated and the same instance of this obj.
    * Ridiculous this is not built in...
