@@ -56,7 +56,7 @@ function disableDontCare(target) {
     } else {
       $(paired_val_ctl).val('');
     }
-    console.log("Disable don't care for: ",paired_val_ctl);
+    //console.log("Disable don't care for: ",paired_val_ctl);
     paired_val_ctl.inputmask('remove');
     $(paired_val_ctl).inputmask('remove');
     $(paired_val_ctl).attr('disabled',true);

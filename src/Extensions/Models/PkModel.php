@@ -404,7 +404,14 @@ abstract class PkModel extends Model {
         $methods = keyval('methods', $def, []);
         $fielddef = "$spaces\$table->$type('$fieldName'$type_args)";
         if ($comment) $fielddef .= "->comment(\"$comment\")";
-        if ($default!==null) $fielddef .= "->default($default)";
+        if ($default!==null) {
+          if ($default === false) {
+            $default = 0;
+          } else if ($default === true) {
+            $default=1;
+          }
+          $fielddef .= "->default($default)";
+        }
         if (is_string($methods)) {
           //Try this instead to normalize - 4 May 2017
           $methods=[$methods];

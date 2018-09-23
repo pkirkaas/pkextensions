@@ -250,7 +250,7 @@ $('body').on( {
         console.error("Failed to get encdata for ["+model+']['+id+']: Got:', encdata);
         return false;
       }
-      console.log("EncData:",encdata);
+      //console.log("EncData:",encdata);
       dlg = buildHoverDetailDialog(dlgHtml, encdata);
       if (!dlg) {
         return;
@@ -346,7 +346,7 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
       var len = encdata[encAttName].length;
       if (len) {
         hasData = true;
-        console.log ("Array Data for "+encAttName + "is: ", encdata[encAttName]);
+        //console.log ("Array Data for "+encAttName + "is: ", encdata[encAttName]);
       }
       //console.log("ENCATTNAME: "+encAttName+' len '+ len + ' encattdata ',encdata[encAttName] );
       //if (!len) jqthis.find(arrChldCl).remove();
@@ -365,7 +365,7 @@ function buildHoverDetailDialog(template,encdata,hideempty) {
         jqthis.append(childArrCopy);
       }
     } else { //We have a value - insert it!
-      console.log ("Non-array Data for "+encAttName + " is: ", encdata[encAttName]);
+      //console.log ("Non-array Data for "+encAttName + " is: ", encdata[encAttName]);
       if ( (encAttName !== 'fname') &&  (encAttName !== 'lname')) {
         hasData = true;
       }

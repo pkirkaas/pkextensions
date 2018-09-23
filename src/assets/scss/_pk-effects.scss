@@ -505,4 +505,8 @@ input[disabled].disabled {
 
 .actionable {
   cursor: pointer; 
+  &:hover {
+    font-weight: bold;
+  }
 }
+
