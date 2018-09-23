@@ -41,10 +41,11 @@ function disableDontCares() {
  */
 function disableDontCare(target) {
   var paired_val_ctl = getCousins('.search-crit-val-pair','.search-val',target);
-  /*
   if (!paired_val_ctl.length) {
+    console.log("No matching paired_val_ctl for target:",target);
     return;
   }
+  /*
   */
   var search_crit_val = $(target).val();
   // if (!search_crit_val) Doesn't work???
@@ -56,6 +57,7 @@ function disableDontCare(target) {
       $(paired_val_ctl).val('');
     }
     console.log("Disable don't care for: ",paired_val_ctl);
+    paired_val_ctl.inputmask('remove');
     $(paired_val_ctl).inputmask('remove');
     $(paired_val_ctl).attr('disabled',true);
     $(paired_val_ctl).attr('title','Select a criteria to enter a value');

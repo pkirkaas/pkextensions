@@ -16,14 +16,12 @@ use \Auth;
  * @author pkirk
  */
 abstract class PkAjaxController extends PkController {
-//  public $data;
- // public $me;
-  /*
+  public $data;
+  public $me;
   public function __construct() {
     if (method_exists(get_parent_class(),'__construct')) {
       parent::__construct();
     }
-    header('content-type: application/json');
     $this->data = request()->all();
     if (class_exists('App\Models\User')) {
       $this->me = Auth::user();
@@ -32,6 +30,7 @@ abstract class PkAjaxController extends PkController {
       }
     }
   }
+  /*
    * *
    */
 
@@ -94,6 +93,10 @@ abstract class PkAjaxController extends PkController {
       $statusText = $status[$statusCode];
     } else {
       $statusCode = $status;
+    }
+    if ($data instanceOf PkModel) {
+      //$data = $data->getTableFieldAttributes();
+      $data = $data->toArray();
     }
     $response = response($data,$statusCode,$headers, $options);
     if ($statusText) {
