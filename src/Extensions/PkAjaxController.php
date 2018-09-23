@@ -18,10 +18,32 @@ use \Auth;
 abstract class PkAjaxController extends PkController {
   public $data;
   public $me;
-  public function __construct() {
+  public function __construct($args=null) {
     if (method_exists(get_parent_class(),'__construct')) {
-      parent::__construct();
+      parent::__construct($args);
     }
+    $this->middleware(function ($request, $next) {
+      //pkdebug("The Request:",$request);
+      //pkdebug("No Request:",$request->toString());
+      $reqinfo=$request->toArray();
+      $reqinfo['url'] = $request->fullUrl();
+      pkdebug("Is Request Ajax?",$request->is('ajax'),"ReqInfo:",$reqinfo);
+          return $next($request);
+    });
+    #Add generic AJAX exception handling
+    /*
+    $this->middleware(function ($request, $next) {
+        try {
+          return $next($request);
+        } catch (\Exception $e) {
+          $data = request()->all();
+          $data += ['error'=>'exception', 'exception'=>$e->getMessage()];
+          return $this->error($data);
+        }
+    });
+     * 
+     */
+    //pkdebug("This App:", app());
     $this->data = request()->all();
     if (class_exists('App\Models\User')) {
       $this->me = Auth::user();
@@ -79,6 +101,12 @@ abstract class PkAjaxController extends PkController {
     }
    */
   public function jsonresponse($data=null,$status=200,$headers=[],$options=true) {
+    return static::sjsonresponse($data, $status,$headers,$options);
+  }
+
+
+  public static function sjsonresponse
+      ($data=null,$status=200,$headers=[],$options=true) {
     if (($options === true) || ($options === 1)) { #Default JSON opts - PrettyPrint
       $options = static::$jsonopts;
     }
@@ -98,7 +126,7 @@ abstract class PkAjaxController extends PkController {
       //$data = $data->getTableFieldAttributes();
       $data = $data->toArray();
     }
-    $response = response($data,$statusCode,$headers, $options);
+    $response = response()->json($data,$statusCode,$headers, $options);
     if ($statusText) {
       $response->setStatusCode($statusCode, $statusText);
     }
@@ -111,6 +139,15 @@ abstract class PkAjaxController extends PkController {
 
   public function error($data='',$status=499,$headers=[],$options=true) {
     return $this->jsonresponse($data,$status,$headers,$options);
+  }
+
+  /** Simpler than attributes (below) - just for 1 model, 1 instance, uses
+   * eloquent
+   */
+  public function modelattributes() {
+    $model = $this->data['model'];
+    $id = to_int($this->id);
+    return $model::find($id);
   }
 
 /** For Vue or JS or jQuery calls to request model attribute values to 
