@@ -1,5 +1,9 @@
 /** Mods/add-ons to default BS 4 */
 
+.form-control {
+  height: auto;
+}
+
 /** Replacing removed elements from BS 4 Alpha -> Beta **/
 $brand-inverse:  #292b2c !default;
 .navbar-inverse .navbar-toggler-icon {
