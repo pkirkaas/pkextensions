@@ -159,11 +159,18 @@ abstract class PkAjaxController extends PkController {
 
   /** Simpler than attributes (below) - just for 1 model, 1 instance, uses
    * eloquent
+   * Can take the same arguments as set/toggle above, with modfield, so can 
+   * use in same AJAX function to set & get
    */
   public function modelattributes() {
     $model = $this->data['model'];
-    $id = to_int($this->id);
-    return $model::find($id);
+    $id = to_int($this->data['id']);
+    $modfield = keyVal('modfield',$this->data);
+    $instance = $model::find($id);
+    if ($modfield) {
+      $instance->modfield = $modfield;
+    }
+    return $this->success($instance);
   }
 
 /** For Vue or JS or jQuery calls to request model attribute values to 

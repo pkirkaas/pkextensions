@@ -45,6 +45,7 @@ Route::any('auth/logout', ['as' => 'auth_logout',
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
 Route::any('ajax/save', ['as' => 'ajax_save', 'uses'=> 'AjaxController@save']);
 Route::any('ajax/toggle', ['as' => 'ajax_toggle', 'uses'=> 'AjaxController@toggle']);
+Route::any('ajax/modelattributes', ['as' => 'ajax_modelattributes', 'uses'=> 'AjaxController@modelattributes']);
 Route::any('ajax/set', ['as' => 'ajax_set', 'uses'=> 'AjaxController@set']);
 Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
 Route::any('test', ['as' => 'test',  function() { ## Just echos the submitted data

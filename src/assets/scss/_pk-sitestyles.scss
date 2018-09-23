@@ -2,6 +2,9 @@
  * overridable in individual sites
  */
 
+:root {
+  font-family: verdana;
+}
 $body-font-size: 14px !default;
 body {
   font-size: $body-font-size;

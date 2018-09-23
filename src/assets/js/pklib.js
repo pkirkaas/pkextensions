@@ -252,31 +252,82 @@ $(function () {
  */
   $('body').on('click', '.js-mod-ajax', function (event) {
     var $target = $(event.target);
-    var data = $(event.target).data();
-    var set =  data.param-set;
+    js_get_set_ajax($target,'set');
+    //window.js_get_set_ajax(event.target,'set');
+  });
+
+$(function () {
+  
+
+  window.js_get_set_ajax = function($target,action) {
+    var data = $target.data();
+    var set =  data.paramSet;
     if (set === 'toggle') {
-      var format = data.param-format || 'checkbox';
+      var format = data.paramFormat || 'checkbox';
       var url = '/ajax/toggle'
       var ajaxdata = {};
     } else {
-      var format = data.param-format;
+      var format = data.paramFormat;
       var url = '/ajax/set'
       var ajaxdata = {value:set};
     }
 
-    var ajaxparamarr =['model','id','modfield'];
-    ajaxparamarr.forEach(function() {
-      ajaxdata[this] = data['param-'+this];
+    var ajaxparamarr =['Model','Id','Modfield'];
+    ajaxparamarr.forEach(function(element) {
+      console.log("In ForEach, element:",element);
+      ajaxdata[element.toLowerCase()] = data['param'+element];
     });
+    console.log("Ajax Data:",ajaxdata,"data",data);
+    if (action==='get') {
+      url = '/ajax/modelattributes';
+    }
+    window.axios.post(url,ajaxdata).
+      then(response=>{
+        var result = response.data[response.data.modfield];
+        console.log("Response data:",response.data,"Result:",result,"Format:", format);
+        $target.htmlFormatted(result,format);
+      }).
+      catch(error=>{
+        console.error(error.response);
+      });
+              /*
+    */
+    }
+  window.js_get_set_ajax($('.js-mod-ajax'),'get');
+  });
+/*
+  $('body').on('click', '.js-mod-ajax', function (event) {
+
+    var $target = $(event.target);
+    var data = $(event.target).data();
+    var set =  data.paramSet;
+    if (set === 'toggle') {
+      var format = data.paramFormat || 'checkbox';
+      var url = '/ajax/toggle'
+      var ajaxdata = {};
+    } else {
+      var format = data.paramFormat;
+      var url = '/ajax/set'
+      var ajaxdata = {value:set};
+    }
+
+    var ajaxparamarr =['Model','Id','Modfield'];
+    ajaxparamarr.forEach(function(element) {
+      console.log("In ForEach, element:",element);
+      ajaxdata[element.toLowerCase()] = data['param'+element];
+    });
+    console.log("Ajax Data:",ajaxdata,"data",data);
     axios.post(url,ajaxdata).
       then(response=>{
-        var result = response.data.modfield;
+        var result = response.data[response.data.modfield];
+        console.log("Response data:",response.data,"Result:",result,"Format:", format);
         $target.htmlFormatted(result,format);
       }).
       catch(error=>{
         console.error(error.response);
       });
   });
+  */
 
   /** This serves both creating multiple new instances before submitting when
    * itemcount is implemented, AND, just creating a single new instance from the
@@ -628,10 +679,12 @@ $(function () {
  */
 jQuery.fn.extend({
   htmlFormatted: function (content,format) {
+    console.log("In HTMLFormatted, content",content,"Format",format);
     //console.log("Formatters:", this.formatters);
     if (format) {
       var formatted = this.formatters[format](this,content,true);
-      this.html(formatted);
+      //console.log("The formatted result:",formatted);
+      //this.html(formatted);
       return;
     }
 
@@ -645,6 +698,7 @@ jQuery.fn.extend({
   formatters: {
     currency: function (jqobj, content, force) {
       if (jqobj.hasClass('jq-format-currency') || force) {
+        console.log("In currency formatter, content:",content);
         var num = toNumber(content);
         if (isNaN(num)) {
           console.error('Invalid Number: ', content);
@@ -670,9 +724,10 @@ jQuery.fn.extend({
       return false;
     },
     checkbox: function(jqobj,content, force) {
+      console.log("In checkbox formatter, content:",content);
       if (jqobj.hasClass('jq-format-checkbox') || force) {
         if (content) {
-          jqobj.html( '&#9745');
+          jqobj.html( '&#9745;');
         } else {
           jqobj.html( '&#9744;');
         }
