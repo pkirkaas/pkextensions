@@ -8,6 +8,7 @@ use PkExtensions\PartialSet;
 use PkExtensions\PkExceptionResponsable;
 use PkExtensions\Models\PkModel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as BaseCollection;
 //use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Builder;
@@ -420,6 +421,85 @@ function urlFromUploadedFilename($filename, $default = null) {
   $url = url($filename);
   return $url;
 }
+
+  /**
+   * Generates a key for a cache
+   * @param indexed array $components - model instances, strings,collections
+   * @param int $maxlength - the maximum allowed length of the key
+   */
+function cacheKey($components=[],$maxlength=254) {
+  if (!is_array($components)) {
+    $components = [$components];
+  }
+  $rawkey = '';
+  foreach ($components as $component) {
+    if ($component instanceOf PkModel) {
+      $rawkey.=get_class($component)."Id".$component->id;
+    } else if (is_scalar($component)) {
+      $rawkey.=$component;
+    //} else if (is_array($component)) {
+     // $rawkey = json_encode($component);
+    } else if ($component instanceOf EloquentCollection) {
+      if (count($component)) {
+        $compclass = get_class($component[0]);
+        $rawkey.="Comp".$compclass;
+        foreach ($component as $instance) {
+          $rawkey.="CId".$instance->id;
+        }
+      }
+    }
+  }
+  pkdebug("RawKey:",$rawkey,"MbStrlen:",mb_strlen($rawkey,'UTF-8'));
+  if (mb_strlen($rawkey,'UTF-8') < $maxlength) {
+    return $rawkey;
+  }
+  $key =gzcompress($rawkey); 
+  pkdebug("Compressed Key:",$key,"MbStrlen:",mb_strlen($key,'UTF-8'));
+  if (mb_strlen($key,'UTF-8') < $maxlength) {
+    return $key;
+  } 
+  return null;
+}
+
+function clearDbCached($comp) {
+  $key = cacheKey($comp);
+  Cache::forget($key);
+}
+
+/** Takes a relation callable, executes it & gets value
+ * 
+ * @param type $comp
+ * @param type $val
+ * @return boolean
+ */
+function getRelDbCached($comp,$callable = false) {
+  $key = cacheKey($comp);
+  if (!$key) {
+    return false;
+  }
+  if (Cache::has($key)) {
+    //return unserilaize(Cache::get($key));
+    pkdebug("Returning val from cache");
+    return Cache::get($key);
+  }
+  if ($callable===false) {
+    return false;
+  }
+  
+  if (is_callable($callable)) {
+    $val = call_user_func($callable);
+    //It's a relationship
+    pkdebug("Type Of Val():",typeOf($val->getResults()));
+    //pkdebug("Type Of Val():",typeOf($val->getResults()));
+    //Cache::put($key,serialize($val),10);
+    $toCache = $val->getResults();
+    Cache::put($key,$toCache,10);
+    return $toCache;
+  }
+}
+
+
+
 /*
 function pkl_uploaded_url($filename, $default=null) {
   if (!$filename) $filename = $default;

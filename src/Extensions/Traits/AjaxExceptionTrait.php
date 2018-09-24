@@ -17,8 +17,6 @@ use PkExtensions\PkAjaxController;
  */
 trait AjaxExceptionTrait {
   public function traitRender($request, \Exception $exception) {
-    pkdebug("Req Segs:",$request->segments(),"Rq isajax?",$request->ajax());
-    
     $segs = $request->segments();
     if ($segs && is_array($segs) && ($segs[0]==='ajax')) {
       $status = [498=>'exception'];

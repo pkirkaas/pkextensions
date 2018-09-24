@@ -31,6 +31,7 @@ var officertbl = new  Vue({
 
 namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
+use PkExtensions\PkException;
 use PkExtensions\PkRefManager;
 use PkForm;
 /**
@@ -197,7 +198,7 @@ trait PkJsonConverter {
     } else {
       $ref = null;
     }
-    pkdebug("Fld Opts:", $opts);
+    //pkdebug("Fld Opts:", $opts);
     if (!$input) {
       if ($ref) {
         $val = keyVal($val,$ref::getKeyValArr());
@@ -213,7 +214,7 @@ trait PkJsonConverter {
     }
     //$fldtype = keyVal('type',$def);
     if ($ref) { //It's a select
-      pkdebug("The Map:",$ref::getKeyValArr());
+      //pkdebug("The Map:",$ref::getKeyValArr());
       if ($vue) {
         return [
           'value'=>$val,
@@ -328,7 +329,7 @@ public static function mkVueTbl($params=[]) {
       return static::_modelToAtts($model, $atts);
     }
     if (!is_arrayish($model) || ! ($model[0] instanceOf PkModel)) {
-      throw new PkException("Wrong argument to modelsToAtts");
+      throw new PkException(["Wrong argument 1 to modelsToAtts",typeOf($model)]);
     }
     $results = [];
     foreach ($model as $key => $instance) {
@@ -338,7 +339,7 @@ public static function mkVueTbl($params=[]) {
   }
   public static function _modelToAtts($model, $atts=[]) {
     if (!$model instanceOf PkModel) {
-      throw new PkException("Wrong argument to modelsToAtts");
+      throw new PkException(["Wrong argument 2 to modelsToAtts",typeOf($model)]);
     }
     $result = ["id"=>$model->id, 'classname'=>get_class($model)];
     foreach ($atts as $type=>$props) {
@@ -355,7 +356,7 @@ public static function mkVueTbl($params=[]) {
           }
           $result[$type]=$cat;
       } else {
-        throw new PkException("Wrong value for Atts to model");
+        throw new PkException(["Wrong value for Atts to model",$props]);
       }
     }
     return $result;

@@ -50,6 +50,7 @@ use PkExtensions\PkCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Closure;
 use Schema;
+use Illuminate\Queue\SerializesModels;
 use ReflectionClass;
 //use App\Models\User;
 //use \Auth;
@@ -63,6 +64,7 @@ use \DB;
 use \PkExtensions\PkTestGenerator;
 use PkExtensions\PkException;
 use PkHtml;
+use Cache;
 
 abstract class PkModel extends Model {
 
@@ -1104,7 +1106,19 @@ class $createclassname extends Migration {
    * 
    * @param array $attributes
    */
+  public $relCacheClosure;
   public function __construct(array $attributes = []) {
+    $pkmodel = $this;
+    /*
+    $this->relCacheClosure = function($rel,$relmodelname) use($pkmodel) {
+      $cacheClosure = function()use($pkmodel, $relmodelname) {
+        return  $pkmodel->hasMany($relmodelname);
+      };
+      return $this->relCached($rel,$cacheClosure);
+    };
+     * 
+     */
+      
     $this->casts = $this->getInstanceArraysMerged('casts');
     $this->fillable($this->getAttributeNames());
     //$this->fillable($this->getFieldNames());
@@ -2092,6 +2106,9 @@ class $createclassname extends Migration {
     return $props;
   }
 
+
+
+
   /**
    * Return a random instance, or array (collection) of random instances
    * @param integer $num: If -1 (default), return single instance. 
@@ -2114,6 +2131,34 @@ class $createclassname extends Migration {
     }
     return \PkExtensions\PkTestGenerator::randData($instances, $num);
   }
+
+  public function clearRelCached($rel) {
+    clearDbCached([$this,'relationship',$rel]);
+  }
+
+  /**
+   * Caching one-to-many relationships
+   * The relationships still return the relationships: Like,
+   * 
+  public function owners() {
+    return $this->hasMany('App\\Models\\Owner');
+  }
+   * But calling getOwners returns the cached collection
+  
+  public function getOwners() {
+     return $this->relCached('owners');
+  }
+   * we 
+   * @param string $rel - relationship name
+   * @return PkCollection
+   */
+  public function relCached($rel) {
+    $callable = [$this,$rel];
+  //public function relCached($rel, $val=false) {
+    //$key = cacheKey([$this,'relationship',$rel]);
+    return getRelDbCached([$this,'relationship',$rel],$callable);
+  }
+
 
 
   #################  Testing PkTypedUploadModel - so a PkModel can have many

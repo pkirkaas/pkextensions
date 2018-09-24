@@ -247,5 +247,8 @@ nav.navbar {
   text-overflow: clip;
   white-space: normal;
   word-break: break-word;
-  background-color: #400;
+  background-color: $tootik-background;
+  color: $tootik-color;
+  font-family: $tootik-font;
+  font-weight: 500;
 }

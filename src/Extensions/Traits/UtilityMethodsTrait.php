@@ -1,6 +1,8 @@
 <?php
 namespace PkExtensions\Traits;
 use Undefined;
+use PkExtensions\Models\PkModel;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Carbon\Carbon;
 use ReflectionClass;
 /** Common methods that might be useful in many class hierarchies. Like a 
