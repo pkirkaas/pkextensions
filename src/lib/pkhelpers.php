@@ -428,6 +428,7 @@ function urlFromUploadedFilename($filename, $default = null) {
    * @param int $maxlength - the maximum allowed length of the key
    */
 function cacheKey($components=[],$maxlength=254) {
+  pkdbgtm("Starting CacheKey Calc");
   if (!is_array($components)) {
     $components = [$components];
   }
@@ -449,7 +450,8 @@ function cacheKey($components=[],$maxlength=254) {
       }
     }
   }
-  pkdebug("RawKey:",$rawkey,"MbStrlen:",mb_strlen($rawkey,'UTF-8'));
+  pkdbgtm("FINISHED CacheKey Calc");
+  //pkdebug("RawKey:",$rawkey,"MbStrlen:",mb_strlen($rawkey,'UTF-8'));
   if (mb_strlen($rawkey,'UTF-8') < $maxlength) {
     return $rawkey;
   }
@@ -494,12 +496,19 @@ function getRelDbCached($comp,$callable = false) {
 
 function getDbDataCached($comp,$callable=false,$min=10) {
   $key = cacheKey($comp);
+  pkdbgtm("Got Key $key - fetch from Cache");
   if (!$key) {
+    pkdebug("?? NO KEY?");
     return false;
   }
   if (Cache::has($key)) {
-    return Cache::get($key);
+    pkdbgtm("Getting CACHED! value for $key");
+    $ret =  Cache::get($key);
+    pkdbgtm("GOT CACHED! value for $key");
+    return $ret;
+    //return Cache::get($key);
   }
+  pkdbgtm("DID NOT FIND !!! cached value for $key");
   if (is_callable($callable)) {
     $val = call_user_func($callable);
     Cache::put($key,$val,$min);

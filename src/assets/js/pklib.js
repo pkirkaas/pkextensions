@@ -728,6 +728,9 @@ jQuery.fn.extend({
     },
     checkbox: function(jqobj,content, force) {
       //console.log("In checkbox formatter, content:",content);
+      if (typeof content === 'string') {
+        content = parseInt(content);
+      }
       if (jqobj.hasClass('jq-format-checkbox') || force) {
         if (content) {
           jqobj.html( '&#9745;');
