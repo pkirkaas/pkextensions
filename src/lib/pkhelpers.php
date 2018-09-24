@@ -478,8 +478,6 @@ function getRelDbCached($comp,$callable = false) {
     return false;
   }
   if (Cache::has($key)) {
-    //return unserilaize(Cache::get($key));
-    pkdebug("Returning val from cache");
     return Cache::get($key);
   }
   if ($callable===false) {
@@ -488,13 +486,24 @@ function getRelDbCached($comp,$callable = false) {
   
   if (is_callable($callable)) {
     $val = call_user_func($callable);
-    //It's a relationship
-    pkdebug("Type Of Val():",typeOf($val->getResults()));
-    //pkdebug("Type Of Val():",typeOf($val->getResults()));
-    //Cache::put($key,serialize($val),10);
     $toCache = $val->getResults();
     Cache::put($key,$toCache,10);
     return $toCache;
+  }
+}
+
+function getDbDataCached($comp,$callable=false,$min=10) {
+  $key = cacheKey($comp);
+  if (!$key) {
+    return false;
+  }
+  if (Cache::has($key)) {
+    return Cache::get($key);
+  }
+  if (is_callable($callable)) {
+    $val = call_user_func($callable);
+    Cache::put($key,$val,$min);
+    return $val;
   }
 }
 

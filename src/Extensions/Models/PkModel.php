@@ -2159,6 +2159,17 @@ class $createclassname extends Migration {
     return getRelDbCached([$this,'relationship',$rel],$callable);
   }
 
+  public function dataCached($comps=[], $callable=null) {
+    if (!is_array($comps)) {
+      $comps = [$comps];
+    }
+    if (is_array($callable)) {
+      $comps=array_merge($comps,$callable);
+    }
+    $comps[]=$this;
+    return getDbDataCached($comps,$callable);
+  }
+
 
 
   #################  Testing PkTypedUploadModel - so a PkModel can have many
