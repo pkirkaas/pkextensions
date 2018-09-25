@@ -105,15 +105,34 @@ abstract class PkModel extends Model {
   public static $escape_fields = [];
 
   //Each instance can cache local calculated values
-  public $instanceCache=[];
-  public function getICache($key) {
-    return keyVal($key, $this->instanceCache,false);
+  public function mkInstanceKey($key=null) {
+    return 'MDL:'.static::class.":ID:".$this->id.":k:$key";
   }
-  public function setICache($key,$value) {
+  public $instanceCache=[];
+  public function getICache($key,$cache=false) {
+    pkdebug("In getICache($key)");
+    $ret = keyVal($key, $this->instanceCache,false);
+    if (!$cache) {
+      return $ret;
+    }
+    $skey = $this->mkInstanceKey($key);
+    $sret = Cache::get($skey);
+    pkdebug("No Local Match, Cache::get($skey) returned: ",$sret);
+    if ($sret !== false) {
+      return $this->setICache($key,$sret);
+    }
+    return false;
+  }
+  public function setICache($key,$value,$cache = false,$min=10) {
     if (is_callable($value)) {
       $value = user_func_array($value);
     }
-    return $this->instanceCache[$key] = $value;
+    $this->instanceCache[$key] = $value;
+    if ($cache) {
+      $skey = $this->mkInstanceKey($key);
+      Cache::put($skey,$value,$min);
+    }
+    return $value;
   }
 
 //Display Value Fields
@@ -988,7 +1007,7 @@ class $createclassname extends Migration {
     $keys = keyVal($tableName,$tablesAndKeys,[]);
     $key=$this->getKey();
     if (in_array($key, $keys)) {
-      pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
+      //pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
       return; #Hope that takes care of cycles
     }
 
@@ -1020,7 +1039,7 @@ class $createclassname extends Migration {
     $keyName = $this->getKeyName();
     $key=$this->getKey();
     if (in_array($key, $keys)) {
-      pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
+      //pkdebug("Leaving: Table: [$tableName], Key: [$key], tablesAndKeys:", $tablesAndKeys);
       return $tablesAndKeys; #Hope that takes care of cycles
     }
     $relations = array_keys(static::getLoadRelations());
@@ -1214,7 +1233,7 @@ class $createclassname extends Migration {
     if (static::class == "App\Models\Borrower") {
       $show = ['constatts'=>$attributes, "InstAtts:" => $this->getAttributes()];
     }
-    pkdbgtm("About to get/run  ExtraConstructors for ".static::class."; ID:".$this->id, $show);
+    //pkdbgtm("About to get/run  ExtraConstructors for ".static::class."; ID:".$this->id, $show);
     $constructors = static::getExtraConstructors();
     if ($constructors) {
       //pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
@@ -1549,7 +1568,7 @@ class $createclassname extends Migration {
         $mycurrentotherobjkeys = [];
         foreach ($otherobjs as $otherobj) {
           if (!is_a($otherobj, $othermodel, true)) { #Again, something seriously wrong
-            pkdebug("For [$relName], other model is [$othermodel], but otherobj:", $otherobj);
+            //pkdebug("For [$relName], other model is [$othermodel], but otherobj:", $otherobj);
             continue;
           }
           $otherobjkey = $otherobj->getKey();
@@ -2200,7 +2219,7 @@ class $createclassname extends Migration {
    * just be the method name.
    */
   public function simpleKey($comps=[]) {
-    pkdbgtm("Starting simpleKey Calc");
+    //pkdbgtm("Starting simpleKey Calc");
     if (!is_array($comps)) {
       $comps=[$comps];
     }
@@ -2220,12 +2239,12 @@ class $createclassname extends Migration {
         $key.=$comp;
       }
     }
-    pkdbgtm("Finish simpleKey Calc [$key]");
+    //pkdbgtm("Finish simpleKey Calc [$key]");
     return $key;
   }
 
   public function localDataCached($comps, $callable=null) {
-    pkdbgtm("Starting localDataCached");
+    //pkdbgtm("Starting localDataCached");
     $compsToCallable = false;
     if (is_array($comps) && !$callable && is_callable($comps)) {
       $callable = $comps;
@@ -2239,7 +2258,7 @@ class $createclassname extends Migration {
     }
     $key = $this->simpleKey($comps);
     return static::getCached($key,$callable,'SDC');
-    pkdbgtm("Leaving localDataCached after getCached");
+    //pkdbgtm("Leaving localDataCached after getCached");
   }
 
   #################  Testing PkTypedUploadModel - so a PkModel can have many

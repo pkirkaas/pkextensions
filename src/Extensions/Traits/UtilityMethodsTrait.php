@@ -155,20 +155,23 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     if (!$keyBase) {
       $keyBase = static::class;
     }
-    pkdbgtm("Getting cached: key: [$keyBase][$key]");
+    //pkdbgtm("Getting cached: key: [$keyBase][$key]");
     if (!array_key_exists($keyBase,static::$_cache)) {
       static::$_cache[$keyBase] = [];
     }
     if (array_key_exists($key,static::$_cache[$keyBase])) {
-      pkdbgtm("Found in xlcache: [$keyBase][$key]");
+      //pkdbgtm("Found in xlcache: [$keyBase][$key]");
       return static::$_cache[$keyBase][$key];
+    }
+    if ($value === false) {#To cache "false", setCached($key,false)
+      return false;
     }
     if (is_callable($value)) {
       $value = call_user_func($value);
     }
     ("[$keyBase][$key] NOT found in cache -- call Set");
     $res = static::setCached($key,$value,$keyBase);
-    pkdbgtm("SET !! in lcache: [$keyBase][$key]");
+    //pkdbgtm("SET !! in lcache: [$keyBase][$key]");
     return $res;
       //return static::setCached($key, call_user_func($callable),$keyBase);
   }

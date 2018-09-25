@@ -81,7 +81,12 @@ Trait PolymorphicBaseTrait {
     */
    public function __call($method, $args=[]) {
      if (strtolower($method) === strtolower($this->getTypeName())) {
-       return call_user_func_array([$this,'traitTypeMorphTo'],$args);
+       $key = strtolower($method);
+       $res = $this->getICache($key);
+       if ($res !== false) {
+         return $res;
+       }
+       return $this->setICache($key,call_user_func_array([$this,'traitTypeMorphTo'],$args));
      }
      $tstType = removeStartStr($method, 'is');
      if ($tstType && is_string($tstType)) {
@@ -102,7 +107,11 @@ Trait PolymorphicBaseTrait {
 
    public function __get($key) {
      if ($key === static::getTypeName()) {
-       return $this->getRelationValue('traitTypeMorphTo');
+       $res = $this->getICache($key);
+       if ($res !== false) {
+         return $res;
+       }
+       return $this->setICache($key,$this->getRelationValue('traitTypeMorphTo'));
      }
      return parent::__get($key);
    }
