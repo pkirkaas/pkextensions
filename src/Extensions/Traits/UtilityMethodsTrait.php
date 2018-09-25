@@ -145,26 +145,42 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   /** Get cached value for class/key - if key isn't set & 
    * callable provided,  run & set cache class key value 
    * @param string $key
-   * @param callable $callable
+   * @param mixed $value - if callable, execute it & set
+   * @param boolean|string $keyBase - if false, use the current class name
+   * as the "root" of the cache entry. But if string, use that as key.
+   * This is so different classes can share the same cache data
    * @return mixed
    */
-  public static function getCached($key, $callable=null) {
-    //pkdebug("Getting cached: key: [$key] for class: ".static::class);
-    if (!array_key_exists(static::class,static::$_cache)) {
-      static::$_cache[static::class] = [];
+  public static function getCached($key, $value=null,$keyBase=false) {
+    if (!$keyBase) {
+      $keyBase = static::class;
     }
-    if (array_key_exists($key,static::$_cache[static::class])) {
-     // pkdebug("Returning:", static::$_cache[static::class][$key]);
-      return static::$_cache[static::class][$key];
+    pkdbgtm("Getting cached: key: [$keyBase][$key]");
+    if (!array_key_exists($keyBase,static::$_cache)) {
+      static::$_cache[$keyBase] = [];
     }
-    if (is_callable($callable)) {
-      return static::setCached($key, call_user_func($callable));
+    if (array_key_exists($key,static::$_cache[$keyBase])) {
+      pkdbgtm("Found in xlcache: [$keyBase][$key]");
+      return static::$_cache[$keyBase][$key];
     }
-    return null;
+    if (is_callable($value)) {
+      $value = call_user_func($value);
+    }
+    ("[$keyBase][$key] NOT found in cache -- call Set");
+    $res = static::setCached($key,$value,$keyBase);
+    pkdbgtm("SET !! in lcache: [$keyBase][$key]");
+    return $res;
+      //return static::setCached($key, call_user_func($callable),$keyBase);
   }
 
-  public static function setCached($key,$value=null) {
-    return static::$_cache[static::class][$key] = $value;
+  public static function setCached($key,$value, $keyBase=false) {
+    if (!$keyBase) {
+      $keyBase = static::class;
+    }
+    if (!array_key_exists($keyBase,static::$_cache)) {
+      static::$_cache[$keyBase] = [];
+    }
+    return static::$_cache[$keyBase][$key] = $value;
   }
 
   /** Automate all the caching - for "getting" functions 

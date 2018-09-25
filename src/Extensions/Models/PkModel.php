@@ -71,6 +71,12 @@ abstract class PkModel extends Model {
   use UtilityMethodsTrait;
 
   public static $timestamp = true;
+  /** Until I can get regular Laravel caching to work, I can
+   * use the UtilityTraits getCache method - works for a single request,
+   * anyway.
+   * @var boolean - if true, use local in-memory cache 
+   */
+  public static $useMemoryCache = true;
 
   /** If a sublcass defines 'static $onlyLocal = true", then static::getTableFieldDefs()
    * will only return static::$table_field_defs;
@@ -98,6 +104,17 @@ abstract class PkModel extends Model {
    */
   public static $escape_fields = [];
 
+  //Each instance can cache local calculated values
+  public $instanceCache=[];
+  public function getICache($key) {
+    return keyVal($key, $this->instanceCache,false);
+  }
+  public function setICache($key,$value) {
+    if (is_callable($value)) {
+      $value = user_func_array($value);
+    }
+    return $this->instanceCache[$key] = $value;
+  }
 
 //Display Value Fields
   public static $displayValueSuffix = "_DV"; #Can override in extended models
@@ -1108,7 +1125,7 @@ class $createclassname extends Migration {
    */
   public $relCacheClosure;
   public function __construct(array $attributes = []) {
-    $pkmodel = $this;
+    //$pkmodel = $this;
     /*
     $this->relCacheClosure = function($rel,$relmodelname) use($pkmodel) {
       $cacheClosure = function()use($pkmodel, $relmodelname) {
@@ -1165,9 +1182,6 @@ class $createclassname extends Migration {
       }
       return $constructors;
     };
-    static::getCached('ExtraConstructors', $cacheclosure);
-    //pkdebug("Cache: ", static::$_cache);
-    //var_dump(static::$_cache);
     return static::getCached('ExtraConstructors', $cacheclosure);
     /*
     if ($constructors === null) {
@@ -1196,6 +1210,11 @@ class $createclassname extends Migration {
 
 
   public function RunExtraConstructors($attributes) {
+    $show = "";
+    if (static::class == "App\Models\Borrower") {
+      $show = ['constatts'=>$attributes, "InstAtts:" => $this->getAttributes()];
+    }
+    pkdbgtm("About to get/run  ExtraConstructors for ".static::class."; ID:".$this->id, $show);
     $constructors = static::getExtraConstructors();
     if ($constructors) {
       //pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
@@ -2160,6 +2179,9 @@ class $createclassname extends Migration {
   }
 
   public function dataCached($comps=[], $callable=null) {
+    if (static::$useMemoryCache) {
+      return $this->localDataCached($comps, $callable);
+    }
     if (!is_array($comps)) {
       $comps = [$comps];
     }
@@ -2170,7 +2192,55 @@ class $createclassname extends Migration {
     return getDbDataCached($comps,$callable);
   }
 
+  /** A simple (faster?) key calc. Uses $this to make
+   * it unique to this instance.
+   * 
+   * @param array|scalar $comps - components of the key
+   * For in-memory caching of calculated attributes, can
+   * just be the method name.
+   */
+  public function simpleKey($comps=[]) {
+    pkdbgtm("Starting simpleKey Calc");
+    if (!is_array($comps)) {
+      $comps=[$comps];
+    }
+    $key='lc';
+    $didThis=false;
+    $comps[] = $this;
+    foreach($comps as $comp) {
+      if ($comp instanceOf PkModel) {
+        if ($this->is($comp)) {
+          if ($didThis) {
+            continue;
+          }
+          $didThis = true;
+        }
+        $key.= "Cl".get_class($comp)."Id".$comp->id;
+      } else if (is_scalar($comp)) {
+        $key.=$comp;
+      }
+    }
+    pkdbgtm("Finish simpleKey Calc [$key]");
+    return $key;
+  }
 
+  public function localDataCached($comps, $callable=null) {
+    pkdbgtm("Starting localDataCached");
+    $compsToCallable = false;
+    if (is_array($comps) && !$callable && is_callable($comps)) {
+      $callable = $comps;
+      $compsToCallable = true;
+    }
+    if (!is_array($comps)) {
+      $comps = [$comps];
+    }
+    if (!$compsToCallable && is_array($callable)) {
+      $comps=array_merge($comps,$callable);
+    }
+    $key = $this->simpleKey($comps);
+    return static::getCached($key,$callable,'SDC');
+    pkdbgtm("Leaving localDataCached after getCached");
+  }
 
   #################  Testing PkTypedUploadModel - so a PkModel can have many
   ###########  individual or collections of various types of file upload objects

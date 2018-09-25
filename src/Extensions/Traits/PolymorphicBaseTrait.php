@@ -47,13 +47,17 @@ Trait PolymorphicBaseTrait {
     * @return array of namespaced Morph/Extension Model, keyed by lc base names,
     * like: ['borrower'=>'App\Models\Borrower', 
     */
+
    public static function getPolyTypes() {
-     if ($r = static::getCached('polyTypes')) return $r; 
-     $polyTypes = [];
-     foreach (static::$polytypes as $polytype) {
+     $spt = static::$polytypes;
+     $closure = function()use($spt) {
+      $polyTypes = [];
+      foreach ($spt as $polytype) {
        $polyTypes[strtolower(getBaseName($polytype))] = $polytype;
-     }
-     return static::setCached('polyTypes',$polyTypes);
+      }
+      return $polyTypes;
+     };
+     return static::getCached('polyTypes', $closure);
    }
 
    public static function getTypeId() {
@@ -81,11 +85,17 @@ Trait PolymorphicBaseTrait {
      }
      $tstType = removeStartStr($method, 'is');
      if ($tstType && is_string($tstType)) {
-       $tstType = strtolower($tstType);
-       $polyTypes = static::getPolytypes();
-       if (in_array($tstType, array_keys($polyTypes))) {
-         return $polyTypes[$tstType] === $this->getMorphType();
+       $key=$method;
+       $res = $this->getICache($key);
+       if ($res === false) {
+         $tstType = strtolower($tstType);
+         $polyTypes = static::getPolytypes();
+         if (in_array($tstType, array_keys($polyTypes))) {
+           $res= $this->setICache
+              ($key, $polyTypes[$tstType] === $this->getMorphType());
+         }
        }
+       return $res;
      }
      return parent::__call($method, $args);
    }
@@ -138,10 +148,19 @@ Trait PolymorphicBaseTrait {
     * @param type $id
     */
    public function traitTypeMorphTo($name = null, $type = null, $id = null) {
-     $name = $name ? $name : static::getTypeName();
-     $type = $type ? $type : static::getTypeName().'_type';
-     $id = $id ? $id : static::getTypeName().'_id';
-     return $this->morphTo($name, $type, $id);
+     $key='traitMorphTo:name:'.$name.'type:'.$type."id:".$id;
+     $res = $this->getICache($key);
+     if ($res === false) {
+       //$closure=
+        $res = $this->setICache($key,
+          (function()use($name, $type, $id) {
+            $name = $name ? $name : static::getTypeName();
+            $type = $type ? $type : static::getTypeName().'_type';
+            $id = $id ? $id : static::getTypeName().'_id';
+            return $this->morphTo($name, $type, $id);
+        })());
+     }
+     return $res;
    }
 
   public static function getTypeName() {

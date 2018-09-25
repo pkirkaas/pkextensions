@@ -428,6 +428,7 @@ function urlFromUploadedFilename($filename, $default = null) {
    * @param int $maxlength - the maximum allowed length of the key
    */
 function cacheKey($components=[],$maxlength=254) {
+  pkdebug("!! DON'T WANT TO BE HERE!!");
   pkdbgtm("Starting CacheKey Calc");
   if (!is_array($components)) {
     $components = [$components];
@@ -464,6 +465,7 @@ function cacheKey($components=[],$maxlength=254) {
 }
 
 function clearDbCached($comp) {
+  pkdebug("!! DON'T WANT TO BE HERE!!");
   $key = cacheKey($comp);
   Cache::forget($key);
 }
@@ -475,6 +477,7 @@ function clearDbCached($comp) {
  * @return boolean
  */
 function getRelDbCached($comp,$callable = false) {
+  pkdebug("!! DON'T WANT TO BE HERE!!");
   $key = cacheKey($comp);
   if (!$key) {
     return false;
@@ -495,6 +498,7 @@ function getRelDbCached($comp,$callable = false) {
 }
 
 function getDbDataCached($comp,$callable=false,$min=10) {
+  pkdebug("!! DON'T WANT TO BE HERE!!");
   $key = cacheKey($comp);
   pkdbgtm("Got Key $key - fetch from Cache");
   if (!$key) {
