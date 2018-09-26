@@ -151,7 +151,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * This is so different classes can share the same cache data
    * @return mixed
    */
-  public static function getCached($key, $value=null,$keyBase=false) {
+  public static function getCached($key, $value=null,$args=[],$keyBase=false) {
     if (!$keyBase) {
       $keyBase = static::class;
     }
@@ -166,17 +166,13 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     if ($value === false) {#To cache "false", setCached($key,false)
       return false;
     }
-    if (is_callable($value)) {
-      $value = call_user_func($value);
-    }
-    ("[$keyBase][$key] NOT found in cache -- call Set");
-    $res = static::setCached($key,$value,$keyBase);
-    //pkdbgtm("SET !! in lcache: [$keyBase][$key]");
-    return $res;
-      //return static::setCached($key, call_user_func($callable),$keyBase);
+    return static::setCached($key,$value,$args,$keyBase);
   }
 
-  public static function setCached($key,$value, $keyBase=false) {
+  public static function setCached($key,$value,$args, $keyBase=false) {
+    if (is_callable($value)) {
+      $value = call_user_func_array($value,$args);
+    }
     if (!$keyBase) {
       $keyBase = static::class;
     }

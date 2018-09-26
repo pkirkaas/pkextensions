@@ -91,16 +91,15 @@ Trait PolymorphicBaseTrait {
      $tstType = removeStartStr($method, 'is');
      if ($tstType && is_string($tstType)) {
        $key=$method;
-       $res = $this->getICache($key);
-       if ($res === false) {
+       //$res = $this->getICache($key);
+       //if ($res === false) {
          $tstType = strtolower($tstType);
          $polyTypes = static::getPolytypes();
          if (in_array($tstType, array_keys($polyTypes))) {
-           $res= $this->setICache
-              ($key, $polyTypes[$tstType] === $this->getMorphType());
+        //   $res= $this->setICache ($key, 
+            return $polyTypes[$tstType] === $this->getMorphType();
          }
-       }
-       return $res;
+       return false;
      }
      return parent::__call($method, $args);
    }

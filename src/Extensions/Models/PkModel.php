@@ -110,28 +110,36 @@ abstract class PkModel extends Model {
   }
   public $instanceCache=[];
   public function getICache($key,$cache=false) {
-    pkdebug("In getICache($key)");
+    $cache = false;
     $ret = keyVal($key, $this->instanceCache,false);
+    $found = ($ret === false)?"DIDN't FIND IT":"found it!";
+    $skey = $this->mkInstanceKey($key);
+    pkdbgtm("In getICache[$skey] $found");
     if (!$cache) {
       return $ret;
     }
     $skey = $this->mkInstanceKey($key);
     $sret = Cache::get($skey);
-    pkdebug("No Local Match, Cache::get($skey) returned: ",$sret);
-    if ($sret !== false) {
+    pkdbgtm("Tried Cache::get($skey)");
+    if ($sret !== null ) {
       return $this->setICache($key,$sret);
     }
     return false;
   }
   public function setICache($key,$value,$cache = false,$min=10) {
+    pkdbgtm("Setting cache for [$key]");
+    $cache = false;
     if (is_callable($value)) {
       $value = user_func_array($value);
     }
     $this->instanceCache[$key] = $value;
     if ($cache) {
       $skey = $this->mkInstanceKey($key);
+      pkdbgtm("Setting Redis Cache for [$skey]");
       Cache::put($skey,$value,$min);
     }
+    $skey = $this->mkInstanceKey($key);
+    pkdbgtm("DONE Setting  Cache for [$skey]");
     return $value;
   }
 
@@ -163,11 +171,39 @@ abstract class PkModel extends Model {
    * as array keys mapped to PkRef classes - or actually, classes that implement
    * the PkDisplayValueInterface
    */
+  public static function cgetDisplayValueFields($onlyrefs = false) {
+      $display_value_fields = static::getArraysMerged('display_value_fields');
+      //pkdebug("Display value fields:", $display_value_fields);
+      if ($onlyrefs) {
+        $refarr = [];
+        foreach ($display_value_fields as $key => $value) {
+          if (is_string ($key) && $value) {
+            $refarr[$key] = $value;
+          }
+        }
+        //pkdebug("Only refs, refarr:", $refarr);
+        return $refarr;
+      }
+      if (!$display_value_fields ||
+        !count($display_value_fields)) {
+        return [];
+      }
+      $normalized = normalizeConfigArray($display_value_fields);
+      if (is_array($normalized)) return array_keys($normalized);
+      return [];
+  }
   public static function getDisplayValueFields($onlyrefs = false) {
     $prefix = 'display_value_fields';
     if ($onlyrefs) $skey=$prefix."_onlyrefs";
     else $skey = $prefix . "_norefs";
-
+    return static::getCached($skey,[static::class,'cgetDisplayValueFields'],
+        [$onlyrefs]);
+  }
+  /*
+  public static function getDisplayValueFields($onlyrefs = false) {
+    $prefix = 'display_value_fields';
+    if ($onlyrefs) $skey=$prefix."_onlyrefs";
+    else $skey = $prefix . "_norefs";
     $closure = function () use ($prefix, $onlyrefs ) {
       $display_value_fields = static::getArraysMerged('display_value_fields');
       //pkdebug("Display value fields:", $display_value_fields);
@@ -191,6 +227,8 @@ abstract class PkModel extends Model {
     };
     return static::getCached($skey, $closure);
   }
+   * 
+   */
 
 
   /** Since $table_field_defs are inherited, if a subclass wants to eliminate
@@ -289,9 +327,8 @@ abstract class PkModel extends Model {
   public static function _getTableFieldDefs() {
     $cacheKey = 'tableFieldDefs';
     if (static::$onlyLocal) return static::$table_field_defs;
-    if (static::getCached($cacheKey) !== null)
-        return static::getCached($cacheKey);
-    return static::setCached($cacheKey, static::getAncestorArraysMerged('table_field_defs'));
+     return static::getCached($cacheKey,
+         [static::class,'getAncestorArraysMerged'],['table_field_defs']);
   }
 
   /** Only if a particular subclass wants to remove inherited fields */
@@ -302,30 +339,16 @@ abstract class PkModel extends Model {
     return $defs;
   }
 
+  public static function cgetTableFieldDefs() {
+    $_gtbd = static::_getTableFieldDefs();
+    $extrad = static:: getExtraTableFieldDefs(); 
+    $ttbd =   static::getTableFieldDefsTrait();
+    $defs = array_merge($_gtbd, $extrad, $ttbd);
+    return $defs;
+  }
   public static function getTableFieldDefs() {
-    //$defs = array_merge(static::_getTableFieldDefs(), static::getExtraTableFieldDefs());
-    $closure = function() {
-
-      /* Eventually...
-      $defs = array_merge(
-        static::_getTableFieldDefs(), 
-        static::getExtraTableFieldDefs(), 
-        static::getTableFieldDefsTrait()
-        );
-       * 
-       */
-      // Debugging:
-      $_gtbd = static::_getTableFieldDefs();
-      $extrad = static:: getExtraTableFieldDefs(); 
-      $ttbd =   static::getTableFieldDefsTrait();
-      $defs = array_merge($_gtbd, $extrad, $ttbd);
-      //pkdebug("For class: ".static::class." Table Field Defs: ",
-          //['_gtbd'=> $_gtbd, 'extrad'=> $extrad, 'ttbd'=>$ttbd, "\n\nAll Defs:"=>$defs]);
-      return $defs;
-    };
-    return static::getCached('tableFieldDefs', $closure);
-    //$defs = static::_getTableFieldDefs();
-    //return static::_unsetTableFieldDefs($defs);
+    return static::getCached('tableFieldDefs',
+        [static::class,'cgetTableFieldDefs']);
   }
 
   public static function getConversion($key) {
@@ -1186,8 +1209,7 @@ class $createclassname extends Migration {
    * ExtraConstructor[TraitName]
    * @param type $attributes
    */
-  public static function getExtraConstructors() {
-    $cacheclosure = function() {
+  public static function cgetExtraConstructors() {
      // pkdebug("Building constructors for : ".static::class);
      // echo "\nIn The extra constructors closure...\n";
       #Assume only from Traits
@@ -1200,27 +1222,10 @@ class $createclassname extends Migration {
         }
       }
       return $constructors;
-    };
-    return static::getCached('ExtraConstructors', $cacheclosure);
-    /*
-    if ($constructors === null) {
-      pkdebug("Building constructors for : ".static::class);
-      #Too many methods, most models don't use traits. so,
-      #Assume only from Traits
-      $traitmethods = static::getTraitMethods(static::$trimtraits);
-      $fnpre = 'ExtraConstructor';
-      //$methods = get_class_methods(static::class);
-      $constructors = [];
-      foreach ($traitmethods as $traitmethod) {
-        if (startsWith($traitmethod, $fnpre, false)) {
-          $constructors[] = $traitmethod;
-        }
-      }
-      static::setCached('ExtraConstructors', $constructors);
     }
-    return $constructors;
-     * 
-     */
+  public static function getExtraConstructors() {
+    return static::getCached
+        ('ExtraConstructors', [static::class,'cgetExtraConstructors']);
   }
 
 
@@ -2107,6 +2112,32 @@ class $createclassname extends Migration {
    * 
    * BAD -= See below for alternative
    */
+  public static function bgetExtraTableFieldDefs() {
+    $fnpre = 'getTableFieldDefsExtra';
+    $methods = get_class_methods(static::class);
+    $tfmethods = [];
+    $tfdefsets = [];
+    foreach ($methods as $method) {
+      if (startsWith($method, $fnpre, false)) {
+        $tfmethods[] = $method;
+      }
+    }
+    if (!$tfmethods || !is_array($tfmethods) || !count($tfmethods)) return [];
+    foreach ($tfmethods as $tfmethod) {
+      $res = static::$tfmethod();
+      if ($res && is_array($res) && count($res)) {
+        $tfdefsets[] = $res;
+      }
+    }
+    if (!$tfdefsets || !is_array($tfdefsets) || !count($tfdefsets)) return [];
+    if (count($tfdefsets) === 1) return $tfdefsets[0];
+    return call_user_func_array('array_merge', $tfdefsets) ?: [];
+  }
+  public static function getExtraTableFieldDefs() {
+    return static::getCached("ExtraTableFieldDefMethods_methods",
+        [static::class,'bgetExtraTableFieldDefs']);
+  }
+    /*
   public static function getExtraTableFieldDefs() {
     $key = "ExtraTableFieldDefMethods";
     $akey = $key."_methods";
@@ -2133,6 +2164,8 @@ class $createclassname extends Migration {
     };
     return static::getCached($akey,$closure);
   }
+     * *
+     */
 
   /** 
    * Get table field defs from trait properties, starting with
@@ -2257,7 +2290,7 @@ class $createclassname extends Migration {
       $comps=array_merge($comps,$callable);
     }
     $key = $this->simpleKey($comps);
-    return static::getCached($key,$callable,'SDC');
+    return static::getCached($key,$callable,[],'SDC');
     //pkdbgtm("Leaving localDataCached after getCached");
   }
 
