@@ -296,11 +296,26 @@ abstract class PkModel extends Model {
     return $merged;
   }
 
-  /** Returns an array of attributes matching the keys, for AJAX */
+  /** Returns an array of attributes matching the keys, for AJAX
+   * Indexed keys are this objects attributes/properties - entries
+   * keyed by a string with value of array are relationship attributes
+   */
+
   public function fetchAttributes($keys = []) {
     $ret = [];
-    foreach ($keys as $key) {
-      $ret[$key]=$this->$key;
+    if (is_string($keys)) {
+      $keys = [$keys];
+    }
+    foreach ($keys as $idx => $key) {
+      if (is_int($idx)) {
+        $ret[$key]=$this->$key;
+      } else if (is_string($idx) && static::getRelationNames($idx)) {
+        $rel = [];
+        foreach ($this->$idx as $arel) {
+          $rel[] = $arel->fetchAttributes($key);
+        }
+        $ret[$idx] = $rel;
+      }
     }
     return $ret;
   }
@@ -1030,15 +1045,28 @@ class $createclassname extends Migration {
     return $uv;
   }
 
-  public static function getAttributeCollectionNames() {
-    return array_keys(static::getLoadRelations());
+  //public static function getAttributeCollectionNames() {
+  public static function getRelationNames($relation = null) {
+    $relations = array_keys(static::getLoadRelations());
+    if (!$relation) {
+      return $relations;
+    }
+    if (in_array($relation, $relations,1)) {
+      return $relation;
+    }
   }
+  /*
+   * 
+   */
 
-  public static function getRelationalClass($relclass) {
+  public static function getRelationClass($relation) {
+    return static::getRelationClasses()[$relation] ?? null;
+    /*
     if (in_array($relclass, static::getRelationalClasses(),1)) {
       return $relclass;
     }
     return null;
+     * */
   }
   /**
    * For generating backup SQL files of the current instance.
@@ -2140,12 +2168,21 @@ class $createclassname extends Migration {
   /**
    * HTML & JSON Encode this model attributes for inclusion in an HTML data-XXX
    * attribute, so we can use JS to display on hover or whatever.
+   * !!!!  RETURNS WAY TOO MUCH !!!  Try just what you need - encodeFetchAttributes()
    * @param type $args
    * @return type
    */
   public function getEncodedCustomAttributes($args=null) {
     $ca = $this->getCustomAttributes($args);
     $jsenc = json_encode($ca, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    $htenc = html_encode($jsenc);
+    //$htenc = static::encodeData($ca);
+    return $htenc;
+  }
+
+  public function encodeFetchAttributes($keys=[]) {
+    $fa = $this->fetchAttributes($keys);
+    $jsenc = json_encode($fa, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     $htenc = html_encode($jsenc);
     //$htenc = static::encodeData($ca);
     return $htenc;

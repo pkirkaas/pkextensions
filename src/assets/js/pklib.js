@@ -252,6 +252,7 @@ $(function () {
  * @result - sets the HTML of the target to the value set
  */
   $('body').on('click', '.js-mod-ajax, .js-set-ajax', function (event) {
+    console.log("Clicked on set");
     var $target = $(event.target);
     js_get_set_ajax($target,'set');
     //window.js_get_set_ajax(event.target,'set');
@@ -272,6 +273,7 @@ $(function () {
       var url = '/ajax/set'
       var ajaxdata = {value:set};
     }
+    console.log("About to AJAX set");
 
     var ajaxparamarr =['Model','Id','Modfield'];
     ajaxparamarr.forEach(function(element) {
