@@ -217,7 +217,7 @@ abstract class PkController extends Controller {
     if (!$this->ShouldProcessSubmit($opts)) return null;
     $validator = keyVal('validator', $opts);
     $valres = $this->validateRequest($validator);
-    pkdebug("Validation Result:", $valres);
+    //pkdebug("Validation Result:", $valres);
  
     #In a POST && met 'shouldProcessSubmit' requirements
     if ($opts instanceOf PkModel) {

@@ -219,6 +219,9 @@ containing block needs to be positioned relatively*/
 
 
 /******   Text Tweaks ***********/
+.small { font-size: small ! important; }
+.smaller { font-size: smaller ! important; }
+.larger { font-size: large ! important; }
 .large { font-size: large ! important; }
 .x-large { font-size: x-large ! important; }
 .xx-large { font-size: xx-large ! important; }
@@ -427,12 +430,14 @@ div.error-popup-box.ui-dialog-content {
       flex-wrap: wrap !important;
     }
   }
+  // Any divs CONTAINED in this el must be block
   .d-block-within-below-#{$bp} > div {
     @include below-bp($bp) {
       display: block !important;
       width: 100% !important;
     }
   }
+  .hidden-#{$bp}-down,
   .d-none-below-#{$bp} {
     @include below-bp($bp) {
       display: none !important;

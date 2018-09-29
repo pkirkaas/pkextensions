@@ -14,9 +14,13 @@ protected function mapWebRoutes() {
 Auth::routes();
 Route::group(['middleware' => ['web']], function () {
 //Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
+  /*
 Route::group(['prefix'=>'admin','middleware'=> ['auth','admin']],function() {
   Route::get('/btest',function () {return "<h1> Proxied Hi, kid</h1><h1> Proxied ";});
+   * 
+   */
   //Route::any('/deletemodel', ['as' => 'admin_deletemodel'], function() {
+  /*
   Route::any('/deletemodel',['as'=>'admin_deletemodel',  'middleware'=>['auth','admin'],
       function() {
         $data = Request::all();
@@ -40,6 +44,8 @@ Route::any('auth/logout', ['as' => 'auth_logout',
         return redirect()->route('home');
       }
   ]);
+   * 
+   */
 
 //Ajax Routes for common PkAjaxController
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
@@ -48,10 +54,13 @@ Route::any('ajax/toggle', ['as' => 'ajax_toggle', 'uses'=> 'AjaxController@toggl
 Route::any('ajax/modelattributes', ['as' => 'ajax_modelattributes', 'uses'=> 'AjaxController@modelattributes']);
 Route::any('ajax/set', ['as' => 'ajax_set', 'uses'=> 'AjaxController@set']);
 Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
+
+/*
 Route::any('test', ['as' => 'test',  function() { ## Just echos the submitted data
     $data = Request::all();
     pkdebug("The submitted data:\n\n", $data);
     return json_encode(["The Request Data" =>$data], JSON_PRETTY_PRINT |  JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES);
 }]);
+*/
 
 });

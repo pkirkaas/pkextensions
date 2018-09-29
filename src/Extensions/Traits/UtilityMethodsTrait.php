@@ -151,7 +151,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * This is so different classes can share the same cache data
    * @return mixed
    */
-  public static function getCached($key, $value=null,$args=[],$keyBase=false) {
+  public static function getCached($key, $value=false,$args=[],$keyBase=false) {
     if (!$keyBase) {
       $keyBase = static::class;
     }
@@ -200,13 +200,18 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * 
    */
 
-  public static function getArraysMerged($prefix, $idx=false) {
+  public static function getArraysMerged($prefix, $idx=false,$default=null) {
     //pkdebug("Entering garmr for class: ".static::class."; prefix: [$prefix]");
   //public static function combineAncestorAndSiblings($prefix, $idx=false) {
     $akey = $prefix.'_combined';
-    $closure = function () use ($prefix, $idx) {
-      $ancestors = static::getAncestorArraysMerged($prefix,$idx);
-      $siblings = static::getSiblingArraysMerged($prefix,$idx);
+    $ret = static::getCached($akey);
+    if ($ret !== false) {
+      return $ret;
+    }
+    
+    $closure = function () use ($prefix, $idx, $default) {
+      $ancestors = static::getAncestorArraysMerged($prefix,$idx,$default);
+      $siblings = static::getSiblingArraysMerged($prefix,$idx,1,$default);
       //pkdebug(['class'=>static::class, 'prefix'=>$prefix, 'siblings'=>$siblings, 'ancestors'=>$ancestors]);
       //echo "For Class ".static::class."; [$prefix] returning: ";
       /*
@@ -329,19 +334,26 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * $reqArr = ['key1', 'key2'=>function($val) {if ($val < 10) return false; return true;},....
    * @return Array: Merged array of hierarchy
    */
-  public static function getAncestorArraysMerged($arrayName, $idx = false) {
+  public static function getAncestorArraysMerged($arrayName, $idx = false,$default=null) {
     $akey = $arrayName."_ancestor";
-    $closure = function() use($arrayName, $idx, $akey) {
+    $ret = static::getCached($akey);
+    if ($ret !== false) {
+      return $ret;
+    }
+    $closure = function() use($arrayName, $idx, $akey, $default) {
       //pkdebug("Making Ancestor Arrays Merged for ".static::class.", akey: $akey");
       //echo ("\nMaking Ancestor Arrays Merged for ".static::class.", akey: $akey\n\n");
       $retArr = [];
-      $convert = function($arr) use ($idx) {
+      /*
+      $convert = function($arr) use ($idx, $default) {
         if (is_string($idx)) {
-          return normalizeConfigArray($arr); 
+          return normalizeConfigArray($arr,null,$default); 
         } else {
           return $arr;
         }
       };
+       * 
+       */
       $thisClass = $class = static::class;
       #All static, so cache results...
       static $fullRetArr = [];
@@ -357,7 +369,9 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       //$fullRetArr[$class] = null;
       #First, build array of arrays....
       if (property_exists($class, $arrayName) && is_array($class::$$arrayName)) {
-        $retArr[] = $convert($class::$$arrayName); #Deliberate double $$
+        $tmar = $class::$$arrayName;
+        $retArr[] = is_string($idx)?  normalizeConfigArray($tmar,null,$default):$tmar; 
+            //$convert($class::$$arrayName); #Deliberate double $$
       }
       while ($par = get_parent_class($class)) {
         if (!property_exists($par, $arrayName) ||
@@ -366,7 +380,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
         }
         if (($tstArr =$par::$$arrayName) && is_array($tstArr) ) {
           //$retArr[] = $par::$$arrayName;
-          $retArr[] = $convert($tstArr);
+          //$retArr[] = $convert($tstArr);
+          $retArr[] = is_string($idx)?normalizeConfigArray($tstArr,null,$default):$tstArr; 
         }
         $class = $par;
       }
@@ -393,10 +408,14 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @param boolean $idx - combine as indexed array or assoc.
    * @param boolean $longer - does the property name have to be longer than prefix?
    */
-  public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1) {
+  public static function getSiblingArraysMerged($prefix, $idx=false, $longer=1, $default=null) {
     //echo "Trying to get SIBLING arrays merged for: ".static::class."\n\n";
     $akey = $prefix."_sibling";
-    $closure = function() use($prefix, $idx, $longer) {
+    $ret = static::getCached($akey);
+    if ($ret !== false) {
+      return $ret;
+    }
+    $closure = function() use($prefix, $idx, $longer, $default) {
       //pkdebug("Making Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'");
       //echo ("\nMaking Sibling Arrays merged for class; ".static::class.", with prefix: '$prefix'\n\n");
       //echo "\nTrying to get reflection class...\n";
@@ -418,7 +437,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
       foreach ($staticprops as $key => $val) {
        // echo "Key:"; var_dump($key); echo "VAL"; var_dump($val);
         if (startsWith($key, $prefix, false, $longer) && $val && count($val)) {
-          $tomerge[]=$val;
+          $tomerge[] = is_string($idx)?normalizeConfigArray($val,null,$default):$val; 
+          //$tomerge[]=$val;
         }
       }
       //echo "\n\nArray to merge: ";print_r($tomerge); echo "  count of :".count($tomerge). " \n\n";

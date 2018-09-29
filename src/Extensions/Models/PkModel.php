@@ -98,6 +98,12 @@ abstract class PkModel extends Model {
    */
   public static $table_field_defs = [ 'id' => 'increments',];
 
+
+
+
+
+  
+
   /** Fields to clean of dangerous HTML tags before saving
    *
    * @var array - example: ['notes']; 
@@ -112,34 +118,41 @@ abstract class PkModel extends Model {
   public function getICache($key,$cache=false) {
     $cache = false;
     $ret = keyVal($key, $this->instanceCache,false);
-    $found = ($ret === false)?"DIDN't FIND IT":"found it!";
-    $skey = $this->mkInstanceKey($key);
-    pkdbgtm("In getICache[$skey] $found");
+    $found = ($ret === false)?"Didn't FIND [$key]":"FOUND [$key]!";
     if (!$cache) {
       return $ret;
     }
+    pkdebug("Don't want to be here!");
     $skey = $this->mkInstanceKey($key);
+    //pkdbgtm("In getICache[$skey] $found");
     $sret = Cache::get($skey);
+    if (!$sret) {
+      $sret = false;
+    }
+    return $sret;
+    /*
     pkdbgtm("Tried Cache::get($skey)");
     if ($sret !== null ) {
       return $this->setICache($key,$sret);
     }
     return false;
+     * *
+     */
   }
   public function setICache($key,$value,$cache = false,$min=10) {
-    pkdbgtm("Setting cache for [$key]");
     $cache = false;
     if (is_callable($value)) {
       $value = user_func_array($value);
     }
+    pkdbgtm("Setting ICache for [$key], typeVal: ".typeOf($value));
     $this->instanceCache[$key] = $value;
     if ($cache) {
+      pkdebug("Don't want to be here!");
       $skey = $this->mkInstanceKey($key);
       pkdbgtm("Setting Redis Cache for [$skey]");
       Cache::put($skey,$value,$min);
     }
-    $skey = $this->mkInstanceKey($key);
-    pkdbgtm("DONE Setting  Cache for [$skey]");
+    pkdbgtm("DONE Setting  Cache for [$key]");
     return $value;
   }
 
@@ -1250,6 +1263,29 @@ class $createclassname extends Migration {
   }
 
 
+  /** Assoc array of non-persistent attribute names to 
+   * methods or callables to populate them.
+   * Used in __get - if name is key of array but not
+   * set on object, execute method & assign it.
+   * @var assocarr 
+   */
+  public static $attstofuncs = [];
+  /**
+   * If no key, returns the mapped array of keys to funcs/methods
+   * If $key, returns the matched callable (or $key if null)
+   * @param null|string $key
+   * @return array|callable
+   */
+  public static function getAttsToFuncs($key = null) {
+    $class = static::class;
+    $attstofuncs = static::getCached('attstofuncs',
+        [static::class,'getArraysMerged'],['attstofuncs','normalize','#key']);
+    if (!$key) return $attstofuncs;
+    return $attstofuncs[$key] ?? null;
+  }
+
+  /** The instance array of calculated atts to values */
+  public $attstocalcs=[];
 
 
   /**
@@ -1261,13 +1297,26 @@ class $createclassname extends Migration {
   public function __get($key) {
     # This seems pretty obvious - why doesn't Eloquent do it?
     if (!$key) return null;
+    if (in_array($key,array_keys($this->attstocalcs),1)) {
+      //pkdebug("Returning existing value for [$key]");
+      return $this->attstocalcs[$key];
+    //} else if (in_array($key,array_keys(static::getAttsToFuncs()),1)) {
+    } else if ($method = static::getAttsToFuncs($key)) {
+      //pkdebug("[$key] is a calculated attribute with callable:",$method);
+      if (is_string($method) && method_exists($this,$method)) {
+       // pkdebug("Executing [$method] to get [$key]");
+        return $this->attstocalcs[$key]=$this->$method();
+      } else if (is_callable($method)) {
+        return $this->attstocalcs[$key]=call_user_func($method);
+      }
+    }
 
     $name = removeEndStr($key, static::$displayValueSuffix);
     if ($name && in_array($name,static::getDisplayValueFields(),1)) {
-      return $this->displayValue($name);
+        return $this->attstocalcs[$key] = $this->displayValue($name);
     }
     if (in_array($key,static::getMethodsAsAttributeNames(),true)) {
-      return $this->$key();
+       return $this->attstocalcs[$key] = $this->$key();
     }
     $res = parent::__get($key);
     if (($this->getConversion($key) !== 'array') || is_array($res)) {

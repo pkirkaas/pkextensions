@@ -679,40 +679,109 @@ $(function () {
  * @param format - opt - the formatter to use, else look for 
  *   CSS class, like 'jq-format-currency'
  * @result - sets this.html to the formatted content
+ * 
+ * ex:
+ * js: $('.jq-format').htmlFormatted();
+ * or:
+   $target.htmlFormatted(result,format);
+ * <div class='jq-format jq-format-currency'>300</div>
  */
 jQuery.fn.extend({
-  htmlFormatted: function (content,format) {
-    //console.log("In HTMLFormatted, content",content,"Format",format);
-    //console.log("Formatters:", this.formatters);
-    if (format) {
-      var formatted = this.formatters[format](this,content,true);
-      //console.log("The formatted result:",formatted);
-      //this.html(formatted);
+  htmlFormatted: function (argcontent,argformat, argparams) {
+    console.log("Matched this -",this);
+    if (!this.length) {
+      console.log("No length for this:",this);
       return;
     }
+    var me = this;
+    this.each(function(idx,el) {
+      
+      console.log("Inside loop:, idx: "+idx+"; el:",el);
+      el = $(el);
+      content = argcontent || el.attr('data-format-content') || el.text();
+      format = argformat || el.attr('data-format-format');
+      console.log("In HTMLFormatted, content",content,"Format",format);
+      //console.log("Formatters:", this.formatters);
+      if (format) {
+        var formatted = me.formatters[format](el,content,true);
+        //console.log("The formatted result:",formatted);
+        //this.html(formatted);
+        return;
+      }
+      params = argparams || el.attr('data-format-params');
 
-    for (var formatter in this.formatters) {
-      if (this.formatters[formatter](this, content))
-        return true;
-    }
-    this.html(content);
-    return;
+      for (var formatter in me.formatters) {
+        if (me.formatters[formatter](el, content))
+          return true;
+      }
+      me.html(content);
+      return;
+    });
   },
   formatters: {
+    //How many decimal places? Default: 2
+    fixed: function(jq,content,force, argparams) {
+      if (jq.hasClass('jq-format-fixed') || force) {
+        if (!content) {
+          content = jq.text();
+        }
+        var ocont = content;
+        content = parseFloat(content);
+        if (isNaN(content)) {
+          console.log("htmlFormatter-fixed - NaN:",ocont);
+          jq.text('');
+          return true;
+        }
+        var prec = argparams || jq.attr('data-params') || 2;
+        if (!Number.isInteger(prec)) {
+          if (typeof prec === 'string') {
+            prec = parseInt(prec);
+          }
+          if (!prec || isNaN(prec)) {
+            prec = 2;
+          }
+        }
+        console.log("In Precision, content:",content);
+        
+
+        jq.text(content.toFixed(prec));
+        return true;
+      }
+      return false;
+    },
+    date: function(jq,content,force, argparams) {
+      if (jq.hasClass('jq-format-date') || force) {
+        if (!content) {
+          content = jq.text();
+        }
+        console.log("In Date Frmatt, content:",content);
+        var m = moment(content);
+        if (!m.isValid()) {
+          console.log("Not a valid date:", content);
+          jq.text('');
+          return true;
+        }
+        var mfmt = argparams || jq.attr('data-params') || "MMMM D, YYYY";
+        jq.text(m.format(mfmt));
+        return true;
+      }
+      return false;
+    },
     currency: function (jqobj, content, force) {
       if (jqobj.hasClass('jq-format-currency') || force) {
         //console.log("In currency formatter, content:",content);
         var num = toNumber(content);
         if (isNaN(num)) {
           console.error('Invalid Number: ', content);
-          jqobj.html('');
+          jqobj.text('');
+          return true;
         }
         var wrap_class = jqobj.attr('data-wrap-class');
         if (wrap_class) {
           jqobj.addClass(wrap_class);
         } else {
-          jqobj.addClass('pk-dollar-value');
-          jqobj.addClass('dollar-format');
+          //jqobj.addClass('pk-dollar-value');
+          //jqobj.addClass('dollar-format');
         }
         var sign = '';
         if (num < 0) {

@@ -18,8 +18,8 @@
         <li class="navbar-brand nav-item site-brand-li">
             <a class="nav-link" data-tootik="Home" data-tootik-conf='bottom'
                title='Home' href="{{route('home')}}">
-              <img class="head-img img-fluid tpm-head-img" src="{{asset(MENU_ICON)}}">
-              <!-- {{SITE_NAME}}  (optional) -->
+              <img class="head-img img-fluid tpm-head-img" 
+                   src="{{asset(Config::get('app.menu_icon'))}}">
             </a>
         </li>
 

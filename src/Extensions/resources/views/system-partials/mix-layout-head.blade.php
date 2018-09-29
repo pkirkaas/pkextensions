@@ -22,6 +22,6 @@ use PkExtensions\PopAtts;
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Open+Sans:400,700|Oswald:400,700|Lato:400,700|Roboto:400,700|Raleway:400,600,700"
           rel="stylesheet">
      */?>
-    <title>{{SITE_NAME}}</title>
+    <title>{{Config::get("app.name")}}</title>
     <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
     {!!PopAtts::jsInit()!!}

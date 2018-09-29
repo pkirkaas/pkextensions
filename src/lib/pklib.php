@@ -456,7 +456,9 @@ function pkdebug_base() {
     $idx++;
   }
 
-  while (empty($stack[$idx]['file']) || ($stack[$idx]['file'] === __FILE__) || (substr($stack[$idx + 1]['function'], -3) === 'Log')) {
+  while (empty($stack[$idx]['file']) || 
+      ($stack[$idx]['file'] === __FILE__) ||
+      (isset($stack[$idx+1]) && (substr($stack[$idx + 1]['function'], -3) === 'Log'))) {
     $idx++;
   }
   $frame = $stack[$idx];
@@ -3357,9 +3359,11 @@ function isPost() {
  * 
  * But in the above, $key1 is a value, not a key, and the value for $key2 is a
  * scalar, not an array. So this converts $config as written into a normalized form.
- * 
+ * If $default &&  
  * If $struct===null, return array will just switch indexed values to keys and
- * return [$key1=>null, $key2=>$val2, etc. 
+ * return [$key1=>$default, $key2=>$val2, etc. 
+ * 
+ * In the special case where $default = "#key", the default value will be the key
  * 
  * if $struct is string, returns
  * [$key1=>[$struct=>null], $key2=>[$struct=>$scalar2], $key3=>[$struct=>null, 'p1'=>$scalar3...
@@ -3387,23 +3391,27 @@ function isPost() {
  *     if $struct is scalar & $val is scalar, make val array: [$struct=>$val]
  *     if $struct is array - $struct[0] contains the keyname if $val is scalar 
  *   if scalar - AND $val is scalar
+ * @param mixed $default: The default 
  * 
  * @return array of form: [$keyName => ['valkey1' => $valOrDefault, 'valkey2
  */
 
-function normalizeConfigArray(array $arr = [], $struct = null) {
+function normalizeConfigArray(array $arr = [], $struct = null,$default=null) {
   if (!$arr || !is_array($arr) || !count($arr)) return [];
-  $defkey = $defarr = null;
-  if (is_string($struct)) $defkey = $struct;
+  $defkey =  null;
+  $defarr = $default;
   if (is_array($struct)) {
     $defkey = keyVal(0, $struct);
     unset($struct[0]);
     $defarr = $struct;
-  }
+  } else if (is_string($struct)) {
+    $defkey = $struct;
+  } 
   $retarr = [];
   foreach ($arr as $origkey => $origval) {
     if (is_int($origkey) && is_string($origval)) {
-      $retarr[$origval] = $defarr;
+      //$retarr[$origval] = $defarr;
+      $retarr[$origval] = ($defarr === '#key')?$origval : $defarr;
     } else if (is_string($origkey)) {
       if (is_scalar($origval) && $defkey) {
         $newval = [$defkey => $origval];
