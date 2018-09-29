@@ -535,6 +535,21 @@ window.formatMixin = {
         return '';
       }
       return val.toFixed(prec);
+    },
+    /*Format a link - val=url, if opt=string, the label, else opt object: {
+      label: the label
+      class: the CSS class
+      atts: Arbitrary attributes (as string)
+    */
+       
+    formatLink: function(val,opt) { 
+      if (!opt) {
+        opt = {};
+      } else if (typeof opt === 'string') {
+        opt = {label:opt};
+      }
+      return "<a href='"+val+"' class='"+opt.class+"' "+opt.atts+">"+opt.label+"</a>";
+
     }
   }
 };
@@ -595,7 +610,12 @@ window.tableMixin = {
             var keymap = _.cloneDeep(this.keymap);
             var celldataarr = [];
             for (var akey in row) {
-              keymap[akey].field = row[akey];
+              if (keymap[akey].format) {
+                var format = keymap[akey].format;
+                keymap[akey].field = this[format](row[akey],keymap[akey].formatopts);
+              } else {
+                keymap[akey].field = row[akey];
+              }
               celldataarr.push(keymap[akey]);
             }
             rowdataarr.push({celldataarr:celldataarr,rowinfo:this.tbldata.rowinfo});
