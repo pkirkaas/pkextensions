@@ -691,19 +691,19 @@ $(function () {
  */
 jQuery.fn.extend({
   htmlFormatted: function (argcontent,argformat, argparams) {
-    console.log("Matched this -",this);
+    //console.log("Matched this -",this);
     if (!this.length) {
-      console.log("No length for this:",this);
+      //console.log("No length for this:",this);
       return;
     }
     var me = this;
     this.each(function(idx,el) {
       
-      console.log("Inside loop:, idx: "+idx+"; el:",el);
+      //console.log("Inside loop:, idx: "+idx+"; el:",el);
       el = $(el);
       content = argcontent || el.attr('data-format-content') || el.text();
       format = argformat || el.attr('data-format-format');
-      console.log("In HTMLFormatted, content",content,"Format",format);
+      //console.log("In HTMLFormatted, content",content,"Format",format);
       //console.log("Formatters:", this.formatters);
       if (format) {
         var formatted = me.formatters[format](el,content,true);
@@ -731,7 +731,7 @@ jQuery.fn.extend({
         var ocont = content;
         content = parseFloat(content);
         if (isNaN(content)) {
-          console.log("htmlFormatter-fixed - NaN:",ocont);
+          //console.log("htmlFormatter-fixed - NaN:",ocont);
           jq.text('');
           return true;
         }
@@ -744,7 +744,7 @@ jQuery.fn.extend({
             prec = 2;
           }
         }
-        console.log("In Precision, content:",content);
+        //console.log("In Precision, content:",content);
         
 
         jq.text(content.toFixed(prec));
@@ -757,10 +757,10 @@ jQuery.fn.extend({
         if (!content) {
           content = jq.text();
         }
-        console.log("In Date Frmatt, content:",content);
+        //console.log("In Date Frmatt, content:",content);
         var m = moment(content);
         if (!m.isValid()) {
-          console.log("Not a valid date:", content);
+          //console.log("Not a valid date:", content);
           jq.text('');
           return true;
         }
@@ -775,7 +775,7 @@ jQuery.fn.extend({
         //console.log("In currency formatter, content:",content);
         var num = toNumber(content);
         if (isNaN(num)) {
-          console.error('Invalid Number: ', content);
+          //console.error('Invalid Number: ', content);
           jqobj.text('');
           return true;
         }

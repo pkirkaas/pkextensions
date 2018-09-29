@@ -3,6 +3,43 @@
  * Compose to make forms
  */
 
+/** Pops up a pk-modal component */
+window.Vue.component('modal-btn',{
+  template: `
+  <div class="btn btn-primary btn-pop" :class="params.popBtnCls"
+       @click="openModal"  @close="closeModal" @custome="custome">
+    {{label}}
+    <pk-modal :params="params" v-show="showModal">This is the slot contents</pk-modal>
+  </div>
+  `,
+  props: ['label','params'],
+  mounted: function() {
+    console.log("In Btn, params:",this.params);
+  },
+  data: function() {
+    return {
+      showModal: false,
+    };
+  },
+  methods: {
+    custome: function(event) {
+      console.log("In OpenModal Btn - received custome");
+    },
+    openModal: function(event) {
+      console.log("Activated OpenModal");
+      this.$emit('custome',5);
+      //this.showModal = !this.showModal;
+      this.showModal = true;
+    },
+    closeModal: function(event) {
+      console.log("In Modal Btn, trying to close");
+      this.showModal = false;
+    },
+  },
+
+
+});
+
 /** Could be a label, or data field - if data-field, just display or input 
  *@params: 
  *  type: label, datum
