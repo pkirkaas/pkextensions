@@ -241,7 +241,8 @@ $(function () {
   });
 
 /**
- * Sets or Toggles Field
+ * Gets/Sets or Toggles Field - one direction only, or both
+ * 3 classes - js-set-ajax only sets, js-get-ajax only gets, js-mod-ajax does both
  * @param data-param-model - the model
  * @param data-param-id - the ID
  * @param data-param-modfield - the field to modify
@@ -250,7 +251,7 @@ $(function () {
  *     Like checkbox or other formatting options
  * @result - sets the HTML of the target to the value set
  */
-  $('body').on('click', '.js-mod-ajax', function (event) {
+  $('body').on('click', '.js-mod-ajax, .js-set-ajax', function (event) {
     var $target = $(event.target);
     js_get_set_ajax($target,'set');
     //window.js_get_set_ajax(event.target,'set');
@@ -284,7 +285,7 @@ $(function () {
     window.axios.post(url,ajaxdata).
       then(response=>{
         var result = response.data[response.data.modfield];
-        //console.log("Response data:",response.data,"Result:",result,"Format:", format);
+        console.log("Response data:",response.data,"Result:",result,"Format:", format);
         $target.htmlFormatted(result,format);
       }).
       catch(error=>{
@@ -293,7 +294,7 @@ $(function () {
               /*
     */
     };
-  $('.js-mod-ajax').each(function(idx,el) {
+  $('.js-mod-ajax,.js-get-ajax').each(function(idx,el) {
     window.js_get_set_ajax($(el),'get');
   });
   //window.js_get_set_ajax($('.js-mod-ajax'),'get');
