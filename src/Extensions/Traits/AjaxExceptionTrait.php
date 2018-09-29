@@ -26,7 +26,7 @@ trait AjaxExceptionTrait {
         'error'=>'exception',
         'exception'=>$exception->getMessage(),
         'exceptiontype' => get_class($exception),
-        'exceptiontrace'=>array_slice($exception->getTrace(),0,3),
+        //'exceptiontrace'=>array_slice($exception->getTrace(),0,3),
         ];
       return PkAjaxController::sjsonresponse($data,$status);
     }

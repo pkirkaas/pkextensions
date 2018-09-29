@@ -483,3 +483,56 @@ window.Vue.component('resp-tbl', {
 
 /******************** END  Reactive Tables ************************/
 
+
+//////////////  Mixins //////////
+window.formatMixin = {
+  methods: {
+    formatDate: function(dt,fmt) {
+      fmt = fmt || "MMMM D, YYYY";
+      var m = window.moment(dt);
+      if (!m.isValid()) {
+        console.log("Invalid date: ",dt);
+        return '';
+      }
+      return m.format(fmt);
+      //return m.isValid() ? m.format(fmt) : '';
+    },
+    formatCurrency: function(amt) { //Returns a wrapped value for negative
+      num = Number(amt);
+      if (isNaN(num)) {
+        console.log("Invalid number: ",amt);
+        return '';
+      }
+      var sign = '';
+      var cssclass = ' dollar-value '
+      if (num < 0) {
+        num = -num;
+        sign = '-';
+        cssclass += ' negative-dollar-value ';
+      }
+      return "<div class='"+cssclass+"'>"+sign +'$'+  num.toLocaleString("en");
+    },
+    formatChecked: function(val) { //If val is string, check if "0"
+      if (typeof val === 'string'){
+        var tst = parseInt(val);
+        if (!isNaN(tst)) {
+          val = tst;
+        }
+      }
+      if (val) {
+        return  '&#9745;';
+      }
+      return  '&#9744;';
+    },
+    formatFixed: function(val,prec) {
+      prec = prec || 2;
+      val = Number(val);
+      if (isNaN(val)) {
+        return '';
+      }
+      return val.toFixed(prec);
+    }
+  }
+};
+
+
