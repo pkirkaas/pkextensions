@@ -144,7 +144,7 @@ abstract class PkModel extends Model {
     if (is_callable($value)) {
       $value = user_func_array($value);
     }
-    pkdbgtm("Setting ICache for [$key], typeVal: ".typeOf($value));
+    //pkdbgtm("Setting ICache for [$key], typeVal: ".typeOf($value));
     $this->instanceCache[$key] = $value;
     if ($cache) {
       pkdebug("Don't want to be here!");
@@ -152,7 +152,7 @@ abstract class PkModel extends Model {
       pkdbgtm("Setting Redis Cache for [$skey]");
       Cache::put($skey,$value,$min);
     }
-    pkdbgtm("DONE Setting  Cache for [$key]");
+    //pkdbgtm("DONE Setting  Cache for [$key]");
     return $value;
   }
 

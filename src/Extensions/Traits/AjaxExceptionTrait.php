@@ -21,11 +21,11 @@ trait AjaxExceptionTrait {
     if ($segs && is_array($segs) && ($segs[0]==='ajax')) {
       $status = [498=>'exception'];
       $data = [
+        'exception'=>$exception->getMessage(),
+        'exceptiontype' => get_class($exception),
         'requestdata'=>$request->toArray(),
         'url'=>$request->fullUrl(),
         'error'=>'exception',
-        'exception'=>$exception->getMessage(),
-        'exceptiontype' => get_class($exception),
         //'exceptiontrace'=>array_slice($exception->getTrace(),0,3),
         ];
       return PkAjaxController::sjsonresponse($data,$status);

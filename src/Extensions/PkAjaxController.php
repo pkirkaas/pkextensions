@@ -4,7 +4,7 @@ use App\Models\User;
 use PkExtensions\PkFileUploadService;
 use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
-use \PkExtenstions\PkCollection;
+use PkExtenstions\PkCollection;
 
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
@@ -68,7 +68,8 @@ abstract class PkAjaxController extends PkController {
    * @param int|boolean $options - json_encode integer options. If true/1, make
    * default JSON Opts as defined in UtilityMethodsTrait
    * @return Laravel/Symfony Response Object - if Axios, if successful,
-   *   in then(response) : if error, in catch(error=>error.response) 
+   *   in then(response) : if error, in catch(error=>error.response)  - if it's
+   *   an AJAX error. If it's a JS error, just "error"
    * {
         data: The JSON encoded Response, or just string if just string
         status: integer- the status
@@ -171,6 +172,28 @@ abstract class PkAjaxController extends PkController {
       $instance->modfield = $modfield;
     }
     return $this->success($instance);
+  }
+
+  /** Fetch attributes as specified by the model, instance id (or IDS), and 
+   * model keys
+   * @return array - 
+   */
+  public function fetchAttributes() {
+    $model = $this->data['model'];
+    $id = $this->data['id'];
+    $keys = $this->data['keys'];
+    $obj = $model::find($id);
+    pkdebug("ID(s):",$id,"TypeOf obj: ".typeOf($obj));
+    if ($obj instanceOf PkCollection || (typeOf($obj) == "PkExtensions\PkCollection")) { #We got an array of IDs, return a set
+      $retarr = [];
+      foreach ($obj as $inst) {
+        $retarr[] = $inst->fetchAttributes($keys);
+      }
+      return $this->success($retarr);
+    }
+
+    $atts = $obj->fetchAttributes($keys);
+    return $this->success($atts);
   }
 
 /** For Vue or JS or jQuery calls to request model attribute values to 

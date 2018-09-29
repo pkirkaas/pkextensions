@@ -9,6 +9,11 @@ class PkAddPhtml {
   public function handle($request, Closure $next) {
     app()['view']->addExtension('html', 'php');
     app()['view']->addExtension('phtml', 'php');
+
+    $segs = $request->segments();
+    if ($segs && is_array($segs) && ($segs[0]==='ajax')) {
+      appLogReset(false);
+    }
     return $next($request);
   }
 }

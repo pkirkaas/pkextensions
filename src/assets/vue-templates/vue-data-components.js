@@ -267,7 +267,8 @@ Vue.component('delete-btn', {
 window.Vue.component('resp-row', {
   name: 'resp-row',
   template: `
-  <div class="js-resp-row" :class="rowcls + show_bg_flex_lbl + display_below">
+  <div class="js-resp-row"
+      :class="rowcls + show_bg_flex_lbl + display_below +' '+lbl_row_cls">
     <input type='hidden' :name='id_name' :value="rowinfo.id" />
     <input type='hidden' name='model' :value="rowinfo.classname" />
     <div v-for="(celldata,idx) in cmp_celldataarr"
@@ -296,6 +297,9 @@ window.Vue.component('resp-row', {
       } else {
         return  " d-block-below-"+this.bp + " ";
       }
+    },
+    lbl_row_cls: function(){return this.rowinfo.islbl ?
+      (this.rowinfo.lbl_row_cls || ' lbl_row_cls ') : '';
     },
     block_below: function(){return  " d-block-below-"+this.bp + " ";},
     none_below: function(){return  " d-none-below-"+this.bp + " ";},
@@ -535,4 +539,72 @@ window.formatMixin = {
   }
 };
 
+/////   Table make Mixin //////////
 
+/**
+ Assumes caller data:  {
+  ids: array of IDs,
+  model: PkModelName,
+  keymap: Object. keys as att names, & value as label str
+     or object of properties- {
+        label: Label for the cell, if small viewport
+        lblcls: Label CSS for the cell, if small viewport
+        fldcls: Field CSS Class
+        cellcls: Cell CSS (if small viewport, so includes both label & field
+  tbldata: object containing the table data:
+      head:Table Header
+      headcls: Head CSS  class
+      tblcls: Table Class
+      bp:  xs, sm, md, lg, xl
+      rowinfo: (Overridden in rowdataarr)
+  
+  url: (opt str) - default: '/ajax/fetchattributes'
+
+*/
+window.tableMixin = {
+  methods: {
+    initData: function() {
+      var lblrow = {};
+      this.tbldata.bp = this.tbldata.bp || 'md';
+      //var tbldata = _.cloneDeep(this.tbldata);
+      //var rowinfo = tbldata.rowinfo ?   _.cloneDeep(tbldata.rowinfo): {};
+      this.tbldata.rowinfo = this.tbldata.rowinfo ? this.tbldata.rowinfo : {};
+      var lblrowinfo =   _.cloneDeep(this.tbldata.rowinfo);
+      lblrowinfo.islbl = true;
+      var rowdataarr = [];
+      //var lblrow = _.cloneDeep(this.rowdataarr[0]);
+      var keys = Object.keys(this.keymap);
+      var lblcelldataarr = [];
+      for (var key in this.keymap) {
+        var map = this.keymap[key];
+        if (typeof map === 'string') {
+          map = {label: map};
+        }
+        lblrow[key] = Object.assign({},map,{field:map.label});
+        lblcelldataarr.push(lblrow[key]);
+        this.keymap[key] = map;
+      }
+      rowdataarr.push({celldataarr:lblcelldataarr,rowinfo:lblrowinfo,bp:this.tbldata.bp});
+      //We made the first label row.
+      var url = this.url || '/ajax/fetchattributes';
+      var data = {id:this.ids, model:this.model,keys:keys};
+      axios.post(url,data).
+        then(response=>{
+          console.log("The response data:",response.data);
+          response.data.forEach(row=>{
+            var keymap = _.cloneDeep(this.keymap);
+            var celldataarr = [];
+            for (var akey in row) {
+              keymap[akey].field = row[akey];
+              celldataarr.push(keymap[akey]);
+            }
+            rowdataarr.push({celldataarr:celldataarr,rowinfo:this.tbldata.rowinfo});
+          });
+          this.tbldata.rowdataarr=rowdataarr;
+          console.log("The tbldata:",this.tbldata);
+        }).
+        catch(error=>{console.error("Error: ",error,error.response);});
+    },
+    
+  },
+};
