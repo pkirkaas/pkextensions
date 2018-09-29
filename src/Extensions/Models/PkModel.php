@@ -294,14 +294,22 @@ abstract class PkModel extends Model {
     $merged = static::getArraysMerged("methodsAsAttributeNames",true);
     if (!$merged) $merged = [];
     return $merged;
-                                               //methodsAsAttributeNames
   }
+
+  /** Returns an array of attributes matching the keys, for AJAX */
+  public function fetchAttributes($keys = []) {
+    $ret = [];
+    foreach ($keys as $key) {
+      $ret[$key]=$this->$key;
+    }
+    return $ret;
+  }
+
 
   /** Executes the methods listed in static::getMethodsAsAttributesNames() and
    * returns the results in an array of arrays
    */
   public function getMethodAttributes($arg=null) {
-    $myclass = get_class($this);
     $methodAttributes = static::getMethodsAsAttributeNames();
     if (!$methodAttributes || !is_arrayish($methodAttributes) || !count($methodAttributes)) {
       return [];

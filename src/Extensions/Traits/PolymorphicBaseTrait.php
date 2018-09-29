@@ -80,13 +80,17 @@ Trait PolymorphicBaseTrait {
     * @return type
     */
    public function __call($method, $args=[]) {
-     if (strtolower($method) === strtolower($this->getTypeName())) {
+     if (strtolower($method) === strtolower(static::getTypeName())) {
+       /*
        $key = strtolower($method);
        $res = $this->getICache($key);
        if ($res !== false) {
          return $res;
        }
        return $this->setICache($key,call_user_func_array([$this,'traitTypeMorphTo'],$args));
+        * 
+        */
+       return call_user_func_array([$this,'traitTypeMorphTo'],$args);
      }
      $tstType = removeStartStr($method, 'is');
      if ($tstType && is_string($tstType)) {
@@ -106,11 +110,15 @@ Trait PolymorphicBaseTrait {
 
    public function __get($key) {
      if ($key === static::getTypeName()) {
+       /*
        $res = $this->getICache($key);
        if ($res !== false) {
          return $res;
        }
        return $this->setICache($key,$this->getRelationValue('traitTypeMorphTo'));
+        * 
+        */
+       return $this->getRelationValue('traitTypeMorphTo');
      }
      return parent::__get($key);
    }
@@ -156,6 +164,7 @@ Trait PolymorphicBaseTrait {
     * @param type $id
     */
    public function traitTypeMorphTo($name = null, $type = null, $id = null) {
+     /*
      $key='traitMorphTo:name:'.$name.'type:'.$type."id:".$id;
      $res = $this->getICache($key);
      if ($res === false) {
@@ -169,6 +178,12 @@ Trait PolymorphicBaseTrait {
         })());
      }
      return $res;
+      * 
+      */
+      $name = $name ? $name : static::getTypeName();
+      $type = $type ? $type : static::getTypeName().'_type';
+      $id = $id ? $id : static::getTypeName().'_id';
+      return $this->morphTo($name, $type, $id);
    }
 
   public static function getTypeName() {
