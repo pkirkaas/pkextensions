@@ -2019,6 +2019,11 @@ VEventDispatcher = {
 };
 
 function formatSSN(ssn) {
+  if (typeof ssn !== 'string') {
+    console.error("Invalid SSN:",ssn);
+    return '';
+  }
+  ssn = ssn.trim();
   var ssarr = Array.from(ssn);
   if (ssarr.length !== 9) {
     console.error("Invalid SSN: ", ssn);

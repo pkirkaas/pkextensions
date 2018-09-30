@@ -33,9 +33,60 @@ window.Vue.component('modal-btn',{
       this.showModal = true;
     },
   },
-
-
 });
+
+//Try to do a better job than above - don't include the modal INSIDE
+//the button - and send param / key to know which modal to open... unless
+//the modal is generic, & the button passes everything to it?
+//Create 3rd component that wraps both & provides data
+window.Vue.component('pk-modal-btn',{
+  template: `
+  <div style="z-index: 2000;" @click="showModal" class="btn btn-primary btn-pop m-5 p-f fs-8" :params="params.popBtnCls">
+        {{label}} And This
+  </div>
+  `,
+  props: ['label','params','showModel'],
+  methods: {
+    onClick: function() {
+      console.log("btn got clicked");
+    },
+    showModal: function() {
+      console.log("Ath least I cought the click");
+      this.$parent.showModal = true;
+      //this.showModal = true;
+    }
+  }
+});
+
+//Wraps both the button & modal
+window.Vue.component('pk-modal-wrapper',{
+  template:`
+  <div>
+    <pk-modal-btn :params="params" @click="showModel = true"
+       class="btn primary-btn" :class="params.btnCls">
+      {{label}}</pk-modal-btn>
+
+  <div class ="border m-8 p-8 bg-ccf">Is there any content here?</div>
+
+     <pk-modal v-if="showModal" @close="showModal=false" :params="params">
+  <h1>This goes in the modal slot</h1>
+      </pk-modal>
+  </div>
+  `,
+  methods: {
+    onClick: function() {
+      console.log("The wapper was clicked");
+    },
+  },
+  props:['label','params'],
+  data: function() {
+    return{showModal:false,
+    };
+  },
+});
+
+
+
 
 /** Could be a label, or data field - if data-field, just display or input 
  *@params: 
@@ -526,7 +577,7 @@ window.Vue.component('resp-tbl', {
 window.formatMixin = {
   methods: {
     formatDate: function(dt,fmt) {
-      if (typeof dt === 'object') {
+      if ((typeof dt === 'object') && (dt !== null)) {
         dt = dt.date;
       }
       fmt = fmt || "MMMM D, YYYY";
@@ -579,6 +630,7 @@ window.formatMixin = {
       atts: Arbitrary attributes (as string)
     */
    formatSSN: function(ssn) {
+      ssn = ssn.trim();
       var ssarr = Array.from(ssn);
       if (ssarr.length !== 9) {
         console.error("Invalid SSN: ", ssn);

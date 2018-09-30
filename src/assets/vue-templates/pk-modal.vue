@@ -1,7 +1,7 @@
 <template>
   <div class='modal-backdrop'>
   <div class='modal-container input-container' id="input-container"
-       :class="params.modalContainerCls" @click.stop='stopHere'>
+       :class="params.modalContainerCls" @click='stopHere'>
     <div class="modal-title" :class="params.modalTitleCls" v-html="params.modalTitle"></div>
     <div class="modal-body" :class="params.modalBodyCls" >
       <slot></slot>
@@ -9,11 +9,11 @@
     <div class="button-row" :class="params.buttonRowCls">
       <div class="btn btn-primary mdl-btn submit-btn"
            :class="params.submitBtnCls"
-           @click.stop="submit">{{params.submitlbl || "Submit"}}</div>
+           @click="submit">{{params.submitlbl || "Submit"}}</div>
 
       <div class="btn btn-secondary mdl-btn cancel-btn"
            :class="params.cancelBtnCls" 
-           @click.stop="cancel">{{params.cancellbl || "Cancel"}}</div>
+           @click="$emit('close')">{{params.cancellbl || "Cancel"}}</div>
     </div>
   </div>
   </div>
@@ -28,7 +28,7 @@ export default {
       return {};
     },
     //params: url, data (added to formdata),
-    props: ['params'],
+    props: ['params','showModel'],
     mounted: function() {
       //console.log("PkModal, params:", this.params);
     },
@@ -61,21 +61,21 @@ export default {
         this.$parent.showModal=false;
         
       },
+
       cancel: function(event) {
+        /*
         $(":input.jq-wipe").val('');
         this.$emit('cancel',"Stop");
         this.$parent.$emit('cancel',"Stop");
-        this.params.message = '';
-        this.$parent.params.message = '';
+        this.params.message = ssage = '';
         this.$parent.showModal=false;
-        /*
         this.$emit('custome',"hellow");
         this.$parent.$emit('custome',"Hi daddy");
         this.$destroy();
         this.$emit('close');
         this.$parent.$emit('close');
-        console.log("In Modal, Trying to close");
         */
+        console.log("In Modal, Trying to close");
       },
     },
   }

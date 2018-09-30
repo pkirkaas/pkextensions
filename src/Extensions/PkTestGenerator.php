@@ -528,7 +528,7 @@ class PkTestGenerator {
   public static function randSSN($separator = '') {
     return static::randDigitString(3).
       $separator.static::randDigitString(2).
-      $separator.static::randDigitString(3);
+      $separator.static::randDigitString(4);
   }
 
   public static function randPhone($separator = '-') {
