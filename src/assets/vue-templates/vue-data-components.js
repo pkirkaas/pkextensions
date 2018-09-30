@@ -526,6 +526,9 @@ window.Vue.component('resp-tbl', {
 window.formatMixin = {
   methods: {
     formatDate: function(dt,fmt) {
+      if (typeof dt === 'object') {
+        dt = dt.date;
+      }
       fmt = fmt || "MMMM D, YYYY";
       var m = window.moment(dt);
       if (!m.isValid()) {
