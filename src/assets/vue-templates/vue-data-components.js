@@ -42,10 +42,13 @@ window.Vue.component('modal-btn',{
 window.Vue.component('pk-modal-btn',{
   template: `
   <div style="z-index: 2000;" @click="showModal" class="btn btn-primary btn-pop m-5 p-f fs-8" :params="params.popBtnCls">
-        {{label}} And This
+        {{lbl}} And This
   </div>
   `,
-  props: ['label','params','showModel'],
+  props: ['lbl','params','showModel'],
+  mounted: function() {
+    console.log("props lbl, params, showModel",this.lbl,this.params, this.showModel);
+  },
   methods: {
     onClick: function() {
       console.log("btn got clicked");
@@ -58,29 +61,51 @@ window.Vue.component('pk-modal-btn',{
   }
 });
 
-//Wraps both the button & modal
-window.Vue.component('pk-modal-wrapper',{
-  template:`
+/*
   <div>
-    <pk-modal-btn :params="params" @click="showModel = true"
+  <h1>The template is rendering</h1>
+  <!--
+    <pk-modal-btn :lbl="lbl" :params="params" @click="showModel = true"
        class="btn primary-btn" :class="params.btnCls">
-      {{label}}</pk-modal-btn>
+      </pk-modal-btn>
 
   <div class ="border m-8 p-8 bg-ccf">Is there any content here?</div>
 
-     <pk-modal v-if="showModal" @close="showModal=false" :params="params">
+     <pk-modal v-if="showModal" @close="showModal=false" :params="params"
+        :dynamicComp="dynamicComp", :dynamicProps="dynamicProps">
+  <h1>This goes in the modal slot</h1>
+      </pk-modal>
+  -->
+  </div>
+*/
+//Wraps both the button & modal
+window.Vue.component('pk-modal-wrapper',{
+  name: 'pk-modal-wrapper',
+  template:`
+  <div>
+    <pk-modal-btn :lbl="lbl" :params="params" @click="showModel = true"
+       class="btn primary-btn" :class="params.btnCls">
+      </pk-modal-btn>
+
+  <div class ="border m-8 p-8 bg-ccf">Is there any content here?</div>
+
+     <pk-modal v-if="showModal" @close="showModal=false" :params="params"
+        :dynamicComp="dynamicComp", :dynamicProps="dynamicProps">
   <h1>This goes in the modal slot</h1>
       </pk-modal>
   </div>
   `,
+  props:["dynamicComp","dynamicProps","lbl","params"],
+  mounted: function() {
+    console.log("Mounted pk-mw, props:",this.dynamicComp,this.dynamicProps,this.lbl, this.params);},
   methods: {
     onClick: function() {
       console.log("The wapper was clicked");
     },
   },
-  props:['label','params'],
   data: function() {
-    return{showModal:false,
+    return{
+      showModal:false,
     };
   },
 });

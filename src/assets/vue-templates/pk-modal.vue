@@ -4,6 +4,7 @@
        :class="params.modalContainerCls" @click='stopHere'>
     <div class="modal-title" :class="params.modalTitleCls" v-html="params.modalTitle"></div>
     <div class="modal-body" :class="params.modalBodyCls" >
+      <component :is="dynamicComp" v-bind="dynamicProps"></component>
       <slot></slot>
     </div>
     <div class="button-row" :class="params.buttonRowCls">
@@ -28,7 +29,7 @@ export default {
       return {};
     },
     //params: url, data (added to formdata),
-    props: ['params','showModel'],
+    props: ['params','showModel','dynamicComp', 'dynamicProps'],
     mounted: function() {
       //console.log("PkModal, params:", this.params);
     },
@@ -63,6 +64,8 @@ export default {
       },
 
       cancel: function(event) {
+        this.$parent.showModal=false;
+        this.$parent.$emit('cancel',"Stop");
         /*
         $(":input.jq-wipe").val('');
         this.$emit('cancel',"Stop");
