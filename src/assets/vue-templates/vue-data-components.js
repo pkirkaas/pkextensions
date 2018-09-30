@@ -575,6 +575,18 @@ window.formatMixin = {
       class: the CSS class
       atts: Arbitrary attributes (as string)
     */
+   formatSSN: function(ssn) {
+      var ssarr = Array.from(ssn);
+      if (ssarr.length !== 9) {
+        console.error("Invalid SSN: ", ssn);
+        return '';
+      }
+      var ss1 = ssarr.slice(0,3).join('');
+      var ss2 = ssarr.slice(3,5).join('');
+      var ss3 = ssarr.slice(5,9).join('');
+      var ssf = ss1 +'-'+ss2+'-'+ss3;
+      return ssf;
+   },
        
     formatLink: function(val,opt) { 
       if (!opt) {

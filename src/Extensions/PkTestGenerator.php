@@ -235,7 +235,7 @@ class PkTestGenerator {
     static $texts = [
 
         'Earum placerat lorem est nunc id a congue ornare suspendisse lectus elementum',
-        'Id qui nulla justo ante phasellus</h4><p>Lectus viverra egestas pellentesque pede metus. Habitant et urna. Amet magna libero. Non sed cras. Placerat magna qui. Mauris euismod quo. Amet id purus. Amet eros in lacus libero vitae. Sed quis consectetuer. Aliquam leo donec sagittis in non wisi praesent pharetra nascetur ut torquent. Tortor amet molestie. Sed a at diam integer arcu. In fringilla odio velit auctor amet',
+        'Id qui nulla justo ante phasellus fectus viverra egestas pellentesque pede metus. Habitant et urna. Amet magna libero. Non sed cras. Placerat magna qui. Mauris euismod quo. Amet id purus. Amet eros in lacus libero vitae. Sed quis consectetuer. Aliquam leo donec sagittis in non wisi praesent pharetra nascetur ut torquent. Tortor amet molestie. Sed a at diam integer arcu. In fringilla odio velit auctor amet',
         'feugiat tellus id nec luctus et pede luctus nibh',
         'egestas consectetuer in Purus wisi massa. Integer gravida dui sed elementum neque. Quisque aut ipsum urna pede in et adipiscing aptent. Urna mi qui leo proin ut. Mi mauris elementum libero hendrerit in officiis lobortis ante. Sed mauris amet. Neque nunc eros at quis pellentesque aliquam ipsum libero. Morbi faucibus rhoncus. Est amet viverra. Eget nulla ridiculus. Amet aliquam at. Nec mi cras.',
         'Molestiae quisque odio mattis volutpat ante. Ut dui amet. Donec in nunc risus etiam hendrerit arcu tellus felis massa id soluta est imperdiet metus. Neque sed malesuada. Arcu viverra elementum odio suspendisse diam dui pellentesque metus',
@@ -528,7 +528,7 @@ class PkTestGenerator {
   public static function randSSN($separator = '') {
     return static::randDigitString(3).
       $separator.static::randDigitString(2).
-      $separator.static::randDigitString(4);
+      $separator.static::randDigitString(3);
   }
 
   public static function randPhone($separator = '-') {

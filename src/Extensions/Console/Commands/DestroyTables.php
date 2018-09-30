@@ -35,7 +35,7 @@ class DestroyTables extends Command {
 
            #If all classes, drop the Migrations, session & password tables, too.
            $this->info ("Model drops/deletions completed; now the rest:");
-           $systables = ['migrations','password_resets','sessions'];
+           $systables = ['migrations','password_resets','sessions','cache'];
            foreach ($systables as $systable) {
              $this->info ("Dropping $systable...");
              PkModel::dropTable($systable);

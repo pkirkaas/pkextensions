@@ -752,6 +752,16 @@ jQuery.fn.extend({
       }
       return false;
     },
+    ssn: function(jq,content,force) {
+      if (jq.hasClass('jq-format-ssn') || force) {
+        if (!content) {
+          content = jq.text();
+        }
+        var res = formatSSN(content);
+        jq.text(res);
+        return true;
+      }
+    },
     date: function(jq,content,force, argparams) {
       if (jq.hasClass('jq-format-date') || force) {
         if (!content) {
@@ -2008,6 +2018,18 @@ VEventDispatcher = {
     }
 };
 
+function formatSSN(ssn) {
+  var ssarr = Array.from(ssn);
+  if (ssarr.length !== 9) {
+    console.error("Invalid SSN: ", ssn);
+    return '';
+  }
+  var ss1 = ssarr.slice(0,3).join('');
+  var ss2 = ssarr.slice(3,5).join('');
+  var ss3 = ssarr.slice(5,9).join('');
+  var ssf = ss1 +'-'+ss2+'-'+ss3;
+  return ssf;
+}
 
 /* Functions to manipulate/extend JS elements, with more modern techniques */
 
