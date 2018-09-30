@@ -7,14 +7,15 @@
 window.Vue.component('modal-btn',{
   template: `
   <div class="btn btn-primary btn-pop" :class="params.popBtnCls"
-       @click="openModal"  @close="closeModal" @custome="custome">
-    {{label}}
-    <pk-modal :params="params" v-show="showModal">This is the slot contents</pk-modal>
+       @click="openModal"> {{label}}
+    <pk-modal :params="params" v-show="showModal" @click.stop="stopProp">
+      <slot></slot>
+    </pk-modal>
   </div>
   `,
   props: ['label','params'],
   mounted: function() {
-    console.log("In Btn, params:",this.params);
+    //console.log("In Btn, params:",this.params);
   },
   data: function() {
     return {
@@ -22,18 +23,14 @@ window.Vue.component('modal-btn',{
     };
   },
   methods: {
-    custome: function(event) {
-      console.log("In OpenModal Btn - received custome");
+    stopProp: function(event) {
+      console.log("Trying to stop click propigation");
     },
     openModal: function(event) {
+      $(":input.jq-wipe").val('');
       console.log("Activated OpenModal");
-      this.$emit('custome',5);
-      //this.showModal = !this.showModal;
+      this.params.message='';
       this.showModal = true;
-    },
-    closeModal: function(event) {
-      console.log("In Modal Btn, trying to close");
-      this.showModal = false;
     },
   },
 

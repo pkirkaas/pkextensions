@@ -1,6 +1,7 @@
 <template>
+  <div class='modal-backdrop'>
   <div class='modal-container input-container' id="input-container"
-       :class="params.modalContainerCls">
+       :class="params.modalContainerCls" @click.stop='stopHere'>
     <div class="modal-title" :class="params.modalTitleCls" v-html="params.modalTitle"></div>
     <div class="modal-body" :class="params.modalBodyCls" >
       <slot></slot>
@@ -8,12 +9,13 @@
     <div class="button-row" :class="params.buttonRowCls">
       <div class="btn btn-primary mdl-btn submit-btn"
            :class="params.submitBtnCls"
-           @click="submit">{{params.submitlbl || "Submit"}}</div>
+           @click.stop="submit">{{params.submitlbl || "Submit"}}</div>
 
       <div class="btn btn-secondary mdl-btn cancel-btn"
            :class="params.cancelBtnCls" 
            @click.stop="cancel">{{params.cancellbl || "Cancel"}}</div>
     </div>
+  </div>
   </div>
 
 </template>
@@ -28,27 +30,52 @@ export default {
     //params: url, data (added to formdata),
     props: ['params'],
     mounted: function() {
-      console.log("PkModal, params:", this.params);
+      //console.log("PkModal, params:", this.params);
     },
     methods: {
+      stopHere: function(event) {
+        console.log("Still hopeing to stop prop");
+      },
       submit: function(event) {
+        console.log("Submitting");
         var fd = new FormData();
-        $('#input-container').filter(":input").each(function(idx, el) {
+        var url = this.params.url;
+        $('#input-container').find(":input").each(function(idx, el) {
             var $el = $(el);
+          console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
             fd.append($el.attr('name'),$el.val());
           }); 
         for(var pair of fd.entries()) {
           console.log(pair[0]+ ', '+ pair[1]); 
         }
+        axios.post(url,fd).
+          then(response=>{
+            console.log("Success: Response:",response);
+    
+            this.$parent.$emit('submitmsg',"Refresh");
+          }).
+          catch(error=>{
+            console.error("Error:",error.response);
+          });
+        $(":input.jq-wipe").val('');
+        this.$parent.showModal=false;
+        
       },
       cancel: function(event) {
+        $(":input.jq-wipe").val('');
+        this.$emit('cancel',"Stop");
+        this.$parent.$emit('cancel',"Stop");
+        this.params.message = '';
+        this.$parent.params.message = '';
         this.$parent.showModal=false;
+        /*
         this.$emit('custome',"hellow");
         this.$parent.$emit('custome',"Hi daddy");
         this.$destroy();
         this.$emit('close');
         this.$parent.$emit('close');
         console.log("In Modal, Trying to close");
+        */
       },
     },
   }
@@ -72,14 +99,17 @@ export default {
   }
   .modal-body {
     flex-grow: 1;
-    min-height: 50px;
-    min-width: 200px;
+    min-height: 150px;
+    min-width: 500px;
     display: flex;
     padding: 1em;
+    flex-direction: column;
   }
   .modal-container {
     z-index: 1000;
-    background-color: #bbb;
+    background-color: #eee;
+    color: #444;
+    font-size: larger;
 
     position: fixed;
     top: 8em;
@@ -92,5 +122,16 @@ export default {
     border: solid #a88 1px;
     border-radius: .5em;
 
+  }
+    .modal-backdrop {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>
