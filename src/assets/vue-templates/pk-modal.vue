@@ -4,7 +4,8 @@
        :class="params.modalContainerCls" @click='stopHere'>
     <div class="modal-title" :class="params.modalTitleCls" v-html="params.modalTitle"></div>
     <div class="modal-body" :class="params.modalBodyCls" >
-      <component :is="dynamicComp" v-bind="dynamicProps"></component>
+    <component v-bind="aprop" :is="aparm"></component>
+      <component :is="dynamiccomp" v-bind="{paramsx:paramsx}"></component>
       <slot></slot>
     </div>
     <div class="button-row" :class="params.buttonRowCls">
@@ -29,7 +30,8 @@ export default {
       return {};
     },
     //params: url, data (added to formdata),
-    props: ['params','showModel','dynamicComp', 'dynamicProps'],
+    props: ['params','showModel','dynamiccomp', 'paramsx',
+    'aparm', 'aprop'],
     mounted: function() {
       //console.log("PkModal, params:", this.params);
     },

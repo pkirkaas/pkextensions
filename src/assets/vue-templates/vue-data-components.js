@@ -41,7 +41,7 @@ window.Vue.component('modal-btn',{
 //Create 3rd component that wraps both & provides data
 window.Vue.component('pk-modal-btn',{
   template: `
-  <div style="z-index: 2000;" @click="showModal" class="btn btn-primary btn-pop m-5 p-f fs-8" :params="params.popBtnCls">
+  <div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8" :params="params.popBtnCls">
         {{lbl}} And This
   </div>
   `,
@@ -53,52 +53,51 @@ window.Vue.component('pk-modal-btn',{
     onClick: function() {
       console.log("btn got clicked");
     },
-    showModal: function() {
+    doshowModal: function() {
       console.log("Ath least I cought the click");
-      this.$parent.showModal = true;
+      //debugger;
+      this.$parent.doshowModal();
       //this.showModal = true;
     }
   }
 });
 
-/*
-  <div>
-  <h1>The template is rendering</h1>
-  <!--
-    <pk-modal-btn :lbl="lbl" :params="params" @click="showModel = true"
-       class="btn primary-btn" :class="params.btnCls">
-      </pk-modal-btn>
-
-  <div class ="border m-8 p-8 bg-ccf">Is there any content here?</div>
-
-     <pk-modal v-if="showModal" @close="showModal=false" :params="params"
-        :dynamicComp="dynamicComp", :dynamicProps="dynamicProps">
-  <h1>This goes in the modal slot</h1>
-      </pk-modal>
-  -->
-  </div>
-*/
 //Wraps both the button & modal
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
   <div>
-    <pk-modal-btn :lbl="lbl" :params="params" @click="showModel = true"
+  <!--
+    <component v-bind:is="noparm"></component>
+    <component v-bind="aprop" :is="aparm"></component>
+  -->
+    <component v-bind="{paramsx:paramsx}" :is="dynamiccomp"></component>
+    <pk-modal-btn :lbl="lbl" :params="params"
+      @click="showModel = true"
        class="btn primary-btn" :class="params.btnCls">
-      </pk-modal-btn>
+    </pk-modal-btn>
 
-  <div class ="border m-8 p-8 bg-ccf">Is there any content here?</div>
-
-     <pk-modal v-if="showModal" @close="showModal=false" :params="params"
-        :dynamicComp="dynamicComp", :dynamicProps="dynamicProps">
-  <h1>This goes in the modal slot</h1>
+    <pk-modal v-if="showModal" @close="showModal=false"
+      :params="params" :paramsx="paramsx"
+          :dynamiccomp="dynamiccomp" :aparm="aparm"
+            :aprop="aprop">
+        
       </pk-modal>
   </div>
+
+
+
+
   `,
-  props:["dynamicComp","dynamicProps","lbl","params"],
-  mounted: function() {
-    console.log("Mounted pk-mw, props:",this.dynamicComp,this.dynamicProps,this.lbl, this.params);},
+  //props:["lbl","params"],
+  props:["dynamiccomp","paramsx","lbl","params",'noparm',
+  'aparm', 'aprop'],
+  //mounted: function() {
+  //  console.log("Mounted pk-mw, props:",this.dynamiccomp,this.paramsx,this.lbl, this.params);},
   methods: {
+    doshowModal: function() {
+      this.showModal = true;
+    },
     onClick: function() {
       console.log("The wapper was clicked");
     },
