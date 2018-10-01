@@ -4,6 +4,7 @@
  */
 
 /** Pops up a pk-modal component */
+/*
 window.Vue.component('modal-btn',{
   template: `
   <div class="btn btn-primary btn-pop" :class="params.popBtnCls"
@@ -34,79 +35,65 @@ window.Vue.component('modal-btn',{
     },
   },
 });
+*/
 
 //Try to do a better job than above - don't include the modal INSIDE
 //the button - and send param / key to know which modal to open... unless
 //the modal is generic, & the button passes everything to it?
 //Create 3rd component that wraps both & provides data
+  //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
 window.Vue.component('pk-modal-btn',{
   template: `
-  <div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8" :params="params.popBtnCls">
-        {{lbl}} And This
-  </div>
+  <div style="z-index: 2000;"  class="btn btn-primary btn-pop m-5 p-f fs-8"
+   :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
   `,
-  props: ['lbl','params','showModel'],
+  props: ['btnparams'],
   mounted: function() {
-    console.log("props lbl, params, showModel",this.lbl,this.params, this.showModel);
+    console.log("PkModalBtn, btnparams",this.btnparams);
   },
   methods: {
     onClick: function() {
       console.log("btn got clicked");
     },
+    /*
     doshowModal: function() {
       console.log("Ath least I cought the click");
-      //debugger;
       this.$parent.doshowModal();
-      //this.showModal = true;
     }
+    */
   }
 });
 
 //Wraps both the button & modal
+//Should take 3 prop objects - "btnparams" (for the button itself - title, appearance)
+//, "modalparams" (For the modal box - size, title, etc)
+// 'contentparams' - what's inside the modal
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
-  <div>
   <!--
-    <component v-bind:is="noparm"></component>
-    <component v-bind="aprop" :is="aparm"></component>
-  -->
     <component v-bind="{paramsx:paramsx}" :is="dynamiccomp"></component>
-    <pk-modal-btn :lbl="lbl" :params="params"
-      @click="showModel = true"
-       class="btn primary-btn" :class="params.btnCls">
+  -->
+  <div>
+    <pk-modal-btn :btnparams="btnparams"
+      @click="showModal = true"
+       class="btn primary-btn" :class="btnparams.btnCls">
     </pk-modal-btn>
 
-    <pk-modal v-if="showModal" @close="showModal=false"
-      :params="params" :paramsx="paramsx"
-          :dynamiccomp="dynamiccomp" :aparm="aparm"
-            :aprop="aprop">
-        
-      </pk-modal>
+
+    <pk-modal ref="mymodal" v-show="showModal" @close="showModal=false"
+      :modalparams="modalparams" :contentparams="contentparams", :showModal="showModal" >
+    </pk-modal>
   </div>
-
-
-
-
   `,
-  //props:["lbl","params"],
-  props:["dynamiccomp","paramsx","lbl","params",'noparm',
-  'aparm', 'aprop'],
-  //mounted: function() {
-  //  console.log("Mounted pk-mw, props:",this.dynamiccomp,this.paramsx,this.lbl, this.params);},
-  methods: {
-    doshowModal: function() {
-      this.showModal = true;
-    },
-    onClick: function() {
-      console.log("The wapper was clicked");
-    },
-  },
+  props:["contentparams","modalparams","btnparams"],
   data: function() {
-    return{
-      showModal:false,
-    };
+    return {showModal: false};
   },
+  mounted: function() {
+    console.log("PkMdlWrp: contentparams:", this.contentparams,'btn',this.btnparams,'mdl',
+    this.modalparams);
+  }
 });
 
 
@@ -752,4 +739,16 @@ window.tableMixin = {
     },
     
   },
+};
+
+//Simple stuff, like non-null object, & not empty
+window.utilityMixin = {
+  methods: {
+    isObject(tst) { 
+      if ((typeof tst === 'object') && (tst !== null)) {
+        return tst;
+      }
+      return false;
+    },
+  }
 };

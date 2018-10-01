@@ -25,13 +25,13 @@ $('body').on('click', '.js-contact', function (event) {
 $('body').on('click', 'div.blocked-toggle', function (event) {
     var them_id = $(event.target).attr('data-them_id');
     var data = {them_id: them_id};
-    console.log('data',data);
+    //console.log('data',data);
     var res = $.ajax({
       url: ajaxUrlToggleBlocked,
       data: data,
       method: 'POST'
     }).done(function (data) {
-      console.log('After Ajax Data',data);
+      //console.log('After Ajax Data',data);
       if (data == 'blocked') {
         $(event.target).addClass('blocked');
         $(event.target).removeClass('unblocked');
@@ -48,13 +48,13 @@ $('body').on('click', 'div.blocked-toggle', function (event) {
 $('body').on('click', 'div.js-delete-el.del-msg', function (event) {
     var message_id = $(event.target).attr('data-message_id');
     var data = {message_id: message_id};
-    console.log('data',data);
+    //console.log('data',data);
     var res = $.ajax({
       url: ajaxUrl + '?action=delete-msg',
       data: data,
       method: 'POST'
     }).done(function (data) {
-      console.log('After Ajax Data',data);
+      //console.log('After Ajax Data',data);
       if (data === true) { 
         $(event.target).closest('div.deletable-data-set').remove();
       }
@@ -72,7 +72,7 @@ $('body').on('click', 'div.js-delete-el.del-conversation', function (event) {
       data: data,
       method: 'POST'
     }).done(function (data) {
-      console.log('After Ajax Data',data);
+      //console.log('After Ajax Data',data);
       if (data === true) { 
         $(event.target).closest('div.deletable-data-set').remove();
       }
@@ -83,13 +83,13 @@ $('body').on('click', 'div.js-delete-el.del-conversation', function (event) {
 $('body').on('click', 'div.favorite-toggle', function (event) {
     var them_id = $(event.target).attr('data-them_id');
     var data = {them_id: them_id};
-    console.log('data',data);
+    //console.log('data',data);
     var res = $.ajax({
       url: ajaxUrlToggleFavorite,
       data: data,
       method: 'POST'
     }).done(function (data) {
-      console.log('After Ajax Data',data);
+      //console.log('After Ajax Data',data);
       if (data == 'favorited') {
         $(event.target).addClass('favorited');
         $(event.target).removeClass('unfavorited');

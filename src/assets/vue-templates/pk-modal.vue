@@ -1,21 +1,23 @@
 <template>
   <div class='modal-backdrop'>
   <div class='modal-container input-container' id="input-container"
-       :class="params.modalContainerCls" @click='stopHere'>
-    <div class="modal-title" :class="params.modalTitleCls" v-html="params.modalTitle"></div>
-    <div class="modal-body" :class="params.modalBodyCls" >
-    <component v-bind="aprop" :is="aparm"></component>
-      <component :is="dynamiccomp" v-bind="{paramsx:paramsx}"></component>
-      <slot></slot>
+       :class="modalparams.modalContainerCls">
+    <div class="modal-title" :class="modalparams.modalTitleCls" v-html="modalparams.title"></div>
+    <div class="modal-body" :class="modalparams.modalBodyCls" >
+
+
+
+
+
     </div>
-    <div class="button-row" :class="params.buttonRowCls">
-      <div class="btn btn-primary mdl-btn submit-btn"
-           :class="params.submitBtnCls"
-           @click="submit">{{params.submitlbl || "Submit"}}</div>
+    <div class="button-row" :class="modalparams.buttonRowCls">
+      <div v-if="modalparams.submit !== false" class="btn btn-primary mdl-btn submit-btn"
+           :class="modalparams.submitBtnCls"
+           @click="submit">{{modalparams.submitlbl || "Submit"}}</div>
 
       <div class="btn btn-secondary mdl-btn cancel-btn"
-           :class="params.cancelBtnCls" 
-           @click="$emit('close')">{{params.cancellbl || "Cancel"}}</div>
+           :class="modalparams.cancelBtnCls" 
+           @click="$emit('close')">{{modalparams.cancellbl || "Cancel"}}</div>
     </div>
   </div>
   </div>
@@ -24,33 +26,48 @@
 
 <script>
 
+/*
+      <component :is="contentparams.cname" v-bind="contentparams"></component>
+      <slot></slot>
+  */
 export default {
     name: 'pk-modal',
     data: function(){
       return {};
     },
-    //params: url, data (added to formdata),
-    props: ['params','showModel','dynamiccomp', 'paramsx',
-    'aparm', 'aprop'],
+    //modalparams: url, data (added to formdata), formatting, title
+    //contentparams - probably an inner comonent, conentparams={cname,cdata}
+    props: ['contentparams', 'modalparams'],
     mounted: function() {
-      //console.log("PkModal, params:", this.params);
+      console.log("PkModal, params:", this.modalparams, 'content',contentparams);
     },
     methods: {
-      stopHere: function(event) {
-        console.log("Still hopeing to stop prop");
-      },
+      /** Will combine data directly provided in modalparams.data,
+       *  with any possible data from the form
+       * @param {type} event
+       * @returns {undefined}
+       */
       submit: function(event) {
         console.log("Submitting");
         var fd = new FormData();
-        var url = this.params.url;
+        var url = this.modalparams.url;
         $('#input-container').find(":input").each(function(idx, el) {
             var $el = $(el);
           console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
             fd.append($el.attr('name'),$el.val());
           }); 
+        //Now add direct data, if any
+        if (modalparams.data && (typeof modalparams.data === 'object')) {
+          for (var key in modalparams.data) {
+            fd.append(key,modalparams.data[key]);
+          }
+        }
         for(var pair of fd.entries()) {
           console.log(pair[0]+ ', '+ pair[1]); 
         }
+        console.log('url',urls);
+        /** // Debugging
+        */
         axios.post(url,fd).
           then(response=>{
             console.log("Success: Response:",response);
@@ -62,7 +79,15 @@ export default {
           });
         $(":input.jq-wipe").val('');
         this.$parent.showModal=false;
+        this.reset();
         
+      },
+      reset: function() {
+        var vm = this;
+        vm.drawComponent = false;
+        Vue.nextTick(function() {
+          vm.drawComponent = true;
+        });
       },
 
       cancel: function(event) {
@@ -81,6 +106,7 @@ export default {
         this.$parent.$emit('close');
         */
         console.log("In Modal, Trying to close");
+        this.reset();
       },
     },
   }

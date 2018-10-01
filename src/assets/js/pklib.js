@@ -74,10 +74,10 @@ $(function () {
   $('body').on('click', '.js-verify', function (event) {
     var target = event.target;
     var origEv = event.originalEvent;
-    console.log ("Event:", event, 'target', target, 'this', this,
-    "Cancelable:", event.cancelable, 'altKey', event.altKey, "origEv.detail", origEv.detail);
+    //console.log ("Event:", event, 'target', target, 'this', this,
+    //"Cancelable:", event.cancelable, 'altKey', event.altKey, "origEv.detail", origEv.detail);
     if (!event.cancelable || !origEv.detail) {
-      console.log("Trying to continue");
+      //console.log("Trying to continue");
       return true;
     }
     event.preventDefault();
@@ -107,7 +107,7 @@ $(function () {
               cancelable: true,
               detail: 0,
             });
-            console.log("Trying to continue w. JS event:", newEv);
+            //console.log("Trying to continue w. JS event:", newEv);
             target.dispatchEvent(newEv);
             $(this).dialog('destroy');
         }
@@ -138,7 +138,7 @@ $(function () {
 function mkNestedHtml(item, depth) {
   depth = depth || 0;
   var tof = typeof item;
-  console.log("Item:", item, "Typeof item: "+tof+'; depth: '+depth);
+  //console.log("Item:", item, "Typeof item: "+tof+'; depth: '+depth);
   if (typeof item === 'string') {
     return "<div class='js-msg'>"+item+"</div>\n";
   } else if (typeof item === 'object'){
@@ -219,7 +219,7 @@ $(function () {
    */
   $('body').on('click', '.btn.js-general-ajax', function (event) {
     var data = $(event.target).data();
-    console.log("Data", data);
+    //console.log("Data", data);
     var ajaxParams = {};
     for (var propName in data) {
       if (data.hasOwnProperty(propName) && propName.startsWith('param')) {
@@ -227,13 +227,13 @@ $(function () {
         ajaxParams[paramName] = data[propName];
       }
     }
-    console.log("AjaxParams:", ajaxParams);
+    //console.log("AjaxParams:", ajaxParams);
     var res = $.ajax({
       url: '/ajax',
       data: ajaxParams,
       method: 'POST'
     }).done(function (data) {
-      console.log("Returned from General Ajax w. data:", data);
+      //console.log("Returned from General Ajax w. data:", data);
       if (data.refresh === true) {
         window.location.reload(true);
       }
@@ -252,7 +252,7 @@ $(function () {
  * @result - sets the HTML of the target to the value set
  */
   $('body').on('click', '.js-mod-ajax, .js-set-ajax', function (event) {
-    console.log("Clicked on set");
+    //console.log("Clicked on set");
     var $target = $(event.target);
     js_get_set_ajax($target,'set');
     //window.js_get_set_ajax(event.target,'set');
@@ -273,11 +273,11 @@ $(function () {
       var url = '/ajax/set'
       var ajaxdata = {value:set};
     }
-    console.log("About to AJAX set");
+    //console.log("About to AJAX set");
 
     var ajaxparamarr =['Model','Id','Modfield'];
     ajaxparamarr.forEach(function(element) {
-      //console.log("In ForEach, element:",element);
+      ////console.log("In ForEach, element:",element);
       ajaxdata[element.toLowerCase()] = data['param'+element];
     });
     //console.log("Ajax Data:",ajaxdata,"data",data);
@@ -287,7 +287,7 @@ $(function () {
     window.axios.post(url,ajaxdata).
       then(response=>{
         var result = response.data[response.data.modfield];
-        console.log("Response data:",response.data,"Result:",result,"Format:", format);
+        //console.log("Response data:",response.data,"Result:",result,"Format:", format);
         $target.htmlFormatted(result,format);
       }).
       catch(error=>{
@@ -366,11 +366,11 @@ $(function () {
   $('body').on('click', '.js.btn.create-new-data-set-int', function (event) {
     //Get a copy of the template element
     var tpl = htmlDecode($(event.target).attr("data-template"));
-    console.log("New TPL: ", tpl);
+    //console.log("New TPL: ", tpl);
     //Get the current count element (one higher than the max index, if multi)
     var cnt = $(event.target).attr('data-itemcount');
     var newstr = $('<div />').html(tpl).text();
-    console.log("New str: ", newstr);
+    //console.log("New str: ", newstr);
     if (cnt === 'single') {
       $(event.target).css('display', 'none');
     } else {
@@ -446,11 +446,11 @@ $('body').on('change', 'input.custom-file-input.pkcfi', function (event) {
   } else {
     fp = "No File Selected";
   }
-  console.log("The file input changed to:", fp);
+  //console.log("The file input changed to:", fp);
   var descel = getCousin('label', '.custom-file-control', event.target);
   descel.attr('data-filename',fp);
   var data_filename = descel.attr('data-filename');
-  console.log("data-filename:", data_filename);
+  //console.log("data-filename:", data_filename);
 });
 
 
@@ -527,7 +527,7 @@ $('body [data-instructions]').on({
      var prop = el.prop('data-instructions');
      var dinst = el.data('instructions');
      if (!instHtml) {
-       console.log("Leaving? InstHTML: ",instHtml, 'dinst: ',dinst,'prop',prop);
+       //console.log("Leaving? InstHTML: ",instHtml, 'dinst: ',dinst,'prop',prop);
        return;
      }
      var elOffset = el.offset();
@@ -604,8 +604,8 @@ $(function () {
           if (typeof (data) !== 'object') { //Use AJAX data return as key to arg
             var attr_content = attr_arg[data];
           } else {
-            console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
-                    data, " -- SEL ARG: ", selector_arg);
+            //console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
+              //      data, " -- SEL ARG: ", selector_arg);
             var attr_content = false;
           }
         } else { //selector_arg is scalarish...
@@ -624,8 +624,8 @@ $(function () {
           if (typeof (data) !== 'object') { //Use AJAX data return as key to arg
             var sel_content = selector_arg[data];
           } else {
-            console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
-                    data, " -- SEL ARG: ", selector_arg);
+            //console.log("AJAX data & selector_arg both objects - what to do? DATA: ",
+             //       data, " -- SEL ARG: ", selector_arg);
             var sel_content = false;
           }
         } else { //selector_arg is scalarish...
@@ -653,7 +653,7 @@ $(function () {
     var target = $(event.target);
     var ajax_url = htmlDecode(target.attr('data-ajax-url'));
     var ajax_params = JSON.parse(htmlDecode(target.attr('data-ajax-params')));
-    console.log("AJAX_URL:",ajax_url,"AJAX PARAMS:", ajax_params);
+    //console.log("AJAX_URL:",ajax_url,"AJAX PARAMS:", ajax_params);
     if (!ajax_url) {
       return false;
     }
@@ -665,7 +665,7 @@ $(function () {
       data: ajax_params,
       method: 'POST'
     }).done(function (data) {
-      console.log("Returned from General Ajax w. data:", data);
+      //console.log("Returned from General Ajax w. data:", data);
       if (data.refresh === true) {
         window.location.reload(true);
       }
@@ -1164,13 +1164,13 @@ $(function () {
 
 $(function () {
 $('body').on('click', '[data-dialogx], .shib2', function (event) {
-  console.log("I definitely got clicked, & my contents are");
+  //console.log("I definitely got clicked, & my contents are");
   var key = $(this).attr('data-dialogx');
-  console.log("The key value:", key, "Try to get the template next");
+  //console.log("The key value:", key, "Try to get the template next");
   var fulltpl = $('script'+key);
-  console.log("Tpl is:",fulltpl);
+  //console.log("Tpl is:",fulltpl);
   var jqhtml = fulltpl.html();
-  console.log("jqhtml", jqhtml);
+  //console.log("jqhtml", jqhtml);
   
 });
 });
@@ -1269,11 +1269,11 @@ $('body').on('click', '.js-dialog-button, [data-dialog], [data-dialog-encoded]',
 
 /** Custom 'big-picture' pop-ups - expected the class is on an img element */
 $('body').on('click', 'img.js-big-picture-button', function (event) {
-  console.log("Big Picture");
+  //console.log("Big Picture");
   var src = $(event.target).attr('src');
   if (!src) return;
   var dlgHtml = "<div class='tac  big-picture-frame'><img class='big-picture-img' src='"+src+"' ></div>";
-  console.log('dltHtml', dlgHtml);
+  //console.log('dltHtml', dlgHtml);
   var dlg = $(dlgHtml);
   var dialogDefaults = {
     modal: true,
@@ -1323,7 +1323,7 @@ $('body').on('click', '.bs4-dialog-button', function (event) {
 //Now do it for BS-4, but just with the encoded content
 $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
   var src = $(event.target).attr('data-bs4-enc-dialog');
-  console.log("Hit it - enc: "+src);
+  //console.log("Hit it - enc: "+src);
   if (!src) {
     return;
   }
@@ -1541,7 +1541,7 @@ $(function () {
   if (isObject (dialogOpts) && !isEmpty(dialogOpts)) {
     dialogDefaults = Object.assign(dialogDefaults, dialogOpts);
   }
-  console.log("In 'new' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
+  //console.log("In 'new' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
   $dbx.dialog(dialogDefaults);
 });
 
@@ -1598,7 +1598,7 @@ function tesstx(arg) {
     b:arg,
     c:arg.param
   };
-  console.log("tesstx objj: ", objj);
+  //console.log("tesstx objj: ", objj);
 }
 
 /** Supposedly jQuery functions to safely html encode/decode text (html)
@@ -1614,7 +1614,7 @@ function htmlEncode(value) {
 
 function htmlDecode(value) {
   if (value) {
-    console.log("In htmlDecode, value:",value);
+    //console.log("In htmlDecode, value:",value);
     return value;
    // return $('<div />').html(value).text();
     return $('<div />').html(value).text();
@@ -1981,7 +1981,7 @@ function dirname(path) {
 $(function () {
   $('body').on('change', 'select.refresh-on-select', function (event) {
     var val = $(this).val();
-    console.log("Val:",val);
+    //console.log("Val:",val);
     var getO = false;
     if (val) {
       getO={select_param : val};

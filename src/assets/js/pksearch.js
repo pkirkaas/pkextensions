@@ -42,7 +42,7 @@ function disableDontCares() {
 function disableDontCare(target) {
   var paired_val_ctl = getCousins('.search-crit-val-pair','.search-val',target);
   if (!paired_val_ctl.length) {
-    console.log("No matching paired_val_ctl for target:",target);
+   // console.log("No matching paired_val_ctl for target:",target);
     return;
   }
   /*
