@@ -32,7 +32,8 @@ export default {
       file: null,
       desc: '',
       imgblob: null,
-
+      //action: 'typedprofileupload',
+      //url: '/ajax',
       };
     },
     props: ['params'],
@@ -68,6 +69,21 @@ export default {
         blobreader.readAsArrayBuffer(file);
       },
       saveFile() {
+        var fd = new FormData();
+        //this.params.action='typedprofileupload';
+        for (var key in this.params) {
+          fd.append(key, this.params[key]);
+        }
+        fd.append('desc',this.desc);
+        fd.append('file',this.file,this.file.name);
+        console.log("In Save, FD:", fd);
+        var me = this;
+        axios.post(this.url,fd).then( response=> {
+          console.log("Response:",response);
+                  me.removeFile(); });
+
+      },
+      saveFileOld() {
         //console.log("File: ", this.file, "Image: ", this.image, "Desc:", this.desc);
         var fd = new FormData();
         fd.append('desc',this.desc);

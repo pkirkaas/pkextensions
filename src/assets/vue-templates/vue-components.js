@@ -560,6 +560,8 @@ Vue.component('new-btn', {
 
 //'label' prop is a single value. 'fields' is an array
 // 'bp' is xs, sm, md, lg, xl
+// NEVER USE
+/*
 window.Vue.component('responsive-column', {
 //CVue.component('responsive-column', {
   name: 'responsive-column',
@@ -580,28 +582,26 @@ window.Vue.component('responsive-column', {
     show_sm: function() {return  " d-"+this.bp+"-none ";},
     show_bg_inline: function() {return  " d-none d-"+this.bp+"-inline-block ";},
     show_bg_flex: function() {return  " d-none d-"+this.bp+"-flex ";}
-    /*
-    clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
-    clc_lbl_bg: function() {
-      var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
-      console.log("lblg", lblbg);
-      return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
-    */
+    //clc_lbl_sm: function() {return this.lblcls + " d-"+this.bp+"-none ";},
+    //clc_lbl_bg: function() {
+     // var lblbg = this.lblcls + " d-none d-"+this.bp+"-inline-block ";
+      //console.log("lblg", lblbg);
+     // return this.lblcls + " d-none d-"+this.bp+"-inline-block ";}
   }
 });
 
-/** 
- * (NOTE: Superceded by resp-tbl & resp-row below, for row-based tables!)
- * Composes a responsive table from responsive-columns
- * Props - single prop object:
- * tbldata: Object:
- *    head:Table Header
- *    headcls: Head CSS  class
- *    tblcls: Table Class
- *    coldefs: Object - column defaults - for coldata entries, unless they exist
- *          like: lblcls, bp, rowcls, fldcls 
- *    coldata: array of prop objects for responsive-column above - each el:
- *        label: Column Label
+//
+ // (NOTE: Superceded by resp-tbl & resp-row below, for row-based tables!)
+ // Composes a responsive table from responsive-columns
+ // Props - single prop object:
+ // tbldata: Object:
+ //    head:Table Header
+ //    headcls: Head CSS  class
+ //    tblcls: Table Class
+ //    coldefs: Object - column defaults - for coldata entries, unless they exist
+ //          like: lblcls, bp, rowcls, fldcls 
+ //    coldata: array of prop objects for responsive-column above - each el:
+ //        label: Column Label
  *        fields: array - field values
  *        (opt, or in tbldata.coldefs)
  *        bp - breakpoint for when to label each field
@@ -610,8 +610,6 @@ window.Vue.component('responsive-column', {
  *        fldcls - field class
  *        
  *   
- */
-/*
  * 
   template: `
   <div :class='tbldata.tblcls' class="row">
@@ -622,10 +620,9 @@ window.Vue.component('responsive-column', {
          :rowcls="coldtm.rowcls"></responsive-column>
   </div>
 `,
- */
-/** Part of turning tables on their side, so big container is column, contain
+** Part of turning tables on their side, so big container is column, contain
  * many rows, eche row contains mini-columnt again.
- */
+ *
 window.Vue.component('responsive-table', {
   name: 'responsive-table',
 //CVue.component('responsive-table', {
@@ -642,7 +639,6 @@ window.Vue.component('responsive-table', {
     </div>
   </div>
 `,
-  */
   template: `
   <div :class='tbldata.tblcls' class="row">
     <div :class="tbldata.headcls" v-html="tbldata.head"></div>
@@ -678,6 +674,7 @@ window.Vue.component('responsive-table', {
     }
   }
   });
+*/
 
 //////////////////  End Column Based Tables ///////////////
 /**

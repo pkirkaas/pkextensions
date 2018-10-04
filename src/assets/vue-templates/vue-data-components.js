@@ -3,72 +3,8 @@
  * Compose to make forms
  */
 
-/** Pops up a pk-modal component */
-/*
-window.Vue.component('modal-btn',{
-  template: `
-  <div class="btn btn-primary btn-pop" :class="params.popBtnCls"
-       @click="openModal"> {{label}}
-    <pk-modal :params="params" v-show="showModal" @click.stop="stopProp">
-      <slot></slot>
-    </pk-modal>
-  </div>
-  `,
-  props: ['label','params'],
-  mounted: function() {
-    //console.log("In Btn, params:",this.params);
-  },
-  data: function() {
-    return {
-      showModal: false,
-    };
-  },
-  methods: {
-    stopProp: function(event) {
-      console.log("Trying to stop click propigation");
-    },
-    openModal: function(event) {
-      $(":input.jq-wipe").val('');
-      console.log("Activated OpenModal");
-      this.params.message='';
-      this.showModal = true;
-    },
-  },
-});
-*/
 
-//Try to do a better job than above - don't include the modal INSIDE
-//the button - and send param / key to know which modal to open... unless
-//the modal is generic, & the button passes everything to it?
-//Create 3rd component that wraps both & provides data
-  //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
-window.Vue.component('pk-modal-btn',{
-  template: `
-  <div style="z-index: 2000;" @click="onClick" class="btn btn-primary btn-pop m-5 p-f fs-8"
-   :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
-  `,
-   props: ['btnparams'],
-  mounted: function() {
-    console.log("PkModalBtn, btnparams",this.btnparams);
-   },
-   methods: {
-    onClick: function() {
-      this.$parent.showModal = true;
-      console.log("btn got clicked");
-    },
-    callOwner: function() {
-      console.log ("BUTTON got called when clicked on "+who);
-    },
-    /*
-    doshowModal: function() {
-      console.log("Ath least I cought the click");
-      this.$parent.doshowModal();
-    }
-    */
-  }
-});
-
-//Wraps both the button & modal
+//Wraps both the button & modal - the modal is a single file component pk-modal.vue
 //Should take 3 prop objects - "btnparams" (for the button itself - title, appearance)
 //, "modalparams" (For the modal box - size, title, etc)
 // 'contentparams' - what's inside the modal
@@ -106,6 +42,37 @@ window.Vue.component('pk-modal-wrapper',{
 });
 
 
+/** Pops up a pk-modal component - DON'T USE DIRECTLY - USE pk-modal-wrapper! */
+
+//the button - and send param / key to know which modal to open... unless
+//the modal is generic, & the button passes everything to it?
+//Create 3rd component that wraps both & provides data
+  //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
+window.Vue.component('pk-modal-btn',{
+  template: `
+  <div style="z-index: 2000;" @click="onClick" class="btn btn-primary btn-pop m-5 p-f fs-8"
+   :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
+  `,
+   props: ['btnparams'],
+  mounted: function() {
+    console.log("PkModalBtn, btnparams",this.btnparams);
+   },
+   methods: {
+    onClick: function() {
+      this.$parent.showModal = true;
+      console.log("btn got clicked");
+    },
+    callOwner: function() {
+      console.log ("BUTTON got called when clicked on "+who);
+    },
+    /*
+    doshowModal: function() {
+      console.log("Ath least I cought the click");
+      this.$parent.doshowModal();
+    }
+    */
+  }
+});
 
 
 /** Could be a label, or data field - if data-field, just display or input 
