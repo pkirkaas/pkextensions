@@ -44,16 +44,20 @@ window.Vue.component('modal-btn',{
   //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
 window.Vue.component('pk-modal-btn',{
   template: `
-  <div style="z-index: 2000;"  class="btn btn-primary btn-pop m-5 p-f fs-8"
+  <div style="z-index: 2000;" @click="onClick" class="btn btn-primary btn-pop m-5 p-f fs-8"
    :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
   `,
-  props: ['btnparams'],
+   props: ['btnparams'],
   mounted: function() {
     console.log("PkModalBtn, btnparams",this.btnparams);
-  },
-  methods: {
+   },
+   methods: {
     onClick: function() {
+      this.$parent.showModal = true;
       console.log("btn got clicked");
+    },
+    callOwner: function() {
+      console.log ("BUTTON got called when clicked on "+who);
     },
     /*
     doshowModal: function() {
@@ -76,17 +80,22 @@ window.Vue.component('pk-modal-wrapper',{
   -->
   <div>
     <pk-modal-btn :btnparams="btnparams"
-      @click="showModal = true"
+      @click="callOwner(event,'button') "
        class="btn primary-btn" :class="btnparams.btnCls">
     </pk-modal-btn>
 
 
-    <pk-modal ref="mymodal" v-show="showModal" @close="showModal=false"
-      :modalparams="modalparams" :contentparams="contentparams", :showModal="showModal" >
+    <pk-modal ref="mymodal" v-if="showModal" @close="showModal=false"
+      :modalparams="modalparams" :contentparams="contentparams" :showModal="showModal" >
     </pk-modal>
   </div>
   `,
   props:["contentparams","modalparams","btnparams"],
+  methods : {
+    callOwner: function() {
+      console.log ("Wrapper got called when clicked on "+who);
+    },
+  },
   data: function() {
     return {showModal: false};
   },

@@ -7,6 +7,8 @@
 
 
 
+      <component :is="contentparams.cname" v-bind="contentparams"></component>
+      <slot></slot>
 
 
     </div>
@@ -27,8 +29,6 @@
 <script>
 
 /*
-      <component :is="contentparams.cname" v-bind="contentparams"></component>
-      <slot></slot>
   */
 export default {
     name: 'pk-modal',
@@ -39,7 +39,7 @@ export default {
     //contentparams - probably an inner comonent, conentparams={cname,cdata}
     props: ['contentparams', 'modalparams'],
     mounted: function() {
-      console.log("PkModal, params:", this.modalparams, 'content',contentparams);
+      console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
     },
     methods: {
       /** Will combine data directly provided in modalparams.data,
@@ -57,22 +57,24 @@ export default {
             fd.append($el.attr('name'),$el.val());
           }); 
         //Now add direct data, if any
-        if (modalparams.data && (typeof modalparams.data === 'object')) {
-          for (var key in modalparams.data) {
-            fd.append(key,modalparams.data[key]);
+        if (this.modalparams.data && (typeof this.modalparams.data === 'object')) {
+          for (var key in this.modalparams.data) {
+            fd.append(key,this.modalparams.data[key]);
           }
         }
         for(var pair of fd.entries()) {
           console.log(pair[0]+ ', '+ pair[1]); 
         }
-        console.log('url',urls);
+        console.log('url',url);
         /** // Debugging
         */
         axios.post(url,fd).
           then(response=>{
             console.log("Success: Response:",response);
     
+            this.$emit('submitmsg',"Refresh");
             this.$parent.$emit('submitmsg',"Refresh");
+            this.$parent.$parent.$emit('submitmsg',"Refresh");
           }).
           catch(error=>{
             console.error("Error:",error.response);
