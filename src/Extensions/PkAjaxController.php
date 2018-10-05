@@ -162,12 +162,14 @@ abstract class PkAjaxController extends PkController {
    * eloquent
    * Can take the same arguments as set/toggle above, with modfield, so can 
    * use in same AJAX function to set & get
+   * $id can be a single id or comma-separated list of ids
    */
   public function modelattributes() {
     $model = $this->data['model'];
-    $id = to_int($this->data['id']);
+    $id = $this->data['id'];
     $modfield = keyVal('modfield',$this->data);
     $instance = $model::find($id);
+    $instance->model = $model;
     if ($modfield) {
       $instance->modfield = $modfield;
     }
@@ -176,23 +178,41 @@ abstract class PkAjaxController extends PkController {
 
   /** Fetch attributes as specified by the model, instance id (or IDS), and 
    * model keys
-   * @return array - 
+   * @param Model -string- the model to search
+   * @param id - single id for single instance, list for collection, empty for all
+   * @param array keys: array of key atts to return, could include relationships. If empty, the default.
+   * @param array extra - extra atts, like relationships, so don't have to specify all keys to add a few.
+   * @return array - results
    */
   public function fetchAttributes() {
     $model = $this->data['model'];
-    $id = $this->data['id'];
-    $keys = $this->data['keys'];
-    $obj = $model::find($id);
+    $id = keyVal('id',$this->data);
+    $keys = keyVal('keys',$this->data);
+    $extra = keyVal('extra',$this->data);
+    if (ne_string($keys)) {
+      $keys=[$keys];
+    }
+    if (is_array($keys) && !in_array('id',$keys,1)) {
+      $keys[]='id'; #Could be one for an instance, or list for PkCollection
+    }
+    if ($id) {
+      $obj = $model::find($id);
+    } else {
+      $obj = $model::all();
+    }
     pkdebug("ID(s):",$id,"TypeOf obj: ".typeOf($obj));
+    /*
     if ($obj instanceOf PkCollection || (typeOf($obj) == "PkExtensions\PkCollection")) { #We got an array of IDs, return a set
       $retarr = [];
       foreach ($obj as $inst) {
-        $retarr[] = $inst->fetchAttributes($keys);
+        $retarr[] = $inst->fetchAttributes($keys,$extra);
       }
       return $this->success($retarr);
     }
+     * 
+     */
 
-    $atts = $obj->fetchAttributes($keys);
+    $atts = $obj->fetchAttributes($keys,$extra);
     return $this->success($atts);
   }
 

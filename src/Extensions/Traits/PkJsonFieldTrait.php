@@ -60,7 +60,8 @@ trait PkJsonFieldTrait {
 
 
   public function ExtraConstructorJsonField($atts = []) {
-    $this->init();
+    $this->init($atts);
+    if ($this->amType()) pkdebug(static::class.": atts:",$atts);
 
     /*
     $this->initStructured();

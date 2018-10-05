@@ -53,7 +53,6 @@ trait PkUploadTrait {
         //echo "\n\nType of File:  ".typeOf($file)."\n\n";
         throw new PkExceptionResponsable(
           "Tried to upload object of type: ".getType($file));
-        return;
       }
       $storeresult = $file->store('public');
       $mimetype = $file->getMimeType();
@@ -78,6 +77,7 @@ trait PkUploadTrait {
        * 
        */
     }
+    return $args;
   }
 
         

@@ -13,6 +13,23 @@ use Illuminate\Database\Eloquent\Model;
 class PkCollection extends Collection {
 
   /**
+   * Just iterates over the instances & returns an array
+   * of the of the individuale instance 'fetchAttributes()
+   * @param type $keys
+   * @param type $extra
+   * @return Array
+   */
+   public function fetchAttributes($keys=[],$extra=[]) {
+     $retarr=[];
+     foreach ($this as $instance) {
+       $retarr[]=$instance->fetchAttributes($keys,$extra);
+     }
+     return $retarr;
+   }
+
+
+
+  /**
    * Deletes Models from an Eloquent collection
    * @param scalar|array|null $stuff  $stuff or array of things 
    * to remove from the collection, AND delete, if they are model instances;

@@ -151,7 +151,8 @@ var XCVue = PkVue.extend({
   }
   });
 
-const BigImg = CVue.extend({
+//const BigImg = CVue.extend({
+const BigImg = Vue.extend({
   template: `<div class='border p-5 m5' style='max-width: 100%; max-height: 100%;'>
      <img class='fullheight fullwidth' :src="href"></div> `,
   me:'Big Image',
@@ -165,7 +166,8 @@ const BigImg = CVue.extend({
   }
   });
 
-const TextModal = CVue.extend({
+//const TextModal = CVue.extend({
+const TextModal = Vue.extend({
   template: `<div class='border p-5 m5' style='max-width: 100%; max-height: 100%;'>
   <div class='pre-wrap text-wrap'>{{content}}</div> </div> `,
   defaultdata: {content:'',title:""}
@@ -173,7 +175,8 @@ const TextModal = CVue.extend({
 
 
 
-const TestHuge = CVue.extend({
+//const TestHuge = CVue.extend({
+const TestHuge = Vue.extend({
   template: `<div style=" top: 10%; border: solid blue 3px; background-color: #ecc;" class="inline h-center resizable"><div class='vue-popup sh2 tac' v-if="title">{{title}}</div><div class='cvue-anchor'></div> <button @click='close'>Close</button></div>`,
   me:'HUGE TEST!',
   initdata: {dynamicComponent:''},
@@ -187,7 +190,8 @@ const TestHuge = CVue.extend({
   }
 });
 
-const FormPopup = CVue.extend({
+//const FormPopup = CVue.extend({
+const FormPopup = Vue.extend({
   template: `<div style=" top: 10%; border: solid blue 3px; background-color: #ecc;" class="inline h-center resizable"><div class='sh2 tac' v-if="title">{{title}}</div><div class='cvue-anchor'></div> <button @click='submit'>{{post}}</button><button @click='close'>Cancel</button></div>`,
   me:'Form Popup Frame',
   defaultdata: {post:"Save",title:"",dynamicComponent:''},
@@ -205,7 +209,8 @@ const FormPopup = CVue.extend({
     //
     //
 // Actually, if in a v-for, prop should be an object, so see below
-CVue.component('text-input',{
+//CVue.component('text-input',{
+Vue.component('text-input',{
   template: `
   <div :class="wrapclass">
     <div :class="lblclass">{{label}}<input type="text" :value="value"
@@ -219,7 +224,8 @@ CVue.component('text-input',{
 /*** Make my own input components for inclusion in arrays***/
 
 // Actually, if in a v-for, prop should be an object, so
-CVue.component('pk-input-arr',{
+//CVue.component('pk-input-arr',{
+Vue.component('pk-input-arr',{
   type: 'input',
   template: `
   <div :class="inpopt.wrapclass">
@@ -254,7 +260,8 @@ window.Vue.component('pk-input',{
 });
 
 /** Checkbox */
-CVue.component('pk-checkbox-arr', {
+//CVue.component('pk-checkbox-arr', {
+Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
@@ -269,7 +276,8 @@ CVue.component('pk-checkbox-arr', {
 });
 
 /** Select */
-CVue.component('pk-select-arr', {
+//CVue.component('pk-select-arr', {
+Vue.component('pk-select-arr', {
   inptype: 'select',
   template: `
   <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
@@ -302,7 +310,8 @@ CVue.component('pk-input-arr',{
 /** Takes an array or object of multiple input options (type, name, value)
  * & iterates through to build a multi-input div, that can be submitted.
  */
-CVue.component('pk-input-form',{
+//CVue.component('pk-input-form',{
+Vue.component('pk-input-form',{
   template: `
   <div :class="formopts.frmclass" class="mini-input-form">
     <div v-for='(inpopt, idx) in inpopts'>
@@ -342,7 +351,8 @@ CVue.component('pk-input-form',{
   }
 });
 
-CVue.component('small-txt', {
+//CVue.component('small-txt', {
+Vue.component('small-txt', {
   template: `
   <div :class='colclass'>
     <div :class='mxtxtclass' @click='clicked'>{{content}}</div>
@@ -358,7 +368,8 @@ CVue.component('small-txt', {
   props: ['content', 'title', 'colclass']
 });
 
-CVue.component('tiny-img', {
+//CVue.component('tiny-img', {
+Vue.component('tiny-img', {
   template: `
   <div :class='colclass'>
     <img :src='url' :class='mximgclass' @click='clicked'>
@@ -378,7 +389,8 @@ CVue.component('tiny-img', {
 });
 
 /** A button to invite a friend, send a message, etc */
-CVue.component('profile-btn', {
+//CVue.component('profile-btn', {
+Vue.component('profile-btn', {
   template: `
   <div :class='mxcolclass'>
     <a :class='mxbtnclass' :data-tootik="tootik" :href='href' :text="label">{{label}}</a> 
@@ -394,7 +406,8 @@ CVue.component('profile-btn', {
   props: ['profile','label','baseurl', 'tootik', 'btnclass','colclass']
 });
 
-const ContactBody = CVue.extend ({
+//const ContactBody = CVue.extend ({
+window.ContactBody = Vue.extend ({
   template: `
    <div class='contact-body-wrapper vue-popup'>
   <div class='contact-header'>{{header}}</div>
@@ -448,7 +461,8 @@ const MessageBody = ContactBody.extend ({
 });
 
 /** Another button to invite a friend, send a message, etc - but for a popup*/
-CVue.component('contact-btn', {
+//CVue.component('contact-btn', {
+Vue.component('contact-btn', {
   popups: {message: MessageBody, invite:InviteBody},
   template: `
     <button class='popup-btn btn btn-success' :data-tootik="tootik" @click.prevent='submit'>{{label}}</button>
@@ -477,9 +491,11 @@ CVue.component('contact-btn', {
 CVue.component('invite-btn', {
   extends: contact-btn,
 */
-CVue.component('invite-btn', {
+//CVue.component('invite-btn', {
+Vue.component('invite-btn', {
 //const InviteBtn =  {
-  extends: CVue.component('contact-btn'),
+  //extends: CVue.component('contact-btn'),
+  extends: Vue.component('contact-btn'),
   contact_type: {
     label: "Friend",
     tootik: "Send a Friend Invitation",
@@ -490,8 +506,10 @@ CVue.component('invite-btn', {
 
 //CVue.component('invite-btn',new InviteBtn());
 
-CVue.component('message-btn', {
-  extends: CVue.component('contact-btn'),
+//CVue.component('message-btn', {
+Vue.component('message-btn', {
+  //extends: CVue.component('contact-btn'),
+  extends: Vue.component('contact-btn'),
   contact_type: {
     label: "Message",
     tootik: "Send a message",
@@ -775,7 +793,8 @@ CVue.component('blog-post-form', {
 
 */
 
-CVue.component('tabs', {
+//CVue.component('tabs', {
+Vue.component('tabs', {
     template: `
         <div>
             <div class="tabs">
@@ -811,7 +830,8 @@ CVue.component('tabs', {
 });
 
 
-CVue.component('tab', {
+//CVue.component('tab', {
+Vue.component('tab', {
     template: `
         <div v-show="isActive"><slot></slot></div>
     `,

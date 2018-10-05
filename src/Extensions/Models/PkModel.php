@@ -299,12 +299,38 @@ abstract class PkModel extends Model {
   /** Returns an array of attributes matching the keys, for AJAX
    * Indexed keys are this objects attributes/properties - entries
    * keyed by a string with value of array are relationship attributes
+   * If $keys is empty or $extra is true, return the default keys
+   * (as defined in attributeNames). Else, defaults PLUS extras
+   * @param array $keys - the key/attribute pairs to be returned.
+   *    if empty, return all the default ones. Can be index for direct
+   *    attributes, or associative, where key is a relationship & value
+   *    is an array of attributes to be returned from the relationships
+   * @param $extra mixed boolean|array - if false, only return the keys
+   * specified by the $keys argument (if $keys empty, all default)
+   * If true, return all default key/values PLUS those specified in $keys
+   * (for example, relationships). If array, merge with $keys, if string,
+   * convert to array
    */
 
-  public function fetchAttributes($keys = []) {
-    $ret = [];
-    if (is_string($keys)) {
+  public function fetchAttributes($keys = [],$extra=[]) {
+    if (!$keys) {
+       $keys = $this->attributeNames;
+    } else if (is_string($keys)) {
       $keys = [$keys];
+    }
+    if (!in_array('id',$keys,1)) {
+      $keys[]='id';
+    }
+    if ($extra === true) {
+      $extra = $this->attributeNames;
+    } else if (is_string($extra)) {
+      $extra = ['extra'];
+    } else {
+      $extra = [];
+    }
+    $ret = [];
+    if (ne_array($extra)) {
+      $keys=array_merge($keys,$extra);
     }
     foreach ($keys as $idx => $key) {
       if (is_int($idx)) {
@@ -600,6 +626,7 @@ abstract class PkModel extends Model {
     //$createclassname = "Create" . $tablename. "Table";
     //$migrationfile = database_path() . "/migrations/{$timestamp}_create_{$tablename}_table.php";
     $migrationfile = database_path() . "/migrations/{$timestamp}_Pk{$createorupdate}_{$tablename}_table.php";
+    $migrationprevdir = database_path() . "/migrations/Previous";
     $migrationheader = "
 <?php
 use Illuminate\Database\Schema\Blueprint;
@@ -625,9 +652,11 @@ class $createclassname extends Migration {
     $closeclass = "\n}\n";
     $migrationtablecontent = $migrationheader .
         $fieldDefStr . $migrationFunctions . $close . $down . $closeclass;
+    #Get rid of previous Pkxxx
     $fp = fopen($migrationfile, 'w');
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
+    array_map('unlink', glob("$migrationprevdir/*Pkcreate*.php"));
     echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
     return "Migration Table [$migrationfile] Created\n";
   }
@@ -735,7 +764,7 @@ class $createclassname extends Migration {
    * no $key, an array of the table field names => values. 
    */
   public function getTableFieldAttributes($key = null) {
-    $attributeNames = $this->getAttributeNames();
+    $attributeNames = $this->attributeNames;
     if (!$key) {
       $key = $attributeNames;
     }
@@ -1216,6 +1245,7 @@ class $createclassname extends Migration {
    */
   public $relCacheClosure;
   public function __construct(array $attributes = []) {
+    if ($this->amType()) pkdebug(static::class." PkModel : atts:",$attributes);
     //$pkmodel = $this;
     /*
     $this->relCacheClosure = function($rel,$relmodelname) use($pkmodel) {
@@ -1226,14 +1256,24 @@ class $createclassname extends Migration {
     };
      * 
      */
+
       
     $this->casts = $this->getInstanceArraysMerged('casts');
-    $this->fillable($this->getAttributeNames());
+    $this->fillable($this->attributeNames);
     //$this->fillable($this->getFieldNames());
     unset ($attributes['id']);
     parent::__construct($attributes);
+    if ($this->amType())pkdebug("In PkModel After Parent, about to run extra const:, attributes:", $attributes);
+
     $this->RunExtraConstructors($attributes);
+    if ($this->amType())pkdebug("In PkModel After after extra const:, attributes:", $attributes);
   }
+    public static function isType($item) {
+      return true;
+    }
+    public function amType() {
+      return static::isType($this);
+    }
 
   /** Traits to ignore when looking for trait methods */
   public static $trimtraits = [
@@ -1283,6 +1323,7 @@ class $createclassname extends Migration {
 
 
   public function RunExtraConstructors($attributes) {
+    if($this->amType())pkdebug("Enter RunEC, ATTS",$attributes);
     $show = "";
     if (static::class == "App\Models\Borrower") {
       $show = ['constatts'=>$attributes, "InstAtts:" => $this->getAttributes()];
@@ -1290,11 +1331,14 @@ class $createclassname extends Migration {
     //pkdbgtm("About to get/run  ExtraConstructors for ".static::class."; ID:".$this->id, $show);
     $constructors = static::getExtraConstructors();
     if ($constructors) {
-      //pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
+      if($this->amType())pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
       foreach ($constructors as $constructor) {
+      if($this->amType())pkdebug("Pre Constructor", $constructor, "Atts:", $attributes);
         $this->$constructor($attributes);
+      if($this->amType())pkdebug("Post Constructor", $constructor, "Atts:", $attributes);
       }
     }
+    if($this->amType())pkdebug("Post All Extra Cons: Atts:", $attributes);
     return $attributes;
   }
 
@@ -1305,7 +1349,7 @@ class $createclassname extends Migration {
    * set on object, execute method & assign it.
    * @var assocarr 
    */
-  public static $attstofuncs = [];
+  public  $attstocalcs = [ ];
   /**
    * If no key, returns the mapped array of keys to funcs/methods
    * If $key, returns the matched callable (or $key if null)
@@ -1320,8 +1364,10 @@ class $createclassname extends Migration {
     return $attstofuncs[$key] ?? null;
   }
 
-  /** The instance array of calculated atts to values */
-  public $attstocalcs=[];
+  /** The instance array of calculated atts to values/functions/runnables */
+  public static  $attstofuncs =[
+      'attributeNames' => 'getAttributeNames', 
+  ];
 
 
   /**
@@ -1602,8 +1648,12 @@ class $createclassname extends Migration {
     return true;
   }
 
-  /** Very approximate - extended models should override this */
   public function owns($item) {
+    return false;
+  }
+
+  /** Very approximate - extended models should override this */
+  public function abstractowns($item) {
     if (!$item instanceOf PkModel) return false;
     if (!$this->id || !$item->id) return false;
     $ownerID = Str::snake(static::basename()).'_id';
@@ -1746,7 +1796,7 @@ class $createclassname extends Migration {
    * @return array - attributeNames=>values
    */
   public function getAccessorAttributes($withAttributes = true) {
-    $attributeNames = $this->getAttributeNames();
+    $attributeNames = $this->attributeNames;
     $extraKeys = [];
     if ($withAttributes) $extraKeys = array_keys($this->getAttributes());
     $attributeNames = array_merge($attributeNames, $extraKeys);
@@ -2031,7 +2081,8 @@ class $createclassname extends Migration {
    * atts, etc. 
    * @return array of model attributes
    */
-  public function getCustomAttributes($arg=null) {
+  public function getCustomAttributes($arg=null,$extra=[]) {
+    return $this->fetchAttributes($arg,$extra);
     /*
     if (is_string($arg)) {
       $thisclass = get_class($this);
@@ -2180,8 +2231,8 @@ class $createclassname extends Migration {
     return $htenc;
   }
 
-  public function encodeFetchAttributes($keys=[]) {
-    $fa = $this->fetchAttributes($keys);
+  public function encodeFetchAttributes($keys=[], $extra=[]) {
+    $fa = $this->fetchAttributes($keys,$extra);
     $jsenc = json_encode($fa, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     $htenc = html_encode($jsenc);
     //$htenc = static::encodeData($ca);

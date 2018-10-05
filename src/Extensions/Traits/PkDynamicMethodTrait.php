@@ -116,6 +116,7 @@ trait PkDynamicMethodTrait {
     if (is_array_assoc($methods)) {
       $this->addInstanceMethods($methods);
     }
+    return $atts;
     //$this->closures = unsetret($atts,'closures');
     #A method factory class just needs to be construted with $this,
     #then examines $this->instancetype and add the instanceMethods for that type
