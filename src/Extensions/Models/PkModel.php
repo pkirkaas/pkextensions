@@ -1245,35 +1245,17 @@ class $createclassname extends Migration {
    */
   public $relCacheClosure;
   public function __construct(array $attributes = []) {
-    if ($this->amType()) pkdebug(static::class." PkModel : atts:",$attributes);
-    //$pkmodel = $this;
-    /*
-    $this->relCacheClosure = function($rel,$relmodelname) use($pkmodel) {
-      $cacheClosure = function()use($pkmodel, $relmodelname) {
-        return  $pkmodel->hasMany($relmodelname);
-      };
-      return $this->relCached($rel,$cacheClosure);
-    };
-     * 
-     */
 
       
     $this->casts = $this->getInstanceArraysMerged('casts');
     $this->fillable($this->attributeNames);
     //$this->fillable($this->getFieldNames());
     unset ($attributes['id']);
+    $attributes = $this->RunExtraConstructors($attributes);
     parent::__construct($attributes);
-    if ($this->amType())pkdebug("In PkModel After Parent, about to run extra const:, attributes:", $attributes);
-
-    $this->RunExtraConstructors($attributes);
-    if ($this->amType())pkdebug("In PkModel After after extra const:, attributes:", $attributes);
   }
-    public static function isType($item) {
-      return true;
-    }
-    public function amType() {
-      return static::isType($this);
-    }
+
+
 
   /** Traits to ignore when looking for trait methods */
   public static $trimtraits = [
@@ -1323,22 +1305,12 @@ class $createclassname extends Migration {
 
 
   public function RunExtraConstructors($attributes) {
-    if($this->amType())pkdebug("Enter RunEC, ATTS",$attributes);
-    $show = "";
-    if (static::class == "App\Models\Borrower") {
-      $show = ['constatts'=>$attributes, "InstAtts:" => $this->getAttributes()];
-    }
-    //pkdbgtm("About to get/run  ExtraConstructors for ".static::class."; ID:".$this->id, $show);
     $constructors = static::getExtraConstructors();
     if ($constructors) {
-      if($this->amType())pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
       foreach ($constructors as $constructor) {
-      if($this->amType())pkdebug("Pre Constructor", $constructor, "Atts:", $attributes);
-        $this->$constructor($attributes);
-      if($this->amType())pkdebug("Post Constructor", $constructor, "Atts:", $attributes);
+        $attributes = $this->$constructor($attributes);
       }
     }
-    if($this->amType())pkdebug("Post All Extra Cons: Atts:", $attributes);
     return $attributes;
   }
 
@@ -1605,41 +1577,44 @@ class $createclassname extends Migration {
       $keys = [];
       $keyName = $tstInstance->getKeyName();
       $relarr = $arr[$relationName];
-      if (is_array($relarr)) {
-          foreach ($relarr as $relrow) {
-          if (!empty($relrow[$keyName])) { #This should be an update
-            $relId = $relrow[$keyName];
-            $keys[] = $relId;
-            $relInstance = $tstInstance->find($relId);
-            if (!$relInstance instanceOf PkModel) { #Report unexpected problem -
-              $thisclassname = get_class($this);
-
-              pkdebug("ERROR: In class [$thisclassname], id [{$this->id}]
-                For Relationship name [$relationName], of type [$relationModel], 
-                Expected to find an instance with ID [$relId] but didn't!
-                Skipping silently, but should figure out why!");
-              continue;
-            }
-          } else { # This is a new relationship/member item - or a delete?
-            if (!is_array($relrow)) {
-              //pkdebug("Huh. RelRow is:", $relrow);
-              continue;
-            }
-            //pkdebug("A new relationship: RelRow:", $relrow);
-            $relInstance = new $relationModel();
-            if (!array_key_exists($foreignKey, $relrow)) {
-              $relrow[$foreignKey] = $modelId;
-            }
-            #Again, compensate for empty string POSTED instead of NULL
-            if (!array_key_exists($keyName, $relrow)) {
-              //pkdebug("keyName [$keyName]; Relrow:", $relrow);
-            }
-            if (!$relrow[$keyName]) $relrow[$keyName]=null;
-            //if (!keyVal($keyName,$relrow)) $relrow[$keyName]=null;
-          }
-          $relInstance->saveRelations($relrow);
-          $keys[] = $relInstance->getKey();
+      if (is_array($relarr)) { #Have to allow for has 1-1
+        if (is_array_assoc($relarr)) { #Just a single entry
+          $relarr = [$relarr];
         }
+        foreach ($relarr as $relrow) {
+        if (!empty($relrow[$keyName])) { #This should be an update
+          $relId = $relrow[$keyName];
+          $keys[] = $relId;
+          $relInstance = $tstInstance->find($relId);
+          if (!$relInstance instanceOf PkModel) { #Report unexpected problem -
+            $thisclassname = get_class($this);
+
+            pkdebug("ERROR: In class [$thisclassname], id [{$this->id}]
+              For Relationship name [$relationName], of type [$relationModel], 
+              Expected to find an instance with ID [$relId] but didn't!
+              Skipping silently, but should figure out why!");
+            continue;
+          }
+        } else { # This is a new relationship/member item - or a delete?
+          if (!is_array($relrow)) {
+            //pkdebug("Huh. RelRow is:", $relrow);
+            continue;
+          }
+          //pkdebug("A new relationship: RelRow:", $relrow);
+          $relInstance = new $relationModel();
+          if (!array_key_exists($foreignKey, $relrow)) {
+            $relrow[$foreignKey] = $modelId;
+          }
+          #Again, compensate for empty string POSTED instead of NULL
+          if (!array_key_exists($keyName, $relrow)) {
+            //pkdebug("keyName [$keyName]; Relrow:", $relrow);
+          }
+          if (!$relrow[$keyName]) $relrow[$keyName]=null;
+          //if (!keyVal($keyName,$relrow)) $relrow[$keyName]=null;
+        }
+        $relInstance->saveRelations($relrow);
+        $keys[] = $relInstance->getKey();
+      }
     }
       #Delete if id not in array AND foreign key = foreign key
       if (!sizeof($keys)) $this->$relationName()->delete();

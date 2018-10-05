@@ -27,6 +27,7 @@
  * 
  */
 namespace PkExtensions\Traits;
+use PkExtensions\PkExceptionResponsable;
 /**
  * @author pkirkaas
  */
@@ -60,8 +61,8 @@ trait PkJsonFieldTrait {
 
 
   public function ExtraConstructorJsonField($atts = []) {
-    $this->init($atts);
-    if ($this->amType()) pkdebug(static::class.": atts:",$atts);
+    $this->init();
+    
 
     /*
     $this->initStructured();

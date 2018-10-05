@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Http\File;
 use PkExtensions\PkFile;
+use PkExtensions\PkExceptionResponsave;
 use \Eventviva\ImageResize;
 //use PkValidator; #The Facade that is actually a validator factory
 use Validator; #The Facade that is actually a validator factory
@@ -21,6 +22,9 @@ use Validator; #The Facade that is actually a validator factory
  * PkFileUploadService - uploads & sanitizes file, returns an array of its
  * properties. 
  *
+ * TO USE: After create, just call "upload($params), as below. Will return
+ * info on uploaded file or array of uploaded files. Can specify various
+ * validation, resize, type rules, etc.
  * @author pkirk
  */
 
@@ -135,7 +139,7 @@ class PkFileUploadService {
       return false;
     }
     $file = new PkFile($destpath);
-    return $this->processfile($file,$params);
+    return $this->processFile($file,$params);
   }
 
   /**
@@ -158,25 +162,24 @@ class PkFileUploadService {
    * @throws Validation Exception 
    * 
    */
-  #$ctl should really be the assoc array of params - just backwards compat.
-  public function upload($ctl=null, $types = null, $params = []) {
-    if (is_array($ctl)) {
-      $params = $ctl;
+  #$attribute should really be the assoc array of params - just backwards compat.
+  public function upload($attribute=null, $types = null, $params = []) {
+    if (is_array($attribute)) {
+      $params = $attribute;
     } else {
-      $params['ctl']=$ctl;
+      $params['attribute']=$attribute;
       $params['types']=$types;
     }
     if (array_key_exists('url',$params)) {
       return $this->fetchFromUrl($params);
     }
     $allFiles = request()->allFiles();
-    $ctl = keyVal('ctl', $params);
-    pkdebug("Entering upload, FileUploadService, req data:", request()->all(), "PARAMS: ", $params);
-    if (!$ctl) { #Get the first
-      return $this->processFile(reset($allFiles), $params);
-    } else if (ne_string($ctl)) { #Get the named
-      return $this->processFile(keyVal($ctl,$allFiles), $params);
-    } else if ($ctl == -1) { #we want an array all files, keyed by name
+    $attribute = keyVal('attribute', $params);
+    pkdebug("Entering upload, FileUploadService, allfiles:", $allFiles, "PARAMS: ", $params);
+    if (ne_string($attribute)) { #Get the named
+      return $this->processFile(keyVal($attribute,$allFiles,reset($allFiles)), $params);
+    } 
+    if ($attribute == -1) { #we want an array all files, keyed by name
       $files = [];
       foreach ($allFiles as $key=>$file) {
         if ($res = $this->processFile($file,$params)) {
@@ -185,6 +188,7 @@ class PkFileUploadService {
       }
       return $files;
     }
+    return $this->processFile(reset($allFiles), $params);
   }
 
     
@@ -194,25 +198,33 @@ class PkFileUploadService {
     //if (!$this->file instanceOf UploadedFile || !$this->file->isValid()) {
     if (!(($this->file instanceOf UploadedFile) || ($this->file instanceOf PkFile)) || !$this->file->isValid()) {
       //pkdebug("file: ", $file);
-      return false;
-    }
-    return $this->processfile($this->file,$types,$params);
-  }
-   * */
-
-  public function processfile($file,  $params = []) {
+ *@param FileObject - a file uploaded by upload above
+ *@param array $paramas - optional params
+ *@return array:
+    'relpath' => $reldir . basename($path),
+    'storagepath' => $storagepath,
+    'path' => $file->path(),
+    'mimetype' => $file->getMimeType(),
+    'size'=>$file->getSize(),
+    'originalname'=>$file->getClientOriginalName(),
+    'type' => $type,
+    'mediatype' => $type,
+   */
+  public function processfile($file,$params = []) {
+    pkdebug("In Process File, FILE:", $file,"Params:",$params);
+    //$file = unsetret($params,'file');
     if (!($file instanceOf SymfonyFile)
         || !$file->isValid()
-        ) {
+        ) { ## Have to use 
       pkdebug("Either wasn't symfony file, or wasn't valid. Type: ".typeOf($file));
-      return false;
+      return [];
     }
     $types = keyVal('types', $params,'image'); #Allowed major file types
     pkdebug("This File: ", $file);
     $type = static::isType($file, $types);
     if (!$type) {
       pkdebug("The filetype didn't match ", $types);
-      return false;
+      throw new PkExceptionResponsave("The Filetypes Didn't match");
     }
     $resize = keyVal('resize', $params);
     $reldir = keyVal('reldir');

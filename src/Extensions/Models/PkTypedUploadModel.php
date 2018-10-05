@@ -12,7 +12,6 @@ use PkExtensions\Traits\PkOwnedModelTrait;
  * @author pkirk
  */
 class PkTypedUploadModel extends PkUploadModel {
-  use PkOwnedModelTrait;
   public static $table_field_defs = [ ];
 
   /*

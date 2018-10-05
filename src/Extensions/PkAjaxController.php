@@ -184,7 +184,7 @@ abstract class PkAjaxController extends PkController {
    * @param array extra - extra atts, like relationships, so don't have to specify all keys to add a few.
    * @return array - results
    */
-  public function fetchAttributes() {
+  public function fetchattributes() {
     $model = $this->data['model'];
     $id = keyVal('id',$this->data);
     $keys = keyVal('keys',$this->data);

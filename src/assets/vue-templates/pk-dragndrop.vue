@@ -32,11 +32,15 @@ export default {
       file: null,
       desc: '',
       imgblob: null,
-      //action: 'typedprofileupload',
-      //url: '/ajax',
+      action: this.params.action || 'typedprofileupload',
+      url: this.params.url || '/ajax/upload',
       };
     },
     props: ['params'],
+    mounted: function() {
+      console.log("Params:",this.params);
+    },
+
     methods: {
       onDrop: function(e) {
         e.stopPropagation();
@@ -78,11 +82,13 @@ export default {
         fd.append('file',this.file,this.file.name);
         console.log("In Save, FD:", fd);
         var me = this;
-        axios.post(this.url,fd).then( response=> {
-          console.log("Response:",response);
-                  me.removeFile(); });
+        axios.post(this.url,fd).
+          then( response=> { console.log("Response:",response);
+          this.$parent.$emit('refresh'); }).
+          catch(error=>{console.log("Error saving:",error.response);});
 
       },
+      /*
       saveFileOld() {
         //console.log("File: ", this.file, "Image: ", this.image, "Desc:", this.desc);
         var fd = new FormData();
@@ -95,6 +101,7 @@ export default {
           console.log("Response:",response);
                   me.removeFile(); });
       },
+      */
       removeFile() {
         this.image = '';
       }

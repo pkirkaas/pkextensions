@@ -2,6 +2,7 @@
 namespace PkExtensions\Traits;
 use PkExtensions\PkExceptionResponsable;
 use PkExtensions\PkFile;
+use PkExtensions\PkFileUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -22,12 +23,11 @@ trait PkUploadTrait {
   'mimetype'=>'string',
   'size'=>'integer',
   'originalname'=>'string',
-
+  'path'=>['string','nullable'],
   'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
   ];
   public $uploadedFile;
-
-  public static $methodsAsAttributeNamesPkUpload = [
+  public static $attstofuncs_uploadTrait=[
       'url',
   ];
 
@@ -38,46 +38,22 @@ trait PkUploadTrait {
   /** Can accept a uploaded file object, or an array of file info 
    * from PkFileUploadService
    * 
-   * @param File|Array $args - either a file, or ['file'=$file] or 
-   * array of file details from PkFileUploadService
-   * @return constructor
+   * @param File|Array $args - either a Symfonyfile, or ['file'=$file] or 
+   * an array of parameters needed by PkFileUploadService to upload the
+   * file - either from disk or URL
+   * @return array - the enhanced constructor array
    * @throws PkExceptionResponsable
    */
-  public function TraitConstructorPkUpload($args=[]) {
-    if ($args instanceOf SymfonyFile) {
-      $args = ['file'=>$args];
+  public function ExtraConstructorPkUploadTrait($args=[]) {
+
+    if (!isPost() || empty($_FILES)) {
+      pkdebug("No Files?");
+      return $args;
     }
-    $file = keyVal('file', $args);
-    if ($file) {
-      if (!$file instanceOf SymfonyFile) {
-        //echo "\n\nType of File:  ".typeOf($file)."\n\n";
-        throw new PkExceptionResponsable(
-          "Tried to upload object of type: ".getType($file));
-      }
-      $storeresult = $file->store('public');
-      $mimetype = $file->getMimeType();
-      $this->mimetype = $mimetype;
-      $this->storagepath = $storeresult;
-      $this->size =$file->getClientSize();
-      $this->mediatype= static::smimeMainType($mimetype);
-      $this->originalname = $file->getClientOriginalName();
-      $this->relpath=Storage::url($storeresult);
-      $this->key = keyVal('key',$args);
-      $this->path =$file->path();
-    } else { #$args should be array of file info {
-      /*
-      $this->mimetype = $mimetype;
-      $this->storagepath = $storeresult;
-      $this->size =$file->getClientSize();
-      $this->mediatype= static::smimeMainType($mimetype);
-      $this->originalname = $file->getClientOriginalName();
-      $this->relpath=Storage::url($storeresult);
-      $this->key = keyVal('key',$args);
-      $this->path =$file->path();
-       * 
-       */
-    }
-    return $args;
+    $us = new PkFileUploadService();
+    $extra = $us->upload($args);
+    pkdebug("Extra for upload:",$extra);
+    return array_merge($args,$extra);
   }
 
         
@@ -113,10 +89,6 @@ trait PkUploadTrait {
     return static::getArraysMerged("upload_types");
   }
 
-  #What could be in here?
-  public function ExtraConstructorUploadTrait($atts = []) {
-    $this->uploadedFile = keyVal('uploaded_file', $atts);
-  }
 
   public static $required_attsPkUpload = ['relpath', 'mimetype'];
 

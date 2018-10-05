@@ -1,7 +1,11 @@
 
 <template>
+  <div>
+  <h1>And we're here!</h1>
   <div class='pk-showimage-container'>
-        <img :src="imagespec.url" alt="" class="img" :style="imagespec.style"/>
+        <img :src="imageprops.url" alt="" class="img" 
+          :style="imgstyle"/>
+  </div>
   </div>
 </template>
 
@@ -9,7 +13,31 @@
 //var app = new Vue({
 export default {
     name: 'pk-showimage',
-    props: ['imagespec'],
+    //params: ajaxurl, ajaxdata,style,class
+    //props: ['params'],
+    props: ['ajaxparams','ajaxurl','imgstyle'],
+    data: function() {
+      return {
+        imageprops: {
+          url: null,
+          //style: null,
+          ////class: null,
+        } };
+    },
+    methods: {
+      initData: function() {
+        axios.post(this.ajaxurl,this.ajaxparams).
+          then(response=>{
+            this.imageprops.url = response.data.url;
+            console.log("Success:", response,"this.imageprops.url:",this.imageprops.url);
+          }).
+          catch(error=>{console.log("Error fetching img URL:",error.response);});
+      },
+    },
+    mounted: function() {
+      console.log("In image vue, props ajaxurl:",this.ajaxurl, 'ajaxparams',this.ajaxparams);
+      this.initData();
+    },
     /*
     methods: {
       onDrop: function(e) {
