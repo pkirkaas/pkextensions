@@ -14,7 +14,9 @@
         <h3>What's the photo about?</h3>
         <textarea placeholder="Description" class="text-desc" v-model="desc"></textarea>
         <br>
+        <!--
         <button class="btn" @click="removeFile">REMOVE</button>
+        -->
         <button v-show="image" class="btn" @click="saveFile">Save</button>
       </div>
     </label>
@@ -48,53 +50,82 @@ export default {
       deleteurl: this.params.deleteurl || '/ajax/delete',
       };
     },
-    props: ['params'], //uploadmodel, uploadid, ownermodel, ownerid, attribute,fetchurl,saveurl,deleteurl
+    props: ['params'], 
     mounted: function() {
-      console.log("dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+      console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+      this.logThis();
       this.initData();
     },
 
     methods: {
+      logThis() {
+        var comatts = ['defaulturl', 'image', 'file', 'desc', 'imgblob', 'uploadopts', 'mediatype',
+            'url', 'attribute', 'foreignkeyname', 'id', 'model', 'ownerid', 'ownermodel',
+          'saveurl', 'fetchurl', 'deleteurl'];
+        var currvals = {};
+        var me = this;
+        comatts.forEach(function(key){
+          currvals[key] = me[key];
+        });
+        console.log("This is:",currvals);
+        return currvals;
+      },
       initData(data) { //Data may be empty or have all we need
         
         var me = this;
-        var keystoset = ['attribute','mediatype','model','id','url'];
-        var searchkeys =[ //Keys useful to find upload
-         'ownermodel','ownerid','model','id','attribute'];
+        var keystoset = ['attribute','mediatype','id','url'];
+        var searchkeys1 =['model','id'];
+        var searchkeys2 =[ 'ownermodel','ownerid','attribute'];
        //Check data is object & not null
-       if ((typeof data === 'object') && (data !== null)) { //Have data object.
-         var all = true;
-         for( let key of keystoset) {
-           if (data[key]) {
-             this[key] = data[key];
-           } else {
-             all = false;
-           }
-         }
-         if (all) { //We set what we wanted
-           return;
-         } //else we did't - let's search
-       } else {
+       if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
          data = {};
        }
-
-       var querydata ={};
-       searchkeys.forEach(function(key) {
-         querydata[key]= me[key] || data[key];
-       });
-       axios.post(this.fetchurl,querydata).
+       //Check if we have enough to query
+        var all = true;
+        var querydata ={};
+        for( let key of searchkeys1) {
+           var tmp = data[key] || me[key];
+           if (!tmp) {
+             all=false;
+             break;
+           }
+           querydata[key]=tmp;
+         }
+         if (!all) { //We don't have enough to query
+           all=true;
+           querydata = {};
+          for( let key of searchkeys2) {
+            var tmp = data[key] || me[key];
+            if (!tmp) {
+              all=false;
+              break;
+            }
+           querydata[key]=tmp;
+         }
+       }
+       if (all) {//We have a query set
+        console.log("In initData, trying to query:", querydata);
+        axios.post(this.fetchurl,querydata).
           then(response=> {
             console.log("Search Results:", response);
-            var data = response.data;
-            if (!data.i) { //No Match
+            var rdata = response.data;
+            if (!rdata.id) { //No Match
               this.url = this.defaulturl;
               return;
             }
+            console.log("Keystoset?",keystoset);
             keystoset.forEach(function(key) {
-              this[key] = data[key];
+              me[key] = rdata[key];
             });
           }).
-          catch(error=>{console.error("We had an error with the search:",error.response);});
+          catch(error=>{console.error("We had an error with the search:",error,error.response);});
+       } else { //Maybe we got good data in data
+          for( let key of searchkeys2) {
+            if (data[key]) {
+              me[key] = data[key];
+            }
+          }
+        }
       },
       onDrop: function(e) { //Just want to upload & save it right away
         e.stopPropagation();
@@ -127,13 +158,15 @@ export default {
         blobreader.readAsArrayBuffer(file);
       },
       saveFile() {
+        console.log("About to save. These are the values?");
+        this.logThis();
         var fd = new FormData();
         var savekeys = [ //The keys required to save the upload
-          'ownermodel','ownerid','uploadmodel','foreignkeyname','attribute',
+          'ownermodel','ownerid','model','foreignkeyname','attribute',
           'mediatype','uploadopts'];
         var me = this;
-        savekeys.foreach(function(key) {
-          fd.append(key,me.key);
+        savekeys.forEach(function(key) {
+          fd.append(key,me[key]);
         });
         //this.params.action='typedprofileupload';
         /*
@@ -151,7 +184,7 @@ export default {
           this.$parent.$refs.dropavatar.initData();
           //this.$emit('refresh');
           }).
-          catch(error=>{console.log("Error saving:",error.response);});
+          catch(error=>{console.log("Error saving:",error,error.response);});
       },
       /*
       removeFile() {

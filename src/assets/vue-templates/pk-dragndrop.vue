@@ -38,7 +38,7 @@ export default {
     },
     props: ['params'],
     mounted: function() {
-      console.log("dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+      //console.log("dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
     },
 
     methods: {
@@ -80,7 +80,7 @@ export default {
         }
         fd.append('desc',this.desc);
         fd.append('file',this.file,this.file.name);
-        console.log("In Save, FD:", fd);
+        //console.log("In Save, FD:", fd);
         var me = this;
         axios.post(this.url,fd).
           then( response=> { console.log("DD Save Response:",response);

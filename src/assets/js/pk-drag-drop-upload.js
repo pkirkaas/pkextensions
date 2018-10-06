@@ -22,7 +22,7 @@ $(function () {
   $('.drop-url').on('drop',function(e) {
     e.preventDefault();
     //console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData('text/html'));
-    console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData());
+    //console.log("Dropped here, dataTransfer: ",e.originalEvent.dataTransfer.getData());
     var url = $(e.originalEvent.dataTransfer.getData('text/html')).filter('img').attr('src');
     if (!url) {
       return;
@@ -37,7 +37,7 @@ $(function () {
       params = parseStr(params);
     }
     params[name]=url;
-    console.log('Params:',params);
+    //console.log('Params:',params);
       
     jQuery('<img/>', {
           src: url,
@@ -138,7 +138,7 @@ $(function () {
       var me = e.target;
       var hiddenfileinput = $('<input type="file" multiple>');
       hiddenfileinput.on('change', function (ec) {
-        console.log("The type of files: "+typeof this.files);
+        //console.log("The type of files: "+typeof this.files);
         if (!this.files instanceof FileList) {
           return;
         }

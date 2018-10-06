@@ -29,7 +29,7 @@
   //retrieve it, url & params to delete
 
 /*
-{owningmodel:'\\App\\Models\\Profile',owningid:<?=$profile->id?>,uploadmodel:'\\App\Models\ProfileUpload',foreignkeyname:'profile_id',attribute:'avatar'}
+{ownermodel:'\\App\\Models\\Profile',ownerid:<?=$profile->id?>,model:'\\App\Models\ProfileUpload',foreignkeyname:'profile_id',attribute:'avatar'}
   */
 //export default {
 //module.exports = {
@@ -40,9 +40,9 @@ export default {
       file: null,
       image: '',
       imgblob: null,
-      owningmodel:'\\App\\Models\\Profile',
-      owningid:37,
-      uploadmodel:'\\App\\Models\\ProfileUpload',  
+      ownermodel:'\\App\\Models\\Profile',
+      ownerid:37,
+      model:'\\App\\Models\\ProfileUpload',  
       foreignkeyname: 'profile_id',
       attribute:'avatar',
       imgclass: " icon inner ", 
@@ -63,9 +63,9 @@ export default {
       fetchurl: this.xparams.fetchurl,
       deleteurl: this.xparams.delurl,
       deletecascade: this.xparams.delcasc,
-      owningmodel: this.xparams.owningmodel,
-      owningid: this.xparams.owningid,
-      uploadmodel: this.xparams.uploadmodel,
+      ownermodel: this.xparams.owningmodel,
+      ownerid: this.xparams.owningid,
+      model: this.xparams.uploadmodel,
       id: this.xparams.id,
       foreigkeyname: this.xparams.foreigkeyname,
       foreigkeyvalue: this.xparams.foreigkeyvalue,

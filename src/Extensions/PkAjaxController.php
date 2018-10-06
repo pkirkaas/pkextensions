@@ -188,6 +188,7 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
+    pkdebug("IN SEARCH?FETCH DATA:", $this->data);
     $obj=null;
     $keys = keyVal('keys',$this->data);
     $extra = keyVal('extra',$this->data);
@@ -208,7 +209,7 @@ abstract class PkAjaxController extends PkController {
     } else { #Not a model
       $ownermodel=keyVal('ownermodel', $this->data);
       $ownerid = keyVal('ownerid',$this->data);
-      $attribute=keyVal('attribute',$this-data);
+      $attribute=keyVal('attribute',$this->data);
       $obj = $ownermodel::find($ownerid)->$attribute;
       $keys[]='totag';
     }

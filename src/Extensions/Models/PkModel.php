@@ -262,8 +262,14 @@ abstract class PkModel extends Model {
   public static function getRequiredArgs() {
     return static::getArraysMerged("requiredArgs");
   }
-  public static function getLoadRelations() {
-    return static::getArraysMerged("load_relations");
+  public static function getLoadRelations($relation=null,$justmodel = false) {
+    $loadrels = static::getArraysMerged("load_relations");
+    if (!$relation) return $loadrels;
+    if ($model = keyVal($relation,$loadrels)) {
+      if ($justmodel) return $model;
+      return ["attribute"=>$relation, 'model'=>$model];
+    }
+    return [];
   }
 
   public static function getHasOneRelations($relation=null) {
@@ -285,7 +291,7 @@ abstract class PkModel extends Model {
   ### God, might as well do it for PkCollections too...
 
   public function totag() {
-    return static::class.'#'.$this-id;
+    return static::class.'#'.$this->id;
   }
 
   public static function fromtag($idtag) {
