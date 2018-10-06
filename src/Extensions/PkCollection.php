@@ -4,6 +4,7 @@ namespace PkExtensions;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use PkExtensions\Models\PkModel;
 
 /**
  * PkCollection - just extends eloquent collection to delete 
@@ -27,6 +28,18 @@ class PkCollection extends Collection {
      return $retarr;
    }
 
+   #### Only works for non-emtpy collections, of the same model...
+   public function totag() {
+     if (!count($this)) return false;
+     $model = get_class($this[0]);
+     $idarr = $this->pluck('id');
+     $idlist = implode(',',$idarr);
+     return $model.'#'.$idlist;
+   }
+
+   public static function fromtag($tag) {
+     return PkModel::fromtag($tag);
+   }
 
 
   /**

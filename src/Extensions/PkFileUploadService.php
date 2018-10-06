@@ -175,7 +175,7 @@ class PkFileUploadService {
     }
     $allFiles = request()->allFiles();
     $attribute = keyVal('attribute', $params);
-    pkdebug("Entering upload, FileUploadService, allfiles:", $allFiles, "PARAMS: ", $params);
+   // pkdebug("Entering upload, FileUploadService, allfiles:", $allFiles, "PARAMS: ", $params);
     if (ne_string($attribute)) { #Get the named
       return $this->processFile(keyVal($attribute,$allFiles,reset($allFiles)), $params);
     } 
@@ -211,7 +211,7 @@ class PkFileUploadService {
     'mediatype' => $type,
    */
   public function processfile($file,$params = []) {
-    pkdebug("In Process File, FILE:", $file,"Params:",$params);
+    //pkdebug("In Process File, FILE:", $file,"Params:",$params);
     //$file = unsetret($params,'file');
     if (!($file instanceOf SymfonyFile)
         || !$file->isValid()
@@ -220,7 +220,7 @@ class PkFileUploadService {
       return [];
     }
     $types = keyVal('types', $params,'image'); #Allowed major file types
-    pkdebug("This File: ", $file);
+    //pkdebug("This File: ", $file);
     $type = static::isType($file, $types);
     if (!$type) {
       pkdebug("The filetype didn't match ", $types);
@@ -234,7 +234,7 @@ class PkFileUploadService {
     } else {
       $reldir = '';
     }
-    pkdebug("in upload - r");
+    //pkdebug("in upload - r");
     /*
     if ($validationStr) {
       //$validator = Validator::make($request->all(), [$ctl => $validationStr]);

@@ -38,7 +38,7 @@ export default {
     },
     props: ['params'],
     mounted: function() {
-      console.log("Params:",this.params);
+      console.log("dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
     },
 
     methods: {
@@ -83,8 +83,13 @@ export default {
         console.log("In Save, FD:", fd);
         var me = this;
         axios.post(this.url,fd).
-          then( response=> { console.log("Response:",response);
-          this.$parent.$emit('refresh'); }).
+          then( response=> { console.log("DD Save Response:",response);
+          //this.$parent.$refs.dropavatar.ajaxurl = response.data.url;
+          this.$parent.$refs.dropavatar.initData();
+          //this.$parent.ajaxurl = response.data.url;
+          //this.$parent.$emit('refresh');
+          //this.$emit('refresh');
+          }).
           catch(error=>{console.log("Error saving:",error.response);});
 
       },

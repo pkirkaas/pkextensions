@@ -29,6 +29,11 @@
  * create/update/delete the one-to-many relationships; like a Cart with Items.
  * Use in conjunction with PkController->processPost, & pklib.js templates.
  * 
+ * If your model has "hasOne" relations, they should be deleted before new is added.
+ * 
+ * public static $has_one_relation [
+ *    ['avatatr' => "\App\Models\ProfileUpload",]
+ * 
  * If your model defines the static array: $display_value_fields, ex:
  * <pre>
  *   public static $display_value_fields = [
@@ -260,6 +265,35 @@ abstract class PkModel extends Model {
   public static function getLoadRelations() {
     return static::getArraysMerged("load_relations");
   }
+
+  public static function getHasOneRelations($relation=null) {
+    $onerelations = static::getArraysMerged("has_one_relation");
+    if ($relation) {
+      return keyVal($relation,$onerelations);
+    }
+    return $onerelations;
+  }
+
+  public function deleteHasOne($relation) {
+    if (static::getHasOneRelations($relation) && $this->$relation) {
+      $this->$relation->delete();
+    }
+  }
+
+  ############  Pair of functs - to make a string to rebuild the object,
+  ######## And the reverse to create the object from the string ######
+  ### God, might as well do it for PkCollections too...
+
+  public function totag() {
+    return static::class.'#'.$this-id;
+  }
+
+  public static function fromtag($idtag) {
+    $comps = explode('#',$idtag);
+    if (count($comps) !== 2 || !(class_exists($comps[0]))) return false;
+    return $comps[0]::find($comps[1]);
+  }
+
 
 
   /** If no args, returns all the valid field for the table.

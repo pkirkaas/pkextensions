@@ -26,17 +26,18 @@ export default {
     },
     methods: {
       initData: function() {
+        console.log("ShomImg init: ajaxparams:",this.ajaxparams,"ajaxurl",this.ajaxurl);
         axios.post(this.ajaxurl,this.ajaxparams).
           then(response=>{
-            this.imageprops.url = response.data.url;
-            console.log("Success:", response,"this.imageprops.url:",this.imageprops.url);
+            this.imageprops.url = response.data.avatarUrl;
+            console.log("ShowImage AJAX Success:", response,"this.imageprops.url:",this.imageprops.url);
           }).
           catch(error=>{console.log("Error fetching img URL:",error.response);});
       },
     },
     mounted: function() {
-      console.log("In image vue, props ajaxurl:",this.ajaxurl, 'ajaxparams',this.ajaxparams);
       this.initData();
+      console.log("In image vue, props ajaxurl:",this.ajaxurl, 'ajaxparams',this.ajaxparams);
     },
     /*
     methods: {

@@ -52,7 +52,7 @@ trait PkUploadTrait {
     }
     $us = new PkFileUploadService();
     $extra = $us->upload($args);
-    pkdebug("Extra for upload:",$extra);
+    //pkdebug("Extra for upload:",$extra);
     return array_merge($args,$extra);
   }
 
@@ -212,7 +212,7 @@ trait PkUploadTrait {
    * @return \static|boolean - the new instance, or false if error
    */
   public static function CreateUpload($fileinfo, $extra = []) {
-    pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
+    //pkdebug("CU; FF: ",$fileinfo,'EXTRA: ', $extra);
     if ($fileinfo === false) {
       pkdebug("Couldn't file the data", $fileinfo);
       return false;
