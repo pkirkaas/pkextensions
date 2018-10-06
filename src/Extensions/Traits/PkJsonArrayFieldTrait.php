@@ -1,6 +1,7 @@
 <?php
 /*
  * Try a simpler implementation of PkJsonFiedTrait, using what Laravel supports
+ * Idea is to support a basic repeatable named object structure - 
  */
 
 namespace PkExtensions\Traits;

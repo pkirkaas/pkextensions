@@ -1,13 +1,12 @@
 <!-- Drop & immediately upload, in place -->
 <template>
   <div class='pk-dragndrop-container'>
-   	<div class="helper"></div>
   	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop">
-    <div class="helper"></div>
-      <div class=" block align-center" >
-        <img :src="url" alt="" class="img" />
+      <div class=" block align-center img-wrapper" >
+         <div class="del-x actionable  svg-inline--fa fa-window-close fa-w-16 fa-5x    "
+              @click="deleteupload()">X</div>
+        <img :src="url" alt="" class="img-upload" />
       </div>
-    </label>
   </div>
   </div>
 </template>
@@ -209,7 +208,6 @@ html, body {
 	height: 100%;
   text-align: center;
 }
-*/
 
 .btn {
   background-color: #d3394c;
@@ -231,6 +229,7 @@ input[type="file"] {
   opacity: 0;
   z-index: -1;
 }
+*/
 
 .align-center {
   text-align: center;
@@ -258,11 +257,11 @@ input[type="file"] {
   vertical-align: middle;
 }
 
-img.img {
+img.img-upload {
   border: 1px solid #f6f6f6;
   display: inline-block;
-  max-width: 100px;
-  max-height: 100px;
+  max-width: 200px;
+  max-height: 200px;
   /*
   height: auto;
   max-height: 80%;
@@ -274,7 +273,7 @@ div.pk-dragndrop-container {
   position: relative;
   margin-left: auto;
   margin-right: auto;
-  width: 30em;
+  display: inline-flex;
   border: #555 solid 1px;
   border-radius: .5em;
   padding: .5em;
@@ -291,6 +290,22 @@ textarea.text-desc {
   height: 60px;
 }
 
+.img-wrapper {
+    position: relative;
+}
+
+.del-x {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: red;
+    width: 25px;
+    height: 15px;
+}
+
+
+
+/*
 .drop {
   background-color: #f2f2f2;
   border: 4px dashed #ccc;
@@ -300,6 +315,7 @@ textarea.text-desc {
   max-width: 600px;
   width: 100%;
 }
+*/
 </style>
 
 
