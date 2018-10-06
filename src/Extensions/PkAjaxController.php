@@ -190,8 +190,8 @@ abstract class PkAjaxController extends PkController {
   public function fetchattributes() {
     pkdebug("IN SEARCH?FETCH DATA:", $this->data);
     $obj=null;
-    $keys = keyVal('keys',$this->data);
-    $extra = keyVal('extra',$this->data);
+    $extra = restoreJson(keyVal('extra',$this->data));
+    $keys = restoreJson(keyVal('keys',$this->data));
     if (ne_string($keys)) {
       $keys=[$keys];
     }

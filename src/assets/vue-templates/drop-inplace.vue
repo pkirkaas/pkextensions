@@ -4,12 +4,8 @@
    	<div class="helper"></div>
   	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop">
     <div class="helper"></div>
-	<label v-if="!image" class="btn display-inline">
-	        SELECT OR DROP AN IMAGE
-	        <input type="file" name="image" @change="onChange">
-      	</label>
-      <div class="hidden display-inline align-center" v-else v-bind:class="{ 'image': true }">
-        <img :src="image" alt="" class="img" />
+      <div class=" block align-center" >
+        <img :src="url" alt="" class="img" />
       </div>
     </label>
   </div>
@@ -145,7 +141,8 @@ export default {
           vm.imgblog = e.target.result;
         }
         reader.onload = function(e) {
-          vm.image = e.target.result;
+          //vm.image = e.target.result;
+          vm.url = e.target.result;
         }
         reader.readAsDataURL(file);
         blobreader.readAsArrayBuffer(file);
