@@ -182,11 +182,13 @@ abstract class PkAjaxController extends PkController {
    * @param id - single id for single instance, list for collection, empty for all
    * @param array keys: array of key atts to return, could include relationships. If empty, the default.
    * @param array extra - extra atts, like relationships, so don't have to specify all keys to add a few.
+   * 
+   * If we have model/id(s) it's easy. Let's extend to finding objects "owned" by others - 
+   * Only need 'ownermodel', 'ownerid', & 'attribute'(relationship)
    * @return array - results
    */
   public function fetchattributes() {
-    $model = $this->data['model'];
-    $id = keyVal('id',$this->data);
+    $obj=null;
     $keys = keyVal('keys',$this->data);
     $extra = keyVal('extra',$this->data);
     if (ne_string($keys)) {
@@ -195,25 +197,26 @@ abstract class PkAjaxController extends PkController {
     if (is_array($keys) && !in_array('id',$keys,1)) {
       $keys[]='id'; #Could be one for an instance, or list for PkCollection
     }
-    if ($id) {
-      $obj = $model::find($id);
-    } else {
-      $obj = $model::all();
-    }
-    pkdebug("ID(s):",$id,"TypeOf obj: ".typeOf($obj));
-    /*
-    if ($obj instanceOf PkCollection || (typeOf($obj) == "PkExtensions\PkCollection")) { #We got an array of IDs, return a set
-      $retarr = [];
-      foreach ($obj as $inst) {
-        $retarr[] = $inst->fetchAttributes($keys,$extra);
+    $model = keyVal('model',$this->data);
+    if ($model) {
+      $id = keyVal('id',$this->data);
+      if ($id) {
+        $obj = $model::find($id);
+      } else {
+        $obj = $model::all();
       }
-      return $this->success($retarr);
+    } else { #Not a model
+      $ownermodel=keyVal('ownermodel', $this->data);
+      $ownerid = keyVal('ownerid',$this->data);
+      $attribute=keyVal('attribute',$this-data);
+      $obj = $ownermodel::find($ownerid)->$attribute;
+      $keys[]='totag';
     }
-     * 
-     */
-
-    $atts = $obj->fetchAttributes($keys,$extra);
-    return $this->success($atts);
+    if ($obj) {
+      $atts = $obj->fetchAttributes($keys,$extra);
+      return $this->success($atts);
+    }
+    return $this->success([]);
   }
 
 /** For Vue or JS or jQuery calls to request model attribute values to 

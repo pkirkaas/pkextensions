@@ -37,7 +37,7 @@ export default {
       mediatype: this.params.mediatype || 'image',
       url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       attribute: this.params.attribute || 'avatar',//the relation name, like avatar
-      foreignkey: this.params.foreignkey,
+      foreignkeyname: this.params.foreignkeyname,
       id: this.params.id || null, //The id of the uploaded object
       model: this.params.model || null, //The upload model 
       ownerid: this.params.ownerid,
@@ -55,23 +55,41 @@ export default {
     },
 
     methods: {
-      initData() {
+      initData(data) { //Data may be empty or have all we need
+        
         var me = this;
+        var keystoset = ['attribute','mediatype','model','id','url'];
         var searchkeys =[ //Keys useful to find upload
          'ownermodel','ownerid','model','id','attribute'];
+       //Check data is object & not null
+       if ((typeof data === 'object') && (data !== null)) { //Have data object.
+         var all = true;
+         for( let key of keystoset) {
+           if (data[key]) {
+             this[key] = data[key];
+           } else {
+             all = false;
+           }
+         }
+         if (all) { //We set what we wanted
+           return;
+         } //else we did't - let's search
+       } else {
+         data = {};
+       }
+
        var querydata ={};
        searchkeys.forEach(function(key) {
-         querydata[key]= me[key];
+         querydata[key]= me[key] || data[key];
        });
        axios.post(this.fetchurl,querydata).
           then(response=> {
             console.log("Search Results:", response);
             var data = response.data;
-            if (!data.id) { //No Match
+            if (!data.i) { //No Match
               this.url = this.defaulturl;
               return;
             }
-            var keystoset = ['attribute','mediatype','model','id','url'];
             keystoset.forEach(function(key) {
               this[key] = data[key];
             });
@@ -111,7 +129,7 @@ export default {
       saveFile() {
         var fd = new FormData();
         var savekeys = [ //The keys required to save the upload
-          'ownermodel','ownerid','uploadmodel','foreignkey','attribute',
+          'ownermodel','ownerid','uploadmodel','foreignkeyname','attribute',
           'mediatype','uploadopts'];
         var me = this;
         savekeys.foreach(function(key) {
