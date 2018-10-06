@@ -3808,3 +3808,16 @@ function isJson($string) {
   string(54) "Illuminate\Database\Eloquent\Concerns\GuardsAttributes"
  * 
  */
+
+
+/** If argument is non-jason, just returns it - if it is valid
+ * JSON string, restores it to structured arr
+ * @param type $arg
+ * @return type
+ */
+function restoreJson($arg) {
+  if (!is_scalar($arg) || !$arg) return $arg;
+  $res = json_decode($arg,1);
+  if (!$res) return $arg;
+  return $res;
+}

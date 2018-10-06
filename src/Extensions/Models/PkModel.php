@@ -365,7 +365,7 @@ abstract class PkModel extends Model {
       $extra = $this->attributeNames;
     } else if (is_string($extra)) {
       $extra = ['extra'];
-    } else {
+    } else if (!is_array($extra)){
       $extra = [];
     }
     $ret = [];

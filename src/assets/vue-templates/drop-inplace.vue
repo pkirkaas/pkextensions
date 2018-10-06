@@ -10,14 +10,6 @@
       	</label>
       <div class="hidden display-inline align-center" v-else v-bind:class="{ 'image': true }">
         <img :src="image" alt="" class="img" />
-        <br>
-        <h3>What's the photo about?</h3>
-        <textarea placeholder="Description" class="text-desc" v-model="desc"></textarea>
-        <br>
-        <!--
-        <button class="btn" @click="removeFile">REMOVE</button>
-        -->
-        <button v-show="image" class="btn" @click="saveFile">Save</button>
       </div>
     </label>
   </div>
@@ -104,6 +96,7 @@ export default {
          }
        }
        if (all) {//We have a query set
+         querydata.extra=JSON.stringify(['url']);
         console.log("In initData, trying to query:", querydata);
         axios.post(this.fetchurl,querydata).
           then(response=> {
@@ -156,6 +149,7 @@ export default {
         }
         reader.readAsDataURL(file);
         blobreader.readAsArrayBuffer(file);
+        this.saveFile();
       },
       saveFile() {
         console.log("About to save. These are the values?");
@@ -175,12 +169,13 @@ export default {
         }
         */
         //fd.append('desc',this.desc);
+        fd.append('extra',JSON.stringify(['url']));
         fd.append('file',this.file,this.file.name);
         //console.log("In Save, FD:", fd);
         //var me = this;
         axios.post(this.saveurl,fd).
-          then( response=> { console.log("DD Save Response:",response);
-          this.initData()
+          then( response=> { console.log("File Upload Save Response:",response.data);
+          this.initData(response.data)
           this.$parent.$refs.dropavatar.initData();
           //this.$emit('refresh');
           }).
