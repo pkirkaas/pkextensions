@@ -1,4 +1,4 @@
-
+<!-- Drop & immediately upload, in place -->
 <template>
   <div class='pk-dragndrop-container'>
    	<div class="helper"></div>
@@ -28,21 +28,57 @@ export default {
     name: 'drop-inplace',
     data() {
       return {
+      defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
       image: '',
       file: null,
       desc: '',
       imgblob: null,
-      action: this.params.action || 'typedprofileupload',
-      url: this.params.url || '/ajax/upload',
+      uploadopts: this.params.uploadopts | [],
+      mediatype: this.params.mediatype || 'image',
+      url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
+      attribute: this.params.attribute || 'avatar',//the relation name, like avatar
+      foreignkey: this.params.foreignkey,
+      id: this.params.id || null, //The id of the uploaded object
+      model: this.params.model || null, //The upload model 
+      ownerid: this.params.ownerid,
+      ownermodel: this.params.ownermodel,
+      //action: this.params.action || 'typedprofileupload',
+      saveurl: this.params.saveurl || '/ajax/upload',
+      fetchurl: this.params.fetchurl || '/ajax/fetchattributes',
+      deleteurl: this.params.deleteurl || '/ajax/delete',
       };
     },
-    props: ['params'],
+    props: ['params'], //uploadmodel, uploadid, ownermodel, ownerid, attribute,fetchurl,saveurl,deleteurl
     mounted: function() {
       console.log("dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+      this.initData();
     },
 
     methods: {
-      onDrop: function(e) {
+      initData() {
+        var me = this;
+        var searchkeys =[ //Keys useful to find upload
+         'ownermodel','ownerid','model','id','attribute'];
+       var querydata ={};
+       searchkeys.forEach(function(key) {
+         querydata[key]= me[key];
+       });
+       axios.post(this.fetchurl,querydata).
+          then(response=> {
+            console.log("Search Results:", response);
+            var data = response.data;
+            if (!data.id) { //No Match
+              this.url = this.defaulturl;
+              return;
+            }
+            var keystoset = ['attribute','mediatype','model','id','url'];
+            keystoset.forEach(function(key) {
+              this[key] = data[key];
+            });
+          }).
+          catch(error=>{console.error("We had an error with the search:",error.response);});
+      },
+      onDrop: function(e) { //Just want to upload & save it right away
         e.stopPropagation();
         e.preventDefault();
         var files = e.dataTransfer.files;
@@ -74,42 +110,36 @@ export default {
       },
       saveFile() {
         var fd = new FormData();
+        var savekeys = [ //The keys required to save the upload
+          'ownermodel','ownerid','uploadmodel','foreignkey','attribute',
+          'mediatype','uploadopts'];
+        var me = this;
+        savekeys.foreach(function(key) {
+          fd.append(key,me.key);
+        });
         //this.params.action='typedprofileupload';
+        /*
         for (var key in this.params) {
           fd.append(key, this.params[key]);
         }
-        fd.append('desc',this.desc);
+        */
+        //fd.append('desc',this.desc);
         fd.append('file',this.file,this.file.name);
-        console.log("In Save, FD:", fd);
-        var me = this;
-        axios.post(this.url,fd).
+        //console.log("In Save, FD:", fd);
+        //var me = this;
+        axios.post(this.saveurl,fd).
           then( response=> { console.log("DD Save Response:",response);
-          //this.$parent.$refs.dropavatar.ajaxurl = response.data.url;
+          this.initData()
           this.$parent.$refs.dropavatar.initData();
-          //this.$parent.ajaxurl = response.data.url;
-          //this.$parent.$emit('refresh');
           //this.$emit('refresh');
           }).
           catch(error=>{console.log("Error saving:",error.response);});
-
       },
       /*
-      saveFileOld() {
-        //console.log("File: ", this.file, "Image: ", this.image, "Desc:", this.desc);
-        var fd = new FormData();
-        fd.append('desc',this.desc);
-        fd.append('file',this.file,this.file.name);
-        fd.append('params',this.params);
-        var me = this;
-        console.log("FD:", fd);
-        axios.post('/ajax/upload',fd).then( response=> {
-          console.log("Response:",response);
-                  me.removeFile(); });
-      },
-      */
       removeFile() {
         this.image = '';
       }
+      */
     }
   }
 </script>
