@@ -377,6 +377,9 @@ abstract class PkModel extends Model {
         $ret[$idx] = $rel;
       }
     }
+    if (in_array('totag',array_keys($ret),1)) {
+      $ret['totag']=$this->totag();
+    }
     return $ret;
   }
 
