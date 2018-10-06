@@ -25,7 +25,7 @@
 <script>
 //var app = new Vue({
 export default {
-    name: 'pk-dragndrop',
+    name: 'drop-inplace',
     data() {
       return {
       image: '',
@@ -228,4 +228,5 @@ textarea.text-desc {
   width: 100%;
 }
 </style>
+
 

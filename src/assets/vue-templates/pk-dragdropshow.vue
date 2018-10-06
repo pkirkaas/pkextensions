@@ -1,13 +1,22 @@
 <!-- For single images - saves instantly, dropping another replaces, & little red delete x -->
+<!-- Start over again on the one I know works rename to 
 <template>
   <div class='pk-dragdrop-show'>
+   	<div class="helper"></div>
   
   	<div class="edit-img frame drop display-inline align-center" 
-         @dragover.prevent @drop="onDrop" :data-tootik="tooltip">
+         @dragover.prevent @drop="onDrop" >
+          <div class="helper"></div>
+	<label v-if="!image" class="btn display-inline">
+	        SELECT OR DROP AN IMAGE
+	        <input type="file" name="image" @change="onChange">
+      	</label>
+                <img :src="image" alt="" class="img" />
+
          <div class="del-x actionable  svg-inline--fa fa-window-close fa-w-16 fa-5x    "
               @click="deleteupload()">X</div>
-	        <img class='img-icon' :class="imgclass" :src="url" />
   </div>
+   	<div class="helper"></div>
 </div>
 </template>
 
@@ -22,13 +31,15 @@
 /*
 {owningmodel:'\\App\\Models\\Profile',owningid:<?=$profile->id?>,uploadmodel:'\\App\Models\ProfileUpload',foreignkeyname:'profile_id',attribute:'avatar'}
   */
+//export default {
+//module.exports = {
 export default {
   name: 'pk-dragdropshow',
-  props: ['xparams'],
-  data: function() {
-
-     // console.log("Data xParams:",this.xparams);
+  data() {
     return {
+      file: null,
+      image: '',
+      imgblob: null,
       owningmodel:'\\App\\Models\\Profile',
       owningid:37,
       uploadmodel:'\\App\\Models\\ProfileUpload',  
@@ -63,17 +74,86 @@ export default {
       */
     };
   },
+  props: ['xparams'],
   computed: {
+    url: function() {
+      return this.xparams.url;
+    },
+    imgclass: function() {
+      return this.xparams.imgclass;
+    },
   },
   methods: {
     onDrop: function(e) { //Upload Immediately
       e.stopPropagation();
       e.preventDefault();
       var files = e.dataTransfer.files;
-      var file =files[0];
+      this.createFile(files[0]);
+    },
+    onChange(e) {
+      var files = e.target.files;
+      this.createFile(files[0]);
+    },
+    createFile(file) {
+      if (!file.type.match('image.*')) {
+        alert('Select an image');
+        return;
+      }
+      this.file = file;
+      var img = new Image();
       var reader = new FileReader();
+      var blobreader = new FileReader();
+      var vm = this;
+
+      blobreader.onload = function(e) {
+        vm.imgblog = e.target.result;
+      }
       reader.onload = function(e) {
-          this.image = e.target.result;
+        vm.image = e.target.result;
+      }
+      reader.readAsDataURL(file);
+      blobreader.readAsArrayBuffer(file);
+    },
+
+      saveFile() {
+        var fd = new FormData();
+        //this.params.action='typedprofileupload';
+        for (var key in this.params) {
+          fd.append(key, this.params[key]);
+        }
+        fd.append('desc',this.desc);
+        fd.append('file',this.file,this.file.name);
+        console.log("In Save, FD:", fd);
+        var me = this;
+        axios.post(this.url,fd).
+          then( response=> { console.log("DD Save Response:",response);
+          //this.$parent.$refs.dropavatar.ajaxurl = response.data.url;
+          this.$parent.$refs.dropavatar.initData();
+          //this.$parent.ajaxurl = response.data.url;
+          //this.$parent.$emit('refresh');
+          //this.$emit('refresh');
+          }).
+          catch(error=>{console.log("Error saving:",error.response);});
+      },
+
+
+      removeFile() {
+        this.image = '';
+      },
+
+
+
+
+
+
+
+/*
+
+
+      var reader = new FileReader();
+      var vm = this;
+      reader.onload = function(e) {
+          vm.image = e.target.result;
        };
       reader.readAsDataURL(file);
       var fd = new FormData();
@@ -91,6 +171,7 @@ export default {
           this.initData();
         }).catch(error=>{console.log("Error uploading File:",error.response);});
       },
+    */
 
     deleteupload: function() {
 
