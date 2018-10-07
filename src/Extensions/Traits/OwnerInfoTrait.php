@@ -17,9 +17,7 @@ trait OwnerInfoTrait {
    */
   public function ownershipInfo($relationship=null, $idx=null) {
     $info=[];
-    pkdebug("Relationship:",$relationship);
     if ($relationship && ($relclass = static::getLoadRelations($relationship,true) )) {
-    pkdebug("RelClass:",$relclass);
       $rel = $this->$relationship;
       $info += ['attribute'=>$relationship,'model'=>$relclass];
       if (!$rel) {
@@ -33,14 +31,11 @@ trait OwnerInfoTrait {
           $rel = $rel[$idx];
         }
       }
-
       if ($relclass::usesTrait('PkUploadTrait') && ($rel instanceOf PkModel)) {
         $info+=['url'=>$rel->url,'mediatype'=>$rel->mediatype];
       }
     }
     $info += ['ownermodel'=>static::class, 'ownerid' => $this->id];
-
-    pkdebug("XXXXXXXXXXXX  INFOR XXXXXXXXXXX", $info);  
     return $info;
   }
 }

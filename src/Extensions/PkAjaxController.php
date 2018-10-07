@@ -188,7 +188,6 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
-    pkdebug("IN SEARCH?FETCH DATA:", $this->data);
     $obj=null;
     $extra = restoreJson(keyVal('extra',$this->data));
     $keys = restoreJson(keyVal('keys',$this->data));
@@ -235,7 +234,6 @@ abstract class PkAjaxController extends PkController {
    */
   public function attributes() {
     $data = request()->all();
-    //pkdebug("Data:",$data);
     $model = keyVal('model', $data);
     $method = keyVal('method', $data);
     $arg = keyVal('arg', $data);
@@ -283,27 +281,23 @@ abstract class PkAjaxController extends PkController {
       return $this->success();
     }
     #$res should be a PKModel or PkCollection of PkModels
-    //pkdebug("The Res Atts:",$res->getCustomAttributes());
     return $this->success($res->getCustomAttributes());
   }
 
   public function delete() { //Delete anything you own
      // return $this->error("You cant do that!");
     $data = request()->all();
-    pkdebug("IN Ajax Delete, data:", $data);
     $model = keyVal('model', $data);
     $id = to_int(keyVal('id', $data));
     $cascade = keyVal('cascade', $data);
     $me = Auth::user();
     $item = $model::find($id);
-    pkdebug("Item:", $item);
     /*
     if (!$me->owns($item)) {
       return $this->error("Can't delete that $model");
     }
      */
     $item->delete($cascade);
-    pkdebug("It's gone?");
     return $this->success("Deleted");
   }
 
@@ -381,11 +375,11 @@ abstract class PkAjaxController extends PkController {
    * @params assoc array - type(s), validation(s),  
    */
    public function _upload($params=[]) {
-     pkdebug("Entered _upload");
+     //pkdebug("Entered _upload");
      $types = keyVal('types', $params, ['image']);
      $fus = new PkFileUploadService();
      $uploaded = $fus->upload();
-     pkdebug("Uploaded: ", $uploaded);
+     //pkdebug("Uploaded: ", $uploaded);
      return $uploaded;
    }
 
