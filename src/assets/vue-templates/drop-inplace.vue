@@ -1,12 +1,10 @@
 <!-- Drop & immediately upload, in place -->
 <template>
-  <div class='pk-dragndrop-container'>
   	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop">
-      <div class=" block align-center img-wrapper" >
-         <div class="del-x actionable  svg-inline--fa fa-window-close fa-w-16 fa-5x    "
-              @click="deleteupload()">X</div>
+              <delete-x data-tootik="Delete This?"></delete-x>
+      <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here">
+               <input class="abs-hidden" type="file" name="image" @change="onChange">
         <img :src="url" alt="" class="img-upload" />
-      </div>
   </div>
   </div>
 </template>
@@ -37,6 +35,16 @@ export default {
       deleteurl: this.params.deleteurl || '/ajax/delete',
       };
     },
+    computed: {
+      deleteparams() {
+        return {
+          model:this.model,
+          id: this.id,
+          cascade: true,
+          deleteurl:this.deleteurl
+        };
+      },
+    },
     props: ['params'], 
     mounted: function() {
       console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
@@ -45,6 +53,17 @@ export default {
     },
 
     methods: {
+      delete() {
+        var delparm = {model:this.model,id:this.id,cascade:true};
+        console.log("About to delete w. params:",delparm);
+        //axios.post(this.deleteurl,{model:this.model,id:this.id,cascade:true}).
+        axios.post(this.deleteurl,delparm).
+          then(response=>{console.log("The delete was successful:",response);
+            this.initData();
+            this.$parent.$refs.dropavatar.initData();
+          }).
+          catch(error=>{console.error("The delete failed:", error, error.response);});
+      },
       logThis() {
         var comatts = ['defaulturl', 'image', 'file', 'desc', 'imgblob', 'uploadopts', 'mediatype',
             'url', 'attribute', 'foreignkeyname', 'id', 'model', 'ownerid', 'ownermodel',
@@ -60,7 +79,7 @@ export default {
       initData(data) { //Data may be empty or have all we need
         
         var me = this;
-        var keystoset = ['attribute','mediatype','id','url'];
+        var keystoset = ['attribute','mediatype','id','url','model'];
         var searchkeys1 =['model','id'];
         var searchkeys2 =[ 'ownermodel','ownerid','attribute'];
        //Check data is object & not null
@@ -91,7 +110,7 @@ export default {
          }
        }
        if (all) {//We have a query set
-         querydata.extra=JSON.stringify(['url']);
+         querydata.extra=JSON.stringify(['url','model']);
         console.log("In initData, trying to query:", querydata);
         axios.post(this.fetchurl,querydata).
           then(response=> {
@@ -116,6 +135,7 @@ export default {
         }
       },
       onDrop: function(e) { //Just want to upload & save it right away
+        console.log("Just dropped something - what?",e);
         e.stopPropagation();
         e.preventDefault();
         var files = e.dataTransfer.files;
@@ -192,6 +212,10 @@ export default {
   font-family: 'Arial';
   font-size: 12px;
 }
+.drop {
+    height: auto;
+    width: auto;
+}
 
 *,
 *:after,
@@ -262,12 +286,6 @@ img.img-upload {
   display: inline-block;
   max-width: 200px;
   max-height: 200px;
-  /*
-  height: auto;
-  max-height: 80%;
-  max-width: 80%;
-  width: auto;
-  */
 }
 div.pk-dragndrop-container {
   position: relative;
@@ -294,28 +312,11 @@ textarea.text-desc {
     position: relative;
 }
 
-.del-x {
-    position: absolute;
-    right: 0;
-    top: 0;
-    color: red;
-    width: 25px;
-    height: 15px;
+div.drop {
+    width: auto;
 }
 
 
-
-/*
-.drop {
-  background-color: #f2f2f2;
-  border: 4px dashed #ccc;
-  background-color: #f6f6f6;
-  border-radius: 2px;
-  max-height: 400px;
-  max-width: 600px;
-  width: 100%;
-}
-*/
 </style>
 
 

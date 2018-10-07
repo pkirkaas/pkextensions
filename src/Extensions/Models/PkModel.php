@@ -372,6 +372,10 @@ abstract class PkModel extends Model {
     if (ne_array($extra)) {
       $keys=array_merge($keys,$extra);
     }
+    if (in_array('model',$keys,1)) {
+      $ret['model'] = static::class;
+    }
+    pkdebug("The Keys:",$keys,"ret:",$ret,"The Class", static::class);
     foreach ($keys as $idx => $key) {
       if (is_int($idx)) {
         $ret[$key]=$this->$key;
@@ -385,6 +389,9 @@ abstract class PkModel extends Model {
     }
     if (in_array('totag',array_keys($ret),1)) {
       $ret['totag']=$this->totag();
+    }
+    if (in_array('model',$keys,1)) {
+      $ret['model'] = static::class;
     }
     return $ret;
   }
@@ -504,6 +511,12 @@ abstract class PkModel extends Model {
     return $tablename;
      * 
      */
+  }
+  public static $jsonfields=[];
+  public static function getJsonFields($tst=null) {
+    $jsonfields = static::getArraysMerged('jsonfields');
+    if (!$tst) return $jsonfields;
+    return in_array($tst,$jsonfields,1);
   }
 
   /** Super flexible - can define a table field in static $table_field_defs = [
@@ -1415,7 +1428,14 @@ class $createclassname extends Migration {
     if (in_array($key,static::getMethodsAsAttributeNames(),true)) {
        return $this->attstocalcs[$key] = $this->$key();
     }
+
+      
     $res = parent::__get($key);
+    if (static::getJsonFields($key) && (!$res instanceOf \ObjectArray)) {
+        $res = new \ObjectArray($res);
+        $this->$key=$res;
+      }
+    return $res;
     if (($this->getConversion($key) !== 'array') || is_array($res)) {
       return $res;
     }
@@ -1435,6 +1455,13 @@ class $createclassname extends Migration {
     public function getAttributeValue($key) {
       if (!$key) return null;
       return parent::getAttributeValue($key);
+    }
+
+    public function __set($name,$value) {
+      if (static::getJsonFields($name) && (! $value instanceOf \ObjectArray)) {
+        $value = new \ObjectArray($value);
+      }
+      parent::__set($name,$value);
     }
 
 

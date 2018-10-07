@@ -246,6 +246,33 @@ Vue.buildInput = function(params) {
   }
 };
 
+
+/** It should be positioned absolutely within a relatively positioned
+ * element representing a model/db object. The containing object should have
+ * data- attributes with model, id, & deletable status.
+ */
+Vue.component('delete-x',{
+  name: 'delete-x',
+  template: `
+  <div data-tootik="Do you want to delete this?" @click="deleteobj">
+ <img src='/mixed/img/cross-31176.svg' class="delete-x actionable" 
+  
+   data-tootik="Delete This?">
+  </div>
+  `,
+  methods: {
+    deleteobj() {
+        this.$parent.delete(); //Preferred anyway
+    },
+  },
+});
+//"C:\www\Laravels\LQP\laravel\public\mixed\img\cross-31176.svg"
+
+
+
+
+
+
 /** AJAX delete button for PkModels
  * @props params
  *   classname - required

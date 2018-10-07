@@ -42,11 +42,8 @@ trait PkJsonFieldTrait {
       'schema' => ['type' => 'string', 'methods'=>['nullable']],
       'keys' => ['type' => 'string', 'methods'=>['nullable']],
     ];
-  public static $jsonfields = ['structured', 'schema', 'keys'];
+  public static $jsonfields_JsonTrait = ['structured', 'schema', 'keys'];
 
-  public static function getJsonFields() {
-    return static::getArraysMerged('jsonfields');
-  }
 
   public static function getJsonTblFields($atts=null) {
     $valid = static::getFieldNames(static::getJsonFields());
