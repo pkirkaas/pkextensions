@@ -379,7 +379,16 @@ abstract class PkModel extends Model {
     //pkdebug("The Keys:",$keys,"ret:",$ret,"The Class", static::class);
     foreach ($keys as $idx => $key) {
       if (is_int($idx)) {
-        $ret[$key]=$this->getAttributeValue($key);
+        //TODO!! Have to see if this works for relations & JSONable
+        /*
+        $value = $this->$key;
+        if (is_arrayish($value)) {
+          $value = json_encode($value,static::$jsonopts);
+        }
+        $ret[$key]=$value;
+         * 
+         */
+        $ret[$key]=$this->$key;
       } else if (is_string($idx) && static::getRelationNames($idx)) {
         $rel = [];
         foreach ($this->$idx as $arel) {

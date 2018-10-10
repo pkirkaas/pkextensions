@@ -4,7 +4,7 @@
               <delete-x data-tootik="Delete This?"></delete-x>
       <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here">
                <input class="abs-hidden" type="file" name="image" @change="onChange">
-        <img :src="url" alt="" class="img-upload" />
+        <img :src="url || defaulturl" alt="" class="img-upload" />
   </div>
   </div>
 </template>
@@ -227,6 +227,11 @@ export default {
   -webkit-touch-callout: none;
 }
 
+.abs-hidden {
+  position: absolute;
+  visibility: hidden;
+}
+
 /*
 html, body {
 	height: 100%;
@@ -284,8 +289,12 @@ input[type="file"] {
 img.img-upload {
   border: 1px solid #f6f6f6;
   display: inline-block;
+  width: 200px;
+  height: auto;
+  /*
   max-width: 200px;
   max-height: 200px;
+  */
 }
 div.pk-dragndrop-container {
   position: relative;
@@ -313,7 +322,11 @@ textarea.text-desc {
 }
 
 div.drop {
-    width: auto;
+  width: auto;
+  /*
+  width: 200px;
+  height: auto;
+  */
 }
 
 
