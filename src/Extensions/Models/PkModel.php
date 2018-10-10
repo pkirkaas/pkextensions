@@ -1440,7 +1440,7 @@ class $createclassname extends Migration {
     }
 
     if (static::getJsonFields($key)) {
-      $structured = $this->attributes[$key];
+      $structured = $this->attributes[$key] ?? null;
       if ($structured instanceOf PkJsonArrayObject) {
         return $structured;
       } else if (!$structured) {

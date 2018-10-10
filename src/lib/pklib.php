@@ -3347,6 +3347,9 @@ function percentage($a, $b, $invalid = '') {
  * @return boolean
  */
 function isPost() {
+  if (isCli()) {
+    return false;
+  }
   return $_SERVER['REQUEST_METHOD'] === 'POST';
 }
 
