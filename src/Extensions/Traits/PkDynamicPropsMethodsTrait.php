@@ -9,5 +9,5 @@ namespace PkExtensions\Traits;
  */
 trait PkDynamicPropsMethodsTrait {
    use PkDynamicMethodTrait;
-   use PkJsonFieldTrait;
+//   use PkJsonFieldTrait;
 }

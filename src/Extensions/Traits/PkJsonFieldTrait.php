@@ -34,7 +34,8 @@ use PkExtensions\PkExceptionResponsable;
 trait PkJsonFieldTrait {
   //public $structuredArr;
   //public $keys = []; #Set in implementing methods
-  protected $casts_JsonField = ['structured'=>'array', 'keys'=>'array', 'schema'=>'array'];
+  //protected $casts_JsonField = ['structured'=>'array', 'keys'=>'array', 'schema'=>'array'];
+  protected $casts_JsonField = [ 'keys'=>'array', 'schema'=>'array'];
   //protected $casts = ['structured'=>'array'];
   public static $table_field_defs_JsonFieldTrait = [
       'structured' => ['type' => 'mediumText', 'methods'=>['nullable']],
@@ -94,6 +95,7 @@ trait PkJsonFieldTrait {
     }
 
   public function init($atts=null) {
+    /*
     foreach (static::getJsonTblFields($atts) as $jfield) {
       if (!isset($this->$jfield) || !$this->$jfield) {
         $this->$jfield = [];
@@ -101,6 +103,8 @@ trait PkJsonFieldTrait {
         $this->$jfield = json_decode($this->$jfield,1);
       }
     }
+     * 
+     */
   }
 
   /** Returns the value for the key or array of keys to depth
@@ -217,13 +221,29 @@ trait PkJsonFieldTrait {
   /** These can only get/set key values if they already exist */
   public function __get($name) {
     if ($name === 'structured') {
-      return json_decode($this->attributes['structured'],1);
+      $structured = $this->attributes['structured'];
+      if ($structured instanceOf \ArrayObject) {
+        return $structured;
+      } else if (!$structured) {
+        return ($this->attributes['structured'] = new \ArrayObject());
+      } else if (ne_string($structured)) {
+        $structured = json_decode($structured,1);
+      }
+      if (is_array($structured)) {
+        return ($this->attributes['structured']=new \ArrayObject($structured));
+      } 
+      throw new \Exception("Invalud structured: \n".print_r($structured,1));
     }
+    return parent::__get($name);
+  }
+    /*
     if (!in_array($name, $this->arrayKeys(),1)) {
       return parent::__get($name);
     }
+     * 
     return keyVal($name,$this->getAttValAsArray('structured'));
   }
+     */
   /*
    * 
    */

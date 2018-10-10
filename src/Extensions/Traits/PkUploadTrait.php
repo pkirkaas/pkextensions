@@ -47,7 +47,7 @@ trait PkUploadTrait {
   public function ExtraConstructorPkUploadTrait($args=[]) {
 
     if (!isPost() || empty($_FILES)) {
-      pkdebug("No Files?");
+      //pkdebug("No Files?");
       return $args;
     }
     $us = new PkFileUploadService();

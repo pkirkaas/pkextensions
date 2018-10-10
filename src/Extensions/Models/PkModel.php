@@ -52,6 +52,7 @@ namespace PkExtensions\Models;
 
 use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\PkCollection;
+use PkExtensions\PkJsonArrayObject;
 use Illuminate\Database\Eloquent\Builder;
 use Closure;
 use Schema;
@@ -375,10 +376,10 @@ abstract class PkModel extends Model {
     if (in_array('model',$keys,1)) {
       $ret['model'] = static::class;
     }
-    pkdebug("The Keys:",$keys,"ret:",$ret,"The Class", static::class);
+    //pkdebug("The Keys:",$keys,"ret:",$ret,"The Class", static::class);
     foreach ($keys as $idx => $key) {
       if (is_int($idx)) {
-        $ret[$key]=$this->$key;
+        $ret[$key]=$this->getAttributeValue($key);
       } else if (is_string($idx) && static::getRelationNames($idx)) {
         $rel = [];
         foreach ($this->$idx as $arel) {
@@ -1429,13 +1430,33 @@ class $createclassname extends Migration {
        return $this->attstocalcs[$key] = $this->$key();
     }
 
+    if (static::getJsonFields($key)) {
+      $structured = $this->attributes[$key];
+      if ($structured instanceOf PkJsonArrayObject) {
+        return $structured;
+      } else if (!$structured) {
+        return ($this->attributes[$key] = new PkJsonArrayObject());
+      } else if (ne_string($structured)) {
+        $structured = json_decode($structured,1);
+      }
+      if (is_array($structured)) {
+        return ($this->attributes[$key]=new PkJsonArrayObject($structured));
+      } 
+      throw new \Exception("Invalud structured: \n".print_r($structured,1));
+    }
       
     $res = parent::__get($key);
-    if (static::getJsonFields($key) && (!$res instanceOf \ObjectArray)) {
-        $res = new \ObjectArray($res);
-        $this->$key=$res;
+
+
+
+
+    /*
+    if (static::getJsonFields($key) && (!$res instanceOf PkJsonArrayObject)) {
+        $res = new PkJsonArrayObject($res);
+        $this->attributes[$key]=$res;
       }
     return $res;
+    */
     if (($this->getConversion($key) !== 'array') || is_array($res)) {
       return $res;
     }
@@ -1454,15 +1475,27 @@ class $createclassname extends Migration {
     }
     public function getAttributeValue($key) {
       if (!$key) return null;
+      if (static::getJsonFields($key)) {
+        $value = $this->attributes[$key];
+        if (is_arrayish($value)) {
+          $value = json_encode($value, static::$jsonopts);
+        }
+        return $value;
+      }
       return parent::getAttributeValue($key);
     }
 
+    /*
     public function __set($name,$value) {
-      if (static::getJsonFields($name) && (! $value instanceOf \ObjectArray)) {
-        $value = new \ObjectArray($value);
+      if (static::getJsonFields($name) && (! $value instanceOf PkJsonArrayObject)) {
+        $value = new PkJsonArrayObject($value);
+        $this->attributes[$name]=$value;
+      } else {
+        parent::__set($name,$value);
       }
-      parent::__set($name,$value);
     }
+     * 
+     */
 
 
   public function __call($method, $args = []) {
@@ -2022,9 +2055,9 @@ class $createclassname extends Migration {
    */
   public function save(array $opts = []) {
     $this->RunExtraMethods("_save", $opts);
-    foreach ($this->getAttributes() as &$value) {
-      if (is_array($value)) {
-        $value = json_encode($value, static::$jsonopts);
+    foreach ($this->getAttributes() as $key => &$value) {
+      if (is_arrayish($value)) {
+        $this->attributes[$key] = json_encode($value, static::$jsonopts);
       }
     }
     if ($this->useBuildFillableOptions) {
