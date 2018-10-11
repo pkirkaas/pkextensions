@@ -929,8 +929,29 @@ window.Vue.component('ajax-text-input', {
         wrapcss: ''};
         */
   template: `
-  <div class='inp-wrap' :class="wrapcss" :style="wrapstyle">
+  <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='inplblclass' :class="lblcss" v-html="label"></div>
-    <input :style="inpstyle" :type="type" @blur="postsubmit" v-model="value" :name="name" :class="inpcss" class="pk-inp">
+    <input :style="inpstyle" :type="type" @blur="postsubmit" v-model="value" :name="name" :class="inpcss" class="ajax-sel-inp">
   </div>`,
 });
+
+
+
+
+
+/**AJAX Load & Save Select */
+//CVue.component('pk-select-arr', {
+/*
+Vue.component('ajax-select-input',{
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  type: 'select',
+  template: `
+  <div class= ":class="wrapcss"> <div v-if="label" :class="lblcls" v-html="label"></div>
+  <select :name="name" :class="inputclass" v-model="value">
+    <option v-for="(option, idx) in inpopt.options" :value="option.value">
+        {{option.label}}
+    </option>
+  </select>
+    </div>
+`,
+*/
