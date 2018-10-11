@@ -13,7 +13,18 @@ $brand-inverse:  #292b2c !default;
     d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
 }
 
+.container-fluid.content-main.pk-main {
+  padding: 0;
+  margin: 0;
+}
 
+.pk-template-content {
+  padding: 0 2em;
+}
+div.pk-template {
+  padding: 0;
+  margin: 0;
+}
 
 //To dropdown menus on hover. Has a JS part also, in jquery-ui-config
 .dropdown:hover>.dropdown-menu {
