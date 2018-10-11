@@ -38,12 +38,19 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * but for complex ref classes, returns the complex array. To guarantee
    * always getting a simple array of key=>value, use static::getKeyValArr()
    * instead
-   * @param boolean $null - if true, adds key null=>'None' to start of array
+   * @param boolean $null - if false or 0,  no "empty" options,
+   * if boolean "True"  adds key null=>'None' to start of array -
+   * if $null=string(also '' empty string - so null w. no label
+   * if $null is ne_string string, puts the string as
+   * the label for the null option.
    * @return array of key=>value
    */
   public static function getRefArr($null=false) {
-    if (!$null) return static::$refArr;
-    return [null=>'None'] + static::$refArr;
+    if (($null===false) || ($null===0)) return static::$refArr;
+    if ($null===true) {
+      $null = "None";
+    }
+    return [null=>$null] + static::$refArr;
   }
 
 /** See function getOptionList below for more option definition
@@ -429,7 +436,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
   /** Only works if there is a refArr. */
-  public static function mkIdxRefArr($null=1, $keylabel='value', $valuelabel='label') {
+  public static function mkIdxRefArr($null=true, $keylabel='value', $valuelabel='label') {
     $refarr = static::getRefArr($null);
     $ret = [];
     foreach ($refarr as $key=>$value) {

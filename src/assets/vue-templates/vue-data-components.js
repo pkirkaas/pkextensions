@@ -794,6 +794,14 @@ window.utilityMixin = {
  * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
  * // Input/TextArea - as soon as lose focus, select as soon as select, checkbox
  * // as soon as check, etc.
+ * 
+ * 
+ * Assume all expect their main "props" is "params". They use the inputMixin,
+ * as well a utility mixin, & possbily format Mixn. They have aside from the 
+ * value parameters, some standards for their appearance. There are generally
+ * 2-3 elements - the input, (optional label div) and a div wrapper.
+ * Each (Wrapper, label div, & input, have a default CSS Class, as well as suppimentary 
+ * classes AND styles provided by the params. The p
  */
 // Common mixin for all immediate inputs
 window.inputMixin = {
@@ -808,13 +816,17 @@ window.inputMixin = {
    *   fetchurl: (opt: default: "/ajax/fetchattributes"
    *   formatin: (opt - format method to show the data)
    *   formatout (opt - format method to submit the data)
-   *   cssclass(opt - css class)
+   *   inpcss(opt - css class for the input)
    *   type(opt - input type)
    *   ownermodel(opt)
    *   ownerid (opt)
-   *   cssclass: (opt - css class for input)
    *   label: (opt - label for control - then will be wrapped)
-   *   lblcss: 
+   *   lblcss:  (opt - css class for input)
+   *   wrapcls:  (opt - css class for input)
+   *   lblstyle: (opt -custom styles for the element)
+   *   wrapstyle: (opt -custom styles for the element)
+   *   inpstyle: (opt -custom styles for the element)
+   *   @atts & noInherit: Possibe way to inject arbitrary atts into an el?
    * @type object
    */
   props: ['params'],
@@ -824,7 +836,8 @@ window.inputMixin = {
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
-        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null};
+        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
+      options:[]};
     var data = defaults;
     data.defaults = defaults;
     console.log("INIT DATA:",data);
@@ -887,7 +900,8 @@ window.inputMixin = {
      }).
       catch(error=>{console.error("Failed to fetch:",error.response, error);});
     },
-    postsubmit() {
+    savesubmit(event,arg) {
+      console.log ("Save submit event",event,"Arg:",arg);
       this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
@@ -911,7 +925,7 @@ window.inputMixin = {
        }
        this.value = value;
      }).
-      catch(error=>{console.error("Failed to submit/post/update:",error.response, error);});
+      catch(error=>{console.error("Failed to save submit/post/update:",error.response, error);});
     },
     }
     
@@ -931,7 +945,13 @@ window.Vue.component('ajax-text-input', {
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='inplblclass' :class="lblcss" v-html="label"></div>
-    <input :style="inpstyle" :type="type" @blur="postsubmit" v-model="value" :name="name" :class="inpcss" class="ajax-sel-inp">
+    <input :style="inpstyle" :type="type"
+       @esc="false"
+       @tab="savesubmit($event,'tab')"
+       @enter="savesubmit($event,'enter')"
+       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
+       @blur="savesubmit($event,'blur')"
+       v-model="value" :name="name" :class="inpcss" class="ajax-sel-inp">
   </div>`,
 });
 
@@ -940,18 +960,23 @@ window.Vue.component('ajax-text-input', {
 
 
 /**AJAX Load & Save Select */
+//options is an array of objects: {value:value,label:label, rendered by:'
+//<option v-for="(option, idx) in options" :value="option.value" v-html="option.label"></option>
 //CVue.component('pk-select-arr', {
-/*
 Vue.component('ajax-select-input',{
+  name: 'ajax-select-input',
   mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
   type: 'select',
   template: `
-  <div class= ":class="wrapcss"> <div v-if="label" :class="lblcls" v-html="label"></div>
-  <select :name="name" :class="inputclass" v-model="value">
-    <option v-for="(option, idx) in inpopt.options" :value="option.value">
-        {{option.label}}
-    </option>
-  </select>
-    </div>
+  <div class='ajax-wrap-class' :class="wrapcss" :style="wrapstyle">
+    <div v-if="label" class='inplblclass' :class="lblcss" :style="lblstyle" v-html="label"></div>
+  <select 
+    @change="savesubmit($event,'Selected Select')" 
+    @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
+    class="ajax-select-css" :name="name" :class="inpcss" :style="inpstyle" v-model="value">
+      <option v-for="(option, idx) in options" :value="option.value" v-html="option.label">
+      </option>
+    </select>
+  </div>
 `,
-*/
+  });
