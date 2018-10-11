@@ -857,7 +857,7 @@ jQuery.fn.extend({
   //Add 'cousin' selector extension to jQuery. Changes the arg order of getCousins
   /**
    * @param cousinSelector is the required selector for the cousin. 
-   * @param ancestorSelector is optional - if empty, increments up ancestor tree & returns first cousing match
+   * @param ancestorSelector is optional - if empty, increments up ancestor tree & returns first cousin match
    * @param first - optional - if maybe several cousins, just the first
    */
     $.fn.cousin = function (cousinSelector, ancestorSelector, first) {

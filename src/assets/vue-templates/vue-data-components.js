@@ -3,6 +3,23 @@
  * Compose to make forms
  */
 
+/*
+//Experiment - an input container that loads & can save & show updates
+window.Vue.component('pk-input-container',{
+  name: 'pk-input-container',
+  temlpate: `
+  <div class='pk-input-container' :class="params.containerclass">
+  <div class='input-wrapper' :class="params.inputwrapperclass">
+  <div class='input' v-for="(control,idx) in params.controls" :class="control.class"
+    <component is:"control.component" 
+  </div>
+  </div>
+  </div>
+`,
+  props: ['params'],
+});
+*/
+
 
 //Wraps both the button & modal - the modal is a single file component pk-modal.vue
 //Should take 3 prop objects - "btnparams" (for the button itself - title, appearance)
@@ -753,5 +770,167 @@ window.utilityMixin = {
       }
       return false;
     },
+    //Called from mounted, defaults an object w. param keys & defaults to set data to
+    // Assumes "params" in props
+    initDataFromParams(defaults) {
+      for (var key in defaults) {
+        this[key] = this.params[key] || defaults[key];
+      }
+    },
+    showThisFromDefaults(defaults,lbl) {
+      if (!defaults) defaults=this.defaults;
+      var vals = {};
+      for (var key in defaults) {
+        vals[key] = this[key];
+      }
+      console.log(lbl+ " Current this values:",vals);
+      return vals;
+    }
   }
 };
+
+
+/****
+ * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
+ * // Input/TextArea - as soon as lose focus, select as soon as select, checkbox
+ * // as soon as check, etc.
+ */
+// Common mixin for all immediate inputs
+window.inputMixin = {
+  /**
+   * 'params' object 
+   *   model:
+   *   id:
+   *   name:
+   *   value:
+   *   tooltip: (opt: Tooltip for intput)
+   *   submiturl: (opt: default: "/ajax/submit")
+   *   fetchurl: (opt: default: "/ajax/fetchattributes"
+   *   formatin: (opt - format method to show the data)
+   *   formatout (opt - format method to submit the data)
+   *   cssclass(opt - css class)
+   *   type(opt - input type)
+   *   ownermodel(opt)
+   *   ownerid (opt)
+   *   cssclass: (opt - css class for input)
+   *   label: (opt - label for control - then will be wrapped)
+   *   lblcss: 
+   * @type object
+   */
+  props: ['params'],
+  data() {
+      var defaults = {
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null};
+    var data = defaults;
+    data.defaults = defaults;
+    console.log("INIT DATA:",data);
+    return data;
+    /*
+    return {
+      name:null,
+      value: null,
+      id: null,
+      ownermodel: null,
+      ownerid: null,
+      model: null,
+      inpcss: null,
+      formatin: null,
+      formatout: null,
+      lblcss: null,
+      label: null,
+      tooltip: null,
+      submiturl: null,
+      fetchurl: null,
+      attribute: null,
+      foreignkey: null,
+      wrpcss: null,
+
+
+    };
+    */
+
+  },
+  mounted() {
+      console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
+      this.initDataFromParams(this.defaults);
+      this.initData();
+
+  },
+  methods: {
+    initData() {
+    
+      this.showThisFromDefaults(this.defaults,"InpCtl About to fetch");
+      axios.post(this.fetchurl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       keys: this.name,
+     }).then(response=>{
+       console.log("Succeeded in fetch, resp:", response);
+       var value = response.data[this.name];
+       if (this.formatin) {
+         value = this[this.formatin](value);
+       }
+       this.value = value;
+       var defaults = this.defaults;
+       var curr = {};
+       
+       for (var key in defaults) {
+         curr[key] = this.key;
+       }
+       console.log("After inits, the current data:",curr);
+     }).
+      catch(error=>{console.error("Failed to fetch:",error.response, error);});
+    },
+    postsubmit() {
+      this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
+      if (this.formatout) {
+        this.value = this[this.formatout](this.value);
+        //var fields = {[keys]:val
+      }
+      axios.post(this.submiturl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       foreignkey: this.foreignkey,
+       attribute: this.attribute,
+       fields: {[this.name]:this.value},
+     }).then(response=>{
+       console.log("Succeeded in submit resp:", response);
+       var data = response.data;
+       this.id = data.id;
+       var value = data[this.name];
+       if (this.params.formatin) {
+         value = this[formatin](value);
+       }
+       this.value = value;
+     }).
+      catch(error=>{console.error("Failed to submit/post/update:",error.response, error);});
+    },
+    }
+    
+
+  };
+
+window.Vue.component('ajax-text-input', {
+  name: 'ajax-text-input',
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  /*
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: ''};
+        */
+  template: `
+  <div class='inp-wrap' :class="wrapcss" :style="wrapstyle">
+    <div v-if="label" :style="lblstyle" class='inplblclass' :class="lblcss" v-html="label"></div>
+    <input :style="inpstyle" :type="type" @blur="postsubmit" v-model="value" :name="name" :class="inpcss" class="pk-inp">
+  </div>`,
+});

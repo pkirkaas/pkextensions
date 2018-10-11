@@ -4,7 +4,7 @@ use App\Models\User;
 use PkExtensions\PkFileUploadService;
 use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
-use PkExtenstions\PkCollection;
+use PkExtensions\PkCollection;
 
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
@@ -176,6 +176,52 @@ abstract class PkAjaxController extends PkController {
     return $this->success($instance);
   }
 
+  /** Could be new or update, 
+   * When fetching, should be keys. When submitting, must be field(s) as assoc
+   * array of keyname=>value, as "fields"
+   */
+  public function submit() {
+    pkdebug("Enter Submit with:",$this->data);
+    $fields = $this->data['fields'] ?? null; //Should be an array
+    if (!$fields || !is_array($fields)) {
+      throw new PkException(["No fields submitted to submit. Data:",$this->data]);
+    }
+    $model = $this->data['model'];
+    $id = $this->data['id'] ?? null;
+    if ($id) { #Updating existing object
+      $obj = $model::find($id);
+    } else { #It's new - does have an owner?
+      $obj = new $model();
+    }
+    foreach ($fields as $key=>$value) {
+      $obj->$key = $value;
+    }
+    if (!$id) { #Does it have an owner?
+      $ownermodel = $this->data['ownermodel'] ?? null; //Optional
+      $ownerid = $this->data['ownerid'] ?? null; //Optional
+      $owneratt = $this->data['owneratt'] ?? null; //What is relationship name in the owner?
+      $foreignkey = $this->data['foreignkey'] ?? null; //Optional
+      if ($ownermodel && $ownerid && $attribute) {
+        $owner = $ownermodel::find($ownerid);
+        $owner->$attribute()->save($object);
+      } else {
+        if ($ownerid & $foreignkey) {
+          $object->$foreignkey = $ownerid;
+        }
+        $obj->save();
+      } #Object should be saved now - return attributes
+    } else { #It already exists, just save it
+      $obj->save(); 
+    }
+    $keys = array_keys($fields);
+    //return $this->success($obj->fetchAttributes($keys));
+    //$ret = $obj->fetchAttributes($keys);
+    $ret = $obj->fetchAttributes();
+    pkdebug("Leaving Submit with ttsL ",$obj->fetchAttributes());
+    //$ret = $this->success($obj->fetchAttributes($keys));
+    return $this->success($obj->fetchAttributes());
+  }
+
   /** Fetch attributes as specified by the model, instance id (or IDS), and 
    * model keys
    * @param Model -string- the model to search
@@ -188,6 +234,7 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
+    PkDebug("Enter Fetchattrures with data:", $this->data);
     $obj=null;
     $extra = restoreJson(keyVal('extra',$this->data));
     $keys = restoreJson(keyVal('keys',$this->data));
@@ -214,6 +261,7 @@ abstract class PkAjaxController extends PkController {
     }
     if ($obj) {
       $atts = $obj->fetchAttributes($keys,$extra);
+      pkdebug ("Rerting got atts of: ",$atts);
       return $this->success($atts);
     }
     return $this->success([]);

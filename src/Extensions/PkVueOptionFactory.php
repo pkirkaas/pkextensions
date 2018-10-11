@@ -207,7 +207,7 @@ function mkStyleAndClass($props = []) {
   public function setCtlProps($params=[]) {
    * */
   /** The Main function that builds the forms */
-  public function makeFormsAndCotrols($params=[]) {
+  public function makeFormsAndControls($params=[]) {
     //$ctlFmt = keyVal('ctlFme',$params);
     $ret = [
       'formopts'=>$this->makeFormOpts(keyVal('formopts',$params),$params),

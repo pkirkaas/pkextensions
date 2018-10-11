@@ -280,13 +280,13 @@ Vue.component('pk-checkbox-arr', {
 Vue.component('pk-select-arr', {
   inptype: 'select',
   template: `
-  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
+  <div :class="inpopt.wrapclass"> <div v-if="inpopt.label" :class="inpopt.lblclass">{{inpopt.label}}</div>
   <select :name="inpopt.name" :class="inpopt.inputclass" v-model="inpopt.value">
     <option v-for="(option, idx) in inpopt.options" :value="option.value">
         {{option.label}}
     </option>
   </select>
-    </div></div>
+    </div>
 `,
   props: ['inpopt']
 

@@ -47,7 +47,7 @@ export default {
     },
     props: ['params'], 
     mounted: function() {
-      console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+      //console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
       this.logThis();
       this.initData();
     },
@@ -55,14 +55,14 @@ export default {
     methods: {
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
-          console.log ("Target was ",event.target," send to file input");
+          //console.log ("Target was ",event.target," send to file input");
           $(event.target).cousin('input.click-target','div.drop').trigger('click');
         ////}
-        console.log("The input got the click, ev:",event,"data:", data);
+        //console.log("The input got the click, ev:",event,"data:", data);
       },
       delete() {
         var delparm = {model:this.model,id:this.id,cascade:true};
-        console.log("About to delete w. params:",delparm);
+        //console.log("About to delete w. params:",delparm);
         //axios.post(this.deleteurl,{model:this.model,id:this.id,cascade:true}).
         axios.post(this.deleteurl,delparm).
           then(response=>{console.log("The delete was successful:",response);
@@ -80,7 +80,7 @@ export default {
         comatts.forEach(function(key){
           currvals[key] = me[key];
         });
-        console.log("This is:",currvals);
+        //console.log("This is:",currvals);
         return currvals;
       },
       initData(data) { //Data may be empty or have all we need
@@ -118,16 +118,16 @@ export default {
        }
        if (all) {//We have a query set
          querydata.extra=JSON.stringify(['url','model']);
-        console.log("In initData, trying to query:", querydata);
+        //console.log("In initData, trying to query:", querydata);
         axios.post(this.fetchurl,querydata).
           then(response=> {
-            console.log("Search Results:", response);
+            //console.log("Search Results:", response);
             var rdata = response.data;
             if (!rdata.id) { //No Match
               this.url = this.defaulturl;
               return;
             }
-            console.log("Keystoset?",keystoset);
+            //console.log("Keystoset?",keystoset);
             keystoset.forEach(function(key) {
               me[key] = rdata[key];
             });
@@ -142,7 +142,7 @@ export default {
         }
       },
       onDrop: function(e) { //Just want to upload & save it right away
-        console.log("Just dropped something - what?",e);
+        //console.log("Just dropped something - what?",e);
         e.stopPropagation();
         e.preventDefault();
         var files = e.dataTransfer.files;

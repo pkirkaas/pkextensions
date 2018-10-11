@@ -54,6 +54,7 @@ Route::any('ajax/toggle', ['as' => 'ajax_toggle', 'uses'=> 'AjaxController@toggl
 Route::any('ajax/modelattributes', ['as' => 'ajax_modelattributes', 'uses'=> 'AjaxController@modelattributes']);
 Route::any('ajax/fetchattributes', ['as' => 'ajax_fetchattributes', 'uses'=> 'AjaxController@fetchattributes']);
 Route::any('ajax/set', ['as' => 'ajax_set', 'uses'=> 'AjaxController@set']);
+Route::any('ajax/submit', ['as' => 'ajax_submit', 'uses'=> 'AjaxController@submit']);
 Route::any('ajax/query', ['as' => 'ajax_query', 'uses'=> 'AjaxController@query']);
 
 /*
