@@ -1,10 +1,10 @@
 <!-- Drop & immediately upload, in place -->
 <template>
-  	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop">
-              <delete-x data-tootik="Delete This?"></delete-x>
-      <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here">
-               <input class="abs-hidden" type="file" name="image" @change="onChange">
-        <img :src="url || defaulturl" alt="" class="img-upload" />
+  	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
+      <delete-x data-tootik="Delete This?"></delete-x>
+      <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
+        <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click="fiClicked($event,'fi')">
+        <img :src="url || defaulturl" alt="" class="img-upload" @clicked="fiClicked($event,'img')"/>
   </div>
   </div>
 </template>
@@ -53,6 +53,13 @@ export default {
     },
 
     methods: {
+      fiClicked(event, data) {
+        //if (event.target === "img.img-upload") {
+          console.log ("Target was ",event.target," send to file input");
+          $(event.target).cousin('input.click-target','div.drop').trigger('click');
+        ////}
+        console.log("The input got the click, ev:",event,"data:", data);
+      },
       delete() {
         var delparm = {model:this.model,id:this.id,cascade:true};
         console.log("About to delete w. params:",delparm);
@@ -197,6 +204,7 @@ export default {
           }).
           catch(error=>{console.log("Error saving:",error,error.response);});
       },
+
       /*
       removeFile() {
         this.image = '';
