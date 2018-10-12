@@ -5,6 +5,96 @@
 :root {
   font-family: verdana;
 }
+
+
+/*** Make some default label, wrapper, & input classes, & input frames/containers
+*/
+$inp-cont-width: 50rem !default;
+
+.input-row {//Flex, wrap, holds many input cards, wraps
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #efefef;
+}
+.input-card-5, .input-card-4, .input-card-3, .input-card-2, .input-card-1 {
+  padding: 2px;
+  margin: 2px;
+  display: inline-block;
+  background-color: #ded;
+}
+.input-card-5 { //Holds several inputs, but is of finite size
+  width: 500px;
+}
+.input-card-4 {
+  width: 400px;
+}
+
+.input-card-3 {
+  width: 300px;
+}
+
+.input-card-2 {
+  width: 200px;
+}
+.input-card-1 {
+  width: 100px;
+}
+
+//Wraps an input or input & label
+.ajax-wrap-css {
+  width: 100%;
+  //padding: 2px;
+  margin: 2px;
+  display: block;
+  border: solid #ddd 1px;
+}
+  
+$ajax-inp-height: 2em !default;
+
+.ajax-select-css,
+.ajax-chcbxinp-css,
+.ajax-inp-css{
+  color: #222;
+  height: $ajax-inp-height;
+  line-height: $ajax-inp-height;
+  border: solid #bbb 1px;
+  padding: 2px;
+  display: block;
+  margin: 0;
+  background-color: white;
+}
+.ajax-select-css,
+.ajax-inp-css{
+  width:100%;
+}
+
+.ajax-chcbxlbl-css,
+.ajax-lbl-css {
+  color: $sdblue;
+  background-color: #fefefe;
+  text-align:center;
+  padding: 2px;
+}
+.ajax-lbl-css {
+  width: 100%;
+  display: block;
+}
+
+$checkbox-width: 2rem !default;
+.ajax-chcbxlbl-css {
+  width: calc(100% - 3rem);
+  display: inline-block;
+}
+
+.ajax-chcbxinp-css {
+  display: inline-block;
+  width: $checkbox-width;
+}
+
+
+
+
+
 $body-font-size: 14px !default;
 body {
   font-size: $body-font-size;

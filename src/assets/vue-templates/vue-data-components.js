@@ -837,7 +837,7 @@ window.inputMixin = {
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
         wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
-      options:[]};
+        checked:null, options:[],checkedvalue:1,uncheckedvalue:0};
     var data = defaults;
     data.defaults = defaults;
     console.log("INIT DATA:",data);
@@ -874,6 +874,27 @@ window.inputMixin = {
 
   },
   methods: {
+    //Special for checkboxes - usually true/false - & if not checked sends nothing,
+    //so not false. This will both toggle the appearance of the checkbox, AND send
+    //the unchecked value, so can clear
+    setCheckedState() {
+      if(this.value == this.checkedvalue) {
+        this.checked = true;
+      } else {
+        this.checked = false;
+      }
+    },
+    toggleCheckState(event,arg) {
+      console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
+      if(this.value == this.checkedvalue) {
+        this.value = this.uncheckedvalue;
+        this.checked = false;
+      } else {
+        this.value = this.checkedvalue;
+        this.checked = true;
+      }
+      console.log("After toggle state, this.checked:",this.checked,"value",this.value);
+    },
     initData() {
     
       this.showThisFromDefaults(this.defaults,"InpCtl About to fetch");
@@ -890,6 +911,11 @@ window.inputMixin = {
          value = this[this.formatin](value);
        }
        this.value = value;
+       if (this.value == this.checkedvalue) {
+         this.checked=true;
+       } else {
+         this.checked = false;
+       }
        var defaults = this.defaults;
        var curr = {};
        
@@ -944,14 +970,14 @@ window.Vue.component('ajax-text-input', {
         */
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
-    <div v-if="label" :style="lblstyle" class='inplblclass' :class="lblcss" v-html="label"></div>
+    <div v-if="label" :style="lblstyle" class='ajax-lbl-css' :class="lblcss" v-html="label"></div>
     <input :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @enter="savesubmit($event,'enter')"
        @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
-       v-model="value" :name="name" :class="inpcss" class="ajax-sel-inp">
+       v-model="value" :name="name" :class="inpcss" class="ajax-inp-css">
   </div>`,
 });
 
@@ -968,8 +994,8 @@ Vue.component('ajax-select-input',{
   mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
   type: 'select',
   template: `
-  <div class='ajax-wrap-class' :class="wrapcss" :style="wrapstyle">
-    <div v-if="label" class='inplblclass' :class="lblcss" :style="lblstyle" v-html="label"></div>
+  <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
+    <div v-if="label" class='ajax-lbl-css' :class="lblcss" :style="lblstyle" v-html="label"></div>
   <select 
     @change="savesubmit($event,'Selected Select')" 
     @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
@@ -980,3 +1006,44 @@ Vue.component('ajax-select-input',{
   </div>
 `,
   });
+
+Vue.component('ajax-checkbox-input',{
+  name: 'ajax-checkbox-input',
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  type: 'checkbox',
+  template: `
+  <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
+    <div v-if="label" class='ajax-chcbxlbl-css' :class="lblcss" :style="lblstyle" v-html="label">
+    </div>
+    <input type="checkbox" 
+      @click="changesavesubmit($event,'Clicked')" 
+      class="ajax-chcbxinp-css" :name="name" :class="inpcss" :style="inpstyle"
+           v-model="checked" :value="value" >
+  </div>
+`
+  /*
+           v-model="checked" :value="value" @change="toggleCheckState($event,'toggleCheckbox')" >
+  */
+  ,
+  methods: {
+    changesavesubmit(event,action) {
+      console.log("In changesavesubmit");
+      this.toggleCheckState(event,'changesavesubmit');
+      this.savesubmit(event, 'changesavesubmit');
+    },
+  },
+  /*
+  <input type="hidden" :name="name" value="0">
+    @change="savesubmit($event,'Clicked')" 
+   * 
+   */
+  
+
+  computed: {
+    /*
+    checked() {
+      return !!this.value;
+    }
+    */
+  },
+});

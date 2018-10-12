@@ -12,3 +12,12 @@ $font-family-monospace:  Consolas, "Liberation Mono", "Courier New", monospace !
 $tootik-background: #400 !default;
 $tootik-color: #fff !default;
 $tootik-font: "Open Sans", verdana !default;
+
+
+//// Sites need a color theme, not necessarily the same. So here we defined
+//// Some site colors, which can be over-ridden individually in _site_variables
+
+$slblue: #88f !default;
+$sdblue: #44e !default;
+$slred: #fee !default;
+
