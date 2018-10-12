@@ -189,6 +189,9 @@ containing block needs to be positioned relatively*/
   flex-shrink: 1;
 }
 
+.fg { flex-grow: 1; }
+.fs { flex-shrink: 1; }
+
 .f-between, .flex-between {
   display: flex;
   flex-flow: row wrap;
@@ -199,6 +202,20 @@ containing block needs to be positioned relatively*/
   flex-flow: row wrap;
   justify-content: space-around;
 }
+.fb49 { flex-basis: 49%; }
+.fb50 { flex-basis: 50%; }
+.fb25 { flex-basis: 25%; }
+.fb75 { flex-basis: 75%; }
+.fb33 { flex-basis: 33%; }
+.fb66 { flex-basis: 66%; }
+.fb10 { flex-basis: 10%; }
+
+.fb360 {display: flex; width: 360px} //The max width you can count on for a phone
+.fbm360 {display: flex; min-width: 360px} //Won't get smaller than that'
+
+.w49 {width: 49%;}
+.w360 {width: 360px;}
+.wm360,.mw360 {min-width: 360px;}
 
 /*
 .flex-between:after {

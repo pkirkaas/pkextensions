@@ -12,6 +12,8 @@ $(function () {
 });
 
 //
+///z8
+/*
 $(function () {
   offsetContent();
   $(window).resize(offsetContent);
@@ -35,6 +37,7 @@ function offsetContent() {
     $('.content-main').css('top', 0);
   }
 }
+*/
 
 /** Puts the item at the bottom of them menu, for any window width over 'over'
  * 
@@ -43,6 +46,7 @@ function offsetContent() {
  * @returns {undefined}
  */
 //function setundermenu(item, over) {
+/*
 window.setundermenu = function(item, over) {
   over = over || 0;
   var top = 0;
@@ -51,3 +55,4 @@ window.setundermenu = function(item, over) {
   }
   jQuerify(item).css('top', top);
 };
+*/

@@ -25,27 +25,22 @@ $inp-cont-width: 50rem !default;
 .input-card-5 { //Holds several inputs, but is of finite size
   width: 500px;
 }
-.input-card-4 {
-  width: 400px;
-}
+.input-card-4 { width: 400px; }
+.input-card-3 { width: 300px; }
+.input-card-2 { width: 200px; }
+.input-card-1 { width: 100px; }
 
-.input-card-3 {
-  width: 300px;
-}
-
-.input-card-2 {
-  width: 200px;
-}
-.input-card-1 {
-  width: 100px;
-}
+.fv, .fh  { display: flex; }
+.fv {flex-direction: column;}
+.fv200, .fh200 { display: flex; width: 200px; }
+.fv200 { flex-direction: column; }
 
 //Wraps an input or input & label
 .ajax-wrap-css {
   width: 100%;
   //padding: 2px;
   margin: 2px;
-  display: block;
+  display: flex;
   border: solid #ddd 1px;
 }
   
@@ -57,11 +52,17 @@ $ajax-inp-height: 2em !default;
   color: #222;
   height: $ajax-inp-height;
   line-height: $ajax-inp-height;
-  border: solid #bbb 1px;
+  border: solid #aaa 1px;
   padding: 2px;
   display: block;
   margin: 0;
-  background-color: white;
+  background-color: #FAFFBD ;
+  &:hover,:focus {
+    border: solid #bbf 1px;
+    box-shadow: 3px 2px 7px 0px rgba(0,0,255,1);
+    background-color: #fff;
+  }
+  
 }
 .ajax-select-css,
 .ajax-inp-css{
@@ -70,8 +71,13 @@ $ajax-inp-height: 2em !default;
 
 .ajax-chcbxlbl-css,
 .ajax-lbl-css {
+  /*
   color: $sdblue;
   background-color: #fefefe;
+  */
+  background-color: #448;
+  color: white;
+  border-radius: 5px;
   text-align:center;
   padding: 2px;
 }

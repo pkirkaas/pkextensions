@@ -172,8 +172,8 @@ window.Vue.component('data-item',{
 Vue.component('data-label-pair', {
   name: 'data-label-pair',
   template: `
-    <div :class="lblcls" :lblstyle="lblstyle" v-html="label"></div>
-    <div :class="fldcls" :fldstyle="fldstyle" v-html="field"</div>
+    <div :class="lblcls" :style="lblstyle" v-html="label"></div>
+    <div :class="fldcls" :style="fldstyle" v-html="field"</div>
   `,
   props: ['params'],
   computed: {
@@ -776,6 +776,15 @@ window.utilityMixin = {
       for (var key in defaults) {
         this[key] = this.params[key] || defaults[key];
       }
+      var lblwidth = this.params.lblwidth || defaults.lblwidth;
+      if (lblwidth && this.label) {
+        this.lblstyle = this.lblstyle + " width: "+lblwidth+"; ";
+      }
+      //Do same for input width, like checkbox:
+      var inpwidth  = this.params.inpwidth || defaults.inpwidth;
+      if (inpwidth) {
+        this.inpstyle += " width: "+inpwidth+"; ";
+      }
     },
     showThisFromDefaults(defaults,lbl) {
       if (!defaults) defaults=this.defaults;
@@ -837,7 +846,9 @@ window.inputMixin = {
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
         wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
-        checked:null, options:[],checkedvalue:1,uncheckedvalue:0};
+        checked:null, options:[],checkedvalue:1,uncheckedvalue:0,
+        lblwidth: null, inpwidth:null}; //If input or label width is limited, 
+         //the other element can take the space. 
     var data = defaults;
     data.defaults = defaults;
     console.log("INIT DATA:",data);

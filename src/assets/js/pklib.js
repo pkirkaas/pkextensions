@@ -69,6 +69,25 @@ $(function () {
   */
  });
 
+//Function to automatically align any fixed menus & move content down below them.
+function alignFixedMenus() { //Assuming just mine with class pk-fixed-menu
+  var bottom = 0;
+  $(".pk-fixed-menu").each(function(idx,el) {
+    $(el).css('top',bottom);
+    $(el).css('left',0);
+    $(el).css('right',0);
+    $(el).css('margin',0);
+    bottom += $(el).outerHeight();
+  });
+  console.log("Tried positioning menus, bottom is:",bottom);
+  $("div.pk-main.content-main").css('top', bottom);
+}
+
+$(window).resize(alignFixedMenus);
+
+$(function () {
+  alignFixedMenus();
+  });
 // Make 'Confirm' Dialog
 $(function () {
   $('body').on('click', '.js-verify', function (event) {
