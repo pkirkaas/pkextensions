@@ -71,16 +71,30 @@ $(function () {
 
 //Function to automatically align any fixed menus & move content down below them.
 function alignFixedMenus() { //Assuming just mine with class pk-fixed-menu
-  var bottom = 0;
-  $(".pk-fixed-menu").each(function(idx,el) {
+  //How far is $("div.pk-main.content-main") from the top of the window:`j
+  /*
+var scrollTop     = $(window).scrollTop(),
+    elementOffset = $('div.pk-main.content-main').offset().top,
+    distance      = (elementOffset - scrollTop);
+    console.log("Distance from top is:",distance);
+  */
+    var scrollTop     = $(window).scrollTop();
+    var elementOffset = $('div.pk-main.content-main').offset().top;
+    var distance      = (elementOffset - scrollTop);
+
+    var bottom = 0;
+    $(".pk-fixed-menu").each(function(idx,el) {
     $(el).css('top',bottom);
     $(el).css('left',0);
     $(el).css('right',0);
     $(el).css('margin',0);
+    console.log("For el",el,"height is:",$(el).outerHeight());
     bottom += $(el).outerHeight();
+    console.log("Bottom:",bottom);
   });
-  console.log("Tried positioning menus, bottom is:",bottom);
-  $("div.pk-main.content-main").css('top', bottom);
+  console.log("Tried positioning menus, bottom is:",bottom, "distance:", distance, 
+  "Bottom - distance", bottom - distance);
+  $("div.pk-main.content-main").css('top', bottom-distance);
 }
 
 $(window).resize(alignFixedMenus);

@@ -597,7 +597,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
 @include mk-colors;
 $base-header-padding: .3rem !default;
-$base-header-margin: .3rem !default;
+//$base-header-margin: .3rem !default;
+$base-header-margin: 0 !default;
 $base-header-font-size: 1rem !default;
 $base-header-color: #400 !default;
 $base-header-ib: #004 !default;
