@@ -106,6 +106,12 @@ class PkCollection extends Collection {
    */
   public function __get($key) {
     $type = $this->type();
+    //\ChromePhp::log(pkdebug_base("The type is:", $type));
+    console("The type is:", $type);
+    if (!class_exists($type)) {
+      return parent::__get($key);
+    }
+    //die("Type:".$type);
     //$typecollections = $type::getAttributeCollectionNames();
     $typecollections = $type::getRelationNames();
     if (!in_array($key,$typecollections, 1)) {
@@ -118,6 +124,7 @@ class PkCollection extends Collection {
     return $joinedcollections;
   }
     
+  #The model class of the collection - but if empty, null
   public function type() {
     return $this->getQueueableClass();
   }

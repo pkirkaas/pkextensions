@@ -19,6 +19,16 @@ date_default_timezone_set("America/Los_Angeles");
 define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
+function console() {
+  $args = func_get_args();
+  $out = call_user_func_array("pkdebug_base", $args);
+  if (class_exists("ChromePhp",false)) {
+    ChromePhp::log($out);
+  } else {
+    pkdebugOut($out);
+  }
+}
+
 class PkLibConfig {
 
   static $suppressPkDebug = false;
@@ -324,6 +334,14 @@ function callingFrame2($file = null) {
   return null;
 }
 
+/*
+///if ((config('app.log_level'))=='debug') {
+if (true) {
+  //require ("../vendor/ccampbell/chromephp/ChromePhp.php");
+  require ("../../../../ccampbell/chromephp/ChromePhp.php");
+}
+ * 
+ */
 /** $exclusions are an array of the form:
  * 
     ['file'=>__FILE__,'line'=>__LINE__,
