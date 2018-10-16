@@ -38,4 +38,4 @@
       <!--
     </div> close menu wrapper
       -->
-    <?php if (!empty($no_user) && !Auth::user()) pkview("forms.DropLoginRegisterDialog")?>
+    <?php /** if (!empty($no_user) && !Auth::user()) view("forms.DropLoginRegisterDialog") */ ?>

@@ -106,7 +106,8 @@ class PkCollection extends Collection {
    */
   public function __get($key) {
     $type = $this->type();
-    $typecollections = $type::getAttributeCollectionNames();
+    //$typecollections = $type::getAttributeCollectionNames();
+    $typecollections = $type::getRelationNames();
     if (!in_array($key,$typecollections, 1)) {
       return parent::__get($key);
     }
