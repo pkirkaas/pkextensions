@@ -225,7 +225,9 @@ abstract class PkAjaxController extends PkController {
   /** Fetch attributes as specified by the model, instance id (or IDS), and 
    * model keys
    * @param Model -string- the model to search
-   * @param id - single id for single instance, list for collection, empty for all
+   * @param id - single id for single instance, list for collection, empty for all - UNLESS
+   * @param searchkeys: if set, array of searchkeys=>values for "where"
+   * @param orderby array of fields=>asc or desc
    * @param array keys: array of key atts to return, could include relationships. If empty, the default.
    * @param array extra - extra atts, like relationships, so don't have to specify all keys to add a few.
    * 
@@ -244,13 +246,20 @@ abstract class PkAjaxController extends PkController {
     if (is_array($keys) && !in_array('id',$keys,1)) {
       $keys[]='id'; #Could be one for an instance, or list for PkCollection
     }
+    $orderby = keyVal('orderby',$this->data);
     $model = keyVal('model',$this->data);
+    $searchkeys  = keyVal('searchkeys',$this->data);
     if ($model) {
       $id = keyVal('id',$this->data);
       if ($id) {
         $obj = $model::find($id);
+      } else if ($searchkeys){
+        $obj = $model::multiWhere($searchkeys);
       } else {
         $obj = $model::all();
+      }
+      if ((! $obj instanceOf PkModel) && $orderby) {
+        $obj = $obj->multiOrderby($orderby);
       }
     } else { #Not a model
       $ownermodel=keyVal('ownermodel', $this->data);

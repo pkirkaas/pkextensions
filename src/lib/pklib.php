@@ -47,13 +47,16 @@ class PkLibConfig {
 Class Undefined {
 
   public function __get($x) {
-    return null;
+    return new Undefined();
   }
-
   public function __set($x, $y) {
-    
   }
-
+  public function __call($method, $args) {
+    return new Undefined();
+  }
+  public function __toString() {
+    return '';
+  }
 }
 
 function isCli() {
@@ -738,7 +741,7 @@ function pkdebugOut($str, $logpath = null) {
     //$logpath = $_SERVER['DOCUMENT_ROOT'] . '/logs/app.log';
     if (!$logpath) $logpath = appLogPath();
     if (isCli()) {
-      echo ("The logpath: [$logpath]");
+      echo ("The logpath: [$logpath]\n");
     }
     if (PkLibConfig::$isWarning) {
       if (PkLibConfig::$warnLogDir) {

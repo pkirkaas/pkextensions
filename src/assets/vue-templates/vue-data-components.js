@@ -43,18 +43,29 @@ window.Vue.component('pk-modal-wrapper',{
     </pk-modal>
   </div>
   `,
-  props:["contentparams","modalparams","btnparams"],
+  //props:["contentparams","modalparams","btnparams"],
+  props:['params'],
   methods : {
     callOwner: function() {
       console.log ("Wrapper got called when clicked on "+who);
     },
   },
   data: function() {
-    return {showModal: false};
+    return {
+      showModal: false,
+      contentparams: {},
+      modalparams: {},
+      btnparams: {},
+      //paramsx: {},
+      //dynamiccomp: {}
+    };
   },
   mounted: function() {
-    console.log("PkMdlWrp: contentparams:", this.contentparams,'btn',this.btnparams,'mdl',
-    this.modalparams);
+    this.contentparams = this.params.contentparams;
+    this.modalparams=this.params.modalparams;
+    this.btnparams =  this.params.btnparams;
+    //console.log("PkMdlWrp: contentparams:", this.contentparams,'btn',this.btnparams,'mdl',
+    //this.modalparams);
   }
 });
 
@@ -993,6 +1004,28 @@ window.Vue.component('ajax-text-input', {
 });
 
 
+window.Vue.component('ajax-textarea-input', {
+  name: 'ajax-textarea-input',
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  /*
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: ''};
+        */
+  template: `
+  <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
+    <div v-if="label" :style="lblstyle" class='ajax-lbl-css' :class="lblcss" v-html="label"></div>
+    <textarea :style="inpstyle" :type="type"
+       @esc="false"
+       @tab="savesubmit($event,'tab')"
+       @enter="savesubmit($event,'enter')"
+       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
+       @blur="savesubmit($event,'blur')"
+       v-model="value" :name="name" :class="inpcss" class="ajax-inp-css"></textarea>
+  </div>`,
+});
 
 
 
@@ -1058,3 +1091,72 @@ Vue.component('ajax-checkbox-input',{
     */
   },
 });
+
+/** Automates some gathering & submitting of ajax data. 
+ * @method fetchData fetches input data from within an enclosing '.input-container',
+ * adds any optional params passed in, & returns the form data object.
+ * @method submitData takes a url & form data & posts it, then calls the method
+ *    this.processResponse(data) in the implementing component. 
+ *  @method autoSubmit takes optional url & params - default Url is /ajax/sumbit
+ *    it passes the params to fetchData, then performs the ajax call.
+ *    All the implementing component needs to do is create the form & 
+ *    implement the response handler.
+ * @type Vue mixin
+ */
+window.ajaxpostingMixin = {
+  methods: {
+    fetchData: function(params) {
+      var fd = new FormData();
+      var el = this.$el;
+      var me = this;
+      console.log ("Mixin el is:",el);
+      //Find the nearest "form container", then all the inputs
+       $(el).closest(".input-container").find(":input").each(function(idx, inp) {
+          var $inp = $(inp);
+          fd.append($inp.attr('name'),$inp.val());
+      }); 
+      //Add any extra data in params
+      if (params && (typeof params === 'object')) {
+        for (var key in params) {
+          fd.append(key,params[key]);
+        }
+      }
+      return fd;
+    },
+
+    submitData = function (url,fd) {
+      axios.post(url,fd).
+        then(response=>{
+          var data = response.data;
+          if (this.processResponse && (typeof this.processResponse === 'function')) {
+            this.processResponse(data);
+          }
+          this.notifyUpdate();
+        }).catch(error=>{console.error("Error submiting:",error.response, error);});
+    },
+
+    autoSubmit: function(url,params) {
+      if (!url) {
+        url = "/ajax/submit";
+      }
+      var fd = this.fetchData(params);
+      this.submitData(url,fd);
+    },
+    notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
+      if (!refs) {
+        refs = this.refs;
+      }
+      if (!refs) {
+        return;
+      }
+      if (!Array.isArray(refs)) {
+        refs = [refs];
+      }
+      refs.forEach(function (idx, cmp) {
+        cmp.initData();
+      });
+    }
+
+
+  },
+}

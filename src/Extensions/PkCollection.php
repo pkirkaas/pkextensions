@@ -28,6 +28,21 @@ class PkCollection extends Collection {
      return $retarr;
    }
 
+   /**Takes assoc array of keys=>asc or desc
+    * and applies them to the collection
+    */
+   public function multiOrderby($keyval) {
+     $collection = $this->toBase();
+     foreach ($keyval as $key=>$val) {
+       if ($val === 'desc') {
+         $collection = $collection->sortbyDesc($key);
+       } else {
+         $collection = $collection->sortby($key);
+       }
+     }
+     return $collection;
+   }
+
    #### Only works for non-emtpy collections, of the same model...
    public function totag() {
      if (!count($this)) return false;

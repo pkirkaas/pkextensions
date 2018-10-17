@@ -105,7 +105,11 @@ abstract class PkModel extends Model {
   public static $table_field_defs = [ 'id' => 'increments',];
 
 
-
+  //Restore "create" to models..
+public static function create(array $attributes = []) {
+  $model = static::query()->create($attributes);
+  return $model;
+}
 
 
   
@@ -1523,6 +1527,24 @@ class $createclassname extends Migration {
     return parent::__call($method, $args);
   }
 
+  /** Creates a builder searchin matches on multiple
+   * key=>val conditions
+   * @param array $keyvals
+   */
+  public static function multiWhere($keyvals) {
+    $builder = static::query();
+    foreach ($keyvals as $key=>$val) {
+      $builder->where($key,$val);
+    }
+    return $builder;
+  }
+  public static function multiOrderby($keyvals) {
+    $builder = static::query();
+    foreach ($keyvals as $key=>$val) {
+      $builder->orderBy($key,$val);
+    }
+    return $builder;
+  }
 
   /**
    *

@@ -75,6 +75,16 @@ class PartialSet extends \ArrayObject {
     }
     return $i;
   }
+  public function getArrayCopy() {
+    $ret = [];
+    foreach ($this as $key=>$val) {
+      if ($val instanceOf \ArrayObject) {
+        $val = $val->getArrayCopy();
+      }
+      $ret[$key] = $val;
+    }
+    return $ret;
+  }
 
   public function array_keys() {
     return array_keys($this->getArrayCopy());

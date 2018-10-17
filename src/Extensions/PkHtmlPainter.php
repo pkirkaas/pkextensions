@@ -132,6 +132,8 @@ class PkHtmlPainter extends PkHtmlRenderer {
         'data-itemcount' => 0,
     ];
 
+    //$args['item_template'] = $args['item_template']->getArrayCopy(); 
+    //console("MkCreateBtnArgs:", $args);
     if (!is_array($args)) $args = [];
     if (keyVal('createbtn_class', $args))
         $args['class'] = $args['createbtn_class'];
@@ -147,16 +149,25 @@ class PkHtmlPainter extends PkHtmlRenderer {
       $attributes['data-template'] = html_encode($item_template);
       // pkdebug("HTML Encoded:", html_encode($item_template));
     }
-    if (($item_count = keyVal('data-itemcount', $params)) && !keyVal('data-itemcount', $attributes)) {
-      $attributes['data-itemcount'] = $item_count;
+    $item_count = keyVal('data-itemcount',$params);
+    if ($item_count === null) {
+      $item_count = keyVal('data-itemcount',$attributes);
     }
+      
+    //if (($item_count = keyVal('data-itemcount', $params)) && !keyVal('data-itemcount', $attributes)) {
+      $attributes['data-itemcount'] = $item_count;
+    //}
     $content = keyVal('createbtn_content', $params);
     $tag = keyVal('createbtn_tag', $params);
     $ps_tpl = keyVal('ps_tpl', $method_vars);
     $ps_key = keyVal('ps_key', $method_vars);
     //pkdebug("args:",$args,"attributes", $attributes);
     $hr = new PkHtmlRenderer();
-    return $this->create_button = $this->injectTpl($hr->$tag($content, $attributes), $ps_tpl, $ps_key);
+
+    console("Attributes:",$attributes);
+    $this->create_button = $this->injectTpl($hr->$tag($content, $attributes), $ps_tpl, $ps_key);
+    //console("Making create btn here",$this->create_button->__toString(),"atts:",$attributes);
+    return $this->create_button;
     //return $this->injectTpl($hr->$tag($content,
     //    keyVal('attributes',$res)),$ps_tpl,$ps_key);
   }
@@ -203,9 +214,11 @@ class PkHtmlPainter extends PkHtmlRenderer {
     }
     $create_button = keyVal('create_button', $args, $this->create_button);
     if (!$create_button) {
+      //console("Didn't have a create button, make one");
       $cbtnargs = $args + ['item_template' => $jsRowTpl, 'data-itemcount' => $item_count];
       $create_button = $this->mkCreateBtn($cbtnargs);
     }
+    //console("Making create button:",$create_button.'', "args:",$args,"this creat",$this->create_button);
     $header = keyVal('header', $args, $this->header);
     if ($header) {
       $subform_tpl['header'] = $header;

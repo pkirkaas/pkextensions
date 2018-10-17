@@ -1,13 +1,13 @@
 <template>
   <div class='modal-backdrop'>
-  <div class='modal-container input-container' id="input-container"
+  <div class='modal-container input-container' id="input-container 
        :class="modalparams.modalContainerCls">
     <div class="modal-title" :class="modalparams.modalTitleCls" v-html="modalparams.title"></div>
     <div class="modal-body" :class="modalparams.modalBodyCls" >
 
 
 
-      <component :is="contentparams.cname" v-bind="contentparams"></component>
+      <component ref="content" :is="contentparams.cname" :params="contentparams" v-bind="contentparams"></component>
       <slot></slot>
 
 
@@ -48,41 +48,48 @@ export default {
        * @returns {undefined}
        */
       submit: function(event) {
-        console.log("Submitting");
-        var fd = new FormData();
-        var url = this.modalparams.url;
-        $('#input-container').find(":input").each(function(idx, el) {
-            var $el = $(el);
-          console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
-            fd.append($el.attr('name'),$el.val());
-          }); 
-        //Now add direct data, if any
-        if (this.modalparams.data && (typeof this.modalparams.data === 'object')) {
-          for (var key in this.modalparams.data) {
-            fd.append(key,this.modalparams.data[key]);
+        if (this.$refs.content.submit &&(typeof this.$refs.content.submit === 'function')) {
+          this.$refs.content.submit(event);
+          $(":input.jq-wipe").val('');
+          this.$parent.showModal=false;
+          this.reset();
+        } else {
+          console.log("Submitting from modal");
+          var fd = new FormData();
+          var url = this.modalparams.url;
+          $('#input-container').find(":input").each(function(idx, el) {
+              var $el = $(el);
+            console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
+              fd.append($el.attr('name'),$el.val());
+            }); 
+          //Now add direct data, if any
+          if (this.modalparams.data && (typeof this.modalparams.data === 'object')) {
+            for (var key in this.modalparams.data) {
+              fd.append(key,this.modalparams.data[key]);
+            }
           }
+          for(var pair of fd.entries()) {
+            console.log(pair[0]+ ', '+ pair[1]); 
+          }
+          console.log('url',url);
+          /** // Debugging
+          */
+          axios.post(url,fd).
+            then(response=>{
+              console.log("Success: Response:",response);
+      
+              this.$emit('submitmsg',"Refresh");
+              this.$parent.$emit('submitmsg',"Refresh");
+              this.$parent.$parent.$emit('submitmsg',"Refresh");
+            }).
+            catch(error=>{
+              console.error("Error:",error.response);
+            });
+          $(":input.jq-wipe").val('');
+          this.$parent.showModal=false;
+          this.reset();
         }
-        for(var pair of fd.entries()) {
-          console.log(pair[0]+ ', '+ pair[1]); 
-        }
-        console.log('url',url);
-        /** // Debugging
-        */
-        axios.post(url,fd).
-          then(response=>{
-            console.log("Success: Response:",response);
-    
-            this.$emit('submitmsg',"Refresh");
-            this.$parent.$emit('submitmsg',"Refresh");
-            this.$parent.$parent.$emit('submitmsg',"Refresh");
-          }).
-          catch(error=>{
-            console.error("Error:",error.response);
-          });
-        $(":input.jq-wipe").val('');
-        this.$parent.showModal=false;
-        this.reset();
-        
+          
       },
       reset: function() {
         var vm = this;

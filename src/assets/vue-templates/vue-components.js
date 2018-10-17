@@ -219,6 +219,25 @@ Vue.component('text-input',{
 });
 
 
+/*** Make my own input components for inclusion in arrays***/
+
+// Actually, if in a v-for, prop should be an object, so
+//CVue.component('pk-input-arr',{
+Vue.component('pk-textarea-arr',{
+  type: 'input',
+  template: `
+  <div :class="inpopt.wrapclass" :style="inpopt.wrapstyle">
+    <div :class="inpopt.lblclass" :style="inpopt.labelstyle">{{inpopt.label}}<textarea v-model="inpopt.value"
+    :name="inpopt.name" :class="inpopt.inputclass" :style="inpopt.inpstyle"
+    class='border' ></textarea></div></div>`,
+
+  data: function() {
+    return {
+    }
+  },
+
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+});
 
 
 /*** Make my own input components for inclusion in arrays***/
@@ -228,13 +247,23 @@ Vue.component('text-input',{
 Vue.component('pk-input-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass">
-    <div :class="inpopt.lblclass">{{inpopt.label}}<input :type="inpopt.type" v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass"
+  <div :class="inpopt.wrapclass" :style="inpopt.wrapstyle">
+    <div :class="inpopt.lblclass" :style="inpopt.labelstyle">{{inpopt.label}}<input :type="inpopt.type" v-model="inpopt.value"
+    :name="inpopt.name" :class="inpopt.inputclass" :style="inpopt.inpstyle"
     class='border' ></div></div>`,
+
+  data: function() {
+    return {
+    }
+  },
 
   props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
   created: function() {
+    if (!this.inpopt.type) {
+      this.inpopt.type = 'text';
+    }
+  },
+  mounted: function() {
     if (!this.inpopt.type) {
       this.inpopt.type = 'text';
     }
