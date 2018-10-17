@@ -20,13 +20,10 @@ define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 function console() {
+  if (!class_exists("ChromePhp",false)) return;
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
-  if (class_exists("ChromePhp",false)) {
-    ChromePhp::log($out);
-  } else {
-    pkdebugOut($out);
-  }
+  ChromePhp::log($out);
 }
 
 class PkLibConfig {

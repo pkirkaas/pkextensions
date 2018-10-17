@@ -52,7 +52,7 @@ function FCeventToArr(FCevent) {
  *Assumes the name of the dialog class is: edit-event-dialog-frame 
  */
 function createEventEditDialog(FCevent) {
-  console.log("Entering createEvent, FCevent:", FCevent);
+  //console.log("Entering createEvent, FCevent:", FCevent);
   $dlghtml = $('.edit-event-dialog-frame ').prop('outerHTML');
   var closeText = 'Cancel';
   var dialogDefaults = {
@@ -98,14 +98,14 @@ function FCeventsToArrays(FCevents) {
 
 function    regesterEventsIndividually(decoded) {
   var res;
-  console.log('Entered individualEvent Reg');
+  //console.log('Entered individualEvent Reg');
   $.each(decoded, function (idx, val) {
     if (!val.title) {
-      console.log('Creating a title');
+      //console.log('Creating a title');
       val.title = generateUUID();
     }
     res = $('.edit-calendar-schedular').fullCalendar('renderEvent', val, true);
-    console.log("In individual loads: " + idx + " the val is:", val, ' The result was: ', res);
+    //console.log("In individual loads: " + idx + " the val is:", val, ' The result was: ', res);
 
   });
 }
@@ -119,7 +119,7 @@ function ajaxFetchEvents() {
    return;
    }
    */
-  console.log('Fetching events');
+  //console.log('Fetching events');
   var model_id = $('.edit-calendar-schedular').attr('data-modelid');
   var fetchUrl = $('.edit-calendar-schedular').attr('data-fetchurl');
   if (!fetchUrl || !model_id) {
@@ -131,7 +131,7 @@ function ajaxFetchEvents() {
     dataType: 'json',
     method: 'POST',
     success: function (result) {
-        console.log("The AJAX FETCH result:", result);
+        //console.log("The AJAX FETCH result:", result);
      // var decoded = JSON.parse(result);
       ///console.log("The decoded FETCH result:", decoded);
       //$('.edit-calendar-schedular').fullCalendar('addEventSource', decoded);
@@ -167,7 +167,7 @@ function ajaxPostEvents() {
     dataType: 'json',
     method: 'POST',
     success: function (result) {
-      console.log("The AJAX result:", result);
+      //console.log("The AJAX result:", result);
     }
   });
 }
@@ -185,16 +185,16 @@ function createFCEventObject(date) {
 function deleteDupEvents(obj) {
   var ttype = typeof(this.guids);
   if (typeof(this.guids) === 'undefined') {
-    console.log("Type",ttype);
+    //console.log("Type",ttype);
     this.guids = [];
   }
   var tmpguid = obj.guid;
-  console.log("Examining:", obj, 'guids', this.guids, 'tmp', tmpguid);
+  //console.log("Examining:", obj, 'guids', this.guids, 'tmp', tmpguid);
   if (!(obj.guid)) { console.log("Deleting because no GUID"); return true;}
   //if (($.inArray(tmpguid, this.guids))!== -1) { console.log("Deleting because in GUIDS ARRAy",tmpguid, this.guids); return true;} 
   if (in_array(tmpguid, this.guids)) { console.log("Deleting because in GUIDS ARRAy",tmpguid, this.guids); return true;} 
   this.guids.push(tmpguid);
-  console.log('We keep this one:', obj);
+  //console.log('We keep this one:', obj);
   return false;
 }
 $(document).ready(function () {
@@ -203,7 +203,7 @@ $(document).ready(function () {
     $('.edit-calendar-schedular').fullCalendar('removeEvents', deleteDupEvents);
   });
   $('body').on('click', '.fetch-events', function (event) {
-    console.log('Asking Calendar to fetch');
+    //console.log('Asking Calendar to fetch');
     $('.edit-calendar-schedular').fullCalendar('refetchEvents');
   });
   $('body').on('click', '.set-event-src', function (event) {
@@ -219,7 +219,7 @@ $(document).ready(function () {
       }, 
       error : function () {alert ("There was an error fetching");}
     };
-    console.log('Setting the JSON Event Src to: ', jsonSrc);
+    //console.log('Setting the JSON Event Src to: ', jsonSrc);
     $('.edit-calendar-schedular').fullCalendar('addEventSource', jsonSrc);
 
   });
@@ -258,7 +258,7 @@ $(document).ready(function () {
       values[field.name] = field.value;
     });
     if (!values.guid) values.guid =  generateUUID();
-    if (!values.guid) console.log("I just assigned it");
+    //if (!values.guid) console.log("I just assigned it");
     var FCevent = arrToFCevent(values);
     $('.edit-calendar-schedular').fullCalendar(
             'renderEvent', FCevent, true);
@@ -299,7 +299,7 @@ $(document).ready(function () {
       }, 
       error : function () {alert ("There was an error fetching");}
     };
-  console.log("About to start full Calendar, the src obj:", jsonSrc);
+  //console.log("About to start full Calendar, the src obj:", jsonSrc);
   $('.edit-calendar-schedular').fullCalendar({
     editable: true,
     dayClick: createFCEventObject,
@@ -307,19 +307,19 @@ $(document).ready(function () {
     eventSources: [ jsonSrc ],
 
     loading: function () {
-      console.log("LOAD event");
+      //console.log("LOAD event");
       //ajaxFetchEvents();
     }, //
     viewRender: function () {
-      console.log("ViewRender event");
+      //console.log("ViewRender event");
       //ajaxFetchEvents();
     }, //
     eventAfterAllRender: function () {
-      console.log("eventAfterAllRender event");
+      //console.log("eventAfterAllRender event");
       //ajaxFetchEvents();
     }, //
     widowResize: function () {
-      console.log("windowResize event");
+      //console.log("windowResize event");
       //ajaxFetchEvents();
     }, //
     //loading : function() {console.log("The Calendar is LOADING");},

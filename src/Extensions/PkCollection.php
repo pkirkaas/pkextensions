@@ -106,8 +106,6 @@ class PkCollection extends Collection {
    */
   public function __get($key) {
     $type = $this->type();
-    //\ChromePhp::log(pkdebug_base("The type is:", $type));
-    console("The type is:", $type);
     if (!class_exists($type)) {
       return parent::__get($key);
     }
