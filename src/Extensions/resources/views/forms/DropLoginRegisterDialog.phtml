@@ -183,7 +183,39 @@ $(function () {
         <div class="shib2">Register/Sign Up</div>
         <div class="v-space-flex full-height p-h-1 p-b-1">
         <div class="lrdlg-link-wrap">
+          <?php if (isset($registerform)) { ?>
+<div class="shir3 tac">Register as a <?=$registerform?></div>
+<div class="tac section">
+<form method="POST" action="/auth/register">
+    <?= csrf_field() ?>
+    <table class='pk-table'>
+      <tr>
+        <td class='pk-lbl'> Name</td>
+        <td><input class='pk-inp' type="text" name="name" value="<?= old('name') ?>"></td>
+      </tr>
+    <tr>
+        <td class='pk-lbl'> Email</td>
+        <td><input class='pk-inp' type="email" name="email" value="<?= old('email') ?>"></td>
+    </tr>
+    <tr>
+        <td class='pk-lbl'>Password</td>
+        <td><input class='pk-inp' type="password" name="password"></td>
+    </tr>
+    <tr>
+        <td class='pk-lbl'>Confirm Password</td>
+        <td> <input class='pk-inp' type="password" name="password_confirmation"></td>
+    </tr>
+    </table>
+    <div class='tac'>
+        <button type="submit">Register</button>
+    </div>
+</form>
+</div>
+          
+          <?php }  else { ?>
+
         <a class="lrdlg-link" href="<?= route('auth_registerform'); ?>">Register</a>
+          <?php } ?>
     </div>
 
           <?php
