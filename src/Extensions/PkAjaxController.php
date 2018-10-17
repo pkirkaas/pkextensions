@@ -182,6 +182,7 @@ abstract class PkAjaxController extends PkController {
    */
   public function submit() {
     pkdebug("Enter Submit with:",$this->data);
+    console("Enter Submit with:",$this->data);
     $fields = $this->data['fields'] ?? null; //Should be an array
     if (!$fields || !is_array($fields)) {
       throw new PkException(["No fields submitted to submit. Data:",$this->data]);

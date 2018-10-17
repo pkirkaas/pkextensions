@@ -1,13 +1,14 @@
 <template>
   <div class='modal-backdrop'>
-  <div class='modal-container input-container' id="input-container 
+    <div class='input-container'>
+  <div class='modal-container input-container' id="input-container" 
        :class="modalparams.modalContainerCls">
     <div class="modal-title" :class="modalparams.modalTitleCls" v-html="modalparams.title"></div>
     <div class="modal-body" :class="modalparams.modalBodyCls" >
 
 
 
-      <component ref="content" :is="contentparams.cname" :params="contentparams" v-bind="contentparams"></component>
+      <component ref="content" :is="contentparams.cname" :params="contentparams" ></component>
       <slot></slot>
 
 
@@ -21,6 +22,7 @@
            :class="modalparams.cancelBtnCls" 
            @click="$emit('close')">{{modalparams.cancellbl || "Cancel"}}</div>
     </div>
+  </div>
   </div>
   </div>
 
@@ -54,6 +56,8 @@ export default {
           this.$parent.showModal=false;
           this.reset();
         } else {
+          console.error("We should be processing on our onwe as a test!");
+                  
           console.log("Submitting from modal");
           var fd = new FormData();
           var url = this.modalparams.url;

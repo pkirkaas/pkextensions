@@ -1105,26 +1105,49 @@ Vue.component('ajax-checkbox-input',{
  */
 window.ajaxpostingMixin = {
   methods: {
+    fetchDataNoFD: function(params) {
+      var emptyobj = {};
+      var el = this.$el;
+      $(el).closest(".input-container").find(":input").each(function(idx, inp) {
+        console.log("The el of the posting comp is:", el);
+        // Base data collection
+        $inp =  $(inp);
+        var key =$inp.attr('name'); 
+        var val = $inp.val(); 
+        emptyobj[key] =val;
+      });
+      if (params !== null && typeof params === 'object') {
+        for (var akey in params) {
+          emptyobj[akey] = params[akey];
+        }
+      }
+      console.log ("The fetch raw key/vals: ", emptyobj);
+      return emptyobj;
+    },
     fetchData: function(params) {
       var fd = new FormData();
       var el = this.$el;
       var me = this;
       console.log ("Mixin el is:",el);
       //Find the nearest "form container", then all the inputs
+      var emptydata = {};
        $(el).closest(".input-container").find(":input").each(function(idx, inp) {
           var $inp = $(inp);
-          fd.append($inp.attr('name'),$inp.val());
+          //fd.append($inp.attr('name'),$inp.val());
+          emptydata[$inp.attr('name')]=$inp.val();
       }); 
+
       //Add any extra data in params
       if (params && (typeof params === 'object')) {
         for (var key in params) {
-          fd.append(key,params[key]);
+//          fd.append(key,params[key]);
+           emptydata[key] = params[key];
         }
       }
-      return fd;
+      return emptydata;
     },
 
-    submitData = function (url,fd) {
+    submitData: function (url,fd) {
       axios.post(url,fd).
         then(response=>{
           var data = response.data;
@@ -1144,7 +1167,7 @@ window.ajaxpostingMixin = {
     },
     notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
       if (!refs) {
-        refs = this.refs;
+        refs = this.$refs;
       }
       if (!refs) {
         return;
@@ -1155,8 +1178,6 @@ window.ajaxpostingMixin = {
       refs.forEach(function (idx, cmp) {
         cmp.initData();
       });
-    }
-
-
+    },
   },
-}
+ };

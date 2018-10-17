@@ -233,7 +233,26 @@ Vue.component('pk-textarea-arr',{
 
   data: function() {
     return {
-    }
+      value:'',
+      label:'',
+      name:'',
+      wrapclass:'',
+      wrapstyle:'',
+      lblstyle:'',
+      inputclass:'',
+      inpstyle:'',
+      labelstyle:'',
+    };
+  },
+  mounted: function() {
+    console.log("In textarea, inpopt:", this.inpopt);
+    this.value = this.inpopt.value;
+    this.label = this.inpopt.label;
+    this.name = this.inpopt.name;
+    this.wrapclass = this.inpopt.wrapclass;
+    this.lblstyle = this.inpopt.lblstyle;
+    this.inpstyle = this.inpopt.inpstyle;
+    this.labelstyle = this.inpopt.labelstyle;
   },
 
   props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
@@ -247,26 +266,38 @@ Vue.component('pk-textarea-arr',{
 Vue.component('pk-input-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass" :style="inpopt.wrapstyle">
-    <div :class="inpopt.lblclass" :style="inpopt.labelstyle">{{inpopt.label}}<input :type="inpopt.type" v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass" :style="inpopt.inpstyle"
+  <div :class="wrapclass" :style="wrapstyle">
+    <div :class="lblclass" :style="labelstyle">{{label}}<input type="text" v-model="value"
+    :name="name" :class="inputclass" :style="inpstyle"
     class='border' ></div></div>`,
 
   data: function() {
     return {
-    }
+      value:'',
+      label:'',
+      name:'',
+      lblclass:'', 
+
+      wrapclass:'',
+      wrapstyle:'',
+      lblstyle:'',
+      inputclass:'',
+      inpstyle:'',
+      labelstyle:'',
+
+    };
   },
 
   props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
-  created: function() {
-    if (!this.inpopt.type) {
-      this.inpopt.type = 'text';
-    }
-  },
   mounted: function() {
-    if (!this.inpopt.type) {
-      this.inpopt.type = 'text';
-    }
+    console.log("In inputarr, inpopt:", this.inpopt);
+    this.value = this.inpopt.value;
+    this.label = this.inpopt.label;
+    this.name = this.inpopt.name;
+    this.wrapclass = this.inpopt.wrapclass;
+    this.lblstyle = this.inpopt.lblstyle;
+    this.inpstyle = this.inpopt.inpstyle;
+    this.labelstyle = this.inpopt.labelstyle;
   },
   methods: {
   }
@@ -299,8 +330,6 @@ Vue.component('pk-checkbox-arr', {
     </div></div>
 `,
   props: ['inpopt'],
-  created: function() {
-  }
 
 });
 
@@ -309,15 +338,35 @@ Vue.component('pk-checkbox-arr', {
 Vue.component('pk-select-arr', {
   inptype: 'select',
   template: `
-  <div :class="inpopt.wrapclass"> <div v-if="inpopt.label" :class="inpopt.lblclass">{{inpopt.label}}</div>
-  <select :name="inpopt.name" :class="inpopt.inputclass" v-model="inpopt.value">
-    <option v-for="(option, idx) in inpopt.options" :value="option.value">
+  <div :class="wrapclass"> <div v-if="label" :class="lblclass">{{label}}</div>
+  <select :name="name" :class="inputclass" v-model="value">
+    <option v-for="(option, idx) in options" :value="option.value">
         {{option.label}}
     </option>
   </select>
     </div>
 `,
-  props: ['inpopt']
+  props: ['inpopt'],
+  data: function() {
+    return {
+      value:'',
+      wrapclass: '',
+      label: '',
+      lblclass:'',
+      name:'',
+      inputclass:'',
+      options:[],
+    };
+  },
+  mounted: function() {
+    console.log("Input options for selecet:",this.inpopt);
+    this.wrapclass=this.inpopt.wrapclass;
+    this.label=this.inpopt.label;
+    this.lblclass=this.inpopt.lblclass;
+    this.name=this.inpopt.name;
+    this.inputclass=this.inpopt.inputclass;
+    this.options=this.inpopt.options;
+  },
 
 });
 
