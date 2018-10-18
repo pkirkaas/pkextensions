@@ -4,8 +4,9 @@ use App\Models\User;
 use PkExtensions\PkFileUploadService;
 use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use PkExtensions\PkCollection;
-
+use Illuminate\Database\Eloquent\Builder;
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
 use Carbon\Carbon;
@@ -217,6 +218,9 @@ abstract class PkAjaxController extends PkController {
     $keys = array_keys($fields);
     //return $this->success($obj->fetchAttributes($keys));
     //$ret = $obj->fetchAttributes($keys);
+    if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
+      $obj = new PkCollection($obj);
+    }
     $ret = $obj->fetchAttributes();
     pkdebug("Leaving Submit with ttsL ",$obj->fetchAttributes());
     //$ret = $this->success($obj->fetchAttributes($keys));
@@ -260,6 +264,9 @@ abstract class PkAjaxController extends PkController {
         $obj = $model::all();
       }
       if ((! $obj instanceOf PkModel) && $orderby) {
+        if ($obj instanceOf Builder) {
+          $obj = $obj->get();
+        }
         $obj = $obj->multiOrderby($orderby);
       }
     } else { #Not a model
@@ -270,6 +277,9 @@ abstract class PkAjaxController extends PkController {
       $keys[]='totag';
     }
     if ($obj) {
+      if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
+        $obj = new PkCollection($obj);
+      }
       $atts = $obj->fetchAttributes($keys,$extra);
       pkdebug ("Rerting got atts of: ",$atts);
       return $this->success($atts);

@@ -28,10 +28,7 @@ window.Vue.component('pk-input-container',{
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
-  <!--
-    <component v-bind="{paramsx:paramsx}" :is="dynamiccomp"></component>
-  -->
-  <div>
+  <div class='inline fs-1'>
     <pk-modal-btn :btnparams="btnparams"
       @click="callOwner(event,'button') "
        class="btn primary-btn" :class="btnparams.btnCls">
@@ -78,7 +75,7 @@ window.Vue.component('pk-modal-wrapper',{
   //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
 window.Vue.component('pk-modal-btn',{
   template: `
-  <div style="z-index: 2000;" @click="onClick" class="btn btn-primary btn-pop m-5 p-f fs-8"
+  <div style="z-index: 2000;" @click="onClick" class="inline btn btn-primary btn-pop m-2 p-f fs-6"
    :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
   `,
    props: ['btnparams'],
@@ -1184,7 +1181,7 @@ window.ajaxpostingMixin = {
     },
     notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
       if (!refs) {
-        refs = this.$refs;
+        refs = this.refs;
       }
       if (!refs) {
         return;
@@ -1192,8 +1189,11 @@ window.ajaxpostingMixin = {
       if (!Array.isArray(refs)) {
         refs = [refs];
       }
-      refs.forEach(function (idx, cmp) {
-        cmp.initData();
+      console.log("In notify update, refs :",refs);
+      refs.forEach( (cmp, idx) => {
+        console.log("In Loop, cmp:",cmp);
+        this.$root.refresh(cmp);
+        //cmp.initData();
       });
     },
   },

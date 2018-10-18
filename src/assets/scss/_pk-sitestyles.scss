@@ -252,7 +252,10 @@ input.pk-inp {
   font-size: $input-font-size;
   //font-family: 'Roboto', verdana;
   color: #300;
-  //background-color: rgba(255,255,255,.4);
+  background-color: white;
+  &:hover, &:focus {
+    box-shadow: 0px 0px 15px 5px rgba(255, 255, 190, .75); 
+  }
 }
 body div div form div select.pk-inp {
    &:not([size]):not([multiple]) {

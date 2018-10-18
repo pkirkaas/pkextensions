@@ -226,10 +226,10 @@ Vue.component('text-input',{
 Vue.component('pk-textarea-arr',{
   type: 'input',
   template: `
-  <div :class="wrapcls" class="m-5" :style="wrapstyle">
+  <div :class="wrapcls" class="" :style="wrapstyle">
     <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
-    <textarea v-model="value"
-    :name="name" :class="inpcls" class="pk-inp block fullwidth m-5" :style="inpstyle">
+    <textarea v-model="value" style="width:90%; min-height: 12em"
+    :name="name" :class="inpcls" class="pk-inp block " :style="inpstyle">
     </textarea></div>`,
 
   mixins: [window.utilityMixin],
@@ -265,10 +265,10 @@ Vue.component('pk-input-arr',{
   mixins: [window.utilityMixin],
   type: 'input',
   template: `
-  <div :class="wrapcls" class="m-5" :style="wrapstyle" >
+  <div :class="wrapcls" class="m-t-3" :style="wrapstyle" >
     <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
 <input type="text" v-model="value" :name="name" :class="inpcls" :style="inpstyle"
-    class='border pk-inp block fullwidth m-3' >
+    class='border pk-inp block  m-3' >
 </div>`,
 
   data: function() {
@@ -298,6 +298,42 @@ Vue.component('pk-input-arr',{
 
 });
 
+/** Select */
+//CVue.component('pk-select-arr', {
+Vue.component('pk-select-arr', {
+  mixins: [window.utilityMixin],
+  inptype: 'select',
+  template: `
+  <div :class="wrapcls" class="m-t-3" :style="wrapstyle"> <div v-if="label" class="pk-lbl" :class="lblcls">{{label}}</div>
+  <select :name="name" :class="inputcls" style="width: 80%;" class="block  pk-inp border m-3" v-model="value">
+    <option v-for="(option, idx) in options" :value="option.value">
+        {{option.label}}
+    </option>
+  </select>
+    </div>
+`,
+  props: ['inpopt'],
+  data: function() {
+    return {
+      wrapstyle:'',// "display: flex; width: 100%; justify-content: stretch;",
+      value:'',
+      wrapcls: '',
+      label: '',
+      lblcls:'',
+      name:'',
+      inputcls:'',
+      options:[],
+    };
+  },
+  mounted: function() {
+    console.log("Input options for selecet:",this.inpopt);
+    this.overrideDefaults(this.inpopt);
+    console.log("Data now for selecet:",this.$data);
+  },
+
+});
+
+
 /** 
  * Bare input element
  */
@@ -326,42 +362,6 @@ Vue.component('pk-checkbox-arr', {
   props: ['inpopt'],
 
 });
-
-/** Select */
-//CVue.component('pk-select-arr', {
-Vue.component('pk-select-arr', {
-  mixins: [window.utilityMixin],
-  inptype: 'select',
-  template: `
-  <div :class="wrapcls" class="m-5" :style="wrapstyle"> <div v-if="label" class="pk-lbl" :class="lblcls">{{label}}</div>
-  <select :name="name" :class="inputcls" class="block fullwidth pk-inp border m-3" v-model="value">
-    <option v-for="(option, idx) in options" :value="option.value">
-        {{option.label}}
-    </option>
-  </select>
-    </div>
-`,
-  props: ['inpopt'],
-  data: function() {
-    return {
-      wrapstyle:'',// "display: flex; width: 100%; justify-content: stretch;",
-      value:'',
-      wrapcls: '',
-      label: '',
-      lblcls:'',
-      name:'',
-      inputcls:'',
-      options:[],
-    };
-  },
-  mounted: function() {
-    console.log("Input options for selecet:",this.inpopt);
-    this.overrideDefaults(this.inpopt);
-    console.log("Data now for selecet:",this.$data);
-  },
-
-});
-
 /*
 CVue.component('pk-input-arr',{
   type: 'input',
