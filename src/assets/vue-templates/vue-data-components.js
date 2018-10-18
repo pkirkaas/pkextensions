@@ -781,6 +781,23 @@ window.utilityMixin = {
       }
       return false;
     },
+//Probably better than below. Data can use sensible defaults, & only params that have keys can override first from settings, second from params
+    overrideDefaults: function(settings) {
+      if (!this.isObject(settings)) {
+        settings = {};
+      }
+      if (!this.isObject(this.params)) {
+        this.params = {};
+      }
+      var datakeys = Object.keys(this.$data);
+      datakeys.forEach((key,idx) => {
+        if (key in settings) {
+          this[key] = settings[key];
+        } else if (key in this.params) {
+          this[key] = this.params[key];
+        }
+      });
+    },
     //Called from mounted, defaults an object w. param keys & defaults to set data to
     // Assumes "params" in props
     initDataFromParams(defaults) {

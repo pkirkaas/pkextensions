@@ -212,10 +212,10 @@ const FormPopup = Vue.extend({
 //CVue.component('text-input',{
 Vue.component('text-input',{
   template: `
-  <div :class="wrapclass">
-    <div :class="lblclass">{{label}}<input type="text" :value="value"
-    :name="name" :class="inputclass" class='border bg-444' placeholder="Come on, Dish!"></div></div>`,
-  props:['lblclass', 'label', 'value','name','inputclass','wrapclass']
+  <div :class="wrapcls">
+    <div :class="lblclass">{{label}}</div><input type="text" :value="value"
+    :name="name" :class="inputcls" class='border bg-444' placeholder="Come on, Dish!"></div>`,
+  props:['lblclass', 'label', 'value','name','inputcls','wrapcls']
 });
 
 
@@ -226,36 +226,33 @@ Vue.component('text-input',{
 Vue.component('pk-textarea-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass" :style="inpopt.wrapstyle">
-    <div :class="inpopt.lblclass" :style="inpopt.labelstyle">{{inpopt.label}}<textarea v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass" :style="inpopt.inpstyle"
-    class='border' ></textarea></div></div>`,
+  <div :class="wrapcls" class="m-5" :style="wrapstyle">
+    <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
+    <textarea v-model="value"
+    :name="name" :class="inpcls" class="pk-inp block fullwidth m-5" :style="inpstyle">
+    </textarea></div>`,
 
+  mixins: [window.utilityMixin],
   data: function() {
     return {
       value:'',
       label:'',
       name:'',
-      wrapclass:'',
-      wrapstyle:'',
+      wrapcls:'',
+      inpcls:'',
+      lblcls:'',
+      wrapstyle:'',//display:flex; width: 100%;',
       lblstyle:'',
-      inputclass:'',
-      inpstyle:'',
-      labelstyle:'',
+      inputcls:'',
+      inpstyle:'', //flex-basis: 100%; flex-grow:1;width: 100%; margin-top: 5px;',
+      lblstyle:'',
     };
   },
   mounted: function() {
-    console.log("In textarea, inpopt:", this.inpopt);
-    this.value = this.inpopt.value;
-    this.label = this.inpopt.label;
-    this.name = this.inpopt.name;
-    this.wrapclass = this.inpopt.wrapclass;
-    this.lblstyle = this.inpopt.lblstyle;
-    this.inpstyle = this.inpopt.inpstyle;
-    this.labelstyle = this.inpopt.labelstyle;
+    this.overrideDefaults(this.inpopt);
   },
 
-  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputcls','wrapcls']
 });
 
 
@@ -264,40 +261,37 @@ Vue.component('pk-textarea-arr',{
 // Actually, if in a v-for, prop should be an object, so
 //CVue.component('pk-input-arr',{
 Vue.component('pk-input-arr',{
+  name: 'pk-inp-arr',
+  mixins: [window.utilityMixin],
   type: 'input',
   template: `
-  <div :class="wrapclass" :style="wrapstyle">
-    <div :class="lblclass" :style="labelstyle">{{label}}<input type="text" v-model="value"
-    :name="name" :class="inputclass" :style="inpstyle"
-    class='border' ></div></div>`,
+  <div :class="wrapcls" class="m-5" :style="wrapstyle" >
+    <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
+<input type="text" v-model="value" :name="name" :class="inpcls" :style="inpstyle"
+    class='border pk-inp block fullwidth m-3' >
+</div>`,
 
   data: function() {
     return {
       value:'',
       label:'',
       name:'',
-      lblclass:'', 
-
-      wrapclass:'',
+      lblcls:'', 
+      inpcls:'', 
+      wrapcls:'',
       wrapstyle:'',
       lblstyle:'',
-      inputclass:'',
+      inputcls:'',
       inpstyle:'',
-      labelstyle:'',
+      lblstyle:'',
 
     };
   },
 
-  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputcls','wrapcls']
   mounted: function() {
     console.log("In inputarr, inpopt:", this.inpopt);
-    this.value = this.inpopt.value;
-    this.label = this.inpopt.label;
-    this.name = this.inpopt.name;
-    this.wrapclass = this.inpopt.wrapclass;
-    this.lblstyle = this.inpopt.lblstyle;
-    this.inpstyle = this.inpopt.inpstyle;
-    this.labelstyle = this.inpopt.labelstyle;
+    this.overrideDefaults(this.inpopt);
   },
   methods: {
   }
@@ -324,9 +318,9 @@ window.Vue.component('pk-input',{
 Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
-  <div :class="inpopt.wrapclass"> <div :class="inpopt.lblclass">{{inpopt.label}}
-  <input type="checkbox" :value="inpopt.value" :name="inpopt.name" :class="inpopt.inputclass"
-       v-model="inpopt.checked"  @change="inpopt.value = +!inpopt.value" />
+  <div :class="wrapcls"> <div :class="lblclass">{{label}}
+  <input type="checkbox" :value="value" :name="name" :class="inputcls"
+       v-model="checked"  @change="value = +!value" />
     </div></div>
 `,
   props: ['inpopt'],
@@ -336,10 +330,11 @@ Vue.component('pk-checkbox-arr', {
 /** Select */
 //CVue.component('pk-select-arr', {
 Vue.component('pk-select-arr', {
+  mixins: [window.utilityMixin],
   inptype: 'select',
   template: `
-  <div :class="wrapclass"> <div v-if="label" :class="lblclass">{{label}}</div>
-  <select :name="name" :class="inputclass" v-model="value">
+  <div :class="wrapcls" class="m-5" :style="wrapstyle"> <div v-if="label" class="pk-lbl" :class="lblcls">{{label}}</div>
+  <select :name="name" :class="inputcls" class="block fullwidth pk-inp border m-3" v-model="value">
     <option v-for="(option, idx) in options" :value="option.value">
         {{option.label}}
     </option>
@@ -349,23 +344,20 @@ Vue.component('pk-select-arr', {
   props: ['inpopt'],
   data: function() {
     return {
+      wrapstyle:'',// "display: flex; width: 100%; justify-content: stretch;",
       value:'',
-      wrapclass: '',
+      wrapcls: '',
       label: '',
-      lblclass:'',
+      lblcls:'',
       name:'',
-      inputclass:'',
+      inputcls:'',
       options:[],
     };
   },
   mounted: function() {
     console.log("Input options for selecet:",this.inpopt);
-    this.wrapclass=this.inpopt.wrapclass;
-    this.label=this.inpopt.label;
-    this.lblclass=this.inpopt.lblclass;
-    this.name=this.inpopt.name;
-    this.inputclass=this.inpopt.inputclass;
-    this.options=this.inpopt.options;
+    this.overrideDefaults(this.inpopt);
+    console.log("Data now for selecet:",this.$data);
   },
 
 });
@@ -374,11 +366,11 @@ Vue.component('pk-select-arr', {
 CVue.component('pk-input-arr',{
   type: 'input',
   template: `
-  <div :class="inpopt.wrapclass">
+  <div :class="inpopt.wrapcls">
     <div :class="inpopt.label<input type="text" v-model="inpopt.value"
-    :name="inpopt.name" :class="inpopt.inputclass"
+    :name="inpopt.name" :class="inpopt.inputcls"
     class='border' ></div></div>`,
-  props:['inpopt'],//'lblclass', 'label', 'value','name','inputclass','wrapclass']
+  props:['inpopt'],//'lblclass', 'label', 'value','name','inputcls','wrapcls']
   methods: {
   },
 });
@@ -402,7 +394,7 @@ Vue.component('pk-input-form',{
     <button @click='close'>Cancel</button></div>
   </div>`,
   props:['inpopts', 'formopts'],
-  //txtinps: obj array of  'lblclass', 'label', 'value','name','inputclass','wrapclass'
+  //txtinps: obj array of  'lblclass', 'label', 'value','name','inputcls','wrapcls'
   //formopts: formopts
   methods: {
     submit: function(ev) {
