@@ -56,6 +56,21 @@ class PkCollection extends Collection {
      return $model.'#'.$idlist;
    }
 
+   /** Returns assoc array to send to AJAX to reconstruct:
+    * ['model'=>$modelName,
+    *   'ids' => $idlist
+    * ] ... but if empty, returns empty []
+    */
+   public function toajax() {
+     if (!count($this)) return [];
+     $idarr = $this->pluck('id');
+     return [
+        'model'=>get_class($this[0]),
+        'idarr' => $idarr,
+        'id' => implode(',',$idarr),
+        ];
+   }
+
    public static function fromtag($tag) {
      return PkModel::fromtag($tag);
    }

@@ -1376,8 +1376,10 @@ class $createclassname extends Migration {
    * @var type 
    */
   public static $allowall = false;
-  public static function allowall($allow=false) {
-    static::$allowall = $allow;
+  public static function allowall($allow=null) {
+    if ($allow || ($allow === false)) {
+      static::$allowall = $allow;
+    }
     return static::$allowall || isCli();
   }
 

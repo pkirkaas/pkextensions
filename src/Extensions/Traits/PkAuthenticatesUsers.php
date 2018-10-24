@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions\Traits;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
 use Auth;
 
@@ -14,7 +15,9 @@ trait PkAuthenticatesUsers {
   }
 
   public function login (Request $request) {
+    PkModel::allowall(true);
     Auth::logoutall();
+    PkModel::allowall(false);
     return $this->traitLogin($request);
   }
   /*
