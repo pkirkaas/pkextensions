@@ -22,9 +22,10 @@ window.Vue.component('pk-input-container',{
 
 
 //Wraps both the button & modal - the modal is a single file component pk-modal.vue
-//Should take 3 prop objects - "btnparams" (for the button itself - title, appearance)
-//, "modalparams" (For the modal box - size, title, etc)
-// 'contentparams' - what's inside the modal
+//  takes 1 prop: "params", containing 3  objects - 
+//  "btnparams" (for the button itself - title, appearance)
+//, "modalparams" (For the modal box - size, title, url etc)
+// 'contentparams' - what's inside the modal. Content, but if a component, cname
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
@@ -1180,6 +1181,18 @@ window.ajaxpostingMixin = {
       this.submitData(url,fd);
     },
     notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
+      if (this.params.reloadrefs) {
+        var reloadrefs = this.params.reloadrefs;
+        if (!Array.isArray(reloadrefs)) {
+          reloadrefs = [reloadrefs];
+        }
+        reloadrefs.forEach(function(el) {
+          if (el.initData) {
+            el.initData();
+          }
+        });
+      }
+      /*
       if (!refs) {
         refs = this.refs;
       }
@@ -1196,5 +1209,7 @@ window.ajaxpostingMixin = {
         //cmp.initData();
       });
     },
+    */
   },
- };
+},
+};

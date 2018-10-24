@@ -1,3 +1,11 @@
+<!-- A generic modal container. Takes props: "modalparams" & "contentparams".
+   "modalparams" are title, formatting, etc. 
+   "contentparams" could be another comonent, or just raw HTML content to
+    display.
+  If "contentparams" is an object with the property "cname", it's a component
+  & substituted in the "component :is="contentparams.cname", & content component
+    :params="contentparams"
+ -->
 <template>
   <div class='modal-backdrop'>
     <div class='input-container'>
@@ -7,8 +15,9 @@
     <div class="modal-body" :class="modalparams.modalBodyCls" >
 
 
-
+      <template v-if="contentIsComponent()">
       <component ref="content" :is="contentparams.cname" :params="contentparams" ></component>
+      </template>
       <slot></slot>
 
 
@@ -35,12 +44,27 @@
 export default {
     name: 'pk-modal',
     data: function(){
-      return {};
+      return {
+        reloadrefs: [],
+      };
     },
     //modalparams: url, data (added to formdata), formatting, title
     //contentparams - probably an inner comonent, conentparams={cname,cdata}
     props: ['contentparams', 'modalparams'],
     mounted: function() {
+      if (this.modalparams.reloadrefs) {
+        var reloadrefs = this.modalparams.reloadrefs;
+        if (!Array.isArray(reloadrefs)) {
+          realoadrefs = [reloadrefs]; 
+        }
+        this.reloadrefs = reloadrefs;
+        if (this.contentparams.reloadrefs) {
+          if (!Array.isArray(this.contentparams.reloadrefs)) {
+            this.contentparams.realoadrefs = [this.contentparams.reloadrefs]; 
+          }
+          this.contentparams.reloadrefs.concat(reloadrefs);
+        }
+      }
       console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
     },
     methods: {
@@ -49,8 +73,15 @@ export default {
        * @param {type} event
        * @returns {undefined}
        */
+      contentIsComponent() {
+        if ((typeof this.contentparams === 'object') && this.contentparams.cname) {
+          return true;
+        }
+      },
       submit: function(event) {
+        console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs.content.submit &&(typeof this.$refs.content.submit === 'function')) {
+          console.log("But the actual submit will be done by the subcomponent");
           this.$refs.content.submit(event);
           $(":input.jq-wipe").val('');
           this.$parent.showModal=false;
@@ -82,9 +113,16 @@ export default {
             then(response=>{
               console.log("Success: Response:",response);
       
-              this.$emit('submitmsg',"Refresh");
-              this.$parent.$emit('submitmsg',"Refresh");
-              this.$parent.$parent.$emit('submitmsg',"Refresh");
+              //this.$emit('submitmsg',"Refresh");
+              //this.$parent.$emit('submitmsg',"Refresh");
+              //this.$parent.$parent.$emit('submitmsg',"Refresh");
+              if (this.reloadrefs) {
+                this.reloadrefs.forEach(function(el) {
+                  if (el.initData) {
+                    el.initData();
+                  }
+                });
+              }
             }).
             catch(error=>{
               console.error("Error:",error.response);
@@ -93,7 +131,6 @@ export default {
           this.$parent.showModal=false;
           this.reset();
         }
-          
       },
       reset: function() {
         var vm = this;
