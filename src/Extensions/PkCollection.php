@@ -44,6 +44,10 @@ class PkCollection extends Collection {
    }
 
    #### Only works for non-emtpy collections, of the same model...
+   /** Returns a short string to allow recreation of the collection from 
+    * the model name & list off IDs
+    * @return string
+    */
    public function totag() {
      if (!count($this)) return false;
      $model = get_class($this[0]);
@@ -104,12 +108,14 @@ class PkCollection extends Collection {
     return $out;
   }
 
+  /*
   public function pkpluck ($value, $key = null) {
     $plucked = $this->pluck($value, $key);
     pkdebug("Plucked:", $plucked);
     return $plucked;
     //return $this->pluck($value, $key);
   }
+   * */
 
 
 

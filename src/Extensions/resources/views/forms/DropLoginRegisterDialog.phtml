@@ -1,6 +1,7 @@
 <?php /*
 Include this just inside the main container (w. BS)
 */
+$route = $route ?? '/auth/login';
 ?>
 <style>
   div.login-register-dialog {
@@ -96,11 +97,16 @@ $(function () {
     $('div.login-register-dialog').hide();
     $('div.login-register-dialog').css('opacity',1);
     
-    $(".log-reg-pop").on("click hover mouseover", function () {
+    $(".log-reg-pop").on("click hover mouseover", function (event) {
+      var $el = $(event.target);
+
+      var $lrd = $el.find('div.login-register-dialog');
       console.log("Devent to show login reg dialog");
       setundermenu('div.login-register-dialog');
-      $('div.demo-dialog').hide();
-      $('div.login-register-dialog').show();
+      //setundermenu($lrd);
+      $el.find('div.demo-dialog').hide();
+      //$('div.login-register-dialog').show();
+      $lrd.show();
       console.log("Tried to show reg dlg?");
     });
 
@@ -108,8 +114,9 @@ $(function () {
       setundermenu('div.login-register-dialog');
     });
 
-    $('.lrdlg-cancel-btn').click(function() {
-      $('div.login-register-dialog').hide();
+    $('.lrdlg-cancel-btn').click(function(e) {
+      var $e = $(e.target);
+      $e.closest('div.login-register-dialog').hide();
     });
 });
 </script>
@@ -128,6 +135,7 @@ $(function () {
     justify-content: center;
   }
 </style>
+  <li class="nav-item nav-text log-reg-pop">
 <div class="login-register-dialog h-center flex-grow">
   <div class="inner-dlg">
 <div class="container-fluid flex-grow">
@@ -140,7 +148,7 @@ $(function () {
       <div class="lr-wrap login">
         <div class="shib2">Login</div>
         <div class="v-space-flex full-height p-h-1 p-b-1">
-        <form class='dlg-login form' method='POST' action='<?= url('/auth/login') ?>' >
+        <form class='dlg-login form' method='POST' action='<?= url($route) ?>' >
 <?= csrf_field() ?>
           <div data-tootik="Email">
           <input class='form-control m-b-2' data-tootik="Email" type='text' name='email' placeholder='Email' />
@@ -158,7 +166,7 @@ $(function () {
               </div>
               <div class="v-c-flex">
                 -->
-                <input class='form-control auto-width inline checkbox-inline m-l-1' type="checkbox" name="remember" id='remember-inline'>
+                <input class='remember-inline form-control auto-width inline checkbox-inline m-l-1' type="checkbox" name="remember">
                 </div>
               </div>
               <div class="v-c-flex">
@@ -254,7 +262,7 @@ $(function () {
 
 <!-- The menu item, so it doesn't need to be also icnluded -->
 
-  <li class="nav-item nav-text log-reg-pop">Login/Sign Up</li>
+    Login/Sign Up</li>
 `
   <!--
   -->
