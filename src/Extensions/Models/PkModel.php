@@ -972,14 +972,14 @@ class $createclassname extends Migration {
    */
   //public function authDelete(Model $user = null) {
   public function authDelete() {
-    if (isCli()) return true;
+    if ( static::allowall()) return true;
     //return $this->authUpdate($user);
     return $this->authUpdate();
   }
 
   //public function authRead(Model $user = null) {
   public function authRead() {
-    if (isCli()) return true;
+    if (static::allowall()) return true;
     //return $this->authUpdate($user);
     return $this->authUpdate();
   }
@@ -987,7 +987,7 @@ class $createclassname extends Migration {
   /** The extended model should over-ride this */
   //public function authUpdate(Model $user = null) {
   public function authUpdate() {
-    if (isCli()) return true;
+    if (static::allowall()) return true;
     return true;
   }
 
@@ -1052,7 +1052,7 @@ class $createclassname extends Migration {
    */
   //public static function authCreate(PkModel $parent = null, Model $user = null) {
   public static function authCreate(PkModel $parent = null) {
-    if (isCli()) return true;
+    if (static::allowall()) return true;
     if ($parent && ($parent instanceOf PkModel)) {
       //return $parent->authUpdate($user);
       return $parent->authUpdate();
@@ -1371,6 +1371,15 @@ class $createclassname extends Migration {
 
 
 
+  /** SOMETIMES - we might want to eliminate restrictions - ideally toggle
+   * back when finished.
+   * @var type 
+   */
+  public static $allowall = false;
+  public static function allowall($allow=false) {
+    static::$allowall = $allow;
+    return static::$allowall || isCli();
+  }
 
 
 
@@ -1391,7 +1400,7 @@ class $createclassname extends Migration {
    * set on object, execute method & assign it.
    * @var assocarr 
    */
-  public  $attstocalcs = [ ];
+  public  $attstocalcs = [];
   /**
    * If no key, returns the mapped array of keys to funcs/methods
    * If $key, returns the matched callable (or $key if null)
@@ -2106,8 +2115,8 @@ class $createclassname extends Migration {
     foreach (static::$escape_fields as $field) {
       if ($this->$field) $this->$field = hpure($this->$field);
     }
-    if (!$this->authUpdate())
-        throw new Exception("Not authorized to update this record");
+    if (!$this->authUpdate()  && !static::$allowall)
+        throw new Exception("Not authorized to update this record: ".$this->totag());
     $result = parent::save($opts);
     if ($result) $this->postSave($opts);
     return $result;

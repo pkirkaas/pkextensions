@@ -13,6 +13,7 @@ $route = $route ?? '/auth/login';
     position: absolute;
     */
     position: fixed;
+    top: 5em;
     margin: auto;
     /*
     width: 100%;
@@ -97,10 +98,14 @@ $(function () {
     $('div.login-register-dialog').hide();
     $('div.login-register-dialog').css('opacity',1);
     
-    $(".log-reg-pop").on("click hover mouseover", function (event) {
+    //$(".log-reg-pop").on("click mouseover hover", function (event) {
+    $(".log-reg-pop").on("click  hover", function (event) {
+
       var $el = $(event.target);
 
       var $lrd = $el.find('div.login-register-dialog');
+      $('div.login-register-dialog').not($lrd.get(0)).hide();
+      $lrd.show();
       console.log("Devent to show login reg dialog");
       setundermenu('div.login-register-dialog');
       //setundermenu($lrd);
@@ -143,10 +148,15 @@ $(function () {
   <div class="flex">
   -->
   <div class="row lrdlg-row">
-    <div class="col-md-6 lrdlg-col">
+
+
+
+
+
+    <div class=" lrdlg-col">
 
       <div class="lr-wrap login">
-        <div class="shib2">Login</div>
+        <div class="shib2"><?=$loginlabel ?? "Login"?></div>
         <div class="v-space-flex full-height p-h-1 p-b-1">
         <form class='dlg-login form' method='POST' action='<?= url($route) ?>' >
 <?= csrf_field() ?>
@@ -186,12 +196,21 @@ $(function () {
           </div>
       </div>
     </div>
+
+
+
+
+
+
+
+
+
+          <?php if (isset($registerform)) { ?>
     <div class="col-md-6 lrdlg-col">
       <div class="lr-wrap register">
         <div class="shib2">Register/Sign Up</div>
         <div class="v-space-flex full-height p-h-1 p-b-1">
         <div class="lrdlg-link-wrap">
-          <?php if (isset($registerform)) { ?>
 <div class="shir3 tac">Register as a <?=$registerform?></div>
 <div class="tac section">
 <form method="POST" action="/auth/register">
@@ -219,12 +238,12 @@ $(function () {
     </div>
 </form>
 </div>
-          
-          <?php }  else { ?>
-
-        <a class="lrdlg-link" href="<?= route('auth_registerform'); ?>">Register</a>
-          <?php } ?>
+      </div>
+      </div>
     </div>
+          
+    </div>
+          <?php } ?>
 
           <?php
            if( Route::has('login_facebook') ) {
@@ -246,9 +265,6 @@ $(function () {
 
 
 
-      </div>
-      </div>
-    </div>
   </div>
   <div class="row lrdlg-row">
   <div class="col tac">
@@ -262,7 +278,7 @@ $(function () {
 
 <!-- The menu item, so it doesn't need to be also icnluded -->
 
-    Login/Sign Up</li>
+<?= $menutext ??  "Login/Sign Up"?></li>
 `
   <!--
   -->
