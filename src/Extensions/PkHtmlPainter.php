@@ -164,7 +164,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     //pkdebug("args:",$args,"attributes", $attributes);
     $hr = new PkHtmlRenderer();
 
-    console("Attributes:",$attributes);
+    ///console("Attributes:",$attributes);
     $this->create_button = $this->injectTpl($hr->$tag($content, $attributes), $ps_tpl, $ps_key);
     //console("Making create btn here",$this->create_button->__toString(),"atts:",$attributes);
     return $this->create_button;

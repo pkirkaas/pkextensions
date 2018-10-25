@@ -633,7 +633,10 @@ window.formatMixin = {
       num = Number(amt);
       if (isNaN(num)) {
         console.log("Invalid number: ",amt);
-        return '';
+        return ' ';
+      }
+      if (!num || (num == 0)) {
+        return ' ';
       }
       var sign = '';
       var cssclass = ' dollar-value '
@@ -655,6 +658,10 @@ window.formatMixin = {
         return  '&#9745;';
       }
       return  '&#9744;';
+    },
+    formatEmpty: function(val) { //If undefined, empty string
+      if (!val) return ' ';
+      return val;
     },
     formatFixed: function(val,prec) {
       prec = prec || 2;
