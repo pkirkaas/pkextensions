@@ -57,6 +57,9 @@ class PkUser extends PkModel
 
     ];
 
+  public static $attstofuncs=[
+      'full_name',
+      ];
   public static $allowUpdate = 0; #To allow user registration/update 
 
   /*
@@ -71,6 +74,12 @@ class PkUser extends PkModel
     if ($this->name) return $this->name;
     return $this->email;
   }
+
+  public function full_name() {
+    return $this->getName();
+  }
+
+  /** Same with full_name */
 
   /** They keep messing with the process, so don't do anything by default.
    * Just make it available & try to keep up & use when necessary.

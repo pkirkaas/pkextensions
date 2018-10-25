@@ -97,6 +97,9 @@ $(function () {
   
     $('div.login-register-dialog').hide();
     $('div.login-register-dialog').css('opacity',1);
+    $('div.login-register-dialog').on("click hover", function(event) {
+      event.stopPropagation();
+    });
     
     //$(".log-reg-pop").on("click mouseover hover", function (event) {
     $(".log-reg-pop").on("click  hover", function (event) {

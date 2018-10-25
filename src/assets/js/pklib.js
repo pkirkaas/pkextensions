@@ -44,6 +44,7 @@ $(function () {
  *  AND for Laravel Validation errors 
  */
 $(function () {
+  $("[class^='jq-format-']").htmlFormatted();
   /*
   $(document).ajaxError(function (event, jqxhr, settings, error) {
     var j = jqxhr;

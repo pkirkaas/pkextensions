@@ -51,7 +51,7 @@ class PkCollection extends Collection {
    public function totag() {
      if (!count($this)) return false;
      $model = get_class($this[0]);
-     $idarr = $this->pluck('id');
+     $idarr = $this->pluck('id')->toArray();
      $idlist = implode(',',$idarr);
      return $model.'#'.$idlist;
    }
@@ -63,11 +63,12 @@ class PkCollection extends Collection {
     */
    public function toajax() {
      if (!count($this)) return [];
-     $idarr = $this->pluck('id');
+     $idarr = $this->pluck('id')->toArray();
+     console("IDARR",$idarr);
      return [
         'model'=>get_class($this[0]),
-        'idarr' => $idarr,
-        'id' => implode(',',$idarr),
+        'id' => $idarr,
+       // 'id' => implode(',',$idarr),
         ];
    }
 

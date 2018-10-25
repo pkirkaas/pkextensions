@@ -276,6 +276,7 @@ abstract class PkAjaxController extends PkController {
       $obj = $ownermodel::find($ownerid)->$attribute;
       $keys[]='totag';
     }
+    pkdebug("TypeOF obj:",typeof($obj));
     if ($obj) {
       if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
         $obj = new PkCollection($obj);

@@ -355,6 +355,10 @@ public static function create(array $attributes = []) {
    * If true, return all default key/values PLUS those specified in $keys
    * (for example, relationships). If array, merge with $keys, if string,
    * convert to array
+   * 
+   * (This way you can add extra keys to the defaults without having to 
+   * specify all the defaults in the $keys arguments. 
+   *
    */
 
   public function fetchAttributes($keys = [],$extra=[]) {
@@ -377,28 +381,29 @@ public static function create(array $attributes = []) {
     if (ne_array($extra)) {
       $keys=array_merge($keys,$extra);
     }
-    if (in_array('model',$keys,1)) {
+    //if (in_array('model',$keys,1)) {
       $ret['model'] = static::class;
-    }
+    //}
     //pkdebug("The Keys:",$keys,"ret:",$ret,"The Class", static::class);
     foreach ($keys as $idx => $key) {
       if (is_int($idx)) {
         //TODO!! Have to see if this works for relations & JSONable
-        /*
         $value = $this->$key;
+        if (($value instanceOf PkModel) || ($value instanceOf PkCollection)) {
+          $value = $value->fetchattributes();
+        }
+        /*
         if (is_arrayish($value)) {
           $value = json_encode($value,static::$jsonopts);
         }
         $ret[$key]=$value;
          * 
          */
-        $ret[$key]=$this->$key;
+        $ret[$key]=$value;
       } else if (is_string($idx) && static::getRelationNames($idx)) {
-        $rel = [];
-        foreach ($this->$idx as $arel) {
-          $rel[] = $arel->fetchAttributes($key);
-        }
-        $ret[$idx] = $rel;
+        //$rel = [];
+        //foreach ($this->$idx as $arel) {
+        $ret[$idx] = $this->$idx->fetchAttributes($key);
       }
     }
     if (in_array('totag',array_keys($ret),1)) {
