@@ -6,9 +6,6 @@
     {{$namedslotcontent}}
      * 
      */ ?>
-    <!-- No menu wrapper
-    <div class="menus-wrapper">
-    -->
     <nav class="navbar pk-fixed-menu navbar-expand-md navbar-inverse bg-inverse pk-top-menu main-menu no-print">
       <!-- Toggle Button -->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav-content">
@@ -35,7 +32,4 @@
       //pkdebug("In menu-component blade - submenu",$sub_menu);
     }
       ?>
-      <!--
-    </div> close menu wrapper
-      -->
     <?php /** if (!empty($no_user) && !Auth::user()) view("forms.DropLoginRegisterDialog") */ ?>

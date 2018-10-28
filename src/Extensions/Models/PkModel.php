@@ -363,7 +363,7 @@ public static function create(array $attributes = []) {
 
   public function fetchAttributes($keys = [],$extra=[]) {
     if (!$keys) {
-       $keys = $this->attributeNames;
+       $keys = array_merge($this->attributeNames,$this->getExtraAttributeNames);
     } else if (is_string($keys)) {
       $keys = [$keys];
     }
@@ -1124,6 +1124,18 @@ class $createclassname extends Migration {
     return $attNames;
   }
 
+  /** For 'fetchAttributes' - extra atts - usually from 'attstofuncs'
+   * @var array - extra attribute names to return w. fetchattributes 
+   */
+  public static $extraAttributeNames = [];
+
+  /** For 'fetchAttributes' - extra atts - usually from 'attstofuncs'
+   * @return array - extra attribute names to return w. fetchattributes 
+   */
+  public static function getExtraAttributeNames() {
+    return static::getArraysMerged("extraAttributeNames");
+  }
+
   /** For generating backup SQL files for the model */
   public static function sqlToBuildRelationTables($self = true) {
     $relClasses = static::getRelationClasses();
@@ -1425,6 +1437,7 @@ class $createclassname extends Migration {
   /** The instance array of calculated atts to values/functions/runnables */
   public static  $attstofuncs =[
       'attributeNames' => 'getAttributeNames', 
+      'getExtraAttributeNames',
   ];
 
 
