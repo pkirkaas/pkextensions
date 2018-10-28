@@ -182,8 +182,8 @@ abstract class PkAjaxController extends PkController {
    * array of keyname=>value, as "fields"
    */
   public function submit() {
-    pkdebug("Enter Submit with:",$this->data);
-    console("Enter Submit with:",$this->data);
+    //pkdebug("Enter Submit with:",$this->data);
+    //console("Enter Submit with:",$this->data);
     $fields = $this->data['fields'] ?? null; //Should be an array
     if (!$fields || !is_array($fields)) {
       throw new PkException(["No fields submitted to submit. Data:",$this->data]);
@@ -222,7 +222,7 @@ abstract class PkAjaxController extends PkController {
       $obj = new PkCollection($obj);
     }
     $ret = $obj->fetchAttributes();
-    pkdebug("Leaving Submit with ttsL ",$obj->fetchAttributes());
+    //pkdebug("Leaving Submit with ttsL ",$obj->fetchAttributes());
     //$ret = $this->success($obj->fetchAttributes($keys));
     return $this->success($obj->fetchAttributes());
   }
@@ -241,7 +241,7 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
-    PkDebug("Enter Fetchattrures with data:", $this->data);
+    //PkDebug("Enter Fetchattrures with data:", $this->data);
     $obj=null;
     $extra = restoreJson(keyVal('extra',$this->data));
     $keys = restoreJson(keyVal('keys',$this->data));
@@ -276,13 +276,13 @@ abstract class PkAjaxController extends PkController {
       $obj = $ownermodel::find($ownerid)->$attribute;
       $keys[]='totag';
     }
-    pkdebug("TypeOF obj:",typeof($obj));
+    //pkdebug("TypeOF obj:",typeof($obj));
     if ($obj) {
       if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
         $obj = new PkCollection($obj);
       }
       $atts = $obj->fetchAttributes($keys,$extra);
-      pkdebug ("Rerting got atts of: ",$atts);
+      //pkdebug ("Rerting got atts of: ",$atts);
       return $this->success($atts);
     }
     return $this->success([]);

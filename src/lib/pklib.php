@@ -231,18 +231,21 @@ function pkdebug() {
  */
 function pkdbgtm() { 
   static $previous = 0;
+  static $first = 0;
   if (!$previous) {
-    $previous = microtime(true); #float 
+    $first = $previous = microtime(true); #float 
   }
   $current = microtime(true);
   $diff = $current - $previous;
+  $odiff = $current - $first;
   $msdiff = intval($diff * 1000);
+  $omsdiff = intval($odiff * 1000);
   $previous = $current;
   $currsec = intval($current);
   $currms = intval(($current - $currsec) * 1000);
   $currsecstr = date("i:s",$currsec);
   $currtmstr=$currsecstr.".".$currms;
-  $msgstr = "Called At: $currtmstr - $msdiff ms since last";
+  $msgstr = "Called At: $currtmstr - $msdiff ms since last; - $omsdiff ms since first";
 
   $args = func_get_args();
   array_unshift($args,$msgstr);

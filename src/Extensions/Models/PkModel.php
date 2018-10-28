@@ -1417,6 +1417,8 @@ class $createclassname extends Migration {
    * methods or callables to populate them.
    * Used in __get - if name is key of array but not
    * set on object, execute method & assign it.
+   * ONLY USED INTERNALLY - NOT SET IN DERIRIVED MODELS - set 
+   * public static $attstofuncs=['attfuncname'];
    * @var assocarr 
    */
   public  $attstocalcs = [];
