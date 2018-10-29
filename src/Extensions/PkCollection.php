@@ -251,7 +251,11 @@ class PkCollection extends Collection {
     
   #The model class of the collection - but if empty, null
   public function type() {
-    return $this->getQueueableClass();
+    try {
+      return $this->getQueueableClass();
+    } catch (\Exception $ex) {
+      return "mixed";
+    }
   }
 
   public function getCustomAttributes($arg=[]) {
