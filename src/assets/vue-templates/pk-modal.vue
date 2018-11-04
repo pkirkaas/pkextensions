@@ -19,6 +19,7 @@
         <component ref="content" :is="contentparams.cname" :params="contentparams" ></component>
       </template>
       <template v-else-if="contentIsHtml()" v-html="contentparams.html">
+        <div v-html="contentparams.html"></div>
       </template>
       
       <slot></slot>
@@ -89,18 +90,23 @@ export default {
        * @returns {undefined}
        */
       contentIsComponent() {
+        console.log("contentIsComponent: ContentParams:",this.contentparams);
         if ((typeof this.contentparams === 'object') && this.contentparams.cname) {
+          console.log("Returning true from contentIsComponent");
           return true;
         }
       },
       contentIsHtml() {
+        console.log("contentIsHtml: ContentParams:",this.contentparams);
         if ((typeof this.contentparams === 'object') && this.contentparams.html) {
+          console.log("Returning true from contentIsHtml");
           return true;
         }
       },
       submit: function(event) {
         console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
-        if (this.$refs.content.submit &&(typeof this.$refs.content.submit === 'function')) {
+        if (this.$refs && this.$refs.content && this.$refs.content.submit
+                &&(typeof this.$refs.content.submit === 'function')) {
           console.log("But the actual submit will be done by the subcomponent");
           this.$refs.content.submit(event);
           $(":input.jq-wipe").val('');
@@ -110,8 +116,13 @@ export default {
           //console.error("We should be processing from 'content' as a test!");
           console.log("Submitting from modal");
           var fd = new FormData();
+          if (this.$refs && this.$refs.content) {
+            var contenturl = this.$refs.content.url || this.$refs.content.submiturl;
+          } else {
+            var contenturl = false;
+          }
           var submiturl = this.modalparams.url || this.modalparams.submiturl 
-               || this.$refs.content.url || this.$refs.content.submiturl ;
+               || contenturl || '/ajax';
           $('#input-container').find(":input").each(function(idx, el) {
               var $el = $(el);
             console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());

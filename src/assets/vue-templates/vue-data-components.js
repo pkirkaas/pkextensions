@@ -42,12 +42,68 @@ window.Vue.component('pk-input-container',{
  * { cname/cdata/html -> added to contentparams
  *   label: Button Label - added to 'btnparams'
  *   title: Modal Title - added to 'modalparams'
- *   url/submiturl: added to 'modalparams' if present
+ *   url/submiturl: added to 'modalparams' if present - else, default to '/ajax'
  *   
  * 
  * 
-      click="callOwner(event,'button') "
-      @click="showModal = true;"
+Example all-in-one post-button.phtml:
+
+<div id="vue-post-btn">
+  <pk-modal-wrapper :params="postparams"></pk-modal-wrapper>
+</div>
+<script>
+Vue.component('post_form',{
+  name:'post_form',
+  template: `
+<div>
+  <input type='hidden' name='action' value='submitpost' />
+  <div class="form-header" >What do you want to say?</div>
+  <div class="post-title border" >
+    <div class="pk-lbl">Title:</div>
+    <input class="pk-inp" type="text" name="title" />
+  </div>
+  <div class="post-body">
+    <textarea class="pk-inp" name="body"></textarea>
+  </div>
+</div>
+  `,
+
+});
+
+var post_btn = new Vue({
+  el: "#vue-post-btn",
+  data: {
+    postparams: {
+      label:"New Post",
+      title:"Submit new post",
+      cname:"post_form",
+    },
+  },
+});
+
+//// Alternatively, instead of cname, just the raw HTML
+
+  data: {
+    postparams: {
+      label:"New Post",
+      title:"Submit new post",
+      //submiturl: "/ajax",
+      //cname:"post_form",
+      html: `
+<div>
+  <input type='hidden' name='action' value='submitpost' />
+  <div class="form-header" >What do you want to say?</div>
+  <div class="post-title border" >
+    <div class="pk-lbl">Title:</div>
+    <input class="pk-inp" type="text" name="title" />
+  </div>
+  <div class="post-body">
+    <textarea class="pk-inp" name="body"></textarea>
+  </div>
+</div>
+  `,
+    },
+  },
 */
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
