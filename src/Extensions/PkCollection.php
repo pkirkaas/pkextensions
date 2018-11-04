@@ -96,28 +96,6 @@ class PkCollection extends Collection {
 
     /**
      * Get an operator checker callback.
-     *
-     * @param  string  $key
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return \Closure
-     */
-  /*
-    protected function operatorForWhere($key, $operator = null, $value = null) {
-      $origOperatorForWhere = parent::operatorForWhere("calcatt",$operator,$value);
-      return function($item) use ($key, $operator, $value, $origOperatorForWhere) {
-        $retrieved = static::pkDataGet($item,$key);
-        $fs = [$retrieved=>"calcatt"];
-
-        pkdebug("Retrieved:",$retrieved,'item',typeOf($item),'key',$key, 'atts',$item->fetchAttributes(['copay','balance_due_client','deductible', 'fee_client']));
-
-        return $origOperatorForWhere($fs);
-      };
-    }
-
-*/
-    /**
-     * Get an operator checker callback.
      * Identical to the default Laravel Collection operatorForWhere, except uses
      * static::pkDataGet() instead of the helper "data_get", so if the item 
      * is an instance of PkModel, still tries to return "$item->$key", instead 

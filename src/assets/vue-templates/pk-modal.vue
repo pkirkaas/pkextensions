@@ -48,8 +48,20 @@ export default {
         reloadrefs: [],
       };
     },
-    //modalparams: url, data (added to formdata), formatting, title
-    //contentparams - probably an inner comonent, conentparams={cname,cdata}
+/**
+ * PARAMETERS:
+  modalparams: url, data (added to formdata), formatting, title
+  reloadrefs: an instance or array of component references that should
+   be called with "ref.initData()" - to reload the contents of the
+   ref components after the update from this submission
+  contentparams - probably an inner component, contentparams={cname,cdata}
+    but could be just the HTML for a form/input
+    submit URL / Action: Multiple possiblitities. If the "contentparams"
+    has a component with a "submit" method, just call that when the submit
+    button is pressed. If "contentparams" OR "modalparams" has either
+    "url" or "submiturl", get all input components from within the modal
+    and submit them to the URL
+*/
     props: ['contentparams', 'modalparams'],
     mounted: function() {
       if (this.modalparams.reloadrefs) {
@@ -87,11 +99,11 @@ export default {
           this.$parent.showModal=false;
           this.reset();
         } else {
-          console.error("We should be processing on our onwe as a test!");
-                  
+          console.error("We should be processing from 'content' as a test!");
           console.log("Submitting from modal");
           var fd = new FormData();
-          var url = this.modalparams.url;
+          var submiturl = this.modalparams.url || this.modalparams.submiturl 
+               || this.$refs.content.url || this.$refs.content.submiturl ;
           $('#input-container').find(":input").each(function(idx, el) {
               var $el = $(el);
             console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
@@ -106,10 +118,10 @@ export default {
           for(var pair of fd.entries()) {
             console.log(pair[0]+ ', '+ pair[1]); 
           }
-          console.log('url',url);
+          console.log('submiturl',submiturl);
           /** // Debugging
           */
-          axios.post(url,fd).
+          axios.post(submiturl,fd).
             then(response=>{
               console.log("Success: Response:",response);
       
@@ -125,7 +137,7 @@ export default {
               }
             }).
             catch(error=>{
-              console.error("Error:",error.response);
+              console.error("Error:",error,error.response);
             });
           $(":input.jq-wipe").val('');
           this.$parent.showModal=false;

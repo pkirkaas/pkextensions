@@ -21,13 +21,27 @@ window.Vue.component('pk-input-container',{
 */
 
 
-// Wraps both the button & modal - 
-//  the modal is a single file component pk-modal.vue
-//  takes 1 prop: "params", containing 3  objects - 
-//  "btnparams" (for the button itself - title, appearance)
-// "modalparams" (For the modal box - size, title, url etc)
-// 'contentparams' - what's inside the modal. Content,
-//  but if a component, cname
+/** pk-modal-wrapper - creates a button that opens a modal when clicked.
+ * Wraps both the button & modal - 
+ *  the modal is a single file component pk-modal.vue
+ * Full Params: 
+ *  takes 1 prop: "params", containing 3  objects - 
+ *  "btnparams" (for the button itself - title, appearance)
+ * "modalparams" (For the modal box - size, title, submit url etc)
+ * 'contentparams' - what's inside the modal. 
+ *    The Content of the modal - generally containing inputs & submit URL,
+ *    but could be HTML or a component, cname, w. cdata. If a component,
+ *    if has a method "submit", that is called when the modal submit button
+ *    is clicked, else look for url/submiturl.
+ * Simplified Params (w. defaults) - builds full param set (content, modal, btn)
+ * { contentparams: Minimal, still as above
+ *   label: Button Label - added to 'btnparams'
+ *   title: Modal Title - added to 'modalparams'
+ *   url/submiturl: added to 'modalparams' if present
+ *   
+ * 
+ * 
+*/
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
@@ -60,10 +74,25 @@ window.Vue.component('pk-modal-wrapper',{
     };
   },
   mounted: function() {
-    this.contentparams = this.params.contentparams;
-    this.modalparams=this.params.modalparams;
-    this.btnparams =  this.params.btnparams;
-  }
+    var contentparams =  this.params.contentparams;
+    var modalparams = this.params.modalparams;
+    var btnparams =   this.params.btnparams;
+
+    this.contentparams = contentparams;
+    if (!modalparams) {
+      modalparams = {
+        submiturl: this.params.submiturl || this.params.url,
+        title: this.params.title || "Update",
+      };
+    }
+    if (!btnparams) {
+      btnparams = {
+        label: this.params.label || "Submit",
+      };
+    }
+    this.modalparams=modalparams;
+    this.btnparams =  btnparams;
+  },
 });
 
 
