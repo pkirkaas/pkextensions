@@ -42,7 +42,9 @@ window.Vue.component('pk-input-container',{
  * { cname/cdata/html -> added to contentparams
  *   label: Button Label - added to 'btnparams'
  *   title: Modal Title - added to 'modalparams'
+ *   
  *   url/submiturl: added to 'modalparams' if present - else, default to '/ajax'
+ *   Then need to add 'action' param & use in AjaxController/index
  *   
  * 
  * 
@@ -81,7 +83,7 @@ var post_btn = new Vue({
   },
 });
 
-//// Alternatively, instead of cname, just the raw HTML
+//// Alternatively, instead of cname, just the raw HTML - no 'post_form' comp.
 
   data: {
     postparams: {
@@ -157,6 +159,7 @@ window.Vue.component('pk-modal-wrapper',{
       modalparams = {
         submiturl: this.params.submiturl || this.params.url,
         title: this.params.title || "Update",
+        reloadrefs: this.params.reloadrefs,
       };
     }
     if (!btnparams) {
