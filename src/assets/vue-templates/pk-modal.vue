@@ -68,19 +68,8 @@ export default {
 */
     props: ['contentparams', 'modalparams'],
     mounted: function() {
-      if (this.modalparams.reloadrefs) {
-        var reloadrefs = this.modalparams.reloadrefs;
-        if (!Array.isArray(reloadrefs)) {
-          realoadrefs = [reloadrefs]; 
-        }
-        this.reloadrefs = reloadrefs;
-        if (this.contentparams.reloadrefs) {
-          if (!Array.isArray(this.contentparams.reloadrefs)) {
-            this.contentparams.realoadrefs = [this.contentparams.reloadrefs]; 
-          }
-          this.contentparams.reloadrefs.concat(reloadrefs);
-        }
-      }
+      this.setReloadRefs();
+
       console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
     },
     methods: {
@@ -89,17 +78,31 @@ export default {
        * @param {type} event
        * @returns {undefined}
        */
+      setReloadRefs: function(reloadrefs) {
+        var lrlr = [];
+        
+        if (reloadrefs) {
+            lrlr = lrlr.concat(reloadrefs);
+        } 
+        if (this.modalparams.reloadrefs) {
+          lrlr = lrlr.concat(this.modalparams.reloadrefs);
+        }
+        if (this.contentparams.reloadrefs) {
+          lrlr = lrlr.concat(this.contentparams.reloadrefs);
+        }
+        if (this.reloadrefs) {
+          lrlr = lrlr.concat(this.reloadrefs);
+        }
+        this.reloadrefs = uniqArr(lrlr);
+        console.log("ReloadRefs:", this.reloadrefs);
+      },
       contentIsComponent() {
-        console.log("contentIsComponent: ContentParams:",this.contentparams);
         if ((typeof this.contentparams === 'object') && this.contentparams.cname) {
-          console.log("Returning true from contentIsComponent");
           return true;
         }
       },
       contentIsHtml() {
-        console.log("contentIsHtml: ContentParams:",this.contentparams);
         if ((typeof this.contentparams === 'object') && this.contentparams.html) {
-          console.log("Returning true from contentIsHtml");
           return true;
         }
       },
@@ -113,6 +116,8 @@ export default {
           this.$parent.showModal=false;
           this.reset();
         } else {
+          this.setReloadRefs();
+          
           //console.error("We should be processing from 'content' as a test!");
           console.log("Submitting from modal");
           var fd = new FormData();
@@ -142,14 +147,15 @@ export default {
           */
           axios.post(submiturl,fd).
             then(response=>{
-              console.log("Success: Response:",response);
+              this.setReloadRefs();
+              console.log("Success: Response:",response, "RelRefs:",this.reloadrefs);
       
               //this.$emit('submitmsg',"Refresh");
               //this.$parent.$emit('submitmsg',"Refresh");
               //this.$parent.$parent.$emit('submitmsg',"Refresh");
               if (this.reloadrefs) {
                 this.reloadrefs.forEach(function(el) {
-                  if (el.initData) {
+                  if (el && el.initData) {
                     el.initData();
                   }
                 });

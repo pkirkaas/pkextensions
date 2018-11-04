@@ -117,7 +117,7 @@ window.Vue.component('pk-modal-wrapper',{
     </pk-modal-btn>
 
 
-    <pk-modal ref="mymodal" v-if="showModal" @close="showModal=false"
+    <pk-modal ref="pk_modal" v-if="showModal" @close="showModal=false"
       :modalparams="modalparams" :contentparams="contentparams" :showModal="showModal" >
     </pk-modal>
   </div>
@@ -132,6 +132,18 @@ window.Vue.component('pk-modal-wrapper',{
     callOwner: function() {
       console.log ("Wrapper got called when clicked on "+who);
     },
+    setReloadRefs: function (reloadrefs) {
+      console.log("In Modal_Wrapper setRR:",reloadrefs);
+      if (reloadrefs) {
+        if (this.$refs && this.$refs.pk_modal
+              && this.$refs.pk_modal.setReloadRefs) {
+          this.$refs.pk_modal.setReloadRefs(reloadrefs);
+        }
+        this.modalparams.reloadrefs=reloadrefs;
+        this.reloadrefs=this.reloadrefs.concat(reloadrefs);
+      }
+      return this.reloadrefs;
+    }
   },
   data: function() {
     return {
@@ -139,6 +151,7 @@ window.Vue.component('pk-modal-wrapper',{
       contentparams: {},
       modalparams: {},
       btnparams: {},
+      reloadrefs: [],
     };
   },
   mounted: function() {
@@ -146,6 +159,9 @@ window.Vue.component('pk-modal-wrapper',{
     var contentparams =  this.params.contentparams;
     var modalparams = this.params.modalparams;
     var btnparams =   this.params.btnparams;
+    if (this.params.reloadrefs) {
+      this.reloadrefs = this.reloadrefs.concat(this.params.reloadrefs);
+    }
 
     if (!contentparams) {
       contentparams = {
@@ -727,6 +743,14 @@ window.formatMixin = {
       if ((typeof dt === 'object') && (dt !== null)) {
         dt = dt.date;
       }
+      if (fmt === "DtTm") {
+        fmt = "MMM D YYYY  h:mm A";
+      } else if (fmt === "Dt") {
+        fmt = "MMM D YYYY";
+      } else if (fmt === "Tm") {
+        fmt = "h:mm A";
+      }
+      //"MMM D YYYY  h:mm A" - Nov 2 2018 3:05 PM
       fmt = fmt || "MMMM D, YYYY";
       var m = window.moment(dt);
       if (!m.isValid()) {

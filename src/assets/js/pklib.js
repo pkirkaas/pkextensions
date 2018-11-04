@@ -89,9 +89,9 @@ var scrollTop     = $(window).scrollTop(),
     $(el).css('left',0);
     $(el).css('right',0);
     $(el).css('margin',0);
-    console.log("For el",el,"height is:",$(el).outerHeight());
+    //console.log("For el",el,"height is:",$(el).outerHeight());
     bottom += $(el).outerHeight();
-    console.log("Bottom:",bottom);
+    //console.log("Bottom:",bottom);
   });
   //console.log("Tried positioning menus, bottom is:",bottom, "distance:", distance, 
   //"Bottom - distance", bottom - distance);
@@ -194,8 +194,6 @@ function mkNestedHtml(item, depth) {
   }
   return  ret;
 }
-
-
 
 $(function () {
 
