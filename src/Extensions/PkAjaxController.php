@@ -13,7 +13,24 @@ use Carbon\Carbon;
 use \Auth;
 
 /**
- * PkAjaxController - Base Ajax Controller - Doesn't do much...
+ * PkAjaxController - Base Ajax Controller - Performs MANY generic AJAX methods,
+ * tuned by params. success, error, submit, delete, fetchattributes, query,
+ * toggle - 
+ * ALSO - uses custom ExceptionHandler which intercepts exceptions from /ajax/
+ * routes & returns them as error responses, so don't need to handle exceptions
+ * in any AJAX controller.
+ * 
+ * TO USE EXCEPTION HANDLER:  Modify default app/Exceptions/Hander.php:
+use PkExtensions\Traits\AjaxExceptionTrait;
+class Handler extends ExceptionHandler {
+  use AjaxExceptionTrait;
+  ...
+  public function render($request, Exception $exception) {
+    return $this->traitRender($request, $exception);
+  }
+  ..
+
+ * 
  * @author pkirk
  */
 abstract class PkAjaxController extends PkController {
@@ -31,9 +48,6 @@ abstract class PkAjaxController extends PkController {
       }
     }
   }
-  /*
-   * *
-   */
 
   /** An AJAX controller just has to call $this->jsonsuccess($resp);
    * jsonsucess will return an assoc array, typically:
@@ -113,6 +127,7 @@ abstract class PkAjaxController extends PkController {
     return $response;
   }
 
+  ///////////  Only return $this->sucess or $this->error - 
   public function success($data="",$status=200,$headers=[],$options=true) {
     return $this->jsonresponse($data,$status,$headers,$options);
   }
@@ -235,6 +250,7 @@ abstract class PkAjaxController extends PkController {
    * @param orderby array of fields=>asc or desc
    * @param array keys: array of key atts to return, could include relationships. If empty, the default.
    * @param array extra - extra atts, like relationships, so don't have to specify all keys to add a few.
+   *   --- that is, if @keys is empty, return all default keys, PLUS those here 
    * 
    * If we have model/id(s) it's easy. Let's extend to finding objects "owned" by others - 
    * Only need 'ownermodel', 'ownerid', & 'attribute'(relationship)
@@ -288,7 +304,9 @@ abstract class PkAjaxController extends PkController {
     return $this->success([]);
   }
 
-/** For Vue or JS or jQuery calls to request model attribute values to 
+/** 
+ * DEPRECATED - Use "fetchattributes" ideally
+ * For Vue or JS or jQuery calls to request model attribute values to 
    * populate templates.
    * Params: 
    * model: the PkModel Name
@@ -370,16 +388,6 @@ abstract class PkAjaxController extends PkController {
     return $this->success("Deleted");
   }
 
-  /** Saves a PK Model & Relations
-   * 
-   */
-  /*
-  public function save() {
-    $data = request()->all();
-    pkdebug("IN Ajax Save, data:", $data);
-  }
-   * 
-   */
 
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
    * 
@@ -464,7 +472,6 @@ abstract class PkAjaxController extends PkController {
     return response()->json($resp, $status, $headers, $options);
   }
   /**
-   */
   public function xjsonsuccess($msg = []) {
     http_response_code(200); 
     if (!is_array($msg)) {
@@ -481,6 +488,7 @@ abstract class PkAjaxController extends PkController {
     }
     die(json_encode($msg,$this->jsonopts));
   }
+   */
 
   public function jsonerror($resp = [], $status=500,
       $headers=['HTTP/1.1 499 PkCustom AJAX Request Error Message'],
@@ -498,9 +506,11 @@ abstract class PkAjaxController extends PkController {
     
 
   /** Some simple AJAX helpers */
+  /*
   public function ajax_header($args = null) {
     header('content-type: application/json');
   }
+   */
 
   /** An AJAX controller just has to call $this->ajaxsuccess($msg);
    * If it's a complicated msg, send an array; else a string. This
@@ -527,32 +537,7 @@ abstract class PkAjaxController extends PkController {
     }
       die(json_encode($msg));
   }
-
-
-  /** If msg is just a string, makes an array ['error'=>$msg], BUT ALSO 
-   * sets the response code to 499 - my custom error code, handled by jQuery
-   * @param string|array $msg
-   */
-  /*
-  public function error($msg = null) {
-    //http_response_code(499);
-    //http_response_code(401);
-    if (is_string($msg)) {
-      $custom_msg="PkAjax Error: ".$msg;
-    } else {
-      $custom_msg = "PkAjax Error";
-    }
-    header("HTTP/1.1 499 $custom_msg");
-    if (!is_array($msg)) {
-      $msg=['error'=>$msg];
-    }
-    die(json_encode($msg));
-  }
-   * *
-   */
-
 /////////////////  END  LEGACY //////////////////
-
 }
 
 

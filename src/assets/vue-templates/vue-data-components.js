@@ -33,22 +33,29 @@ window.Vue.component('pk-input-container',{
  *    but could be HTML or a component, cname, w. cdata. If a component,
  *    if has a method "submit", that is called when the modal submit button
  *    is clicked, else look for url/submiturl.
+ *    contentparams: {
+ *      cname: component name,
+ *      cdata: component data,
+ *      html: simple HTML inputs
+*      }
  * Simplified Params (w. defaults) - builds full param set (content, modal, btn)
- * { contentparams: Minimal, still as above
+ * { cname/cdata/html -> added to contentparams
  *   label: Button Label - added to 'btnparams'
  *   title: Modal Title - added to 'modalparams'
  *   url/submiturl: added to 'modalparams' if present
  *   
  * 
  * 
+      click="callOwner(event,'button') "
+      @click="showModal = true;"
 */
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
   <div class='inline fs-1'>
     <pk-modal-btn :btnparams="btnparams"
-      @click="callOwner(event,'button') "
-       class="btn primary-btn" :class="btnparams.btnCls" v-html="label">
+       @click="openModal(event)"
+       class="btn primary-btn" :class="btnparams.btnCls">
     </pk-modal-btn>
 
 
@@ -60,6 +67,10 @@ window.Vue.component('pk-modal-wrapper',{
   //props:["contentparams","modalparams","btnparams"],
   props:['params'],
   methods : {
+    openModal: function(event) {
+      console.log("In wrapper, clicked on openModal w. event:",event);
+      this.showModal = true;
+    },
     callOwner: function() {
       console.log ("Wrapper got called when clicked on "+who);
     },
@@ -69,15 +80,22 @@ window.Vue.component('pk-modal-wrapper',{
       showModal: false,
       contentparams: {},
       modalparams: {},
-      btnparams: {label:"Really here?"},
-      label:"Doesn't Count",
+      btnparams: {},
     };
   },
   mounted: function() {
+    console.log("Modal-Wrapper mounted w. params:", this.params);
     var contentparams =  this.params.contentparams;
     var modalparams = this.params.modalparams;
     var btnparams =   this.params.btnparams;
 
+    if (!contentparams) {
+      contentparams = {
+        cname: this.params.cname, //Component name
+        cdata: this.params.cdata, //Component data
+        html: this.params.html, // OR - Just HTML
+      };
+    }
     this.contentparams = contentparams;
     if (!modalparams) {
       modalparams = {
@@ -92,6 +110,8 @@ window.Vue.component('pk-modal-wrapper',{
     }
     this.modalparams=modalparams;
     this.btnparams =  btnparams;
+    console.log("After mounted. this.contentparams:", this.contentparams, "this.modalparams:",
+      this.modalparams,"this.btnparams:", this.btnparams);
   },
 });
 
@@ -112,9 +132,9 @@ window.Vue.component('pk-modal-btn',{
     console.log("PkModalBtn, btnparams",this.btnparams);
    },
    methods: {
-    onClick: function() {
+    onClick: function(event) {
+      console.log("modal-btn got clicked, event:",event);
       this.$parent.showModal = true;
-      console.log("btn got clicked");
     },
     callOwner: function() {
       console.log ("BUTTON got called when clicked on "+who);

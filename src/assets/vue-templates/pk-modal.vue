@@ -16,8 +16,11 @@
 
 
       <template v-if="contentIsComponent()">
-      <component ref="content" :is="contentparams.cname" :params="contentparams" ></component>
+        <component ref="content" :is="contentparams.cname" :params="contentparams" ></component>
       </template>
+      <template v-else-if="contentIsHtml()" v-html="contentparams.html">
+      </template>
+      
       <slot></slot>
 
 
@@ -90,6 +93,11 @@ export default {
           return true;
         }
       },
+      contentIsHtml() {
+        if ((typeof this.contentparams === 'object') && this.contentparams.html) {
+          return true;
+        }
+      },
       submit: function(event) {
         console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs.content.submit &&(typeof this.$refs.content.submit === 'function')) {
@@ -99,7 +107,7 @@ export default {
           this.$parent.showModal=false;
           this.reset();
         } else {
-          console.error("We should be processing from 'content' as a test!");
+          //console.error("We should be processing from 'content' as a test!");
           console.log("Submitting from modal");
           var fd = new FormData();
           var submiturl = this.modalparams.url || this.modalparams.submiturl 
@@ -118,7 +126,7 @@ export default {
           for(var pair of fd.entries()) {
             console.log(pair[0]+ ', '+ pair[1]); 
           }
-          console.log('submiturl',submiturl);
+          console.log('submiturl in pk-modal submit:',submiturl);
           /** // Debugging
           */
           axios.post(submiturl,fd).
