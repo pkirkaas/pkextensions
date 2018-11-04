@@ -21,18 +21,20 @@ window.Vue.component('pk-input-container',{
 */
 
 
-//Wraps both the button & modal - the modal is a single file component pk-modal.vue
+// Wraps both the button & modal - 
+//  the modal is a single file component pk-modal.vue
 //  takes 1 prop: "params", containing 3  objects - 
 //  "btnparams" (for the button itself - title, appearance)
-//, "modalparams" (For the modal box - size, title, url etc)
-// 'contentparams' - what's inside the modal. Content, but if a component, cname
+// "modalparams" (For the modal box - size, title, url etc)
+// 'contentparams' - what's inside the modal. Content,
+//  but if a component, cname
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
   <div class='inline fs-1'>
     <pk-modal-btn :btnparams="btnparams"
       @click="callOwner(event,'button') "
-       class="btn primary-btn" :class="btnparams.btnCls">
+       class="btn primary-btn" :class="btnparams.btnCls" v-html="label">
     </pk-modal-btn>
 
 
@@ -53,17 +55,14 @@ window.Vue.component('pk-modal-wrapper',{
       showModal: false,
       contentparams: {},
       modalparams: {},
-      btnparams: {},
-      //paramsx: {},
-      //dynamiccomp: {}
+      btnparams: {label:"Really here?"},
+      label:"Doesn't Count",
     };
   },
   mounted: function() {
     this.contentparams = this.params.contentparams;
     this.modalparams=this.params.modalparams;
     this.btnparams =  this.params.btnparams;
-    //console.log("PkMdlWrp: contentparams:", this.contentparams,'btn',this.btnparams,'mdl',
-    //this.modalparams);
   }
 });
 

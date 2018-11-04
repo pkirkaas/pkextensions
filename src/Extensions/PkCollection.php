@@ -30,7 +30,8 @@ class PkCollection extends Collection {
      return $retarr;
    }
 
-   /** Helper data_get only works on objects with set properties - not dynamic
+   /** The Laravel Helper function data_get only works on objects
+    * with set properties - not dynamic
     * properties from __get, like models. So hijack for collection of PkModels
     * @param type $target
     * @param type $key
@@ -45,35 +46,41 @@ class PkCollection extends Collection {
       if ($segment === '*') {
         if ($target instanceof Collection) {
           $target = $target->all();
-        } elseif (! is_array($target)) {
+         } elseif (! is_array($target)) {
+          return value($default);
+          }
+          $result = [];
+          foreach ($target as $item) {
+            $result[] = static::pkDataGet($item, $key);
+          }
+          return in_array('*',$key) ? Arr::collapse($result) : $result;
+        }
+        if (($target instanceOf \PkExtensions\Models\PkModel)) {
+          pkdebug("Target instance intane of PkModel? Key: ", $key, "SEGMENT:", $segment);
+          $target = $target->$segment;
+          pkdebug("After deref: Target is:", typeOf($target), $target);
+        } else if (Arr::accessible($target) && Arr::exists($target, $segment)) {
+          $target = $target[$segment];
+        } elseif (is_object($target) && isset($target->{$segment})) {
+          $target = $target->{$segment};
+        } else {
           return value($default);
         }
-        $result = [];
-        foreach ($target as $item) {
-          $result[] = static::pkDataGet($item, $key);
-        }
-        return in_array('*',$key) ? Arr::collapse($result) : $result;
+        $lseg = $segment;
       }
-
-      
-      if ($target instanceOf PkModel) {
-        $target = $target->$segment;
-      } else if (Arr::accessible($target) && Arr::exists($target, $segment)) {
-          $target = $target[$segment];
-      } elseif (is_object($target) && isset($target->{$segment})) {
-        $target = $target->{$segment};
-      } else {
-        return value($default);
-      }
-    }
+    pkdebug("Returning [$target] , of segment [$lseg]");
     return $target;
   }
+   /*
+    * 
+    */
  
 /**
   * Get a value retrieving callback.
   * @param  string  $value
   * @return callable - again, override for Models to use their custom properties
   */
+  /*
     protected function valueRetriever($value) {
         if ($this->useAsCallable($value)) {
             return $value;
@@ -82,6 +89,8 @@ class PkCollection extends Collection {
             return static::pkDataGet($item, $value);
         };
     } 
+   * 
+   */
 
 
 
@@ -93,15 +102,69 @@ class PkCollection extends Collection {
      * @param  mixed  $value
      * @return \Closure
      */
+  /*
     protected function operatorForWhere($key, $operator = null, $value = null) {
-      $origOperatorForWhere = parent::operatorForWhere($key,$operator,$value);
+      $origOperatorForWhere = parent::operatorForWhere("calcatt",$operator,$value);
       return function($item) use ($key, $operator, $value, $origOperatorForWhere) {
         $retrieved = static::pkDataGet($item,$key);
-        return $origOperatorForWhere;
+        $fs = [$retrieved=>"calcatt"];
+
+        pkdebug("Retrieved:",$retrieved,'item',typeOf($item),'key',$key, 'atts',$item->fetchAttributes(['copay','balance_due_client','deductible', 'fee_client']));
+
+        return $origOperatorForWhere($fs);
       };
     }
 
+*/
+    /**
+     * Get an operator checker callback.
+     * Identical to the default Laravel Collection operatorForWhere, except uses
+     * static::pkDataGet() instead of the helper "data_get", so if the item 
+     * is an instance of PkModel, still tries to return "$item->$key", instead 
+     * of using default data_get, which only de-references object properties if
+     * they are set (that is, does not allow for "__get")
+     * @param  string  $key
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Closure
+     */
+    protected function operatorForWhere($key, $operator = null, $value = null) {
+        if (func_num_args() === 1) {
+            $value = true;
+            $operator = '=';
+        }
+        if (func_num_args() === 2) {
+            $value = $operator;
+            $operator = '=';
+        }
+        return function ($item) use ($key, $operator, $value) {
+            $retrieved = static::pkDataGet($item, $key);
+            $strings = array_filter([$retrieved, $value], function ($value) {
+                return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
+            });
 
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+                return in_array($operator, ['!=', '<>', '!==']);
+            }
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':  return $retrieved == $value;
+                case '!=':
+                case '<>':  return $retrieved != $value;
+                case '<':   return $retrieved < $value;
+                case '>':   return $retrieved > $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '===': return $retrieved === $value;
+                case '!==': return $retrieved !== $value;
+            }
+        };
+    }
+  /*
+   * 
+   */
 
 
 
@@ -132,6 +195,9 @@ class PkCollection extends Collection {
          return  $this->sortby($key);
        }
      }
+   /*
+    * 
+    */
 
    #### Only works for non-emtpy collections, of the same model...
    /** Returns a short string to allow recreation of the collection from 
@@ -154,7 +220,7 @@ class PkCollection extends Collection {
    public function toajax() {
      if (!count($this)) return [];
      $idarr = $this->pluck('id')->toArray();
-     console("IDARR",$idarr);
+     ///console("IDARR",$idarr);
      return [
         'model'=>get_class($this[0]),
         'id' => $idarr,
@@ -229,7 +295,7 @@ class PkCollection extends Collection {
    * Like, users have clients, client have appointments, appointments have payments
    * Silly that Users->client->appointments->payments can't all combine
    * @param type $key - the colletion name - like "appointments" for appointment
-   * @return typeWe have several models in the model type collection with same models
+   * @return type We have several models in the model type collection with same models
    */
   public function __get($key) {
     $type = $this->type();
