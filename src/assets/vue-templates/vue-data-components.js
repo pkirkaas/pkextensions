@@ -51,7 +51,7 @@ window.Vue.component('pk-input-container',{
 Example all-in-one post-button.phtml:
 
 <div id="vue-post-btn">
-  <pk-modal-wrapper :params="postparams"></pk-modal-wrapper>
+  <pk-modal-wrapper ref="modal_wrapper" :params="postparams"></pk-modal-wrapper>
 </div>
 <script>
 Vue.component('post_form',{
@@ -71,7 +71,8 @@ Vue.component('post_form',{
   `,
 
 });
-
+// Note this is an independant Vue instance - should be OUTSIDE of other
+// Vue instances
 var post_btn = new Vue({
   el: "#vue-post-btn",
   data: {
@@ -107,6 +108,54 @@ var post_btn = new Vue({
     },
   },
 */
+
+/** If ALSO want to provide component refs to refresh after update with this
+ * post/submission, additionally have to add:
+//To post_button or other form that changes data:
+Note the Vue instance name for the pop-up form is "post_btn"
+data: {
+  postparams: {
+    reloadrefs: [],
+    label: ..
+  }
+},
+methods: { // (But this is also in the mixin reloadRefsMixin)
+  setReloadRefs: function (reloadrefs) {
+    if (reloadrefs) {
+      if (this.$refs && this.$refs.modal_wrapper
+            && this.$refs.modal_wrapper.setReloadRefs) {
+        this.$refs.modal_wrapper.setReloadRefs(reloadrefs);
+      }
+      this.postparams.reloadrefs = this.postparams.reloadrefs.concat(reloadrefs);
+    }
+  }
+}
+
+// Then, your main Vue instance on the page has to call the Vue instance setReloadRefs
+// method with the components that want to be refreshed when data changes. 
+
+  mounted: function() {
+    this.registerRefresh();
+  },
+  methods: {
+    registerRefresh: function() {
+      post_btn.setReloadRefs(this.$refs.posts_component);
+    },
+  },
+
+//
+Finally, your posts-component has to implement method initData(), & use it for 
+initial load (in mounted), & refresh being called by post_btn:
+  mounted: function() {
+    this.initData();
+  },
+  methods: {
+    initData: function() {
+      axios.post(url,data)....
+
+... And when including posts-component, specify the reference:
+  <posts-component ref="posts_component" :profile_id="profile_id"></posts-component>
+ */
 window.Vue.component('pk-modal-wrapper',{
   name: 'pk-modal-wrapper',
   template:`
@@ -962,6 +1011,25 @@ window.utilityMixin = {
   }
 };
 
+/** For a stand-alone Vue instance that pops up a Modal submission form, &
+ * then wants to update other data on the page based on the changes
+ * See top of file for docs, and
+ * LQP/apps/resources/... activeprofile.blade.php, PostComponents.vue,
+ *  & post_button.phtml for examples
+ */
+window.refreshRefsMixin = {
+  methods: { // (But this is also in the mixin reloadRefsMixin)
+    setReloadRefs: function (reloadrefs) {
+      if (reloadrefs) {
+        if (this.$refs && this.$refs.modal_wrapper
+              && this.$refs.modal_wrapper.setReloadRefs) {
+          this.$refs.modal_wrapper.setReloadRefs(reloadrefs);
+        }
+        this.postparams.reloadrefs = this.postparams.reloadrefs.concat(reloadrefs);
+      }
+    }
+  }
+};
 
 /****
  * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
