@@ -28,7 +28,7 @@ class Handler extends ExceptionHandler {
   public function render($request, Exception $exception) {
     return $this->traitRender($request, $exception);
   }
-  ..
+  ...
 
  * 
  * @author pkirk
@@ -233,6 +233,9 @@ abstract class PkAjaxController extends PkController {
     $keys = array_keys($fields);
     //return $this->success($obj->fetchAttributes($keys));
     //$ret = $obj->fetchAttributes($keys);
+    if ($obj instanceOf Builder) {
+      $obj = $obj->get();
+    }
     if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
       $obj = new PkCollection($obj);
     }
@@ -244,7 +247,7 @@ abstract class PkAjaxController extends PkController {
 
   /** Fetch attributes as specified by the model, instance id (or IDS), and 
    * model keys
-   * @param Model -string- the model to search
+   * @param model -string- the model to search
    * @param id - single id for single instance, list for collection, empty for all - UNLESS
    * @param searchkeys: if set, array of searchkeys=>values for "where"
    * @param orderby array of fields=>asc or desc
@@ -279,13 +282,13 @@ abstract class PkAjaxController extends PkController {
       } else {
         $obj = $model::all();
       }
+      if ($obj instanceOf Builder) {
+        $obj = $obj->get();
+      }
       if ((! $obj instanceOf PkModel) && $orderby) {
-        if ($obj instanceOf Builder) {
-          $obj = $obj->get();
-        }
         $obj = $obj->multiOrderby($orderby);
       }
-    } else { #Not a model
+    } else { #Don't know this model - search by owner & relationship
       $ownermodel=keyVal('ownermodel', $this->data);
       $ownerid = keyVal('ownerid',$this->data);
       $attribute=keyVal('attribute',$this->data);
@@ -294,6 +297,9 @@ abstract class PkAjaxController extends PkController {
     }
     //pkdebug("TypeOF obj:",typeof($obj));
     if ($obj) {
+      if ($obj instanceOf Builder) {
+        $obj = $obj->get();
+      }
       if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
         $obj = new PkCollection($obj);
       }

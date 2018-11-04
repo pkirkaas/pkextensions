@@ -258,6 +258,9 @@ class PkTestGenerator {
    * @param boolean $time - default false -- just an SQL Date, or DateTime?
    * @return type
    */
+  public static function rndSqlDtTmFromRange($from, $to=0, $multiplier = 365) {
+    return static::randSqlDateFromRange($from, $to, $multiplier, true);
+  }
   public static function randSqlDateFromRange($from, $to=0, $multiplier = 365, $time = false) {
     return static::sqlDateFromUnix(static::randUnixDateFromRange($from, $to, $multiplier), $time);
   }
