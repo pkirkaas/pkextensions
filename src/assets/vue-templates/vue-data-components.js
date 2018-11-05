@@ -1011,7 +1011,8 @@ window.utilityMixin = {
   }
 };
 
-/** For a stand-alone Vue instance that pops up a Modal submission form, &
+/** For a top-level stand-alone Vue instance that pops up a pk-modal-wrapper button
+ * for Modal submission form, &
  * then wants to update other data on the page based on the changes
  * See top of file for docs, and
  * LQP/apps/resources/... activeprofile.blade.php, PostComponents.vue,

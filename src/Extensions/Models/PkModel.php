@@ -1512,22 +1512,49 @@ class $createclassname extends Migration {
     return null;
   }
 
-    public function getAttribute($key) {
-      if (!$key) return null;
-      return parent::getAttribute($key);
+  public static function getAllAttributesNames($name = null) {
+    $key = "allPkModelAttributeNames";
+    $allAttNames = static::getCached($key);
+    if (!$allAttNames) {
+      $allAttNames = array_unique(array_merge(
+        static::getFieldNames(),
+        array_keys(static::getAttsToFuncs()),
+        // Do I want relationships?
+        static::getRelationNames(),
+        static::getDisplayValueFields()
+      ));
+     static::setCached($key,$allAttNames);
+    }
+    if (!$name) return $allAttNames;
+    return in_array($name,$allAttNames,1);
+    /*
+    if (in_array($name,$allAttNames,1)) {
+      return $name;
+    }
+    */
+  }
 
-    }
-    public function getAttributeValue($key) {
-      if (!$key) return null;
-      if (static::getJsonFields($key)) {
-        $value = $this->attributes[$key];
-        if (is_arrayish($value)) {
-          $value = json_encode($value, static::$jsonopts);
-        }
-        return $value;
+  /** Want to return true for all valid attributes */
+  public function __isset($key) {
+    return static::getAllAttributeNames($key);
+  }
+
+  public function getAttribute($key) {
+    if (!$key) return null;
+    return parent::getAttribute($key);
+
+  }
+  public function getAttributeValue($key) {
+    if (!$key) return null;
+    if (static::getJsonFields($key)) {
+      $value = $this->attributes[$key];
+      if (is_arrayish($value)) {
+        $value = json_encode($value, static::$jsonopts);
       }
-      return parent::getAttributeValue($key);
+      return $value;
     }
+    return parent::getAttributeValue($key);
+  }
 
     /*
     public function __set($name,$value) {

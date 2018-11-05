@@ -7,6 +7,7 @@
     :params="contentparams"
  -->
 <template>
+ <transition name="modal">
   <div class='modal-backdrop'>
     <div class='input-container'>
   <div class='modal-container input-container' id="input-container" 
@@ -39,6 +40,7 @@
   </div>
   </div>
 
+ </transition>
 </template>
 
 <script>
