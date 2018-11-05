@@ -111,6 +111,29 @@ public static function create(array $attributes = []) {
   return $model;
 }
 
+/** Unlike the Builder method updateOrCreate, this only looks at
+ * $attributes['id'] - if non-zero, update, else create
+ * @param array $attributes
+ * @return type
+ */
+public static function createOrUpdate(array $attributes = []) {
+  $id = to_int(keyVal('id',$attributes));
+  pkdebug("attributes:",$attributes);
+  if ($id) {
+    $model = static::find($id);
+    pkdebug("Tried to find model existing",typeOf($model));
+    if (!$model) {
+      return null;
+    }
+    $model->update($attributes);
+    return $model;
+  }
+  unset($attributes['id']);
+  $model = static::query()->create($attributes);
+  pkdebug("Tried to create new model:", typeOf($model));
+  return $model;
+}
+
 
   
 

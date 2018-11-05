@@ -74,11 +74,11 @@ export default {
     "url" or "submiturl", get all input components from within the modal
     and submit them to the URL
 */
-    props: ['contentparams', 'modalparams'],
+    props: ['contentparams', 'modalparams',  ],
     mounted: function() {
       this.setReloadRefs();
 
-      console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
+      //console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
     },
     methods: {
       /** Will combine data directly provided in modalparams.data,
@@ -102,7 +102,9 @@ export default {
           lrlr = lrlr.concat(this.reloadrefs);
         }
         this.reloadrefs = uniqArr(lrlr);
-        console.log("ReloadRefs:", this.reloadrefs);
+        console.log("PkModal-ReloadRefs:", this.reloadrefs);
+        /*
+    */
       },
       contentIsComponent() {
         if ((typeof this.contentparams === 'object') && this.contentparams.cname) {
@@ -118,7 +120,7 @@ export default {
         console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs && this.$refs.content && this.$refs.content.submit
                 &&(typeof this.$refs.content.submit === 'function')) {
-          console.log("But the actual submit will be done by the subcomponent");
+          //console.log("But the actual submit will be done by the subcomponent");
           this.$refs.content.submit(event);
           $(":input.jq-wipe").val('');
           this.$parent.showModal=false;
@@ -127,7 +129,7 @@ export default {
           this.setReloadRefs();
           
           //console.error("We should be processing from 'content' as a test!");
-          console.log("Submitting from modal");
+          //console.log("Submitting from modal");
           var fd = new FormData();
           if (this.$refs && this.$refs.content) {
             var contenturl = this.$refs.content.url || this.$refs.content.submiturl;
@@ -138,7 +140,7 @@ export default {
                || contenturl || '/ajax';
           $('#input-container').find(":input").each(function(idx, el) {
               var $el = $(el);
-            console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
+            //console.log("Iterating: Name",$el.attr('name'),"Val:",$el.val());
               fd.append($el.attr('name'),$el.val());
             }); 
           //Now add direct data, if any
@@ -148,9 +150,9 @@ export default {
             }
           }
           for(var pair of fd.entries()) {
-            console.log(pair[0]+ ', '+ pair[1]); 
+            //console.log(pair[0]+ ', '+ pair[1]); 
           }
-          console.log('submiturl in pk-modal submit:',submiturl);
+          //console.log('submiturl in pk-modal submit:',submiturl);
           /** // Debugging
           */
           axios.post(submiturl,fd).
@@ -200,7 +202,7 @@ export default {
         this.$emit('close');
         this.$parent.$emit('close');
         */
-        console.log("In Modal, Trying to close");
+        //console.log("In Modal, Trying to close");
         this.reset();
       },
     },

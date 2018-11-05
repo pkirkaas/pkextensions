@@ -167,7 +167,7 @@ window.Vue.component('pk-modal-wrapper',{
 
 
     <pk-modal ref="pk_modal" v-if="showModal" @close="showModal=false"
-      :modalparams="modalparams" :contentparams="contentparams" :showModal="showModal" >
+      :modalparams="modalparams" :contentparams="contentparams" :reloadrefs="reloadrefs" :showModal="showModal" >
     </pk-modal>
   </div>
   `,
@@ -175,14 +175,15 @@ window.Vue.component('pk-modal-wrapper',{
   props:['params'],
   methods : {
     openModal: function(event) {
-      console.log("In wrapper, clicked on openModal w. event:",event);
+      //console.log("In wrapper, clicked on openModal w. event:",event);
       this.showModal = true;
     },
     callOwner: function() {
-      console.log ("Wrapper got called when clicked on "+who);
+      //console.log ("Wrapper got called when clicked on "+who);
     },
     setReloadRefs: function (reloadrefs) {
-      console.log("In Modal_Wrapper setRR:",reloadrefs);
+      console.log("ModalWrapper: Enter setReloadRefs, this.reloadrefs:",this.reloadrefs);
+      //console.log("In Modal_Wrapper setRR:",reloadrefs);
       if (reloadrefs) {
         if (this.$refs && this.$refs.pk_modal
               && this.$refs.pk_modal.setReloadRefs) {
@@ -191,6 +192,7 @@ window.Vue.component('pk-modal-wrapper',{
         this.modalparams.reloadrefs=reloadrefs;
         this.reloadrefs=this.reloadrefs.concat(reloadrefs);
       }
+      console.log("Leaving setReloadRefs, this.reloadrefs:",this.reloadrefs);
       return this.reloadrefs;
     }
   },
@@ -204,15 +206,12 @@ window.Vue.component('pk-modal-wrapper',{
     };
   },
   created: function() {
-    console.log("Modal-Wrapper CREATED w. params:", this.params);
+    //console.log("Modal-Wrapper CREATED w. params:", this.params);
   },
   mounted: function() {
     console.log("Modal-Wrapper mounted w. params:", this.params);
-    for (var key in this.params) {
-      console.log("For key: ",key,"; val:",this.params[key]);
-    }
-    var cdata = this.params.cdata;
-    console.log("Modal-Wrapper cdata:", cdata);
+    //var cdata = this.params.cdata;
+    //console.log("Modal-Wrapper cdata:", cdata);
     var contentparams =  this.params.contentparams;
     var modalparams = this.params.modalparams;
     var btnparams =   this.params.btnparams;
@@ -240,11 +239,11 @@ window.Vue.component('pk-modal-wrapper',{
         this.contentparams.cparams= this.params.cparams; //Component parameters/settings
         this.contentparams.html= this.params.html; // OR - Just HTML
       */
-      console.log("Content params were empty!");
+      //console.log("Content params were empty!");
     }
-    console.log("Modal-wrapper after init of content params:",contentparams);
+    //console.log("Modal-wrapper after init of content params:",contentparams);
     this.contentparams = contentparams;
-    console.log("Modal-wrapper after init of this.contentparams:",this.contentparams, "thiscp.cd",this.contentparams.cdata);
+    //console.log("Modal-wrapper after init of this.contentparams:",this.contentparams, "thiscp.cd",this.contentparams.cdata);
 
     if (!modalparams) {
       modalparams = {
@@ -260,8 +259,8 @@ window.Vue.component('pk-modal-wrapper',{
     }
     this.modalparams=modalparams;
     this.btnparams =  btnparams;
-    console.log("After mounted in pk-modal-wrapper: this.contentparams:", this.contentparams, "this.modalparams:",
-      this.modalparams,"this.btnparams:", this.btnparams);
+    //console.log("After mounted in pk-modal-wrapper: this.contentparams:", this.contentparams, "this.modalparams:",
+     // this.modalparams,"this.btnparams:", this.btnparams);
   },
 });
 
@@ -279,15 +278,15 @@ window.Vue.component('pk-modal-btn',{
   `,
    props: ['btnparams'],
   mounted: function() {
-    console.log("PkModalBtn, btnparams",this.btnparams);
+    //console.log("PkModalBtn, btnparams",this.btnparams);
    },
    methods: {
     onClick: function(event) {
-      console.log("modal-btn got clicked, event:",event);
+      //console.log("modal-btn got clicked, event:",event);
       this.$parent.showModal = true;
     },
     callOwner: function() {
-      console.log ("BUTTON got called when clicked on "+who);
+      //console.log ("BUTTON got called when clicked on "+who);
     },
     /*
     doshowModal: function() {
@@ -538,6 +537,10 @@ Vue.component('delete-btn', {
         cascade: this.params.cascade
       };
       axios.post(url,params).then(response=> {
+        console.log("This parent:",this.$parent);
+        if (this.$parent.initData) {
+          this.$parent.initData();
+        }
         if (delfromdom) {
           $(this.$el).closest(delfromdom).remove();
         }
