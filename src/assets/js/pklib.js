@@ -99,11 +99,24 @@ var scrollTop     = $(window).scrollTop(),
   $("div.pk-main.content-main").css('top', bottom);
 }
 
-$(window).resize(alignFixedMenus);
-
-$(function () {
-  alignFixedMenus();
+/** Fit all objects w. class js-fit-width to the width of their container,
+ * on initialization & on window resize
+ * @returns {undefined}
+ */
+function js_fit_width() {
+  //var $fits = $(".js-fit-width").;
+  $(".js-fit-width").each(function() {
+    var parent = $(this).parent();
   });
+  
+}
+
+$(window).resize(alignFixedMenus);
+$(function () { alignFixedMenus(); });
+
+
+
+
 // Make 'Confirm' Dialog
 $(function () {
   $('body').on('click', '.js-verify', function (event) {

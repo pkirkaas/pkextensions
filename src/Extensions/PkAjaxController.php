@@ -260,7 +260,7 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
-    PkDebug("Enter Fetchattrures with data:", $this->data, "Request Method:", $_SERVER['REQUEST_METHOD']);
+    //PkDebug("Enter Fetchattrures with data:", $this->data, "Request Method:", $_SERVER['REQUEST_METHOD']);
     $obj=null;
     $extra = restoreJson(keyVal('extra',$this->data));
     $keys = restoreJson(keyVal('keys',$this->data));
@@ -295,7 +295,7 @@ abstract class PkAjaxController extends PkController {
       $obj = $ownermodel::find($ownerid)->$attribute;
       $keys[]='totag';
     }
-    pkdebug("TypeOF obj:",typeof($obj));
+    //pkdebug("TypeOF obj:",typeof($obj));
     if ($obj) {
       if ($obj instanceOf Builder) {
         $obj = $obj->get();
@@ -303,9 +303,9 @@ abstract class PkAjaxController extends PkController {
       if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
         $obj = new PkCollection($obj);
       }
-      pkdebug("TypeOF obj AFTER Conv:",typeof($obj));
+      //pkdebug("TypeOF obj AFTER Conv:",typeof($obj));
       $atts = $obj->fetchAttributes($keys,$extra);
-      pkdebug ("Rerting got atts of: ",$atts);
+      //pkdebug ("Rerting got atts of: ",$atts);
       return $this->success($atts);
     }
     return $this->success([]);

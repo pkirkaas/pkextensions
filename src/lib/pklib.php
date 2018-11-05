@@ -1359,6 +1359,11 @@ function filter_url($url) {
   return '/';
 }
 
+function isUrl($url) {
+  return filter_var($url, FILTER_VALIDATE_URL);
+}
+
+
 function cln_arr_val(Array $arr, $key, $filter = FILTER_SANITIZE_STRING) {
   if (!array_key_exists($key, $arr)) {
     return null;
