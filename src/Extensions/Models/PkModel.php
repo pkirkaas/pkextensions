@@ -1535,9 +1535,12 @@ class $createclassname extends Migration {
   }
 
   /** Want to return true for all valid attributes */
+  /*
   public function __isset($key) {
     return static::getAllAttributeNames($key);
   }
+   * 
+   */
 
   public function getAttribute($key) {
     if (!$key) return null;
