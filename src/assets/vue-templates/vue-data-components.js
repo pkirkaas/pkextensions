@@ -203,15 +203,22 @@ window.Vue.component('pk-modal-wrapper',{
       reloadrefs: [],
     };
   },
+  created: function() {
+    console.log("Modal-Wrapper CREATED w. params:", this.params);
+  },
   mounted: function() {
     console.log("Modal-Wrapper mounted w. params:", this.params);
+    for (var key in this.params) {
+      console.log("For key: ",key,"; val:",this.params[key]);
+    }
+    var cdata = this.params.cdata;
+    console.log("Modal-Wrapper cdata:", cdata);
     var contentparams =  this.params.contentparams;
     var modalparams = this.params.modalparams;
     var btnparams =   this.params.btnparams;
     if (this.params.reloadrefs) {
       this.reloadrefs = this.reloadrefs.concat(this.params.reloadrefs);
     }
-
     if (!contentparams) {
       contentparams = {
         cname: this.params.cname, //Component name
@@ -219,8 +226,26 @@ window.Vue.component('pk-modal-wrapper',{
         cparams: this.params.cparams, //Component parameters/settings
         html: this.params.html, // OR - Just HTML
       };
+      /*
+        this.contentparams.cname= this.params.cname; //Component name
+        this.contentparams.cdata= {};
+        this.contentparams.cdata.body = this.params.cdata.body;
+        this.contentparams.cdata.id = this.params.cdata.id;
+        this.contentparams.cdata.iframesrc = this.params.cdata.iframesrc;
+        this.contentparams.cdata.model = this.params.cdata.model;
+        this.contentparams.cdata.postdate = this.params.cdata.postdate;
+        this.contentparams.cdata.profile_id = this.params.cdata.profile_id;
+        this.contentparams.cdata.title = this.params.cdata.title;
+        this.contentparams.cdata.topic = this.params.cdata.topic;
+        this.contentparams.cparams= this.params.cparams; //Component parameters/settings
+        this.contentparams.html= this.params.html; // OR - Just HTML
+      */
+      console.log("Content params were empty!");
     }
+    console.log("Modal-wrapper after init of content params:",contentparams);
     this.contentparams = contentparams;
+    console.log("Modal-wrapper after init of this.contentparams:",this.contentparams, "thiscp.cd",this.contentparams.cdata);
+
     if (!modalparams) {
       modalparams = {
         submiturl: this.params.submiturl || this.params.url,
@@ -235,7 +260,7 @@ window.Vue.component('pk-modal-wrapper',{
     }
     this.modalparams=modalparams;
     this.btnparams =  btnparams;
-    console.log("After mounted. this.contentparams:", this.contentparams, "this.modalparams:",
+    console.log("After mounted in pk-modal-wrapper: this.contentparams:", this.contentparams, "this.modalparams:",
       this.modalparams,"this.btnparams:", this.btnparams);
   },
 });
