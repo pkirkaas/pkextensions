@@ -215,7 +215,8 @@ window.Vue.component('pk-modal-wrapper',{
     if (!contentparams) {
       contentparams = {
         cname: this.params.cname, //Component name
-        cdata: this.params.cdata, //Component data
+        cdata: this.params.cdata, //Component data - for the input ctls name: value
+        cparams: this.params.cparams, //Component parameters/settings
         html: this.params.html, // OR - Just HTML
       };
     }

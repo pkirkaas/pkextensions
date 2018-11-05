@@ -5,6 +5,12 @@
   If "contentparams" is an object with the property "cname", it's a component
   & substituted in the "component :is="contentparams.cname", & content component
     :params="contentparams"
+So the 'content' component MUST accept props as "params" - which will be an object
+of potentially 3 keys:
+props: {params: {cname: content component name
+                 cdata: { Possible data for the content form }
+                 cparams: {possible extra settings, classes, labels, etc
+}
  -->
 <template>
  <transition name="modal">
