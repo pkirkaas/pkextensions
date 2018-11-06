@@ -102,7 +102,7 @@ export default {
           lrlr = lrlr.concat(this.reloadrefs);
         }
         this.reloadrefs = uniqArr(lrlr);
-        console.log("PkModal-ReloadRefs:", this.reloadrefs);
+        //console.log("PkModal-ReloadRefs:", this.reloadrefs);
         /*
     */
       },
@@ -117,7 +117,7 @@ export default {
         }
       },
       submit: function(event) {
-        console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
+        //console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs && this.$refs.content && this.$refs.content.submit
                 &&(typeof this.$refs.content.submit === 'function')) {
           //console.log("But the actual submit will be done by the subcomponent");
@@ -158,7 +158,7 @@ export default {
           axios.post(submiturl,fd).
             then(response=>{
               this.setReloadRefs();
-              console.log("Success: Response:",response, "RelRefs:",this.reloadrefs);
+              //console.log("Success: Response:",response, "RelRefs:",this.reloadrefs);
       
               //this.$emit('submitmsg',"Refresh");
               //this.$parent.$emit('submitmsg',"Refresh");

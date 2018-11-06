@@ -162,7 +162,7 @@ window.Vue.component('pk-modal-wrapper',{
   <div class='inline fs-1'>
     <pk-modal-btn :btnparams="btnparams"
        @click="openModal(event)"
-       class="btn primary-btn" :class="btnparams.btnCls">
+       class="primary-btn" :class="btnparams.btnCls">
     </pk-modal-btn>
 
 
@@ -182,7 +182,7 @@ window.Vue.component('pk-modal-wrapper',{
       //console.log ("Wrapper got called when clicked on "+who);
     },
     setReloadRefs: function (reloadrefs) {
-      console.log("ModalWrapper: Enter setReloadRefs, this.reloadrefs:",this.reloadrefs);
+      //console.log("ModalWrapper: Enter setReloadRefs, this.reloadrefs:",this.reloadrefs);
       //console.log("In Modal_Wrapper setRR:",reloadrefs);
       if (reloadrefs) {
         if (this.$refs && this.$refs.pk_modal
@@ -192,7 +192,7 @@ window.Vue.component('pk-modal-wrapper',{
         this.modalparams.reloadrefs=reloadrefs;
         this.reloadrefs=this.reloadrefs.concat(reloadrefs);
       }
-      console.log("Leaving setReloadRefs, this.reloadrefs:",this.reloadrefs);
+      //console.log("Leaving setReloadRefs, this.reloadrefs:",this.reloadrefs);
       return this.reloadrefs;
     }
   },
@@ -209,7 +209,7 @@ window.Vue.component('pk-modal-wrapper',{
     //console.log("Modal-Wrapper CREATED w. params:", this.params);
   },
   mounted: function() {
-    console.log("Modal-Wrapper mounted w. params:", this.params);
+    //console.log("Modal-Wrapper mounted w. params:", this.params);
     //var cdata = this.params.cdata;
     //console.log("Modal-Wrapper cdata:", cdata);
     var contentparams =  this.params.contentparams;
@@ -273,8 +273,8 @@ window.Vue.component('pk-modal-wrapper',{
   //<div style="z-index: 2000;" @click="doshowModal" class="btn btn-primary btn-pop m-5 p-f fs-8"
 window.Vue.component('pk-modal-btn',{
   template: `
-  <div style="z-index: 2000;" @click="onClick" class="inline btn btn-primary btn-pop m-2 p-f fs-6"
-   :class="btnparams.popBtnCls"> {{btnparams.label}} </div>
+  <div style="z-index: 2000;" @click="onClick" class="pkmvc-button inline btn-pop m-1 p-f fs-2"
+   :class="btnparams.popBtnClsx"> {{btnparams.label}} </div>
   `,
    props: ['btnparams'],
   mounted: function() {
@@ -296,6 +296,55 @@ window.Vue.component('pk-modal-btn',{
     */
   }
 });
+
+
+//###################   Another try at image componets ###############
+window.Vue.component('img-comp',{
+  name: 'img-comp',
+  template: `
+   <img v-if="url" :src="url" style="max-width: 200px; max-height: 200px;" />
+  `,
+  props: ['url',],
+  data: function() {
+    return {};
+  },
+  methods: {
+  },
+  mounted: function() {
+  },
+
+});
+
+//###################  Delete/Clear Icon  ###############
+//Little round red button that can either actually delete from the DB, or
+//just clear the input field, so when the user saves, then that field is deleted.
+
+
+
+window.Vue.component('del-icon',{
+  name: 'del-icon',
+  template: `
+  <img src='/mixed/img/cross-31176.svg' data-tootik='Delete/Clear this?'
+      style='width: 3rem; height: 3rem;' @click="clearField()" >
+`,
+  props: ['toclear'], //selector can be a selector string, or array 
+  methods: {
+    clearField: function() {
+      if (!this.toclear) {
+        console.error("Nothing to delete");
+        return;
+      }
+      console.log("Trying to clear:", this.toclear, "Current:",this.$parent[this.toclear] );
+      this.$parent[this.toclear]=null;
+      console.log("After clear:",this.$parent[this.toclear] );
+    }
+  }
+
+});
+
+
+
+
 
 
 /** Could be a label, or data field - if data-field, just display or input 
@@ -365,7 +414,7 @@ window.Vue.component('data-item',{
         } else if (typeof input === 'object') {// Must be object to have enough info
           input.val = input.val || input.value || value;
           input.options = map;
-          console.log("In the component, map:", map);
+          //console.log("In the component, map:", map);
         } else {
           throw "Input invalid type";
         }
@@ -537,7 +586,7 @@ Vue.component('delete-btn', {
         cascade: this.params.cascade
       };
       axios.post(url,params).then(response=> {
-        console.log("This parent:",this.$parent);
+        //console.log("This parent:",this.$parent);
         if (this.$parent.initData) {
           this.$parent.initData();
         }
@@ -752,7 +801,7 @@ window.Vue.component('resp-tbl', {
       });
       var me = this;
       axios.post(this.savebtn.url, fd).then(response=> {
-        console.log("The response was:", response);
+        //console.log("The response was:", response);
       });
     },
     addrow: function() {
@@ -832,7 +881,7 @@ window.formatMixin = {
       fmt = fmt || "MMMM D, YYYY";
       var m = window.moment(dt);
       if (!m.isValid()) {
-        console.log("Invalid date: ",dt);
+        console.error("Invalid date: ",dt);
         return '';
       }
       return m.format(fmt);
@@ -841,7 +890,7 @@ window.formatMixin = {
     formatCurrency: function(amt) { //Returns a wrapped value for negative
       num = Number(amt);
       if (isNaN(num)) {
-        console.log("Invalid number: ",amt);
+        console.error("Invalid number: ",amt);
         return ' ';
       }
       if (!num || (num == 0)) {
@@ -962,7 +1011,7 @@ window.tableMixin = {
       var data = {id:this.ids, model:this.model,keys:keys};
       axios.post(url,data).
         then(response=>{
-          console.log("The response data:",response.data);
+          //console.log("The response data:",response.data);
           response.data.forEach(row=>{
             var keymap = _.cloneDeep(this.keymap);
             var celldataarr = [];
@@ -978,7 +1027,7 @@ window.tableMixin = {
             rowdataarr.push({celldataarr:celldataarr,rowinfo:this.tbldata.rowinfo});
           });
           this.tbldata.rowdataarr=rowdataarr;
-          console.log("The tbldata:",this.tbldata);
+          //console.log("The tbldata:",this.tbldata);
         }).
         catch(error=>{console.error("Error: ",error,error.response);});
     },
@@ -1034,7 +1083,7 @@ window.utilityMixin = {
       for (var key in defaults) {
         vals[key] = this[key];
       }
-      console.log(lbl+ " Current this values:",vals);
+      //console.log(lbl+ " Current this values:",vals);
       return vals;
     }
   }
@@ -1141,7 +1190,7 @@ window.inputMixin = {
 
   },
   mounted() {
-      console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
+      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
       this.initDataFromParams(this.defaults);
       this.initData();
 
@@ -1158,7 +1207,7 @@ window.inputMixin = {
       }
     },
     toggleCheckState(event,arg) {
-      console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
+      //console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
       if(this.value == this.checkedvalue) {
         this.value = this.uncheckedvalue;
         this.checked = false;
@@ -1166,7 +1215,7 @@ window.inputMixin = {
         this.value = this.checkedvalue;
         this.checked = true;
       }
-      console.log("After toggle state, this.checked:",this.checked,"value",this.value);
+      //console.log("After toggle state, this.checked:",this.checked,"value",this.value);
     },
     initData() {
     
@@ -1178,7 +1227,7 @@ window.inputMixin = {
        ownerid:this.ownerid,
        keys: this.name,
      }).then(response=>{
-       console.log("Succeeded in fetch, resp:", response);
+       //console.log("Succeeded in fetch, resp:", response);
        var value = response.data[this.name];
        if (this.formatin) {
          value = this[this.formatin](value);
@@ -1195,12 +1244,12 @@ window.inputMixin = {
        for (var key in defaults) {
          curr[key] = this.key;
        }
-       console.log("After inits, the current data:",curr);
+       //console.log("After inits, the current data:",curr);
      }).
       catch(error=>{console.error("Failed to fetch:",error.response, error);});
     },
     savesubmit(event,arg) {
-      console.log ("Save submit event",event,"Arg:",arg);
+      //console.log ("Save submit event",event,"Arg:",arg);
       this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
@@ -1215,7 +1264,7 @@ window.inputMixin = {
        attribute: this.attribute,
        fields: {[this.name]:this.value},
      }).then(response=>{
-       console.log("Succeeded in submit resp:", response);
+       //console.log("Succeeded in submit resp:", response);
        var data = response.data;
        this.id = data.id;
        var value = data[this.name];
@@ -1322,7 +1371,7 @@ Vue.component('ajax-checkbox-input',{
   ,
   methods: {
     changesavesubmit(event,action) {
-      console.log("In changesavesubmit");
+      //console.log("In changesavesubmit");
       this.toggleCheckState(event,'changesavesubmit');
       this.savesubmit(event, 'changesavesubmit');
     },
@@ -1360,7 +1409,7 @@ window.ajaxpostingMixin = {
       var emptyobj = {};
       var el = this.$el;
       $(el).closest(".input-container").find(":input").each(function(idx, inp) {
-        console.log("The el of the posting comp is:", el);
+        //console.log("The el of the posting comp is:", el);
         // Base data collection
         $inp =  $(inp);
         var key =$inp.attr('name'); 
@@ -1372,14 +1421,14 @@ window.ajaxpostingMixin = {
           emptyobj[akey] = params[akey];
         }
       }
-      console.log ("The fetch raw key/vals: ", emptyobj);
+      //console.log ("The fetch raw key/vals: ", emptyobj);
       return emptyobj;
     },
     fetchData: function(params) {
       var fd = new FormData();
       var el = this.$el;
       var me = this;
-      console.log ("Mixin el is:",el);
+      //console.log ("Mixin el is:",el);
       //Find the nearest "form container", then all the inputs
       var emptydata = {};
        $(el).closest(".input-container").find(":input").each(function(idx, inp) {
