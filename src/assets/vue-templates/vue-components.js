@@ -354,9 +354,9 @@ window.Vue.component('pk-input',{
 Vue.component('pk-checkbox-arr', {
   inptype: 'checkbox',
   template: `
-  <div :class="wrapcls"> <div :class="lblclass">{{label}}
-  <input type="checkbox" :value="value" :name="name" :class="inputcls"
-       v-model="checked"  @change="value = +!value" />
+  <div :class="inpopt.wrapcls"> <div :class="inpopt.lblclass">{{inpopt.label}}
+  <input type="checkbox" :value="inpopt.value" :name="inpopt.name" :class="inpopt.inputcls"
+       v-model="inpopt.checked"  @change="inpopt.value = +!inpopt.value" />
     </div></div>
 `,
   props: ['inpopt'],
