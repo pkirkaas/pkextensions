@@ -299,20 +299,93 @@ window.Vue.component('pk-modal-btn',{
 
 
 //###################   Another try at image componets ###############
+//params: size: max height/width. round: false/true, fit:object-fit - contain
+// (but could be cover/clipped), position: center, modal - size of modal,
+// if 0, no modal.
+// position: 
 window.Vue.component('img-comp',{
   name: 'img-comp',
   template: `
-   <img v-if="url" :src="url" style="max-width: 200px; max-height: 200px;" />
+   <div class='inline'>
+   <img v-if="src" :src="src" :style="style" @click="showBig()"/>
+
+    <pk-modal ref="pk_modal" v-if="showModal && modal" @close="showModal=false"
+      :modalparams="modalparams"
+      :contentparams="contentparams"
+      :showModal="showModal" >
+    </pk-modal>
+  </div>
   `,
-  props: ['url',],
+  props: ['src','params'],
   data: function() {
-    return {};
+    return {
+      size: 200,
+      round: false,
+      fit: 'contain',
+      position: 'center',
+      modal: 500,
+      showModal: false,
+    };
   },
   methods: {
+    showBig: function() {
+      console.log("Clicked on image");
+      if (!this.modal) {
+        return;
+      }
+      this.showModal = true;
+    }
   },
   mounted: function() {
+    if (typeof this.params !== 'object') {
+      return;
+    }
+    var params = this.params;
+    this.size = params.size || this.size;
+    this.round = params.round;
+    this.fit = params.fit || this.fit;
+    this.position = params.position || this.position;
+    this.modal = params.modal || this.modal;
   },
-
+  computed: {
+    modalparams: function() {
+      var modalsz = this.modal + 5;
+      return {
+        submit: false,
+        cancellbl: "Close",
+        modalBodyStyle: `width: ${modalsz}px; height: ${modalsz}px;`
+      };
+    },
+    contentparams: function() {
+      if (!this.modal) {
+        return {};
+      }
+      var imgstyle = `
+        width: ${this.modal}px;
+        height: ${this.modal}px;
+        object-fit: contain;
+      `;
+      var content = `
+        <img src="${this.src}" style="${imgstyle}" />
+        `;
+      var contentparams = {
+        html: content,
+      };
+      return contentparams;
+    },
+    style: function() {
+      var style = {
+       width: this.size + "px",
+       height: this.size + "px",
+       objectFit: this.fit,
+       objectPosition: this.position,
+      };
+      if (this.round) {
+        style.borderRadius = "50%;";
+      }
+      return style;
+    },
+  },
 });
 
 //###################  Delete/Clear Icon  ###############

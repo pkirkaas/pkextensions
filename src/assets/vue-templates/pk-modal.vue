@@ -19,7 +19,8 @@ props: {params: {cname: content component name
   <div class='modal-container input-container' id="input-container" 
        :class="modalparams.modalContainerCls">
     <div class="modal-title" :class="modalparams.modalTitleCls" v-html="modalparams.title"></div>
-    <div class="modal-body" :class="modalparams.modalBodyCls" >
+    <div class="modal-body" :class="modalparams.modalBodyCls"
+         :style="modalparams.modalBodyStyle">
 
 
       <template v-if="contentIsComponent()">
@@ -40,7 +41,7 @@ props: {params: {cname: content component name
 
       <div class="btn btn-secondary mdl-btn cancel-btn"
            :class="modalparams.cancelBtnCls" 
-           @click="$emit('close')">{{modalparams.cancellbl || "Cancel"}}</div>
+           @click="close()">{{modalparams.cancellbl || "Cancel"}}</div>
     </div>
   </div>
   </div>
@@ -187,9 +188,14 @@ export default {
         });
       },
 
+      close: function(event) {
+        return this.cancel(event);
+      },
       cancel: function(event) {
+        this.reset();
         this.$parent.showModal=false;
         this.$parent.$emit('cancel',"Stop");
+        this.$emit('close')
         /*
         $(":input.jq-wipe").val('');
         this.$emit('cancel',"Stop");
@@ -203,7 +209,6 @@ export default {
         this.$parent.$emit('close');
         */
         //console.log("In Modal, Trying to close");
-        this.reset();
       },
     },
   }

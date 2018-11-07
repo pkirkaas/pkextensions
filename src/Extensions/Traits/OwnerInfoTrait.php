@@ -11,7 +11,7 @@ use PkExtensions\PkCollection;
 
    
 trait OwnerInfoTrait {
-  /**Provides info about the own & optionally its named relationship.
+  /**Provides info about the owner & optionally its named relationship.
    * If $relationship name/attribute, adds array [attribute->name, model-Model]
    * if $idx is not null, returns the ID of 
    */
