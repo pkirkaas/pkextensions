@@ -38,6 +38,13 @@ class PkCollection extends Collection {
     * @param type $default
     */
    ##################  Experiment with PkModel::__isset - maybe don't need this? 11/2018
+
+
+
+
+   /*
+    */
+
   public static function pkDataGet($target, $key,$default = null) {
     if (is_null($key)) {
       return $target;
@@ -74,19 +81,18 @@ class PkCollection extends Collection {
   }
  
 
-/*
-     * Get an operator checker callback.
-     * Identical to the default Laravel Collection operatorForWhere, except uses
-     * static::pkDataGet() instead of the helper "data_get", so if the item 
-     * is an instance of PkModel, still tries to return "$item->$key", instead 
-     * of using default data_get, which only de-references object properties if
-     * they are set (that is, does not allow for "__get")
-     * @param  string  $key
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @return \Closure
-    * *
-    */
+   #  * Get an operator checker callback.
+   #  * Identical to the default Laravel Collection operatorForWhere, except uses
+   #  * static::pkDataGet() instead of the helper "data_get", so if the item 
+   #  * is an instance of PkModel, still tries to return "$item->$key", instead 
+   #  * of using default data_get, which only de-references object properties if
+   #  * they are set (that is, does not allow for "__get")
+   #  * @param  string  $key
+   #  * @param  string  $operator
+   #  * @param  mixed  $value
+   #  * @return \Closure
+   # * *
+    
     protected function operatorForWhere($key, $operator = null, $value = null) {
         if (func_num_args() === 1) {
             $value = true;
@@ -122,6 +128,7 @@ class PkCollection extends Collection {
         };
     }
     
+/**/
 ## Already wasn't using this, or not finished 
 /**
   * Get a value retrieving callback.

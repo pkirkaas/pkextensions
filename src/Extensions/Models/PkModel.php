@@ -1453,7 +1453,7 @@ class $createclassname extends Migration {
    */
   public static function getAttsToFuncs($key = null) {
     $class = static::class;
-    $attstofuncs = static::getCached('attstofuncs',
+  $attstofuncs = static::getCached('attstofuncs_key',
         [static::class,'getArraysMerged'],['attstofuncs','normalize','#key']);
     if (!$key) return $attstofuncs;
     return $attstofuncs[$key] ?? null;
