@@ -245,7 +245,7 @@ export default {
     font-size: larger;
 
     position: fixed;
-    top: 4rem;
+    top: 6rem;
     margin-right: 0;
     margin-left: 0;
     left: 50%;

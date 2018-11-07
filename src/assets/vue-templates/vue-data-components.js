@@ -381,7 +381,8 @@ window.Vue.component('img-comp',{
        objectPosition: this.position,
       };
       if (this.round) {
-        style.borderRadius = "50%;";
+        style.borderRadius = "50%";
+      //  style['border-radius'] = "50%";
       }
       return style;
     },
