@@ -505,11 +505,14 @@ public static function createOrUpdate(array $attributes = []) {
         [static::class,'cgetTableFieldDefs']);
   }
 
+  /*
   public static function getConversion($key) {
     $def = keyVal($key,static::getTableFieldDefs());
     if (!ne_array($def)) return false;
     return keyVal('conversion', $def);
   }
+   * *
+   */
 
   /** Tries to return a description of the attribute for a label
    * If there is a 'desc' property for the attribute, return it.
@@ -1497,6 +1500,9 @@ class $createclassname extends Migration {
        return $this->attstocalcs[$key] = $this->$key();
     }
 
+    /** This section is for JSON fields as array objects so they can be
+     * passed by reference & set like "$this->jsfld['key'] = $aval;"
+     */
     if (static::getJsonFields($key)) {
       $structured = $this->attributes[$key] ?? null;
       if ($structured instanceOf PkJsonArrayObject) {
@@ -1509,21 +1515,13 @@ class $createclassname extends Migration {
       if (is_array($structured)) {
         return ($this->attributes[$key]=new PkJsonArrayObject($structured));
       } 
-      throw new \Exception("Invalud structured: \n".print_r($structured,1));
+      throw new \Exception("Invalid structured: \n".print_r($structured,1));
     }
-      
+    return parent::__get($key);
+     /** 7 Nov 18 - NO idea what I wanted to do with "conversion"? */ 
+    /*
     $res = parent::__get($key);
 
-
-
-
-    /*
-    if (static::getJsonFields($key) && (!$res instanceOf PkJsonArrayObject)) {
-        $res = new PkJsonArrayObject($res);
-        $this->attributes[$key]=$res;
-      }
-    return $res;
-    */
     if (($this->getConversion($key) !== 'array') || is_array($res)) {
       return $res;
     }
@@ -1533,10 +1531,12 @@ class $createclassname extends Migration {
       return json_decode($res,1) ?: [];
     }
     return null;
+     * 
+     */
   }
 
   /** For use with __isset() & fetchAttributes()
-   * @param string|null $name - if null, all at names, else true if it's one the
+   * @param string|null $name - if null, all at names, else true if it's one them
    * @return array of attribute names
    */
   public static function getAllAttributesNames($name = null) {
@@ -1595,7 +1595,6 @@ class $createclassname extends Migration {
         parent::__set($name,$value);
       }
     }
-     * 
      */
 
 
