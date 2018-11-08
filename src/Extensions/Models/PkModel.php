@@ -1535,6 +1535,10 @@ class $createclassname extends Migration {
     return null;
   }
 
+  /** For use with __isset() & fetchAttributes()
+   * @param string|null $name - if null, all at names, else true if it's one the
+   * @return array of attribute names
+   */
   public static function getAllAttributesNames($name = null) {
     $key = "allPkModelAttributeNames";
     $allAttNames = static::getCached($key);
@@ -1543,7 +1547,7 @@ class $createclassname extends Migration {
         static::getFieldNames(),
         array_keys(static::getAttsToFuncs()),
         // Do I want relationships?
-        static::getRelationNames(),
+        //static::getRelationNames(),
         static::getDisplayValueFields()
       ));
      static::setCached($key,$allAttNames);
