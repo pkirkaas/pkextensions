@@ -912,7 +912,7 @@ jQuery.fn.extend({
       if (!ancestorSelector) {
         this.parents().each(function (idx,anc){
           cousins = $(anc).find(cousinSelector);
-          if (csns.length) {
+          if (cousins.length) {
             return false;
           }
 
@@ -920,6 +920,9 @@ jQuery.fn.extend({
 
       } else 
       cousins = this.closest(ancestorSelector).find(cousinSelector);
+      if (!cousins.length) {
+        return false;
+      }
       if (first) {
         cousins = cousins.first();
       }
