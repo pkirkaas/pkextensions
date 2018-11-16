@@ -13,15 +13,8 @@
     "laravelcollective/html": ">5",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
-    "eventviva/php-image-resize": "*"
-  },
-  "require-dev" : {
+    "eventviva/php-image-resize": "*",
     "ccampbell/chromephp": "^4.1"
-  },
-  "autoload-dev": {
-    "files": [
-      "../../vendor/ccampbell/chromephp/ChromePhp.php"
-    ]
   },
   "autoload": {
     "psr-4": {
