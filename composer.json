@@ -15,6 +15,14 @@
     "ezyang/htmlpurifier": "*",
     "eventviva/php-image-resize": "*"
   },
+  "require-dev" : {
+    "ccampbell/chromephp": "^4.1"
+  },
+  "autoload-dev": {
+    "files": [
+      "../../vendor/ccampbell/chromephp/ChromePhp.php"
+    ]
+  },
   "autoload": {
     "psr-4": {
       "PkExtensions\\": "src/Extensions/"

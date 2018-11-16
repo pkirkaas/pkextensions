@@ -20,7 +20,13 @@ define('MYSQL_MAXDATE', '9999-12-31');
 define('MYSQL_MINDATE', '1000-01-01');
 
 function console() {
-  if (!class_exists("ChromePhp",false)) return;
+  //if (!class_exists("ChromePhp",false)) return;
+  if (!class_exists("ChromePhp")) {
+    pkdebug("What! ChromePhp doesn't exist?");
+    return;
+  } else {
+    pkdebug("Writing to ChromePhp Console. Make sure ChromePHP extension is enabled!");
+  }
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
   ChromePhp::log($out);
@@ -58,6 +64,49 @@ Class Undefined {
     return '';
   }
 }
+
+/** Time/Interval logging section - for profiling */
+class TimeLogger {
+  // Stores moments (in micro seconds) with string key
+  public static $instants = [];
+  //Initializes a $keyed moment
+  public static function startInterval($key) {
+    static::$instants[$key] = microtime(true);
+  }
+  //Returns the interval from the $keyed moment til now
+  public static function getInterval($key) {
+    return number_format((microtime(true) - static::$instance[$key])/1000000,2);
+  }
+  public static $start;
+  public static $current;
+  public static function sinceFirstLast() {
+    if (!static::$start) {
+      static::$start = static::$current =  microtime(true);
+    }
+    $previous = static::$current;
+    $now = static::$current = microtime(true);
+    $fsincefirst = number_format(($now - static::$start)/1000000,2);
+    $fsincelast = number_format(($now - $previous)/1000000,2);
+    return "Since start: $fsincefirst; since last: $fsincelast\n";
+  }
+  public static function init() {
+    static::$current = static::$start = microtime(true);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function isCli() {
   return php_sapi_name() == 'cli';

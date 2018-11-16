@@ -49,7 +49,7 @@ class PkHtmlTemplate extends PkHtmlRenderer {
       </div>\n",
 
     'wrapval' =>"
-      <div class='{{wrapClass}} data-tootik='{{tootik}}' {{wrapAtts}}>
+      <div class='{{wrapClass}}' data-tootik='{{tootik}}' {{wrapAtts}}>
         <div class='{{lblWrap}}'>{{label}}</div>
         <div class='{{valWrap}}'>{{value}}</div>
       </div>\n",
