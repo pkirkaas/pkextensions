@@ -265,9 +265,9 @@ Vue.component('pk-input-arr',{
   mixins: [window.utilityMixin],
   type: 'input',
   template: `
-  <div :class="wrapcls" class="m-t-3" :style="wrapstyle" >
-    <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
-<input type="text" v-model="value" :name="name" :class="inpcls" :style="inpstyle"
+<div :class="wrapcls" class="m-t-3" :style="wrapstyle" >
+  <div :class="lblcls" class="pk-lbl" :style="lblstyle">{{label}}</div>
+  <input type="text" v-model="value" :name="name" :class="inpcls" :style="inpstyle"
     class='border pk-inp block  m-3' >
 </div>`,
 

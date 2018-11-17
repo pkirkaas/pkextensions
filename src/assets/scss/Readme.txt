@@ -2,6 +2,9 @@
 Sites styled AFTER now use this "assets/scss" folder 
 Sites styled BEFORE use the legacy "assets/css" folder
 
+//// Dimensions to consider : In portait, keep max width of item 320px
+//// If landscape, 468px
+
 Some useful classes:
 pre-wrap
 
@@ -10,7 +13,6 @@ Font (N=-50 -> 50)
   Size: fs-N, f-sN, large, x-large, xx-large 
   Weight: fwN (N = 1 -> 9)
   Families: oswald, lato, roboto, open-sans, montserrat, raleway, droid-sans, s-sans-pro
-
 
 Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
   h-N, hN, heightN, height-N, minh-N, min-h-N, min-heightN, maxhN, etc
@@ -46,6 +48,25 @@ Positioning:
   Flex Centering: fcenter, vfcenter
   absolute, relative, fixed
 
+Boxes & Borders: 
+Set the basic 'card' width to 320px, as advised. So I can apportion the box, divid $min-width into 6 dimensions:
+.mw66 = $min-width: 320px !default;
+.mw56 = $mw56: 5*$min-width/6;
+.mw46 = $mw46: 4*$min-width/6;
+.mw36 = $mw36: 3*$min-width/6;
+.mw26 = $mw26: 2*$min-width/6;
+.mw16 = $mw16: $min-width/6;
+
+To fit div to content!
+hft - height fit content
+wft - width fit content.
+
+Boxes:
+.basic-box,bb - just  m66 width
+.bb-fc @extend .ms66; height: fit-content;
+.bbborder { @extend .mw66; @extend .border-rad;
+.bbfcborder { @extend .bb-fc; @extend .border-rad;
+.flex-row { flex-wrap: wrap; }
 Tables: 
   No Borders: tableno-borders
   Collapsed: tablepk-tbl
