@@ -187,7 +187,8 @@ abstract class PkAjaxController extends PkController {
     $instance = $model::find($id);
     $instance->model = $model;
     if ($modfield) {
-      $instance->modfield = $modfield;
+      $modfieldval = keyVal($modfield,$this->data);
+      $instance->$modfield = $modfieldval;
     }
     return $this->success($instance);
   }

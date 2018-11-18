@@ -76,6 +76,7 @@ export default {
     and submit them to the URL
 */
     props: ['contentparams', 'modalparams',  ],
+
     mounted: function() {
       this.setReloadRefs();
 
@@ -118,6 +119,7 @@ export default {
         }
       },
       submit: function(event) {
+   
         //console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs && this.$refs.content && this.$refs.content.submit
                 &&(typeof this.$refs.content.submit === 'function')) {

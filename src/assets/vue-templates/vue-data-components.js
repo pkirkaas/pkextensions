@@ -640,13 +640,18 @@ Vue.component('delete-btn', {
     btncls: function (){
       return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";}
   },
+ 
   methods: {
     del: function() {
+    
       var delfromdom=this.params.delfromdom;
       if (delfromdom && !(typeof delfromdom === 'string')) {
         delfromdom = ".js-resp-row";
       }
-      if (!this.params.classname || !this.params.id) {
+      if (!this.params.model && this.params.classname) {
+        this.params.model = this.params.classname;
+      }
+      if (!this.params.model || !this.params.id) {
         if (delfromdom) {
           $(this.$el).closest(delfromdom).remove();
         }
@@ -655,7 +660,7 @@ Vue.component('delete-btn', {
 
       var url = this.params.url || "/ajax/delete";
       var params = {
-        model: this.params.classname,
+        model: this.params.model,
         id: this.params.id,
         cascade: this.params.cascade
       };
@@ -674,6 +679,46 @@ Vue.component('delete-btn', {
     }
   }
 }); 
+
+
+/** Doesn't actually edit, but just takes the id & classname (& the owning object
+ * ID & field name if it's new) & launches the popup 
+ * form, maybe with some labels & formatting params */
+/*
+Vue.component('edit-btn', {
+  name: 'edit-btn',
+  template: `
+   <div :class="btncls"
+      @click.stop="popup()" v-html="editlabel">
+      </div>
+`,
+  props:['params'], //params at minimum must have the component name or raw HTML 
+                    //to launch the form, & id if it's an existing instance
+  data: function() {
+    return {editlabel: "Edit",
+            id: null,
+            model: null,
+            owner_id: null,
+            owner_att_name: null,
+            cname: null, //registered component name or
+            html: null, //raw HTML to go into the popup modal
+            title: null, //optional title for the popup
+            btncls:null, // optional CSS for button
+            tooltip:null, // optional tool tip
+            label:null, // optional label, which could even be an image
+            url: null, //if not default
+          };
+  },
+  computed: {
+    btncls: function (){
+      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";}
+  },
+  inject: ['refresh'],
+  mounted: function() {
+  methods: {
+    del: function() {
+  }
+  */
 
 
 //////////////////  Start Row Based Tables ///////////////
@@ -1468,6 +1513,7 @@ Vue.component('ajax-checkbox-input',{
 
 /** Automates some gathering & submitting of ajax data. 
  * @method fetchData fetches input data from within an enclosing '.input-container',
+ * (which is part of pk-modal anyway)
  * adds any optional params passed in, & returns the form data object.
  * @method submitData takes a url & form data & posts it, then calls the method
  *    this.processResponse(data) in the implementing component. 
@@ -1478,8 +1524,9 @@ Vue.component('ajax-checkbox-input',{
  * @type Vue mixin
  */
 window.ajaxpostingMixin = {
+  // MUST IMPLEMENT loadData(data) in each form that uses this.
   methods: {
-    fetchDataNoFD: function(params) {
+    fetchDataNoFD: function(params) { //Gets data from the form w jQuery, & merges params with it
       var emptyobj = {};
       var el = this.$el;
       $(el).closest(".input-container").find(":input").each(function(idx, inp) {
@@ -1498,7 +1545,8 @@ window.ajaxpostingMixin = {
       //console.log ("The fetch raw key/vals: ", emptyobj);
       return emptyobj;
     },
-    fetchData: function(params) {
+
+    fetchData: function(params) { //As above, but with the FormData object. Testing both
       var fd = new FormData();
       var el = this.$el;
       var me = this;
@@ -1521,11 +1569,11 @@ window.ajaxpostingMixin = {
       return emptydata;
     },
 
-    submitData: function (url,fd) {
+    submitData: function (url,fd) { //AJAX submits the data
       axios.post(url,fd).
         then(response=>{
           var data = response.data;
-          if (this.processResponse && (typeof this.processResponse === 'function')) {
+          if (this.processResponse && (typeof this.processResponse === 'function')) {// A callback using classes can implement for further processing
             this.processResponse(data);
           }
           this.notifyUpdate();
@@ -1570,5 +1618,24 @@ window.ajaxpostingMixin = {
     },
     */
   },
-},
+
+  ajaxInitData: function() { //Need sufficient data - if we have it, the implementing component should just call this from initData()
+     //Maybe getting 1 or many. At least need model & either id (or array of IDs), or foreign_key & foreign_key value
+     //Assume we get those in the params prop
+     var url = this.params.url || "/ajax/fetchattributes";
+     var data = {
+        extra: this.params.extra,
+        keys: this.param.keys,
+        model: this.param.model,
+        ownermodel: this.param.ownermodel,
+        ownerid: this.param.ownerid,
+        attribute: this.param.attribute,
+        keys: this.param.keys,
+      }; 
+      axios.post(url,data).done(results=>{
+        console.log("Success, about to call 'this.loadData() with: ", results.data);
+        this.loadData(results.data);}).catch(defaxerr);
+        
+    }
+ },
 };

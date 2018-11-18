@@ -13,6 +13,17 @@ $tootik-background: #400 !default;
 $tootik-color: #fff !default;
 $tootik-font: "Open Sans", verdana !default;
 
+//This should be your box size for almost everything, so they can wrap on 
+//any device. Divide into 6 units for combos
+$min-width: 320px !default;
+$mw56: 5*$min-width/6;
+$mw46: 4*$min-width/6;
+$mw36: 3*$min-width/6;
+$mw26: 2*$min-width/6;
+$mw16: $min-width/6;
+
+
+$default-border-color: #aaa;
 
 //// Sites need a color theme, not necessarily the same. So here we defined
 //// Some site colors, which can be over-ridden individually in _site_variables

@@ -43,8 +43,8 @@ $inner-border-spread: 1px !default;
 .italic { font-style: italic; }
 .bold { font-weight: bold ! important; }
 
-.float-left, .floatleft, .fleft { float: left ! important; }
-.float-right, .floatright, .fright { float: right ! important; }
+.float-left, .floatleft, .fleft, .left { float: left ! important; }
+.float-right, .floatright, .fright, .right { float: right ! important; }
 
 .block { display: block ! important; }
 .inline { display: inline-block ! important; }
@@ -73,7 +73,12 @@ $inner-border-spread: 1px !default;
 .hw1, .wh1 {height: 1rem !important; width: 1rem !important;}
 .hw2, .wh2 {height: 2rem !important; width: 2rem !important;}
 
-.border-light, .border, .mildborder, .mild-border { border: solid #aaa 1px; }
+.border-light, .border, .mildborder, .mild-border 
+    { border: solid $default-border-color 1px; }
+.border-rad {
+  @extend .border;
+  border-radius: 5px;
+}
 
 .border-red {border-color: #f00 ! important;}
 
@@ -107,8 +112,16 @@ $inner-border-spread: 1px !default;
 
 .width-90pc, .width90pc, .most-width, .mostwidth { width: 90% !important; }
 .width-80pc, .width80pc { width: 80% !important; }
-
 .w-a {width: auto !important; }
+
+/** !!! MY GOD - WHY DIDN'T I KNOW ABOUT THIS BEFORE!!!!  '*/
+.hfc {
+  height: fit-content;
+}
+
+.wfc {
+  width: fit-content;
+}
 
 .spacing-5 { margin: 5px; padding: 5px; border-radius: 5px; }
 
@@ -189,8 +202,25 @@ containing block needs to be positioned relatively*/
   flex-shrink: 1;
 }
 
-.fg { flex-grow: 1; }
-.fs { flex-shrink: 1; }
+.fg,.fg1 { flex-grow: 1; }
+.fs, .fs1 { flex-shrink: 1; }
+
+.nfg,.fg0 { flex-grow: 0; }
+.nfs, .fs0 { flex-shrink: 0; }
+
+.flex-rowwrap {
+  display:flex;
+  flex-wrap: wrap;
+  height: fit-content;
+  justify-content: stretch;
+}
+
+.flex-rownowrap {
+  display:flex;
+  flex-wrap: nowrap;
+  height: fit-content;
+  justify-content: stretch;
+}
 
 .f-between, .flex-between {
   display: flex;
@@ -216,6 +246,13 @@ containing block needs to be positioned relatively*/
 .w49 {width: 49%;}
 .w360 {width: 360px;}
 .wm360,.mw360 {min-width: 360px;}
+
+.iflex16 {display: inline-flex; flex-basis: (1/6)*100%; }
+.iflex26 {display: inline-flex; flex-basis: (2/6)*100%; }
+.iflex36 {display: inline-flex; flex-basis: (3/6)*100%; }
+.iflex46 {display: inline-flex; flex-basis: (4/6)*100%; }
+.iflex56 {display: inline-flex; flex-basis: (5/6)*100%; }
+.iflex66 {display: inline-flex; flex-basis: (6/6)*100%; }
 
 /*
 .flex-between:after {

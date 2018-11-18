@@ -371,6 +371,39 @@ img.avatar.micro {
   max-width: $img-avatar-micro-max-height;
 }
 
+.min-width, .mw66  {width: $min-width;}
+.mw56 {width: $mw56;}
+.mw46 { width: $mw46;}
+.mw36 { width: $mw36;}
+.mw26 { width: $mw26;}
+.mw16 { width: $mw16;}
+
+
+.basic-box, .bb {
+  @extend .mw66;
+}
+
+.bb-fc {
+  @extend .mw66;
+  height: fit-content;
+}
+
+.bbborder {
+  @extend .mw66;
+  @extend .border-rad;
+  flex-grow: 1;
+}
+
+.bbfcborder {
+  flex-grow: 1;
+  @extend .bb-fc;
+  @extend .border-rad;
+}
+
+.fcol {
+  display: flex;
+  flex-direction: column;
+}
 
 
 
