@@ -76,8 +76,11 @@ export default {
     and submit them to the URL
 */
     props: ['contentparams', 'modalparams',  ],
+    inject: ['refresh','foo'],
 
     mounted: function() {
+        this.refresh();
+        console.log("We did get foo though? ",this.foo);
       this.setReloadRefs();
 
       //console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
