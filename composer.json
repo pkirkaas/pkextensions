@@ -24,7 +24,6 @@
       "PkExtensions\\": "src/Extensions/"
     },
     "files": [
-      "src/lib/require-external-files.php",
       "src/lib/PkExtensions.php",
       "src/lib/pklib.php",
       "src/lib/pkhtmlhelpers.php",
