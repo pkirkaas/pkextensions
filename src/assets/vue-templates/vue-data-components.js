@@ -172,7 +172,7 @@ window.Vue.component('pk-modal-wrapper',{
   </div>
   `,
   //props:["contentparams","modalparams","btnparams"],
-  props:['params'],
+  props:['params','initData'],
   methods : {
     openModal: function(event) {
       //console.log("In wrapper, clicked on openModal w. event:",event);
@@ -250,6 +250,7 @@ window.Vue.component('pk-modal-wrapper',{
         submiturl: this.params.submiturl || this.params.url,
         title: this.params.title || "Update",
         reloadrefs: this.params.reloadrefs,
+        initData:this.params.initData,
       };
     }
     if (!btnparams) {

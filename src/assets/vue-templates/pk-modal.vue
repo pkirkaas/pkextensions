@@ -76,11 +76,8 @@ export default {
     and submit them to the URL
 */
     props: ['contentparams', 'modalparams',  ],
-    inject: ['refresh','foo'],
 
     mounted: function() {
-        this.refresh();
-        console.log("We did get foo though? ",this.foo);
       this.setReloadRefs();
 
       //console.log("PkModal, params:", this.modalparams, 'content',this.contentparams);
@@ -122,7 +119,8 @@ export default {
         }
       },
       submit: function(event) {
-   
+        console.log("About to call initData in pk-modal:", this.modalparams.initData); 
+         this.modalparams.initData(); 
         //console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs && this.$refs.content && this.$refs.content.submit
                 &&(typeof this.$refs.content.submit === 'function')) {
