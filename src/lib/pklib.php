@@ -1185,7 +1185,7 @@ function getAsArray($val) {
     return $val->getArrayCopy();
   }
   if (method_exists($val, 'toArray')) return $val->toArray();
-  if is_iterable($val)) {
+  if (is_iterable($val)) {
     $ret = [];
     foreach ($val as $key=>$data) {
         $ret[$key] = $data;
