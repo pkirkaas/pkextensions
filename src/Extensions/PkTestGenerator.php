@@ -161,8 +161,13 @@ class PkTestGenerator {
       $keysleft = array_keys($copy);
       $numkeysleft = count($keysleft);
       $key = $keysleft[mt_rand(0,  $numkeysleft - 1)];
-      $retarr[$key] =  $copy[$key];
+      if ($withKeys) {
+        $retarr[$key] =  $copy[$key];
+      } else {
+        $retarr[] = $copy[$key];
+      }
       unset($copy[$key]);
+
     }
     return $retarr;
   }

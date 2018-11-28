@@ -16,7 +16,7 @@ use \Request;
  * Builds a query from criteria and value params. Should be available to both
  * query models and query controllers.
  * <p>
- * There are two potential kinds of Models here - a "target" model to be 
+ * There are two potential kinds of Models here - a "target" model to be
  * searched, and a "Query" model which contains the query/search criteria for the
  * target model to be searched.
  * <p>
@@ -34,18 +34,18 @@ use \Request;
   return json_decode($value,true);
   }
  * </pre>
- * This trait supports "out of the box" direct field queries. 
+ * This trait supports "out of the box" direct field queries.
  * @author Paul Kirkaas
- * 
- * A trait that extends this trait can call static::buildQueryOnTable or 
- * buildQueryOnModel several times with several tables or models, combine 
+ *
+ * A trait that extends this trait can call static::buildQueryOnTable or
+ * buildQueryOnModel several times with several tables or models, combine
  * them, then also call it's own custom methods to refine the results, based
  * on the Query defs below.
- * 
+ *
  */
 
   /**
-   * 
+   *
    * IMPLEMENTOR TO PROVIDE:
     public static $search_field_defs = [
       $basename1 => ['fieldtype' => 'integer',
@@ -53,30 +53,30 @@ use \Request;
      'parms'=>['integer','date',...]
      'extra'=>['suffix'=>$type],
      'criteria'=>[ #If not the full default set of criteria for the comptype
-       'criteriaSet' =>['='=>'The Same As', '!='=>'Different From',... 
+       'criteriaSet' =>['='=>'The Same As', '!='=>'Different From',...
            #EG: An explicit set of criteria values/labels
        {OR} 'omit'=>['=', '!=', ...} #Omit these from the default
        {OR} 'include'=>['0', '='], #include ONLY these from the default
     $basename2 =>  'integer', #Assumes comparison is numeric
     $basename3, #Assumes type is integer & comparison is numeric
     ];
-   * 
-   * Where $basename is the field name in the target table to search - 
+   *
+   * Where $basename is the field name in the target table to search -
    * Builds something like ['assets_val'=>'integer','assets_crit'=>'string','assets_cmp'=>'string']
    * extra only if we want extra db fields, like 'extra'=>['param'=>'string'] builds 'assets_param=>'string'
-   * 
+   *
    * This Trait can then build both the table field definitions AND maybe the
    * search controls for the search forms
-   * 
+   *
    * IF THE QUERY FIELD IS ON A METHOD - IT MIGHT TAKE PARAMETERS - So the "parms" key points to a scalar (only 1 parm of that type),
    * or an array of types. Parm fields will be called "$basename_parm1, "$basename_parm2, etc
-   * 
-   * The filed Def array can also have a key 'property' - default is 'attribute' of the target table/model. 
+   *
+   * The filed Def array can also have a key 'property' - default is 'attribute' of the target table/model.
    * But it can also be a method on THIS model -  ('attribute'=>'method') OR another model, if the 'model' key is
    * set
    */
 
-/** Note: When using the " IN " set criteria ("group" type query), we use accessors/mutators to 
+/** Note: When using the " IN " set criteria ("group" type query), we use accessors/mutators to
  * convert in-memory arrays to JSON strings stored in the DB
  */
 trait BuildQueryTrait {
@@ -103,7 +103,7 @@ trait BuildQueryTrait {
   /** From CriteriaSetsTrait:
   public static function isValidCriterion($crit, $type = null) {
   public static $criteriaSets = [
-   * 
+   *
    */
 
   /** Must be intish */
@@ -119,12 +119,12 @@ trait BuildQueryTrait {
         null,['class'=>'form-control search-crit'])!!}
         {!!PkForm::hidden($basename.'_val',1) !!}
       </label>
-   * 
+   *
    */
 
   /** Uses the above static $withinQueryCrit for now, until phased out
-   * 
-   * @param string|null $type - query type - 'within', 'string', etc. If null, all 
+   *
+   * @param string|null $type - query type - 'within', 'string', etc. If null, all
    */
   /*
   public function getQueryCrit($type = null) {
@@ -144,11 +144,11 @@ trait BuildQueryTrait {
       return false;
     }
   }
-   * 
+   *
    */
 
 
-  /** Converts the simple $search_field_defs into canonical - 
+  /** Converts the simple $search_field_defs into canonical -
    * THIS HAS THE NORMALIZED DEFINITION OF THE FIELDS FROM THE SEARCH CLASS
    * It is used to build the table field defs, but information is stripped.
    * We should merge the two - this w. getBasenameQueryDef
@@ -168,8 +168,8 @@ trait BuildQueryTrait {
   }
 
   /** Builds a set of HTML inputs for a particular search item/term, based on the
-   * comparison type - ex, if 
-   * @param type $baseName - 
+   * comparison type - ex, if
+   * @param type $baseName -
    */
   /* No, don't think I'll do this - already have good generators */
   /*
@@ -189,7 +189,7 @@ trait BuildQueryTrait {
     if (!is_array($fieldDefSet) || !count($fieldDefSet)) return [];
     return call_user_func_array('array_merge', $fieldDefSet);
   }
-    
+
   /** This returns an array keyed by basename=>array of all defs for that basename
    *  query/filter. It needs to be flattened and indexed to be used in building actual
    *  migration table building code, which is what the above
@@ -204,7 +204,7 @@ trait BuildQueryTrait {
       if ($baseName) return keyVal($baseName,$r);
       return $r;
     }
-     * 
+     *
      */
     //$searchDefs = []; //Made of both the table field defs AND other params/settings
     $searchFields = static::getSearchFieldDefs();
@@ -244,7 +244,7 @@ trait BuildQueryTrait {
         $extraDefs = static::buildExtraFields($baseName, $extra);
         if (is_array($extraDefs)) $fieldDefs = array_merge($fieldDefs, $extraDefs);
       }
-       * 
+       *
        */
       //$searchFields[$baseName]['field_defs']=$fieldDefs;
       $def['field_defs'] = $fieldDefs;
@@ -267,7 +267,7 @@ trait BuildQueryTrait {
   public static function decomposeQueryDef() {
     $queryDefs = static::getbaseNameQueryDef();
     $models = [];
-    
+
     foreach ($queryDefs as $baseName=>$queryDef) {
 
     }
@@ -293,7 +293,7 @@ trait BuildQueryTrait {
     $methods = keyVal('methods',$params);
     $attributes = keyVal('attributes',$params);
     foreach ($queryDefs as $baseName=>$queryDef) {
-      
+
     }
 
 
@@ -307,7 +307,7 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -323,7 +323,7 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -346,8 +346,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      //$fields[$baseName.'_parm'.$i] = $parm; 
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      //$fields[$baseName.'_parm'.$i] = $parm;
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -362,8 +362,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      //$fields[$baseName.'_parm'.$i] = $parm; 
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      //$fields[$baseName.'_parm'.$i] = $parm;
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -377,8 +377,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      //$fields[$baseName.'_parm'.$i] = $parm; 
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      //$fields[$baseName.'_parm'.$i] = $parm;
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_maxval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_minval'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
@@ -400,8 +400,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      //$fields[$baseName.'_parm'.$i] = $parm; 
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      //$fields[$baseName.'_parm'.$i] = $parm;
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -424,8 +424,8 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      //$fields[$baseName.'_parm'.$i] = $parm; 
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      //$fields[$baseName.'_parm'.$i] = $parm;
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -441,7 +441,7 @@ trait BuildQueryTrait {
     if ($parms && is_scalar($parms)) $parms = [$parms];
 
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
-      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ; 
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[  $baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[ $baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
@@ -456,12 +456,15 @@ trait BuildQueryTrait {
    * @param string|null $table
    * @return QueryBuilder instance or false
    */
+  /** Currently useless
   public function buildQueryOnTable($table = null) {
     if (!$table) $table = $this->getTargetTable();
     if (empty($table)) return false;
     $sets = $this->buildQuerySets();
     if (empty($sets)) return false;
   }
+   *
+   */
 
   /** String '0' and int 0 are valid values, NULL or '' are empty */
   public static function emptyVal($val) {
@@ -487,18 +490,32 @@ trait BuildQueryTrait {
 
     $newcol = $this->filterOnMatch($collection);
     $nnewcol = $this->filterOnClosures($newcol);
+    $nnncol = $this->filterCustomMethods($nncol);
     //$sza = count($newcol);
     //pkdebug("SXA:  $sza");
-    return $nnewcol;
+    return $nnnewcol;
   }
 
 
   /**
    * Just an indexed array of closures to run on the collection, simpler
    * than filterOnMatch
-   * @var array 
+   * @var array
    */
   public $closureFilters=[];
+  public $customMethods = [];
+  #Uses the "customMethods array above - each entry of which has to also contain an
+  #array of structures with method name, fields, criteria, etch.
+
+  public function filterCustomMethods($collection) {
+    $newcol = $collection;
+    foreach($this->customMethods as $filterdata) {
+      $newcol = call_user_func_array($filterdata['callable'], [$filterdata, $newcoll]);
+    }
+    return $newcol;
+  }
+
+
   public function filterOnClosures($collection) {
     if (method_exists($this,'buildClosureFilters')) {
       $this->buildClosureFilters();
@@ -513,13 +530,13 @@ trait BuildQueryTrait {
       throw new PkException("Invalid Type for this->closureFilters:",
           $this->closureFilters);
     }
-    $cfrs = $this->closureFilters; 
+    $cfrs = $this->closureFilters;
     $subcol = $collection->reject(function ($item) use ($cfrs) {
       $failed = false;
       foreach($cfrs as  $cfr) { #A Closure
         if (!$cfr($item)) {
           $failed = true;
-          break;  
+          break;
         }
       }
       return $failed;
@@ -538,15 +555,15 @@ trait BuildQueryTrait {
    * which has to be defined in the implementing classes, presumably a trait
    * shared by the Controller/SearchModel. Looks first for field name, then
    * method name, defined as <tt>$this->customQuery{What}($crit,$val)</tt>
-   * 
+   *
    * One advantage to searching on a model instance - you can also use
-   * and specify model methods as comparison criteria for stuff that's hard in 
+   * and specify model methods as comparison criteria for stuff that's hard in
    * DB. Can also take parameters. The Query will first execute the query it
    * can on the DB - then from the return, filter on the instances using
    * the methods.
-   * 
+   *
    * (Ex: <tt>$this->customQueryAsset_debt_ratio($query,$crit, $val)</tt>:
-   * <pre> 
+   * <pre>
    * [
    *   'fieldName1'=>['crit'=>$crit1, 'val'=>$val1],
    *   'fieldName2'=>['crit'=>$crit2, 'val'=>$val2],
@@ -554,7 +571,7 @@ trait BuildQueryTrait {
    *   'methodName2'=>['crit'=>$crit4, 'val'=>$val4, 'param'=>$param],
    * ....]
    * </pre>
-   * 
+   *
    * @param $targetModel - A PkModel CLASS, NOT instance.
    * @return Eloquent Builder
    * */
@@ -569,10 +586,10 @@ trait BuildQueryTrait {
     }
     //pkdebug("QuerySets:", $querySets);
     #Sets are keyed by 'root' or 'baseName', with a definition array. If the
-    #root key matches an attribute name on the model, that's what we search 
+    #root key matches an attribute name on the model, that's what we search
     #against. If not, try to figure out what the query is on/for/to.
     #
-    #The definition array might contain a sub-definition array - 
+    #The definition array might contain a sub-definition array -
     #$sets[$root]['def']['attribute'] - which could be : 'property',
     #'target_method' (a method to call on the target Model), or 'self_method'
     #(a method defined in this model/trait.) - with $baseName the method or property
@@ -588,7 +605,7 @@ trait BuildQueryTrait {
 
     //pkdebug("My PkMatchObjs:", $this->matchObjs);
     #$querySets includes both attribute=>'property' types, which are eloquent/SQL suitable,
-    #as well as attribute=>'method', which should go to PkMatch filters 
+    #as well as attribute=>'method', which should go to PkMatch filters
     foreach ($querySets as $root => $critset) {
       if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val'])) {
         continue;
@@ -607,7 +624,7 @@ trait BuildQueryTrait {
         }
         continue;
       }
-      $toq = typeOf($query);
+      //$toq = typeOf($query);
       //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
       if ($root == '0') continue;
       //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
@@ -617,7 +634,7 @@ trait BuildQueryTrait {
         pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
         //pkdebug("ADR: QT: ".typeOf($query)."..");
       }
-       * 
+       *
        */
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
@@ -625,7 +642,35 @@ trait BuildQueryTrait {
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
-        //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
+        if (method_exists($this, 'customCompare' . $comptype)) {
+
+            #The $critset is roughly:
+            /*
+              ['crit'] = $arr[$key];
+              ['val'] = $valval;
+              ['param'] = $arr[$paramfield];
+              ['comptype'] = $comptype;
+              ['root'] = $root;
+              ['def'] = static::getFullQueryDef($root);
+             .... and here lets add the callable - to make it generic for any kind of function,
+             closure, method, etc. That runable should accept two arguments - this critset,
+             and the collection that passed through the SQL part
+             */
+            $critset['callable'] = [$this, "customCompare$comptype"];
+            $this->customMethods[] = $critset;
+
+
+            #We have to pack everything in a structure with field names,
+            #method name, criteria, values, etc, & add it to the
+
+            #$this->customMethods array, which in turn will be iterated through & executed
+            #by $this->filterCustomMethods($collection), which will take each entry & further
+            #This is for methods/comparisons that unlike the above are not built for a
+            #single field and might be reusable, or just not suitible for SQL and
+            #not worth the trouble of match filters or custom closures. Like "intersects"
+            //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
+          continue;
+        }
         if (is_array($critset['val'])) {
           if (($comptype === 'group') && ($critset['crit'] === 'IN')) {
             $query = $query->whereIn($root, array_values($critset['val']));
@@ -669,7 +714,8 @@ trait BuildQueryTrait {
         }
       } else if (method_exists($this, 'customQuery' . $root)) {
         $customQueryMethod = 'customQuery' . $root;
-        $query = $this->$customQueryMethod($query, $critset['crit'], $critset['val'], $critset['param']);
+        $query = $this->$customQueryMethod($query,
+            $critset['crit'], $critset['val'], $critset['param']);
       }
     }
     pkdbgtm("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
@@ -691,16 +737,44 @@ trait BuildQueryTrait {
     return $this->matchObjArr;
   }
 
+  /** Compares if 2 arrays have any values in common -
+   *
+   * @param array $critset
+              ['crit'] = $arr[$key];
+              ['val'] = $valval;
+              ['param'] = $arr[$paramfield];
+              ['comptype'] = $comptype;
+              ['root'] = $root;
+              ['def'] = static::getFullQueryDef($root);
+              ['callable'] = [$this, "customCompare$comptype"];
+   For this function -
+      crit = 0, IN, or NOTIN
+      val is indexed arrayish (or empty or JSON or ArrayObject) maybe with values
+      root is the name of the field to check in the collection element
+   * @param collection $collection
+   * @return Collection
+   */
+  public function customCompareintersects($critset, $collection) {
+      $crit = $critset['crit'];
+      if (!$crit) return $collection;
+      $toArr = function($tst) { #Try to make the arg arrayable - & only the values
+          if (is_array($tst)) {
+            return array_values($tst);
+          }
+
+
+  }
+
   /** Takes an associative array, possibly from a Search Model, possibly from a post,
    * and only selects matching keys in the form:
     "xxxx_crit"
     "xxxx_val"
     "xxxx_param" (optional parameters for custom querys)
    * ... and
-   * only if the content of those keys is valid. Then builds an array in the 
+   * only if the content of those keys is valid. Then builds an array in the
    * form of: ['xxxx']=>['crit'=> $crit, 'val'=>$val, 'param' => $param] and returns it.
    * <p>
-   * 'xxxx'/$root: either a field/column name in the base table of the model, 
+   * 'xxxx'/$root: either a field/column name in the base table of the model,
    * ELSE the name of a method in the custom query trait, like for calculation
    * of ratios, or "within x miles of ZIP". But this method doesn't know about that, it's the
    * "buildQueryOnModel/Table" Class implementing this trait that
@@ -723,7 +797,7 @@ trait BuildQueryTrait {
    */
 
   ## I should consider NOT building all match objs at once - just ONE AT A TIME
-  ## And adding them when I can't build an SQL query. 
+  ## And adding them when I can't build an SQL query.
   ## I want executeQuery to process 3 things - sql queries, PkMatch objs, and
   ## any custom filter methods defined on the Query Model
 
@@ -793,12 +867,13 @@ trait BuildQueryTrait {
         //pkdebug("VALVAL",$valval);
       }
 
-       
+
       $sets[$root] = [];
       $rootMatch->crit=$sets[$root]['crit'] = $arr[$key];
       $rootMatch->val=$sets[$root]['val'] = $valval;
       $rootMatch->param=$sets[$root]['param'] = $arr[$paramfield];
       $rootMatch->comptype=$sets[$root]['comptype'] = $comptype;
+      $rootMatch->root=$sets[$root]['root'] = $root;
       $sets[$root]['def'] = static::getFullQueryDef($root);
     }
     $this->querySets = $sets;
@@ -835,23 +910,23 @@ trait BuildQueryTrait {
     }
   }
 
-  /** Temporarilly deprecated? Maybe restore later? 
+  /** Temporarilly deprecated? Maybe restore later?
   public function getMatchObjs() {
     if (!$this->matchObjs || !is_arrayish($this->matchObjs)) {
       $this->buildQuerySets();
     }
     return $this->matchObjs;
   }
-   * 
+   *
    */
 
   /** After the Eloquent has run on the attributes and returned an eloquent collection,
-   * this method takes the collection and $querySets as above, 
+   * this method takes the collection and $querySets as above,
    * [$key=>['val'=>$val,'crit'=>$crit,'parm0'=>$parm0.....
    * @param Eloquent Collection $collection
    * @param array $querySets or null to take from local object
    */
-  /** Temporarilly deprecated? Maybe restore later? 
+  /** Temporarilly deprecated? Maybe restore later?
   public function filterOnMethods(Collection $collection, $matchObjs=null) {
     pkdebug("Yes, trying to filter on Method!.");
     if (!$matchObjs || !is_arrayish($matchObjs)) $matchObjs = $this->getMatchObjs();
@@ -879,7 +954,7 @@ trait BuildQueryTrait {
     });
     return $trimmedCollection;
   }
-   * 
+   *
    */
 
   /** Using the individual match objects I created one at a
@@ -899,7 +974,7 @@ trait BuildQueryTrait {
       foreach($pkmarr as $base => $match) {
         if (!$match->satisfy($item->$base)) {
           $failed = true;
-          break;  
+          break;
         }
       }
       return $failed;
@@ -909,22 +984,22 @@ trait BuildQueryTrait {
 
   /** For use in Query Forms - makes a full query control
    * from the field name and comparison type, with $params
-   * 
+   *
    * For now, only handle simple _crit, _val comparisons
    * with $params['basename']
-   * 
+   *
    * @param assoc array $params:
    *   @paramParam: string 'basename' (required): The basename of the field to search - like,
    *   'annual_income' - will build a criteria select box called "annual_income_crit'
    *      ("<", ">", etc)
    *    and a value input box named 'annual_income_val'
-   * 
+   *
    * @paramParam string 'label' (optional, suggested) - the label for the control
-   * 
-   * 
+   *
+   *
    * @return string HTML to make the control
    */
-   
+
   public static function htmlQueryControl($params=[]) {
     $basename = $params['basename'];
     $queryDef = static::getFullQueryDef($basename);
@@ -967,7 +1042,7 @@ trait BuildQueryTrait {
         unset ($fieldNames[$i]);
       }
     }
-     * 
+     *
      */
     $tmpCtl =  PkHtmlRenderer::buildQuerySet($params);
     //pkdebug("TMPCTL: \n$tmpCtl\n");
@@ -988,7 +1063,7 @@ trait BuildQueryTrait {
 
     return parent::processSubmit($opts, $inits);
   }
-   * 
+   *
    */
 
   /*
@@ -1009,7 +1084,7 @@ trait BuildQueryTrait {
     }
     return parent::save($opts);
   }
-   * 
+   *
    */
 
   public static function critset($root) {

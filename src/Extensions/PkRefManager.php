@@ -280,6 +280,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   public static function keys($first = null) {
     //$refArr = static::getKeyValArr();
     //$keys = array_keys($refArr);
+    //echo ("\n\nIn Refman/keys - getKeyValArr:\n");
+    //var_dump(static::getKeyValArr());
     $keys = array_keys(static::getKeyValArr());
     if ($first && ($first < count($keys))) {
       $keys = array_slice($keys,0,$first);

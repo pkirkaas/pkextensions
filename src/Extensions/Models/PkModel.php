@@ -622,6 +622,8 @@ public static function createOrUpdate(array $attributes = []) {
           if (!isset($type)) $type='integer';
         }
         //$type = keyVal('type', $def, 'integer');
+        ## 'type_args' is custom arguments to field creation, like to change
+        # the default size of varchar,  ['type_args'=>3000]
         $type_args = keyVal('type_args', $def) ? ', ' . keyVal('type_args', $def) : '';
         $comment = keyval('comment', $def);
         $default = keyval('default', $def);

@@ -24,7 +24,7 @@ trait SocialAuthTrait {
 //      pkdebug("Got Here, data:", request()->all());
 
       $error = false;
-//      try{
+      try{
         session()->put('state', request()->input('state'));
         $fbuser = Socialite::driver('facebook')->user();
         if (!$fbuser instanceOf Auth2User) {
@@ -56,23 +56,29 @@ trait SocialAuthTrait {
     [profileUrl] => https://www.facebook.com/app_scoped_user_id/10212606807038579/
 )
          */
- //     } catch (\Exception $e) {
-  //      $error = "We had a problem communicating with Facebookx: ".$e->getMessage();
-   //   }
+      } catch (\Exception $e) {
+         $error = "We had a problem communicating with Facebookx: ".$e->getMessage();
+      }
       if ($error) {
         //return $this->error($error."\nPlease try registering or logging in manually");
         pkdebug("Got an error?", $error);
         return $this->error("Got an error [$error]");
       }
-      $user = User::where('email', '=', $fbuser->getEmail())->first();
-      if (!User::instantiated($user) && method_exists($this,"socialRegister")) {
-        $user = $this->socialRegister($fbuser);
-      }
-      if (User::instantiated($user)) {
-        $user->login(true);
-        if (method_exists($this,"socialLogin")){
-          $this->socialLogin($fbuser,$user);
+      try {
+        $user = User::where('email', '=', $fbuser->getEmail())->first();
+        if (!User::instantiated($user) && method_exists($this,"socialRegister")) {
+          $user = $this->socialRegister($fbuser);
         }
+        if (User::instantiated($user)) {
+          $user->login(true);
+          if (method_exists($this,"socialLogin")){
+            $this->socialLogin($fbuser,$user);
+          }
+        }
+      } catch (\Exception $e) {
+         $error = "We had a problem communicating with Facebookx: ".$e->getMessage();
+        pkdebug("Got an error?", $error);
+        return $this->error("Got an error [$error]");
       }
       return redirect('/');
     }
