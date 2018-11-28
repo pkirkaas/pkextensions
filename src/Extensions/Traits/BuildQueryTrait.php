@@ -756,13 +756,22 @@ trait BuildQueryTrait {
    */
   public function customCompareintersects($critset, $collection) {
       $crit = $critset['crit'];
+      $root = $critset['root'];
+      $in = ($crit === 'IN');
+      $val = $critset['val'];
       if (!$crit) return $collection;
       $toArr = function($tst) { #Try to make the arg arrayable - & only the values
-          if (is_array($tst)) {
-            return array_values($tst);
-          }
+        return iterable_values($tst) ?? [];
+      };
+      $isIntersect = function($a,$b) use ($toArr, $in) {
+        return array_intersect($toArr($a), $toArr($b)) ?
+          $in : !$in;
+      };
 
-
+      $filter = function( $instance) use ($isIntersect, $root, $val) {
+        return $isIntersect($instance->$root, $val);
+      };
+      return $collection->filter($filter);
   }
 
   /** Takes an associative array, possibly from a Search Model, possibly from a post,

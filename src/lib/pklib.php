@@ -1,13 +1,13 @@
 <?php
 
 /**
- * PKMVC Framework 
+ * PKMVC Framework
  *
  * @author    Paul Kirkaas
  * @email     p.kirkaas@gmail.com
- * @link     
+ * @link
  * @copyright Copyright (c) 2012-2014 Paul Kirkaas. All rights Reserved
- * @license   http://opensource.org/licenses/BSD-3-Clause  
+ * @license   http://opensource.org/licenses/BSD-3-Clause
  */
 /**
  * General, non-symfony utility functions
@@ -112,8 +112,8 @@ function isCli() {
   return php_sapi_name() == 'cli';
 }
 
-/** UnCamelCases a string, or, recursively, an array 
- * 
+/** UnCamelCases a string, or, recursively, an array
+ *
  * @param mixed $arg: String or array of possibly camel cased values
  * @return mixed: The un_camel_cased result, string or array
  * @throws Exception
@@ -235,7 +235,7 @@ function tmpdbg() {
   PKMVC\BaseController::addSlot('debug', call_user_func_array("pkdebug_base", $args));
 }
 
-/** Like PkDebug, except first arg is the name of a logfile - 
+/** Like PkDebug, except first arg is the name of a logfile -
  * To create a specific named Log function, do:
   function myLog( ) {
   $args = func_get_args();
@@ -278,11 +278,11 @@ function pkdebug() {
 /** Like pkdebug, except adds time of call & ms since last call, for
  * performance debugging
  */
-function pkdbgtm() { 
+function pkdbgtm() {
   static $previous = 0;
   static $first = 0;
   if (!$previous) {
-    $first = $previous = microtime(true); #float 
+    $first = $previous = microtime(true); #float
   }
   $current = microtime(true);
   $diff = $current - $previous;
@@ -301,20 +301,20 @@ function pkdbgtm() {
   $out = call_user_func_array("pkdebug_base", $args);
   pkdebugOut($out);
   return false;
-  
 
-  
-  
+
+
+
 }
 
 /** Take a stab to Try to get function/method/file this function was called from
  * Not always right because debug_backtrace is inconsistent.
  * Not top priority now - but useful for DB logging
- * 
+ *
  * TODO: This version only for calling from within a LOG class - not general
  * function yet.
  * @return assoc array - file, line, function, method, etc.
- * 
+ *
  */
 //function getCallingFrame($level = 0, $classlevel =0) {
 function getCallingFrame($baseFile = null) {
@@ -392,10 +392,10 @@ if (true) {
   //require ("../vendor/ccampbell/chromephp/ChromePhp.php");
   require ("../../../../ccampbell/chromephp/ChromePhp.php");
 }
- * 
+ *
  */
 /** $exclusions are an array of the form:
- * 
+ *
     ['file'=>__FILE__,'line'=>__LINE__,
  *  'class'=>__CLASS_, 'function' => __FUNCTION__];
  * @param type $exclusions
@@ -448,7 +448,7 @@ function startTime($msg=null) {
   } else {
     $msg = [];
   }
-  global $starttime, $startframe; 
+  global $starttime, $startframe;
   $starttime = time();
   $startframe = $msg + callingFrame(['function'=>__FUNCTION__]);
 }
@@ -526,7 +526,7 @@ function pkdebug_base() {
     $idx++;
   }
 
-  while (empty($stack[$idx]['file']) || 
+  while (empty($stack[$idx]['file']) ||
       ($stack[$idx]['file'] === __FILE__) ||
       (isset($stack[$idx+1]) && (substr($stack[$idx + 1]['function'], -3) === 'Log'))) {
     $idx++;
@@ -541,7 +541,7 @@ function pkdebug_base() {
     } else {
     $out .= "\n: " . $frame['file'] . ": TOP-LEVEL: " . $frame['line'] . ": \n  ";
     }
-   * 
+   *
    */
   /** Test $retvals - better way? */
   $tstrr = "\n";
@@ -637,7 +637,7 @@ if (!function_exists('typeOf')) {
 }
 
 /** Returns an array of all ancestor classes of the class name or object
- * 
+ *
  * @staticvar array $classhierarchy
  * @param objinstance|classname $heritable
  * @return boolean|array - false if invalid argument, else array of class hierarchy.
@@ -710,7 +710,7 @@ function pkvardump($arg, $disableXdebug = true, $useVarDump=true) {
   return $vardump;
 }
 
-/** Sets the path and name for the debug log IF 
+/** Sets the path and name for the debug log IF
  * PkLibConfig::getSuppressPkDebug() is FALSE
  * @staticvar type $logpath
  * @param type $path
@@ -773,7 +773,7 @@ function appLogReset($reset = null) {
 }
 
 /** Outputs to the destination specified by $useDebugLog
- * 
+ *
  * @staticvar boolean $first
  * @param type $str
  * @return boolean
@@ -925,7 +925,7 @@ function isHttps() {
 }
 
 /**
- * 
+ *
  * @return String: The URL without subdirs, but with protocol (http://, etc)
  */
 function getBaseUrl() {
@@ -961,7 +961,7 @@ function getRequestUri($withgets = true) {
 
 /* * Another version, only handles ports & forwarding, etc.
  * NOTE: THESE URL FUNCTIONS DO NOT FILTER! Just return the raw URL.
- * 
+ *
  */
 
 function fullHost($use_forwarded_host = false) {
@@ -976,7 +976,7 @@ function fullHost($use_forwarded_host = false) {
 }
 
 /**
- * Returns all components of the page URL, without the 
+ * Returns all components of the page URL, without the
  * GET query parameters
  */
 function getUrlNoQuery() {
@@ -1018,7 +1018,7 @@ function getPathArray($path = null) {
 
 /** Sets (changes or adds or unsets/clears) a get parameter to a value
  *
- * 
+ *
  * @param type $getkey -- the get parameter name
  * @param type $getval -- the new get parameter value, or if NULL,
  *   clea's the get parameter
@@ -1063,7 +1063,7 @@ function setGet($getkey, $getval = null, $qstr = null) {
 
 
 #This only goes wrong if passed a query string w/o '?', like "akey=avall&bkey=bval"
-#But how to distinguish that from "/path/within/url"?. 
+#But how to distinguish that from "/path/within/url"?.
   if (empty($urlarr[0]) || $qm || $fullurl || $ispath) {
     $preqstr = array_shift($urlarr);
   }
@@ -1084,13 +1084,13 @@ function setGet($getkey, $getval = null, $qstr = null) {
 
 /** Sets (changes or adds or unsets/clears) get parameters to values. Only works
  * with/returns the query string, not the whole URL.
- * 
+ *
  * @param array $paramArr -- assoc arr of GET [$key => $val]. If $val = '', sets
- * &key=&nextkey=nextval - but if $val === NULL, clears the 
+ * &key=&nextkey=nextval - but if $val === NULL, clears the
  * @param string|null $qstr -- if string, assumed a query string and paramArr added;
   if '', returned str is just from the $paramArr; if NULL, the current REQUEST QUERY
   is used, and $paramArr added or replaced into it.
- * 
+ *
 
   @return string - query string
  */
@@ -1145,8 +1145,8 @@ function makePicker($name, $key, $val, $arr, $selected = null, $none = null) {
 
 /** No guarantee, but approximate heuristic to determine if an array is
  * associative or integer indexed.
- * NOTE: Will return FALSE if array is empty, and TRUE if array is 
- * indexed but not sequential. 
+ * NOTE: Will return FALSE if array is empty, and TRUE if array is
+ * indexed but not sequential.
  * @param type $array
  * @return type
  */
@@ -1185,6 +1185,13 @@ function getAsArray($val) {
     return $val->getArrayCopy();
   }
   if (method_exists($val, 'toArray')) return $val->toArray();
+  if is_iterable($val)) {
+    $ret = [];
+    foreach ($val as $key=>$data) {
+        $ret[$key] = $data;
+    }
+    return $ret;
+  }
   return null;
 }
 
@@ -1192,7 +1199,7 @@ function getAsArray($val) {
  * also verifies the integer indices are consecutive starting from 0
  * @param array $array
  * @param boolean $sequential - if true, indices must be sequential integers.
- *   if false, indices may be non-sequential, but must be integer or integer 
+ *   if false, indices may be non-sequential, but must be integer or integer
  *   equivalents. If false, returns the array with integerish keys converted
  *   to integers. Like, $array['1'=>'aval', 3=>'bval'] will return:
  *   [1=>'aval', 3=>'bval'];
@@ -1238,7 +1245,7 @@ function is_scalarish($value, $nullorfalse = true) {
 
 /**
  * Takes any number of arguments as scalars or arrays, or nested arrays, and
- * returns a 1 dimentional indexed array of the values 
+ * returns a 1 dimentional indexed array of the values
  * $args: any number of arguments to flatten into an array
  * @return array: 1 dimensional index array of values
  */
@@ -1263,7 +1270,7 @@ function is_simple($val) {
 }
 
 /**
- * Like array_merge(), except instead of a list of arrays to merge, takes an 
+ * Like array_merge(), except instead of a list of arrays to merge, takes an
  * array of arrays to merge, and returns the merged array.
  * @param Array $arrs: Array of arrays
  * @return Array: Merged array of arrays
@@ -1287,9 +1294,9 @@ function array_merge_array($arrs = []) {
 }
 
 /**
- * Converts a compatable argument to an actual integer type ('7' -> 7), or 
+ * Converts a compatable argument to an actual integer type ('7' -> 7), or
  * boolean false ('010' -> false, '' -> false).
- * Totally unnecessary function but more convenient than remembering constant 
+ * Totally unnecessary function but more convenient than remembering constant
  * @param scalar $arg - something to convert to an int
  * @param mixed $default - the default value if can't be converted to an int. Default: false
  * @return: integer if integer, also 0, but boolean false if not an integer
@@ -1301,7 +1308,7 @@ function array_merge_array($arrs = []) {
  * to_int(NULL) === FALSE;
  * to_int('0') === 0;
  * SADLY, however:
- * 
+ *
  * to_int(7.45) === FALSE; - but can use intval
  * to_int('9.7') === FALSE; - but can use intval
  */
@@ -1313,7 +1320,7 @@ function to_int($arg, $default = false) {
 }
 
 /** Implements filter_var on array variables
- * 
+ *
  * @param array or string $input: The input to be filtered. Does not filter keys.
  * @param int $flag: See php filter_var docs
  * @param mixed $options: See php filter_var docs
@@ -1441,7 +1448,7 @@ function html_encode_file($path, $enclose = null) {
 }
 
 /** Takes a PHP array, encodes it to JSON, and then re-encodes it to HTML
- * string for inclusion in html attribute values, to be reconstituted 
+ * string for inclusion in html attribute values, to be reconstituted
  * in a script as a JS Object
  * @param array $arr: data to encode
  */
@@ -1462,7 +1469,7 @@ function html_decode($str) {
 
 /**
  * Insert the value into the given array (or new array) at the appropriate
- * depth/key sequence specified by the array of keys. Ex: 
+ * depth/key sequence specified by the array of keys. Ex:
  * var_dump(insert_into_array(array('car','ford','mustang','engine'), "351 Cleavland"));
  * Outputs:
  * array (size=1)
@@ -1475,7 +1482,7 @@ function html_decode($str) {
   'engine' => string '351 Cleavland' (length=13)
  * @param array $keys: Sequence/depth of keys
  * @param Mixed $value: Whatever value to assign to the location
- * @param array|NULL $arr -- Optional array to add to or create 
+ * @param array|NULL $arr -- Optional array to add to or create
  * @param boolean $unset (optional): If value is null, default is to create
  * the entry with a null value. If $unset==true, unset the key if it exists.
  * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
@@ -1513,7 +1520,7 @@ function &insert_into_arrayBAD($keys, $value, & $arr = null, $unset = false) {
 
 /**
  * Insert the value into the given array (or new array) at the appropriate
- * depth/key sequence specified by the array of keys. Ex: 
+ * depth/key sequence specified by the array of keys. Ex:
  * var_dump(insert_into_array(array('car','ford','mustang','engine'), "351 Cleavland"));
  * Outputs:
  * array (size=1)
@@ -1524,17 +1531,17 @@ function &insert_into_arrayBAD($keys, $value, & $arr = null, $unset = false) {
   'mustang' =>
   array (size=1)
   'engine' => string '351 Cleavland' (length=13)
- * 
- * Can also just RETURN the value at the path without changing the array 
+ *
+ * Can also just RETURN the value at the path without changing the array
  * @param array $keys: Sequence/depth of keys
  * @param Mixed $value: Whatever value to assign to the location
- * @param array|NULL $arr -- Optional array to add to or create 
+ * @param array|NULL $arr -- Optional array to add to or create
  * @param boolean $unset (optional): If value is null, default is to create
  * @param boolean $fetch (optional): If true, just try to return value
  * @param boolean $append (optional): If true, append the value to the array
       of the keys. If no value for keys, make array & append. If $keys value is
       scalar, throw exception.
- * 
+ *
  * the entry with a null value. If $unset==true, unset the key if it exists.
  * EVEN IF TRUE, however, WILL CREATE REST OF THE PATH, UP TO ENTRY
  * @return Array: Array with value set at appropriate vector. If called with
@@ -1604,7 +1611,7 @@ function &fetch_from_array($keys,Array &$arr) {
  * OH -- BUT THIS IS SO NOT RIGHT....
  * @param array $keys: Sequence of keys to the array value to remove
  * @param array $arr: The array to pop/unset from...
- * @return 
+ * @return
  */
 /* Don't think I need this - fixed the above - but wait & see...
   function unset_array_keys($keys, &$arr) {
@@ -1619,7 +1626,7 @@ function &fetch_from_array($keys,Array &$arr) {
   }
   array_pop($y);
   }
- * 
+ *
  */
 
 /**
@@ -1644,7 +1651,7 @@ function arrayish_keys_exist($keys, $arr = null) {
 }
 
 /** Returns indexed array of two - the key & value, by default first,
- * 
+ *
  * @param array $arr
  * @param int $idx - which key/val pair do you want? Default 0
  */
@@ -1654,6 +1661,21 @@ function keyvalpair($arr, $idx=0){
   return [$key, $arr[$key]];
 }
 
+/** Like array_values, but for anything iterable by foreach.
+ *
+ * @param iterable $arg
+ * @return array of values, or null if not iterable
+ */
+function iterable_values($arg) {
+    if (!is_iterable($arg)) {
+        return null;
+    }
+    $ret = [];
+    foreach ($arg as $val) {
+        $ret[]=$val;
+    }
+    return $ret;
+}
 
 /** Both ArrayObject & Laravel Collections implement ArrayAccess - but they
  * they DON'T have the same array clone:
@@ -1663,10 +1685,12 @@ function keyvalpair($arr, $idx=0){
  * @return type
  */
 function is_arrayish($arg) {
-  return (is_array($arg) || ($arg instanceOf ArrayAccess) || ($arg instanceOf Generator) || (($arg instanceOf ArrayAccess) && ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
+  return (is_array($arg) || ($arg instanceOf ArrayAccess) ||
+    ($arg instanceOf Generator) || (($arg instanceOf ArrayAccess) &&
+        ($arg instanceOf Countable) && ($arg instanceOf IteratorAggregate)));
 }
 
-/** Similar to above (array_keys_exist()), only returns the value at the 
+/** Similar to above (array_keys_exist()), only returns the value at the
  * location
  * @param array|scalar $keys. What to do if null? Return it all...
  * @param array $arr
@@ -1705,7 +1729,7 @@ function arrayish_key_exists($keyval, $arr) {
 
 /**
  * Returns Max int key index for array with mixed assoc/idx keys (or Max + 1
- * if $next == true). 
+ * if $next == true).
  * @param array $arr: The array to find max int key of
  * @param boolean $next: If true, returns max+1; or 0 if no int keys.
  * @return null|int: Max int key index in array with mixed assoc/idx keys
@@ -1761,10 +1785,10 @@ function arrayish_keys($arr) {
  * Returns a list of all declared classes that are descendants/instances Of
  * the named class
  * @TODO: Should really return a hierarchy instead of a flat array..
- * 
+ *
  * @param string $class: The class to check for descendants of...
- * @param Boolean $alsome: Also Me? That is, return this class itself? 
- * @return boolean|array: all declared classes that are descendants of the 
+ * @param Boolean $alsome: Also Me? That is, return this class itself?
+ * @return boolean|array: all declared classes that are descendants of the
  * given class
  */
 function get_descendants($class, $alsome = 0) {
@@ -1853,7 +1877,7 @@ function checkNonce() {
  * Processes the form submission and redirects if NONCE requirement not met.
  * If not a post, returns successfully. If POSTed NONCE value exists but
  * doesn't match SESSSION NONCE, redirects to default NONCE mismatch page.
- * If POSTed NONCE doesn't exist, either returns "FALSE", or redirects to 
+ * If POSTed NONCE doesn't exist, either returns "FALSE", or redirects to
  * NONCE mismatch page, depending on options. If POSTed NONCE exists and matches
  * SESSION NONCE, returns TRUE.
  */
@@ -1897,7 +1921,7 @@ function slugify($text) {
 
 /**
  * NOT FOR PASSWORDS - just to generate a short string probably unique in a
- * page for HTML 'id'-s 
+ * page for HTML 'id'-s
  * @param int $length: Length of string to return
  * @return string: Short, randomish lower case alpha string
  */
@@ -1906,7 +1930,7 @@ function generateShortRandomString($length = 5) {
 }
 
 /** Makes a urlencoded parameter string from an associative input array.
- * 
+ *
  * @param array $args: Associative array of get keys/values
  * @return String: URL encoded string of gets
  */
@@ -1923,7 +1947,7 @@ function generateShortRandomString($length = 5) {
   #Trim terminal '&'...
   return substr($getstr, 0, -1);
   }
- * 
+ *
  */
 
 /**
@@ -1943,7 +1967,7 @@ function combineAsArrays($arg1, $arg2) {
 }
 
 /**
- * Examines $arg - if not an array (eg, scaler, null or object), puts it into an array. 
+ * Examines $arg - if not an array (eg, scaler, null or object), puts it into an array.
  * If "$ish" is true, considers an "arrayish" arg as an array.
  * @param mixed $arg
  * @param boolean $ish - consider ArrayObjects already arrays?
@@ -1954,7 +1978,7 @@ function toArray($arg, $ish = false) {
   return [$arg];
 }
 
-/** Takes a string and a terminator; if the terminator is present at the 
+/** Takes a string and a terminator; if the terminator is present at the
  * end, returns the string with the terminator removed.
  * @param string $str
  * @param string $test
@@ -1994,7 +2018,7 @@ function removeStartStr($str, $test = '') {
 /** Returns $str with prepended $test string removed if str starts w. test;
  * else returns just the original $str.
  * @param string $str - the string to examine and remove leading string from
- * @param string $test - the string to remove from the given string, if it starts 
+ * @param string $test - the string to remove from the given string, if it starts
  * with it.
  * @ return string - the initial argument $str string, with $test removed if it exists
  */
@@ -2026,8 +2050,8 @@ function startsWith($haystack, $needle, $case = true, $longer = false) {
 
 /**
  * For Apache re-writes through an index.php (or other) file - returns the
- * base URL where the reroute file is - without 'index.php' (default) or 
- * whatever the reroute file name is - appended. 
+ * base URL where the reroute file is - without 'index.php' (default) or
+ * whatever the reroute file name is - appended.
  * @param string $rerouteBase - default: 'index.php'.
  * The file name Apache calls are routed through
  * @return string - The URL without the appended filename.
@@ -2048,7 +2072,7 @@ function getDomain() {
   return $domain;
 }
 
-/** This uses tricks like DNS lookup of IP Address - so can handle more 
+/** This uses tricks like DNS lookup of IP Address - so can handle more
  * complex domains, but also more error prone. Don't use unless necessary.
  * @return string - domain name
  */
@@ -2111,8 +2135,8 @@ function getRealPostArray() {
 /**
  * Attempt to implement var_export output for arrays with square brackets
  * instead of "array(...)"
- * 
- * JUST EXPERIMENTAL - USE ONLY FOR FORM SUGGEST, 
+ *
+ * JUST EXPERIMENTAL - USE ONLY FOR FORM SUGGEST,
  * @param mixed $var - what to output
  */
 function var_export_square($var, $depth = 0, $indent = '  ') {
@@ -2150,7 +2174,7 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
     } else if (is_bool($key)) {
       $key = ($$key ? "TRUE" : "FALSE");
     } else if (is_numeric($key)) {
-      
+
     }
     $output .= ("$key => " . var_export_square($value, $depth, $indent) . " ");
   }
@@ -2163,7 +2187,7 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
 }
 
 /**
- * Displays the data in hopefully readable format. 
+ * Displays the data in hopefully readable format.
  * @param mixed $data
  * @param int $level
  * @param int $indent
@@ -2197,7 +2221,7 @@ function displayData($data, $level = 0, $indent = 2) {
   require_once $filename;
   }
   }
- * 
+ *
  */
 
 function require_once_all($path, $ext = 'php') {
@@ -2218,8 +2242,8 @@ function require_once_all($path, $ext = 'php') {
  * Return how many dimensions an array/argument has.
  * My model - if $arg is not an array, return null.
  * If empty array, return 0.
- * 
- * @param mixed $arg: 
+ *
+ * @param mixed $arg:
  * @param type $depth
  * @return null|integer
  */
@@ -2244,7 +2268,7 @@ function array_dimension($arg, $depth = 0) {
  * with any values, and converts all the intKey => stringVal to stringVal => null
  * (or a passed in default value)-
  * Ex: ['id', 'name'=>'text','age','date'=>['format'=>'sql']] becomres:
- * ['id'=>$default, 'name'=>'text', 'age'=>$default, 'date'=>['format'=>'sql]] 
+ * ['id'=>$default, 'name'=>'text', 'age'=>$default, 'date'=>['format'=>'sql]]
  * @param array $array
  * @param mixed $default: default: null
  * @return array
@@ -2317,7 +2341,7 @@ function arrays_compatable($array1, $array2, $allowEmpty = false, $allowNotArray
 }
 
 /* * Quick lazy way to get a list of id's (or other values) from an array like:
- * [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Sally', ...]] 
+ * [['id'=>1, 'name'=>'Johnny'], ['id'=>2, 'name'=>'Sally', ...]]
  * With no (deault) arg, get [1,2,..], or if use arg = 'name', get ['Johnny', 'Sally',]
  */
 
@@ -2378,7 +2402,7 @@ function cciInArray($name, $array) {
   return false;
 }
 
-/** In between in_array($a, $b) & in_array($a,$b, true) -- it will match 
+/** In between in_array($a, $b) & in_array($a,$b, true) -- it will match
  * [0] && ['0'], but not 0 & null, etc...
  * @param type $needle
  * @param type $haystack
@@ -2416,19 +2440,19 @@ function equivalent($a, $b) {
     if ($b === null) {
     $b = '';
     }
-   * 
+   *
    */
   return $a === $b;
 }
 
-/** Displays a number as dollar format - or if array arg, totals the numeric 
+/** Displays a number as dollar format - or if array arg, totals the numeric
  * values of the array and retuns them as a $ formatted string
  * @param numeric|numeric array $num - the value or array of values to represent
  * @param int|string|array $opts:
  *   if int - precision $prec.
  *   If string - $wrap_class: enclose results in div w. class; negative in "$wrap_class negative-dollar-value"
  *   If boolean true - $wrap_class: enclose results in div w. class 'dollar-format'; negative in "$wrap_class negative-value"
- *   If array, look for those keys, & 'hide0' as well, for multiple options 
+ *   If array, look for those keys, & 'hide0' as well, for multiple options
  * @return string - dollar formatted
  */
 function d_f($num, $opts = 0, $hide0 = true) {
@@ -2466,10 +2490,10 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
 }
 
 /** Returns the key value of the array if it exists, or null
- * 
+ *
  * @param scalar $key: Key to test
  * @param array $array: Array to test in
- * @param boolean $emptyArray: default false; despite the function name, if 
+ * @param boolean $emptyArray: default false; despite the function name, if
  * $emptyArray is true, will return an empty array instead of null.
  * @return mixed or null: The value, if any, for $array[$key], or null
  */
@@ -2489,15 +2513,15 @@ function dollar_format($num, $opts = 0, $hide0 = false) {
   }
   return $emptyArray;
   }
- * 
+ *
  */
 
 /** Returns the value of the key for an Object or Array, else the default (or null)
  * the array at the key, or else the default value (null), or as specified
  * in the $default parameter
- * 
+ *
  * TODO: Currently,just access the values in scope (public, whatever) - add option for all attributes?
- * 
+ *
  * Will also return values of class static vars, even if modified in calling instance method!
  * @param scalar $key - Key into the array or object attributed
  * @param array|object $container - array/object to check for the key
@@ -2552,15 +2576,15 @@ function get_static_vars($object) {
   return $result;
 }
 
-/** Uses reflection to return (by default) ALL object vars and values, public, private, 
+/** Uses reflection to return (by default) ALL object vars and values, public, private,
  * static, but accepts parameters to limit scope. Also, can't return magic _get properties
- * 
+ *
  * #NOTE! If an object is derived from a class that declares a private variable, the name
  * of the variable will be visible if call $property->setAccessible(true) - BUT THE VALUE WILL NOT
  * But if the parent declares the property as protected, both the name and value will be available
- * 
+ *
  * #NOTE! Be careful of var_dump - some values may be recursive!
- * 
+ *
  * @param object $object - The object to fetch properties from
  * @param INT|NULL $permissions(optional) If set, is the ORed Permissions/Protection levels of attributes to return
  *        default: null -- all constants : ReflectionProperty::IS_STATIC |  ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE
@@ -2585,7 +2609,7 @@ function get_all_object_vars($object, $permissions = null) {
  * - already implemented as 'ancestry()'...
  * @param object|string $objclassname - either an object instance, or a class name
  * @return array hierarchy of ancestor class names, starting with this.
- * 
+ *
  */
 /*
   function getAncestors($objclassname){
@@ -2602,7 +2626,7 @@ function get_all_object_vars($object, $permissions = null) {
   $classhier = [$class];
 
   }
- * 
+ *
  */
 
 /**
@@ -2622,7 +2646,7 @@ function get_all_object_vars($object, $permissions = null) {
   }
   return $default;
   }
- * 
+ *
  */
 
 /** Returns only those $key/$value pairs in $array which have
@@ -2701,7 +2725,7 @@ function aspectRatio($filePath) {
 }
 
 /** Kind of hokey function that takes two arrays, and returns true if the second
- * array equals the first, up to the depth of the first. For example, 
+ * array equals the first, up to the depth of the first. For example,
  * ['image'], ['image','gif'] would return true...
  * @param type $arr1
  * @param type $arr2
@@ -2741,19 +2765,19 @@ function uniqueName($suffix = '') {
 }
 
 /** Good for PHP >= 7 -- alphanum, okay for URLs
- * 
+ *
  * @param int $len
  * @return string - random
  */
 function pkrandstr($len = 7) {
   $bytes = random_bytes($len); //random. Increase input for more bytes
-  $code = bin2hex($bytes); 
+  $code = bin2hex($bytes);
   return $code;
 }
 /**
  * Takes two arrays that have similar key structures, but then not. Makes an
  * array that combines the two input arrays up to the key parallels, then
- * adds the elements where the keys are different. 
+ * adds the elements where the keys are different.
  * Example: Args:
  * <tt>['idx1' => [ 'idx2' => [ 'name' => "abilito 2 .doc", ],]</tt> and
  * <tt>['idx1' => [ 'idx2' => [ 'type' => "application/msword", ],]</tt>
@@ -2786,7 +2810,7 @@ function array_meld($arr1, $arr2) {
 }
 
 /** Replaces or deletes any key/values in $arr1 with any comperable values in $arr2
- * 
+ *
  * @param type $arr1
  * @param type $arr2
  */
@@ -2808,7 +2832,7 @@ function array_meld($arr1, $arr2) {
   }
   return $arr1;
   }
- * 
+ *
  */
 
 /**
@@ -2830,20 +2854,20 @@ function array_remove_by_value($array, $value, $reindex = true) {
 }
 
 /**
- * 
+ *
  * @return array: Restructured $_FILES array, with the new array keys path/
  * sequence matching the control name - that is, if the file input name is:
  * <tt>input type='file' name='my_test_upload[idx1][idx2]'</tt>
  * the returned "files" array will contain:
- * 
+ *
  * 'my_test_upload' => [
   'idx1' => ['idx2' => [
- *   'name' => "abilito 2 .doc", 
+ *   'name' => "abilito 2 .doc",
  *   'type' => "application/msword",
- *   'tmp_name' => "C:\\Windows\\Temp\\php934C.tmp", 
+ *   'tmp_name' => "C:\\Windows\\Temp\\php934C.tmp",
  *   'error' => 0,
  *   'size' => 15360,  ],
- * 
+ *
  * @return array: The restructured $_FILES array.
  */
 function transposeFilesUploadsArray() {
@@ -2943,7 +2967,7 @@ function pk_encrypt($rawkey, $data, $utf8 = true, $cipher_type = MCRYPT_RIJNDAEL
 }
 
 /**
- * Decrypts arbitrary PHP data/object encrypted by pk_encrypt. 
+ * Decrypts arbitrary PHP data/object encrypted by pk_encrypt.
  * @param type $rawkey
  * @param type $data
  * @param type $cipher_type
@@ -3028,7 +3052,7 @@ function displayArraysAsTable($arr, $headers = [], $cssclasses = '') {
 /**
  * Mangages Static Cache Arrays of arbitrary depth. Initializes array down to
  * level depth-1 if no value exists.
- * 
+ *
  * Functions and static methods can use a static nested array to retain values
  * that don't need to be recalculated. For example, usage in a Class (with SubClasses):
  * <pre>
@@ -3068,8 +3092,8 @@ function manageStaticCache(&$cacheArr, $levels = []) {
   return;
 }
 
-/** Converts Unix/PHP time value to SQL format. 
- * 
+/** Converts Unix/PHP time value to SQL format.
+ *
  * @param int $unixtime - If not null, the unix time to convert to SQL format.
  * If null, return current moment as SQL date/time
  * @return string The SQL date/time
@@ -3084,7 +3108,7 @@ function unixtimeToSql($unixtime = null, $just_date = false) {
   return $mysqldate;
 }
 
-/** Difference between the SQL date & Unix Date in Seconds - 
+/** Difference between the SQL date & Unix Date in Seconds -
  * Positive values are SQL date AFTER UNIX, negative before.
  * If Unix date is null, defaults to now.
  * @param string $sqlDate
@@ -3098,10 +3122,10 @@ function diffSqlDate($sqlDate, $unixDate = null) {
 }
 
 /** Takes any $date arg, & tries to convert & return an
- * SQL date (time). 
+ * SQL date (time).
  * @param string|int $date - if valid SQL date/time, just return it
  *    if intish, assume it's unix time, convert to SQL Date/time
- *    if another string, hope it's 
+ *    if another string, hope it's
  * @param boolean $andtime - return sql time part also?
  * @return string|null - an SQL Date/Time if possible, else null
  */
@@ -3144,7 +3168,7 @@ function validSqlDate($val) {
 }
 
 /** Returns seconds diff (+future or -past) between $sqlDt1 & $sqlDt2
- * 
+ *
  * @param string $sqlDt1 - an SQL date
  * @param string|null $sqlDt2 - an SQL date, or NULL for now
  * @param boolean $just_date - just use date, not date-time for now
@@ -3228,7 +3252,7 @@ function elementWrap($text = '', $tag = 'td', $style = 'border: solid black 1px;
 }
 
 /** Returns the names or full paths of all files in the directory
- * 
+ *
  * @param string $dirPath The Directory path to search
  * @param boolean $fullPath Should return the full path of each file, or just
  *   the file names? Default true, full file path.
@@ -3253,7 +3277,7 @@ function getAllFilesInDir($dirPath, $fullPath = true) {
 }
 
 /** Like array_reverse, except also works on ArrayObjects
- * 
+ *
  * @param array|ArrayObject $items
  * @return - the items in reverse order
  */
@@ -3295,7 +3319,7 @@ function getNullPath() {
 }
 
 /** Returns a string value for true/false. Default is "True" or "False", but
- * 
+ *
  * @param mixed $val - truish or not
  * @param string $true - String to return if truish - default "True"
  * @param string $false - String to return if not truish - default "False"
@@ -3342,9 +3366,9 @@ function getBaseName($class = null) {
 }
 
 /** Doesn't belong here, but quick and dirty - to assign a "name" to an HTML
- * form element - if the first argument exists, the second argument is added 
+ * form element - if the first argument exists, the second argument is added
  * as an array key, or a series of array keys. Either argument can be an array
- * of strings. 
+ * of strings.
  * @param string|array|null $arg1 - the first argument to build the name from
  * @param string|array|null $arg2 - the second argument to build the name from
  * @return string - the HTML Form Input Element name
@@ -3356,7 +3380,7 @@ function getBaseName($class = null) {
  *    return 'goodbye[all][my][old][friends][hello]'
  * $arg1 = 'goodbye[my][old]',  $arg2 = [2,'friends'],
  *    return 'goodbye[my][old][2][friends]'
- * 
+ *
  */
 function buildFormInputNameFromSegments($arg1 = null, $arg2 = null) {
   $name = '';
@@ -3395,7 +3419,7 @@ function intOrNull($value = null) {
 }
 
 /** Case Insensitive "in_array" - works only with strings, of course
- * 
+ *
  * @param mixed $needle
  * @param array $haystack
  * @param boolean $strict
@@ -3431,46 +3455,46 @@ function isPost() {
 /* * I use lots of arrays for configuration, where I expect the form to be an
  * associative array of keys, each with a value array, like:
  * [$key1=>['p1'=>$scalar1, 'p2'=>$scalar2,..], $key2=>['p1'=>$vv1,...]]
- * 
+ *
  * But I don't want to write all that if not all params are set. I write the array
  * like: $config =[$key1,$key2=>$scalar2, $key3=['p1'=>$scalar3,'p2'=>$scalar4,..]
- * 
+ *
  * But in the above, $key1 is a value, not a key, and the value for $key2 is a
  * scalar, not an array. So this converts $config as written into a normalized form.
- * If $default &&  
+ * If $default &&
  * If $struct===null, return array will just switch indexed values to keys and
- * return [$key1=>$default, $key2=>$val2, etc. 
- * 
+ * return [$key1=>$default, $key2=>$val2, etc.
+ *
  * In the special case where $default = "#key", the default value will be the key
- * 
+ *
  * if $struct is string, returns
  * [$key1=>[$struct=>null], $key2=>[$struct=>$scalar2], $key3=>[$struct=>null, 'p1'=>$scalar3...
- * 
+ *
  * if $struct is an array, if $struct[0] is string, is used as above, but
  * the associative part of the array is used as defaults for the returned value arrays
  * and merged with the returned value arrays
- * 
- * if $struct is assoc array with no int keys, for array values is merged as 
+ *
+ * if $struct is assoc array with no int keys, for array values is merged as
  * above to provide defaults; but if val is scalar, stays the val
- * 
+ *
  * but want make them as simple as
  * possible - like, if I have array of function names and arguments, I might
- * use the funcname as key and args as val - but if the function doesn't take 
+ * use the funcname as key and args as val - but if the function doesn't take
  * args, don't want to bother with [$funcname => null, ...], so just use funcname
  * as a $val and let it have a numeric index. And if there may be a single val
  * with a default name, or ...
  * @param array $arr - the array to normalize to assoc array [$keyva1=>$val1,
- * @param array|string|null $struct - if present, has defaults for the return array 
+ * @param array|string|null $struct - if present, has defaults for the return array
  *   $struct might be: ['fieldtype','fieldtype'=>'integer','comparison'=>'numeric',...]
- *   
+ *
  *   foreach key of $arr, if the key is int & $val is string, make $val new $key
  *     and set the new val to $struct
  *     if $key is string, keep as index - if no $struct, keep val as val
  *     if $struct is scalar & $val is scalar, make val array: [$struct=>$val]
- *     if $struct is array - $struct[0] contains the keyname if $val is scalar 
+ *     if $struct is array - $struct[0] contains the keyname if $val is scalar
  *   if scalar - AND $val is scalar
- * @param mixed $default: The default 
- * 
+ * @param mixed $default: The default
+ *
  * @return array of form: [$keyName => ['valkey1' => $valOrDefault, 'valkey2
  */
 
@@ -3484,7 +3508,7 @@ function normalizeConfigArray(array $arr = [], $struct = null,$default=null) {
     $defarr = $struct;
   } else if (is_string($struct)) {
     $defkey = $struct;
-  } 
+  }
   $retarr = [];
   foreach ($arr as $origkey => $origval) {
     if (is_int($origkey) && is_string($origval)) {
@@ -3508,18 +3532,18 @@ function normalizeConfigArray(array $arr = [], $struct = null,$default=null) {
 }
 
 /** Normalize/convert an arg into an associative array if it isn't already.
- * 
+ *
  * @param stringish|array $arg - The argument to make into an ass arr if it isn't
  * @param string $key - the key for the primary argument, if the value is a string
  * @param array|string $defaults - the defaults for the argument array
  *   If string, make it an array w. the same key as arg
  * @param array $addons - values to add to the argument array, if any
  * @param array $replace - if you want you just totally replace any key values
- * 
- * Example: arrayifyArg(null, null, ['class'=>'col', 'tag'=>'div']) 
+ *
+ * Example: arrayifyArg(null, null, ['class'=>'col', 'tag'=>'div'])
  * returns: ['class'=>'col','tag'=>'div']
- * 
- * arrayifyArg('Name',null,['tag'=>'div']) 
+ *
+ * arrayifyArg('Name',null,['tag'=>'div'])
  * returns ['value'=>'Name', 'tag'=>'div]
  */
 function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = null, $replace = null) {
@@ -3563,7 +3587,7 @@ function arrayifyArg($arg = null, $key = 'value', $defaults = null, $addons = nu
 }
 
 /**
- * For getting valid params or defaults. REMOVES $param key=>values if 
+ * For getting valid params or defaults. REMOVES $param key=>values if
  * $key not in $default - so safe to use with extract($result);
  * Takes an associative array of parameters, and associative array of
  * defaults and returns an associative array JUST WITH KEYS IN DEFAULTS,
@@ -3579,7 +3603,7 @@ function getParamsOrDefault($params = [], $defaults = []) {
   return array_merge($defaults, $params);
 }
 
-/** Takes a scalar as first arg, and unlimited other args 
+/** Takes a scalar as first arg, and unlimited other args
  * (arrays or objects) and returns the first non-empty value for that key.
  * @param scalar $key
  * @param arrayish $arg1
@@ -3685,7 +3709,7 @@ function unsetret(&$arr, $key = null, $default = null) {
 }
 
 /** Takes an arbitrary number of mixed args, returns as a flattened array
- * 
+ *
  */
 if (!function_exists('array_flatten')) {
 
@@ -3707,7 +3731,7 @@ if (!function_exists('array_flatten')) {
 }
 
 /** Like Explode, but delimeter may be an ARRAY of delimiters, so all exploded.
- * 
+ *
  * @param string|array $delimiter
  * @param string $string
  * @param boolean|string $trim - default TRUE, trim results. If false, don't, if
@@ -3769,8 +3793,8 @@ function classHierarchy ($oorc) {
   return $hierarchy;
 }
 
-/** Ascends the class hierarchy & returns all the traits used 
- * inherited by this class 
+/** Ascends the class hierarchy & returns all the traits used
+ * inherited by this class
  * @param type $oorc
  */
 function getAllTraits($oorc) {
@@ -3798,7 +3822,7 @@ function getTraits($oorc, $traitsusingtraits) {
 }
 
 /** Does an object/class use a trait? Like instanceOf
- * 
+ *
  * @param type $oorc
  * @param string $trait
  * @root - just compare the root, not the whole namespace name
@@ -3809,7 +3833,7 @@ function hasTrait($oorc, $trait, $root = true) {
   if (!$root) {
     return in_array($trait, $traits, 1);
   }
- * 
+ *
  */
   /** Checks if class "instanceOf" $traitname, or all of [traitnames]
    * $target - default null, so for the current class. Else,
@@ -3851,7 +3875,7 @@ function usesTrait($traitName, $target, $useBaseName=true) {
   return true;
 }
 
-/** Returns the trait methods - if $trait is an array, 
+/** Returns the trait methods - if $trait is an array,
  * all the methods for all the traits
  * @param string|array $trait
  * @param array of traits to ignore/remove
@@ -3869,7 +3893,7 @@ function traitMethods($traits, $omittraits=[]) {
   foreach ($traits as $trait) {
     $reflection = new ReflectionClass($trait);
     $traitmethods = array_merge($traitmethods,
-        array_map(function($ar) {return $ar->name;},($reflection->getMethods()))); 
+        array_map(function($ar) {return $ar->name;},($reflection->getMethods())));
   }
   //pkdebug("Trait Methods:", $traitmethods);
   return array_unique($traitmethods);
@@ -3884,7 +3908,7 @@ function isJson($string) {
   string(17) "fillableFromArray"
   ["class"]=>
   string(54) "Illuminate\Database\Eloquent\Concerns\GuardsAttributes"
- * 
+ *
  */
 
 
