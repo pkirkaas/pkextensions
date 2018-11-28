@@ -305,8 +305,11 @@ abstract class PkController extends Controller {
       $pkmodel->save();
       return $pkmodel;
     } else {
+      /*
       pkdebug("No file uploaded to ".get_class($pkmodel).
           " for att: [$attName] with ctlName: [$ctlName]");
+       * *
+       */
     }
   }
 

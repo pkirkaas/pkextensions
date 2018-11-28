@@ -108,6 +108,9 @@ abstract class PkModel extends Model {
   //Restore "create" to models..
 public static function create(array $attributes = []) {
   $model = static::query()->create($attributes);
+  if ( removeEndStr(static::class, "Bouncer")) {
+    pkdebug("Att shift_j:", keyVal('shift_j',$attributes), "b->sj",$model->shift_j);
+  }
   return $model;
 }
 

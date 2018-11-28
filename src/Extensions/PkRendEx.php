@@ -46,7 +46,7 @@ class PkRendEx extends PkHtmlRenderer {
   //}
   public function announce($msg) {
     $msg.="\n\n".$this->report();
-    pkdebug ($msg);
+    //pkdebug ($msg);
   }
 
   public function makeChild() {
@@ -97,7 +97,7 @@ class PkRendEx extends PkHtmlRenderer {
 
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $rep = $this->report();
-    pkdebug("Can I write now? .. $rep  ");
+    //pkdebug("Can I write now? .. $rep  ");
     $ctype = typeOf($content);
     //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);

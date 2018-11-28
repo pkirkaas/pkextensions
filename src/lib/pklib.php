@@ -792,7 +792,7 @@ function pkdebugOut($str, $logpath = null) {
     //$logpath =  WP_CONTENT_DIR.'/app.log';
     //$logpath = $_SERVER['DOCUMENT_ROOT'] . '/logs/app.log';
     if (!$logpath) $logpath = appLogPath();
-    if (isCli()) {
+    if (isCli() && $first) {
       echo ("The logpath: [$logpath]\n");
     }
     if (PkLibConfig::$isWarning) {
