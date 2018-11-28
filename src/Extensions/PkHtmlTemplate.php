@@ -74,7 +74,7 @@ data-ajax-params='{!!data-ajax-params!!}' data-tootik='{{data-tootik}}'>{{label}
       'wrapval'=>['wrapAtts'=>'','lblWrap'=>'pk-lbl', 'valWrap'=>'pk-val', 'wrapClass'=>''],
       'js-ajax-button'=>["button-class"=>'site-button',
           'data-ajax-params'=>'', 'label'=>'Submit'],
-      'checkSet' => ['checkrow'=>'check-row',
+      'checkSet' => ['checkrow'=>'check-row', 'check'=>'',
           'checkclass'=>'check-class inline', 'labelclass'=>'pk-lbl inline',
           'checkstyle'=>'zoom:1.5;', 'labelstyle'=>''],
   ];

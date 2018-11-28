@@ -510,7 +510,7 @@ trait BuildQueryTrait {
   public function filterCustomMethods($collection) {
     $newcol = $collection;
     foreach($this->customMethods as $filterdata) {
-      pkdebug("Did enter with a custom method to search...");
+      //pkdebug("Did enter with a custom method to search...");
       $newcol = call_user_func_array($filterdata['callable'], [$filterdata, $newcol]);
     }
     return $newcol;
@@ -657,7 +657,7 @@ trait BuildQueryTrait {
              closure, method, etc. That runable should accept two arguments - this critset,
              and the collection that passed through the SQL part
              */
-            pkdebug("About to add critset to custom methods: critset:",$critset);
+            //pkdebug("About to add critset to custom methods: critset:",$critset);
             $critset['callable'] = [$this, "customCompare$comptype"];
             $this->customMethods[] = $critset;
 
@@ -764,7 +764,7 @@ trait BuildQueryTrait {
       $root = $critset['root'];
       $in = ($crit === 'IN');
       $val = $critset['val'];
-      pkdebug("In the customCopare: crit: [$crit], root: [$root], in:",$in,"val:", $val);
+      //pkdebug("In the customCopare: crit: [$crit], root: [$root], in:",$in,"val:", $val);
       if (!$crit) return $collection;
       $toArr = function($tst) { #Try to make the arg arrayable - & only the values
         return iterable_values($tst) ?? [];
@@ -772,8 +772,7 @@ trait BuildQueryTrait {
       $isIntersect = function($a,$b) use ($toArr, $in) {
           $res =  array_intersect($toArr($a), $toArr($b)) ?
             $in : !$in;
-          pkdebug("In isIntersect, toarra:",$toArr($a),"toarrb:", $toArr($b), "res:",
-              $res);
+    //pkdebug("In isIntersect, toarra:",$toArr($a),"toarrb:", $toArr($b), "res:", $res);
         return array_intersect($toArr($a), $toArr($b)) ?
           $in : !$in;
       };
@@ -826,7 +825,6 @@ trait BuildQueryTrait {
   #  Have to distinguish between SQL query filters & match set/method
   ## Filters. AND - Don't build filter if "don't care"
   public function buildQuerySets(Array $arr = []) {
-    pkdebug("Building");
     //if ($this->matchObjs === null) {
       //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
     //}
