@@ -43,7 +43,7 @@ class PkUser extends PkModel
         'password', 'remember_token',
     ];
   public static $table_field_defs = [
-      'name' => ['type'=>'string', 'methods'=>['nullable','unique']],
+      'name' => ['type'=>'string', 'methods'=>['nullable','inde']],
       'email' => ['type' => 'string', 'methods' => 'unique'],
       'password' =>  ['type'=>'string', 'methods'=>'nullable'],
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
