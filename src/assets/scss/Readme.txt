@@ -20,6 +20,9 @@ Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
 
   wNpc, widthNpc, hNpc, heightNpc - where N 1-100%
 
+  NOW! Just simple preset widths in em:
+  w10em, w20rem - {width: 10em/10rem;}, etc.
+
 
 min-line-height - empty div minimum 1 line height
 

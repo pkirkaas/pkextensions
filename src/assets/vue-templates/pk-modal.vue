@@ -103,7 +103,7 @@ export default {
         if (this.reloadrefs) {
           lrlr = lrlr.concat(this.reloadrefs);
         }
-        this.reloadrefs = uniqArr(lrlr);
+        this.reloadrefs = window.uniqArr(lrlr);
         //console.log("PkModal-ReloadRefs:", this.reloadrefs);
         /*
     */
@@ -119,8 +119,16 @@ export default {
         }
       },
       submit: function(event) {
-        console.log("About to call initData in pk-modal:", this.modalparams.initData); 
-         this.modalparams.initData(); 
+        var initData = function() {console.log("There was no initData for this");};
+        if (typeof this.modalparams.initData === 'function') {
+          initData = this.modalparams.initData;
+        }
+        if (this.$refs && this.$refs.content && this.$refs.content.initData
+            &&(typeof this.$refs.content.initData === 'function')) {
+          initData = this.$refs.content.initData; 
+        }
+        console.log("About to call initData in pk-modal:"); 
+        initData(); 
         //console.log("Submit from Modal; loadedrefs:",this.reloadrefs);
         if (this.$refs && this.$refs.content && this.$refs.content.submit
                 &&(typeof this.$refs.content.submit === 'function')) {
@@ -174,10 +182,8 @@ export default {
                   }
                 });
               }
-            }).
-            catch(error=>{
-              console.error("Error:",error,error.response);
-            });
+            }).catch(defaxerr);
+            
           $(":input.jq-wipe").val('');
           this.$parent.showModal=false;
           this.reset();

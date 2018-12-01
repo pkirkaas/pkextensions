@@ -20,6 +20,552 @@ window.Vue.component('pk-input-container',{
 });
 */
 
+const Vue = window.Vue;
+//
+//////////////  Mixins //////////
+window.formatMixin = {
+  methods: {
+    formatDate: function(dt,fmt) {
+      if ((typeof dt === 'object') && (dt !== null)) {
+        dt = dt.date;
+      }
+      if (fmt === "DtTm") {
+        fmt = "MMM D YYYY  h:mm A";
+      } else if (fmt === "Dt") {
+        fmt = "MMM D YYYY";
+      } else if (fmt === "Tm") {
+        fmt = "h:mm A";
+      }
+      //"MMM D YYYY  h:mm A" - Nov 2 2018 3:05 PM
+      fmt = fmt || "MMMM D, YYYY";
+      var m = window.moment(dt);
+      if (!m.isValid()) {
+        console.error("Invalid date: ",dt);
+        return '';
+      }
+      return m.format(fmt);
+      //return m.isValid() ? m.format(fmt) : '';
+    },
+    formatCurrency: function(amt) { //Returns a wrapped value for negative
+      num = Number(amt);
+      if (isNaN(num)) {
+        console.error("Invalid number: ",amt);
+        return ' ';
+      }
+      if (!num || (num == 0)) {
+        return ' ';
+      }
+      var sign = '';
+      var cssclass = ' dollar-value '
+      if (num < 0) {
+        num = -num;
+        sign = '-';
+        cssclass += ' negative-dollar-value ';
+      }
+      return "<div class='"+cssclass+"'>"+sign +'$'+  num.toLocaleString("en");
+    },
+    formatChecked: function(val) { //If val is string, check if "0"
+      if (typeof val === 'string'){
+        var tst = parseInt(val);
+        if (!isNaN(tst)) {
+          val = tst;
+        }
+      }
+      if (val) {
+        return  '&#9745;';
+      }
+      return  '&#9744;';
+    },
+    formatEmpty: function(val) { //If undefined, empty string
+      if (!val) return ' ';
+      return val;
+    },
+    formatFixed: function(val,prec) {
+      prec = prec || 2;
+      val = Number(val);
+      if (isNaN(val)) {
+        return '';
+      }
+      return val.toFixed(prec);
+    },
+    /*Format a link - val=url, if opt=string, the label, else opt object: {
+      label: the label
+      class: the CSS class
+      atts: Arbitrary attributes (as string)
+    */
+   formatSSN: function(ssn) {
+      ssn = ssn.trim();
+      var ssarr = Array.from(ssn);
+      if (ssarr.length !== 9) {
+        console.error("Invalid SSN: ", ssn);
+        return '';
+      }
+      var ss1 = ssarr.slice(0,3).join('');
+      var ss2 = ssarr.slice(3,5).join('');
+      var ss3 = ssarr.slice(5,9).join('');
+      var ssf = ss1 +'-'+ss2+'-'+ss3;
+      return ssf;
+   },
+       
+    formatLink: function(val,opt) { 
+      if (!opt) {
+        opt = {};
+      } else if (typeof opt === 'string') {
+        opt = {label:opt};
+      }
+      return "<a href='"+val+"' class='"+opt.class+"' "+opt.atts+">"+opt.label+"</a>";
+
+    }
+  }
+};
+
+/////   Table make Mixin //////////
+
+/**
+ Assumes caller data:  {
+  ids: array of IDs,
+  model: PkModelName,
+  keymap: Object. keys as att names, & value as label str
+     or object of properties- {
+        label: Label for the cell, if small viewport
+        lblcls: Label CSS for the cell, if small viewport
+        fldcls: Field CSS Class
+        cellcls: Cell CSS (if small viewport, so includes both label & field
+  tbldata: object containing the table data:
+      head:Table Header
+      headcls: Head CSS  class
+      tblcls: Table Class
+      bp:  xs, sm, md, lg, xl
+      rowinfo: (Overridden in rowdataarr)
+  
+  url: (opt str) - default: '/ajax/fetchattributes'
+
+*/
+window.tableMixin = {
+  methods: {
+    initData: function() {
+      var lblrow = {};
+      this.tbldata.bp = this.tbldata.bp || 'md';
+      //var tbldata = _.cloneDeep(this.tbldata);
+      //var rowinfo = tbldata.rowinfo ?   _.cloneDeep(tbldata.rowinfo): {};
+      this.tbldata.rowinfo = this.tbldata.rowinfo ? this.tbldata.rowinfo : {};
+      var lblrowinfo =   _.cloneDeep(this.tbldata.rowinfo);
+      lblrowinfo.islbl = true;
+      var rowdataarr = [];
+      //var lblrow = _.cloneDeep(this.rowdataarr[0]);
+      var keys = Object.keys(this.keymap);
+      var lblcelldataarr = [];
+      for (var key in this.keymap) {
+        var map = this.keymap[key];
+        if (typeof map === 'string') {
+          map = {label: map};
+        }
+        lblrow[key] = Object.assign({},map,{field:map.label});
+        lblcelldataarr.push(lblrow[key]);
+        this.keymap[key] = map;
+      }
+      rowdataarr.push({celldataarr:lblcelldataarr,rowinfo:lblrowinfo,bp:this.tbldata.bp});
+      //We made the first label row.
+      var url = this.url || '/ajax/fetchattributes';
+      var data = {id:this.ids, model:this.model,keys:keys};
+      axios.post(url,data).
+        then(response=>{
+          //console.log("The response data:",response.data);
+          response.data.forEach(row=>{
+            var keymap = _.cloneDeep(this.keymap);
+            var celldataarr = [];
+            for (var akey in row) {
+              if (keymap[akey].format) {
+                var format = keymap[akey].format;
+                keymap[akey].field = this[format](row[akey],keymap[akey].formatopts);
+              } else {
+                keymap[akey].field = row[akey];
+              }
+              celldataarr.push(keymap[akey]);
+            }
+            rowdataarr.push({celldataarr:celldataarr,rowinfo:this.tbldata.rowinfo});
+          });
+          this.tbldata.rowdataarr=rowdataarr;
+          //console.log("The tbldata:",this.tbldata);
+        }).
+        catch(defaxerr);
+    },
+    
+  },
+};
+
+//Simple stuff, like non-null object, & not empty
+window.utilityMixin = {
+  methods: {
+    isObject(tst) { 
+      if ((typeof tst === 'object') && (tst !== null)) {
+        return tst;
+      }
+      return false;
+    },
+//Probably better than below. Data can use sensible defaults, & only params that have keys can override first from settings, second from params
+    overrideDefaults: function(settings) {
+      if (!this.isObject(settings)) {
+        settings = {};
+      }
+      if (!this.isObject(this.params)) {
+        this.params = {};
+      }
+      var datakeys = Object.keys(this.$data);
+      datakeys.forEach((key,idx) => {
+        if (key in settings) {
+          this[key] = settings[key];
+        } else if (key in this.params) {
+          this[key] = this.params[key];
+        }
+      });
+    },
+    //Called from mounted, defaults an object w. param keys & defaults to set data to
+    // Assumes "params" in props
+    initDataFromParams(defaults) {
+      for (var key in defaults) {
+        this[key] = this.params[key] || defaults[key];
+      }
+      var lblwidth = this.params.lblwidth || defaults.lblwidth;
+      if (lblwidth && this.label) {
+        this.lblstyle = this.lblstyle + " width: "+lblwidth+"; ";
+      }
+      //Do same for input width, like checkbox:
+      var inpwidth  = this.params.inpwidth || defaults.inpwidth;
+      if (inpwidth) {
+        this.inpstyle += " width: "+inpwidth+"; ";
+      }
+    },
+    showThisFromDefaults(defaults,lbl) {
+      if (!defaults) defaults=this.defaults;
+      var vals = {};
+      for (var key in defaults) {
+        vals[key] = this[key];
+      }
+      //console.log(lbl+ " Current this values:",vals);
+      return vals;
+    }
+  }
+};
+
+/** For a top-level stand-alone Vue instance that pops up a pk-modal-wrapper button
+ * for Modal submission form, &
+ * then wants to update other data on the page based on the changes
+ * See top of file for docs, and
+ * LQP/apps/resources/... activeprofile.blade.php, PostComponents.vue,
+ *  & post_button.phtml for examples
+ */
+window.refreshRefsMixin = {
+  methods: { // (But this is also in the mixin reloadRefsMixin)
+    setReloadRefs: function (reloadrefs) {
+      if (reloadrefs) {
+        if (this.$refs && this.$refs.modal_wrapper
+              && this.$refs.modal_wrapper.setReloadRefs) {
+          this.$refs.modal_wrapper.setReloadRefs(reloadrefs);
+        }
+        this.postparams.reloadrefs = this.postparams.reloadrefs.concat(reloadrefs);
+      }
+    }
+  }
+};
+
+/****
+ * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
+ * // Input/TextArea - as soon as lose focus, select as soon as select, checkbox
+ * // as soon as check, etc.
+ * 
+ * 
+ * Assume all expect their main "props" is "params". They use the inputMixin,
+ * as well a utility mixin, & possbily format Mixn. They have aside from the 
+ * value parameters, some standards for their appearance. There are generally
+ * 2-3 elements - the input, (optional label div) and a div wrapper.
+ * Each (Wrapper, label div, & input, have a default CSS Class, as well as suppimentary 
+ * classes AND styles provided by the params. The p
+ */
+// Common mixin for all immediate inputs
+window.inputMixin = {
+  /**
+   * 'params' object 
+   *   model:
+   *   id:
+   *   name:
+   *   value:
+   *   tooltip: (opt: Tooltip for intput)
+   *   submiturl: (opt: default: "/ajax/submit")
+   *   fetchurl: (opt: default: "/ajax/fetchattributes"
+   *   formatin: (opt - format method to show the data)
+   *   formatout (opt - format method to submit the data)
+   *   inpcss(opt - css class for the input)
+   *   type(opt - input type)
+   *   ownermodel(opt)
+   *   ownerid (opt)
+   *   label: (opt - label for control - then will be wrapped)
+   *   lblcss:  (opt - css class for input)
+   *   wrapcls:  (opt - css class for input)
+   *   lblstyle: (opt -custom styles for the element)
+   *   wrapstyle: (opt -custom styles for the element)
+   *   inpstyle: (opt -custom styles for the element)
+   *   @atts & noInherit: Possibe way to inject arbitrary atts into an el?
+   * @type object
+   */
+  props: ['params'],
+  data() {
+      var defaults = {
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
+        checked:null, options:[],checkedvalue:1,uncheckedvalue:0,
+        lblwidth: null, inpwidth:null}; //If input or label width is limited, 
+         //the other element can take the space. 
+    var data = defaults;
+    data.defaults = defaults;
+    console.log("INIT DATA:",data);
+    return data;
+    /*
+    return {
+      name:null,
+      value: null,
+      id: null,
+      ownermodel: null,
+      ownerid: null,
+      model: null,
+      inpcss: null,
+      formatin: null,
+      formatout: null,
+      lblcss: null,
+      label: null,
+      tooltip: null,
+      submiturl: null,
+      fetchurl: null,
+      attribute: null,
+      foreignkey: null,
+      wrpcss: null,
+
+
+    };
+    */
+
+  },
+  mounted() {
+      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
+      this.initDataFromParams(this.defaults);
+      this.initData();
+
+  },
+  methods: {
+    //Special for checkboxes - usually true/false - & if not checked sends nothing,
+    //so not false. This will both toggle the appearance of the checkbox, AND send
+    //the unchecked value, so can clear
+    setCheckedState() {
+      if(this.value == this.checkedvalue) {
+        this.checked = true;
+      } else {
+        this.checked = false;
+      }
+    },
+    toggleCheckState(event,arg) {
+      //console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
+      if(this.value == this.checkedvalue) {
+        this.value = this.uncheckedvalue;
+        this.checked = false;
+      } else {
+        this.value = this.checkedvalue;
+        this.checked = true;
+      }
+      //console.log("After toggle state, this.checked:",this.checked,"value",this.value);
+    },
+    initData() {
+    
+      this.showThisFromDefaults(this.defaults,"InpCtl About to fetch");
+      axios.post(this.fetchurl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       keys: this.name,
+     }).then(response=>{
+       //console.log("Succeeded in fetch, resp:", response);
+       var value = response.data[this.name];
+       if (this.formatin) {
+         value = this[this.formatin](value);
+       }
+       this.value = value;
+       if (this.value == this.checkedvalue) {
+         this.checked=true;
+       } else {
+         this.checked = false;
+       }
+       var defaults = this.defaults;
+       var curr = {};
+       
+       for (var key in defaults) {
+         curr[key] = this.key;
+       }
+       //console.log("After inits, the current data:",curr);
+     }).
+      catch(defaxerr);
+    },
+    savesubmit(event,arg) {
+      //console.log ("Save submit event",event,"Arg:",arg);
+      this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
+      if (this.formatout) {
+        this.value = this[this.formatout](this.value);
+        //var fields = {[keys]:val
+      }
+      axios.post(this.submiturl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       foreignkey: this.foreignkey,
+       attribute: this.attribute,
+       fields: {[this.name]:this.value},
+     }).then(response=>{
+       //console.log("Succeeded in submit resp:", response);
+       var data = response.data;
+       this.id = data.id;
+       var value = data[this.name];
+       if (this.params.formatin) {
+         value = this[formatin](value);
+       }
+       this.value = value;
+     }).
+      catch(defaxerr);
+    },
+    }
+    
+
+  };
+/** Automates some gathering & submitting of ajax data. 
+ * @method fetchData fetches input data from within an enclosing '.input-container',
+ * (which is part of pk-modal anyway)
+ * adds any optional params passed in, & returns the form data object.
+ * @method submitData takes a url & form data & posts it, then calls the method
+ *    this.processResponse(data) in the implementing component. 
+ *  @method autoSubmit takes optional url & params - default Url is /ajax/sumbit
+ *    it passes the params to fetchData, then performs the ajax call.
+ *    All the implementing component needs to do is create the form & 
+ *    implement the response handler.
+ * @type Vue mixin
+ */
+window.ajaxpostingMixin = {
+  // MUST IMPLEMENT loadData(data) in each form that uses this.
+  methods: {
+    fetchDataNoFD: function(params) { //Gets data from the form w jQuery, & merges params with it
+      var emptyobj = {};
+      var el = this.$el;
+      $(el).closest(".input-container").find(":input").each(function(idx, inp) {
+        //console.log("The el of the posting comp is:", el);
+        // Base data collection
+        $inp =  $(inp);
+        var key =$inp.attr('name'); 
+        var val = $inp.val(); 
+        emptyobj[key] =val;
+      });
+      if (params !== null && typeof params === 'object') {
+        for (var akey in params) {
+          emptyobj[akey] = params[akey];
+        }
+      }
+      //console.log ("The fetch raw key/vals: ", emptyobj);
+      return emptyobj;
+    },
+
+    fetchData: function(params) { //As above, but with the FormData object. Testing both
+      var fd = new FormData();
+      var el = this.$el;
+      var me = this;
+      //console.log ("Mixin el is:",el);
+      //Find the nearest "form container", then all the inputs
+      var emptydata = {};
+       $(el).closest(".input-container").find(":input").each(function(idx, inp) {
+          var $inp = $(inp);
+          //fd.append($inp.attr('name'),$inp.val());
+          emptydata[$inp.attr('name')]=$inp.val();
+      }); 
+
+      //Add any extra data in params
+      if (params && (typeof params === 'object')) {
+        for (var key in params) {
+//          fd.append(key,params[key]);
+           emptydata[key] = params[key];
+        }
+      }
+      return emptydata;
+    },
+
+    submitData: function (url,fd) { //AJAX submits the data
+      axios.post(url,fd).
+        then(response=>{
+          var data = response.data;
+          if (this.processResponse && (typeof this.processResponse === 'function')) {// A callback using classes can implement for further processing
+            this.processResponse(data);
+          }
+          this.notifyUpdate();
+        }).catch(defaxerr);
+    },
+
+    autoSubmit: function(url,params) {
+      if (!url) {
+        url = "/ajax/submit";
+      }
+      var fd = this.fetchData(params);
+      this.submitData(url,fd);
+    },
+    notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
+      if (this.params.reloadrefs) {
+        var reloadrefs = this.params.reloadrefs;
+        if (!Array.isArray(reloadrefs)) {
+          reloadrefs = [reloadrefs];
+        }
+        reloadrefs.forEach(function(el) {
+          if (el.initData) {
+            el.initData();
+          }
+        });
+      }
+      /*
+      if (!refs) {
+        refs = this.refs;
+      }
+      if (!refs) {
+        return;
+      }
+      if (!Array.isArray(refs)) {
+        refs = [refs];
+      }
+      console.log("In notify update, refs :",refs);
+      refs.forEach( (cmp, idx) => {
+        console.log("In Loop, cmp:",cmp);
+        this.$root.refresh(cmp);
+        //cmp.initData();
+      });
+    },
+    */
+  },
+
+  ajaxInitData: function() { //Need sufficient data - if we have it, the implementing component should just call this from initData()
+     //Maybe getting 1 or many. At least need model & either id (or array of IDs), or foreign_key & foreign_key value
+     //Assume we get those in the params prop
+     var url = this.params.url || "/ajax/fetchattributes";
+     var data = {
+        extra: this.params.extra,
+        keys: this.param.keys,
+        model: this.param.model,
+        ownermodel: this.param.ownermodel,
+        ownerid: this.param.ownerid,
+        attribute: this.param.attribute,
+        keys: this.param.keys,
+      }; 
+      axios.post(url,data).done(results=>{
+        console.log("Success, about to call 'this.loadData() with: ", results.data);
+        this.loadData(results.data);}).catch(defaxerr);
+        
+    }
+ },
+};
 
 /** pk-modal-wrapper - creates a button that opens a modal when clicked.
  * Wraps both the button & modal - 
@@ -499,16 +1045,54 @@ window.Vue.component('data-item',{
   },
 });
 
-Vue.component('data-label-pair', {
+
+/** Looks like it wraps a label with associated data value OR input ctl
+ * 
+ */
+window.Vue.component('data-label-pair', {
   name: 'data-label-pair',
   template: `
-    <div :class="lblcls" :style="lblstyle" v-html="label"></div>
-    <div :class="fldcls" :style="fldstyle" v-html="field"</div>
+  <div class="pair-wrap lpair-wrap" :class="pair_wrap" :style="pair_wrap_style">
+    <div class="pk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
+    <div class="pk-val" :class="fldcls" :style="fldstyle" v-html="field"></div>
+  </div>
   `,
   props: ['params'],
+  data: function() {
+    return {
+      field:null,
+      lblcls:null,
+      lblstyle:null,
+      label:null,
+      fldcls:null,
+      fldstyle:null,
+      pair_wrap:null,
+      pair_wrap_style:null,
+    };
+  },
+  mounted: function() {
+    if (!this.params.input) {
+      this.field = this.params.field;
+    } else {
+      this.field =  window.Vue.buildInput(this.params);
+    }
+    this.lblcls = this.params.lblcls || '';
+    this.lblstyle = this.params.lblstyle || '';
+    this.label = this.params.label || '';
+    this.fldcls = this.params.fldcls || '';
+    this.fldstyle = this.params.fldstyle || '';
+    this.pair_wrap = this.params.pair_wrap || '';
+    this.pair_wrap_style = this.params.pair_wrap_style || '';
+    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+  },
+    /*
   computed: {
-    lblcls: function() {return this.params.lblcls || " rt-fldcls rt-lblcls ";},
-    fldcls: function() {return this.params.fldcls || " rt-fldcls rt-lblcls ";},
+    //lblcls: function() {return this.params.lblcls || " rt-fldcls rt-lblcls ";},
+    //fldcls: function() {return this.params.fldcls || " rt-fldcls rt-lblcls ";},
+    lblcls: function() {return this.params.lblcls;},
+    fldcls: function() {return this.params.fldcls;},
     lblstyle: function() {return this.params.lblstyle;},
     fldstyle: function() {return this.params.fldstyle;},
     label: function() {return this.params.label;},
@@ -516,10 +1100,11 @@ Vue.component('data-label-pair', {
       if (!params.input) {
         return this.params.field;
       } else {
-        return Vue.buildInput(params);
+        return window.Vue.buildInput(params);
       }
     },
   },
+    */
 });
 
 /** Builds an HTML input based on params:
@@ -546,7 +1131,7 @@ Vue.buildInput = function(params) {
   var inpcls = params.inpcls + defcls ;
   var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
           placeholder+'" '+ params.inpatts + ' ';
-  var type = params.type;
+  var type = params.type || 'text';
   //console.log("Build Input: params:",params,"cmnatts:",cmnatts);
   if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
@@ -674,9 +1259,7 @@ Vue.component('delete-btn', {
           $(this.$el).closest(delfromdom).remove();
         }
         console.log("\nDelete Success w. response:\n", response);
-      }).catch(error=>{
-        console.log("\nDelete Failed w. error:\n", error);
-      });
+      }).catch(defaxerr);
     }
   }
 }); 
@@ -980,425 +1563,11 @@ window.Vue.component('resp-tbl', {
 
 
 
+
 /******************** END  Reactive Tables ************************/
 
+//// Ajax Input Components (Use mixins below)
 
-//////////////  Mixins //////////
-window.formatMixin = {
-  methods: {
-    formatDate: function(dt,fmt) {
-      if ((typeof dt === 'object') && (dt !== null)) {
-        dt = dt.date;
-      }
-      if (fmt === "DtTm") {
-        fmt = "MMM D YYYY  h:mm A";
-      } else if (fmt === "Dt") {
-        fmt = "MMM D YYYY";
-      } else if (fmt === "Tm") {
-        fmt = "h:mm A";
-      }
-      //"MMM D YYYY  h:mm A" - Nov 2 2018 3:05 PM
-      fmt = fmt || "MMMM D, YYYY";
-      var m = window.moment(dt);
-      if (!m.isValid()) {
-        console.error("Invalid date: ",dt);
-        return '';
-      }
-      return m.format(fmt);
-      //return m.isValid() ? m.format(fmt) : '';
-    },
-    formatCurrency: function(amt) { //Returns a wrapped value for negative
-      num = Number(amt);
-      if (isNaN(num)) {
-        console.error("Invalid number: ",amt);
-        return ' ';
-      }
-      if (!num || (num == 0)) {
-        return ' ';
-      }
-      var sign = '';
-      var cssclass = ' dollar-value '
-      if (num < 0) {
-        num = -num;
-        sign = '-';
-        cssclass += ' negative-dollar-value ';
-      }
-      return "<div class='"+cssclass+"'>"+sign +'$'+  num.toLocaleString("en");
-    },
-    formatChecked: function(val) { //If val is string, check if "0"
-      if (typeof val === 'string'){
-        var tst = parseInt(val);
-        if (!isNaN(tst)) {
-          val = tst;
-        }
-      }
-      if (val) {
-        return  '&#9745;';
-      }
-      return  '&#9744;';
-    },
-    formatEmpty: function(val) { //If undefined, empty string
-      if (!val) return ' ';
-      return val;
-    },
-    formatFixed: function(val,prec) {
-      prec = prec || 2;
-      val = Number(val);
-      if (isNaN(val)) {
-        return '';
-      }
-      return val.toFixed(prec);
-    },
-    /*Format a link - val=url, if opt=string, the label, else opt object: {
-      label: the label
-      class: the CSS class
-      atts: Arbitrary attributes (as string)
-    */
-   formatSSN: function(ssn) {
-      ssn = ssn.trim();
-      var ssarr = Array.from(ssn);
-      if (ssarr.length !== 9) {
-        console.error("Invalid SSN: ", ssn);
-        return '';
-      }
-      var ss1 = ssarr.slice(0,3).join('');
-      var ss2 = ssarr.slice(3,5).join('');
-      var ss3 = ssarr.slice(5,9).join('');
-      var ssf = ss1 +'-'+ss2+'-'+ss3;
-      return ssf;
-   },
-       
-    formatLink: function(val,opt) { 
-      if (!opt) {
-        opt = {};
-      } else if (typeof opt === 'string') {
-        opt = {label:opt};
-      }
-      return "<a href='"+val+"' class='"+opt.class+"' "+opt.atts+">"+opt.label+"</a>";
-
-    }
-  }
-};
-
-/////   Table make Mixin //////////
-
-/**
- Assumes caller data:  {
-  ids: array of IDs,
-  model: PkModelName,
-  keymap: Object. keys as att names, & value as label str
-     or object of properties- {
-        label: Label for the cell, if small viewport
-        lblcls: Label CSS for the cell, if small viewport
-        fldcls: Field CSS Class
-        cellcls: Cell CSS (if small viewport, so includes both label & field
-  tbldata: object containing the table data:
-      head:Table Header
-      headcls: Head CSS  class
-      tblcls: Table Class
-      bp:  xs, sm, md, lg, xl
-      rowinfo: (Overridden in rowdataarr)
-  
-  url: (opt str) - default: '/ajax/fetchattributes'
-
-*/
-window.tableMixin = {
-  methods: {
-    initData: function() {
-      var lblrow = {};
-      this.tbldata.bp = this.tbldata.bp || 'md';
-      //var tbldata = _.cloneDeep(this.tbldata);
-      //var rowinfo = tbldata.rowinfo ?   _.cloneDeep(tbldata.rowinfo): {};
-      this.tbldata.rowinfo = this.tbldata.rowinfo ? this.tbldata.rowinfo : {};
-      var lblrowinfo =   _.cloneDeep(this.tbldata.rowinfo);
-      lblrowinfo.islbl = true;
-      var rowdataarr = [];
-      //var lblrow = _.cloneDeep(this.rowdataarr[0]);
-      var keys = Object.keys(this.keymap);
-      var lblcelldataarr = [];
-      for (var key in this.keymap) {
-        var map = this.keymap[key];
-        if (typeof map === 'string') {
-          map = {label: map};
-        }
-        lblrow[key] = Object.assign({},map,{field:map.label});
-        lblcelldataarr.push(lblrow[key]);
-        this.keymap[key] = map;
-      }
-      rowdataarr.push({celldataarr:lblcelldataarr,rowinfo:lblrowinfo,bp:this.tbldata.bp});
-      //We made the first label row.
-      var url = this.url || '/ajax/fetchattributes';
-      var data = {id:this.ids, model:this.model,keys:keys};
-      axios.post(url,data).
-        then(response=>{
-          //console.log("The response data:",response.data);
-          response.data.forEach(row=>{
-            var keymap = _.cloneDeep(this.keymap);
-            var celldataarr = [];
-            for (var akey in row) {
-              if (keymap[akey].format) {
-                var format = keymap[akey].format;
-                keymap[akey].field = this[format](row[akey],keymap[akey].formatopts);
-              } else {
-                keymap[akey].field = row[akey];
-              }
-              celldataarr.push(keymap[akey]);
-            }
-            rowdataarr.push({celldataarr:celldataarr,rowinfo:this.tbldata.rowinfo});
-          });
-          this.tbldata.rowdataarr=rowdataarr;
-          //console.log("The tbldata:",this.tbldata);
-        }).
-        catch(error=>{console.error("Error: ",error,error.response);});
-    },
-    
-  },
-};
-
-//Simple stuff, like non-null object, & not empty
-window.utilityMixin = {
-  methods: {
-    isObject(tst) { 
-      if ((typeof tst === 'object') && (tst !== null)) {
-        return tst;
-      }
-      return false;
-    },
-//Probably better than below. Data can use sensible defaults, & only params that have keys can override first from settings, second from params
-    overrideDefaults: function(settings) {
-      if (!this.isObject(settings)) {
-        settings = {};
-      }
-      if (!this.isObject(this.params)) {
-        this.params = {};
-      }
-      var datakeys = Object.keys(this.$data);
-      datakeys.forEach((key,idx) => {
-        if (key in settings) {
-          this[key] = settings[key];
-        } else if (key in this.params) {
-          this[key] = this.params[key];
-        }
-      });
-    },
-    //Called from mounted, defaults an object w. param keys & defaults to set data to
-    // Assumes "params" in props
-    initDataFromParams(defaults) {
-      for (var key in defaults) {
-        this[key] = this.params[key] || defaults[key];
-      }
-      var lblwidth = this.params.lblwidth || defaults.lblwidth;
-      if (lblwidth && this.label) {
-        this.lblstyle = this.lblstyle + " width: "+lblwidth+"; ";
-      }
-      //Do same for input width, like checkbox:
-      var inpwidth  = this.params.inpwidth || defaults.inpwidth;
-      if (inpwidth) {
-        this.inpstyle += " width: "+inpwidth+"; ";
-      }
-    },
-    showThisFromDefaults(defaults,lbl) {
-      if (!defaults) defaults=this.defaults;
-      var vals = {};
-      for (var key in defaults) {
-        vals[key] = this[key];
-      }
-      //console.log(lbl+ " Current this values:",vals);
-      return vals;
-    }
-  }
-};
-
-/** For a top-level stand-alone Vue instance that pops up a pk-modal-wrapper button
- * for Modal submission form, &
- * then wants to update other data on the page based on the changes
- * See top of file for docs, and
- * LQP/apps/resources/... activeprofile.blade.php, PostComponents.vue,
- *  & post_button.phtml for examples
- */
-window.refreshRefsMixin = {
-  methods: { // (But this is also in the mixin reloadRefsMixin)
-    setReloadRefs: function (reloadrefs) {
-      if (reloadrefs) {
-        if (this.$refs && this.$refs.modal_wrapper
-              && this.$refs.modal_wrapper.setReloadRefs) {
-          this.$refs.modal_wrapper.setReloadRefs(reloadrefs);
-        }
-        this.postparams.reloadrefs = this.postparams.reloadrefs.concat(reloadrefs);
-      }
-    }
-  }
-};
-
-/****
- * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
- * // Input/TextArea - as soon as lose focus, select as soon as select, checkbox
- * // as soon as check, etc.
- * 
- * 
- * Assume all expect their main "props" is "params". They use the inputMixin,
- * as well a utility mixin, & possbily format Mixn. They have aside from the 
- * value parameters, some standards for their appearance. There are generally
- * 2-3 elements - the input, (optional label div) and a div wrapper.
- * Each (Wrapper, label div, & input, have a default CSS Class, as well as suppimentary 
- * classes AND styles provided by the params. The p
- */
-// Common mixin for all immediate inputs
-window.inputMixin = {
-  /**
-   * 'params' object 
-   *   model:
-   *   id:
-   *   name:
-   *   value:
-   *   tooltip: (opt: Tooltip for intput)
-   *   submiturl: (opt: default: "/ajax/submit")
-   *   fetchurl: (opt: default: "/ajax/fetchattributes"
-   *   formatin: (opt - format method to show the data)
-   *   formatout (opt - format method to submit the data)
-   *   inpcss(opt - css class for the input)
-   *   type(opt - input type)
-   *   ownermodel(opt)
-   *   ownerid (opt)
-   *   label: (opt - label for control - then will be wrapped)
-   *   lblcss:  (opt - css class for input)
-   *   wrapcls:  (opt - css class for input)
-   *   lblstyle: (opt -custom styles for the element)
-   *   wrapstyle: (opt -custom styles for the element)
-   *   inpstyle: (opt -custom styles for the element)
-   *   @atts & noInherit: Possibe way to inject arbitrary atts into an el?
-   * @type object
-   */
-  props: ['params'],
-  data() {
-      var defaults = {
-        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
-        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
-        label: null, tooltip: '', submiturl:"/ajax/submit",
-        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
-        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
-        checked:null, options:[],checkedvalue:1,uncheckedvalue:0,
-        lblwidth: null, inpwidth:null}; //If input or label width is limited, 
-         //the other element can take the space. 
-    var data = defaults;
-    data.defaults = defaults;
-    console.log("INIT DATA:",data);
-    return data;
-    /*
-    return {
-      name:null,
-      value: null,
-      id: null,
-      ownermodel: null,
-      ownerid: null,
-      model: null,
-      inpcss: null,
-      formatin: null,
-      formatout: null,
-      lblcss: null,
-      label: null,
-      tooltip: null,
-      submiturl: null,
-      fetchurl: null,
-      attribute: null,
-      foreignkey: null,
-      wrpcss: null,
-
-
-    };
-    */
-
-  },
-  mounted() {
-      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
-      this.initDataFromParams(this.defaults);
-      this.initData();
-
-  },
-  methods: {
-    //Special for checkboxes - usually true/false - & if not checked sends nothing,
-    //so not false. This will both toggle the appearance of the checkbox, AND send
-    //the unchecked value, so can clear
-    setCheckedState() {
-      if(this.value == this.checkedvalue) {
-        this.checked = true;
-      } else {
-        this.checked = false;
-      }
-    },
-    toggleCheckState(event,arg) {
-      //console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
-      if(this.value == this.checkedvalue) {
-        this.value = this.uncheckedvalue;
-        this.checked = false;
-      } else {
-        this.value = this.checkedvalue;
-        this.checked = true;
-      }
-      //console.log("After toggle state, this.checked:",this.checked,"value",this.value);
-    },
-    initData() {
-    
-      this.showThisFromDefaults(this.defaults,"InpCtl About to fetch");
-      axios.post(this.fetchurl,
-      {model:this.model,
-       id:this.id,
-       ownermodel:this.ownermodel,
-       ownerid:this.ownerid,
-       keys: this.name,
-     }).then(response=>{
-       //console.log("Succeeded in fetch, resp:", response);
-       var value = response.data[this.name];
-       if (this.formatin) {
-         value = this[this.formatin](value);
-       }
-       this.value = value;
-       if (this.value == this.checkedvalue) {
-         this.checked=true;
-       } else {
-         this.checked = false;
-       }
-       var defaults = this.defaults;
-       var curr = {};
-       
-       for (var key in defaults) {
-         curr[key] = this.key;
-       }
-       //console.log("After inits, the current data:",curr);
-     }).
-      catch(error=>{console.error("Failed to fetch:",error.response, error);});
-    },
-    savesubmit(event,arg) {
-      //console.log ("Save submit event",event,"Arg:",arg);
-      this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
-      if (this.formatout) {
-        this.value = this[this.formatout](this.value);
-        //var fields = {[keys]:val
-      }
-      axios.post(this.submiturl,
-      {model:this.model,
-       id:this.id,
-       ownermodel:this.ownermodel,
-       ownerid:this.ownerid,
-       foreignkey: this.foreignkey,
-       attribute: this.attribute,
-       fields: {[this.name]:this.value},
-     }).then(response=>{
-       //console.log("Succeeded in submit resp:", response);
-       var data = response.data;
-       this.id = data.id;
-       var value = data[this.name];
-       if (this.params.formatin) {
-         value = this[formatin](value);
-       }
-       this.value = value;
-     }).
-      catch(error=>{console.error("Failed to save submit/post/update:",error.response, error);});
-    },
-    }
-    
-
-  };
 
 window.Vue.component('ajax-text-input', {
   name: 'ajax-text-input',
@@ -1512,131 +1681,5 @@ Vue.component('ajax-checkbox-input',{
   },
 });
 
-/** Automates some gathering & submitting of ajax data. 
- * @method fetchData fetches input data from within an enclosing '.input-container',
- * (which is part of pk-modal anyway)
- * adds any optional params passed in, & returns the form data object.
- * @method submitData takes a url & form data & posts it, then calls the method
- *    this.processResponse(data) in the implementing component. 
- *  @method autoSubmit takes optional url & params - default Url is /ajax/sumbit
- *    it passes the params to fetchData, then performs the ajax call.
- *    All the implementing component needs to do is create the form & 
- *    implement the response handler.
- * @type Vue mixin
- */
-window.ajaxpostingMixin = {
-  // MUST IMPLEMENT loadData(data) in each form that uses this.
-  methods: {
-    fetchDataNoFD: function(params) { //Gets data from the form w jQuery, & merges params with it
-      var emptyobj = {};
-      var el = this.$el;
-      $(el).closest(".input-container").find(":input").each(function(idx, inp) {
-        //console.log("The el of the posting comp is:", el);
-        // Base data collection
-        $inp =  $(inp);
-        var key =$inp.attr('name'); 
-        var val = $inp.val(); 
-        emptyobj[key] =val;
-      });
-      if (params !== null && typeof params === 'object') {
-        for (var akey in params) {
-          emptyobj[akey] = params[akey];
-        }
-      }
-      //console.log ("The fetch raw key/vals: ", emptyobj);
-      return emptyobj;
-    },
 
-    fetchData: function(params) { //As above, but with the FormData object. Testing both
-      var fd = new FormData();
-      var el = this.$el;
-      var me = this;
-      //console.log ("Mixin el is:",el);
-      //Find the nearest "form container", then all the inputs
-      var emptydata = {};
-       $(el).closest(".input-container").find(":input").each(function(idx, inp) {
-          var $inp = $(inp);
-          //fd.append($inp.attr('name'),$inp.val());
-          emptydata[$inp.attr('name')]=$inp.val();
-      }); 
-
-      //Add any extra data in params
-      if (params && (typeof params === 'object')) {
-        for (var key in params) {
-//          fd.append(key,params[key]);
-           emptydata[key] = params[key];
-        }
-      }
-      return emptydata;
-    },
-
-    submitData: function (url,fd) { //AJAX submits the data
-      axios.post(url,fd).
-        then(response=>{
-          var data = response.data;
-          if (this.processResponse && (typeof this.processResponse === 'function')) {// A callback using classes can implement for further processing
-            this.processResponse(data);
-          }
-          this.notifyUpdate();
-        }).catch(error=>{console.error("Error submiting:",error.response, error);});
-    },
-
-    autoSubmit: function(url,params) {
-      if (!url) {
-        url = "/ajax/submit";
-      }
-      var fd = this.fetchData(params);
-      this.submitData(url,fd);
-    },
-    notifyUpdate: function(refs) { //Calls other componentes (either args or properties) to re-init
-      if (this.params.reloadrefs) {
-        var reloadrefs = this.params.reloadrefs;
-        if (!Array.isArray(reloadrefs)) {
-          reloadrefs = [reloadrefs];
-        }
-        reloadrefs.forEach(function(el) {
-          if (el.initData) {
-            el.initData();
-          }
-        });
-      }
-      /*
-      if (!refs) {
-        refs = this.refs;
-      }
-      if (!refs) {
-        return;
-      }
-      if (!Array.isArray(refs)) {
-        refs = [refs];
-      }
-      console.log("In notify update, refs :",refs);
-      refs.forEach( (cmp, idx) => {
-        console.log("In Loop, cmp:",cmp);
-        this.$root.refresh(cmp);
-        //cmp.initData();
-      });
-    },
-    */
-  },
-
-  ajaxInitData: function() { //Need sufficient data - if we have it, the implementing component should just call this from initData()
-     //Maybe getting 1 or many. At least need model & either id (or array of IDs), or foreign_key & foreign_key value
-     //Assume we get those in the params prop
-     var url = this.params.url || "/ajax/fetchattributes";
-     var data = {
-        extra: this.params.extra,
-        keys: this.param.keys,
-        model: this.param.model,
-        ownermodel: this.param.ownermodel,
-        ownerid: this.param.ownerid,
-        attribute: this.param.attribute,
-        keys: this.param.keys,
-      }; 
-      axios.post(url,data).done(results=>{
-        console.log("Success, about to call 'this.loadData() with: ", results.data);
-        this.loadData(results.data);}).catch(defaxerr);
-        
-    }
- },
-};
+//// END Ajax Input Components (Use mixins below)

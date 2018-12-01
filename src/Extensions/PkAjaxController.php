@@ -136,6 +136,24 @@ abstract class PkAjaxController extends PkController {
     return $this->jsonresponse($data,$status,$headers,$options);
   }
 
+  /**
+   * Returns an error but also pops up a message to the user
+   * @param string|array $data - the message to the user. If an array, can contain
+   *   title as well. ['title'=>$title,'msg'=>$msg]
+   * @param type $status
+   * @param type $headers
+   * @param type $options
+   * @return type
+   */
+  public function errormsg($data='',$status=499,$headers=[],$options=true) {
+    if (!is_array($data)) {
+      $data=['systemmsg'=>"error", "title"=>"Error", "msg" => $data];
+    } else {
+      $data['systemmsg'] = 'error';
+    }
+    return $this->error($data, $status, $headers, $options);
+  }
+
   /** Toggles a PkModel boolean field
    * @param id = the instance ID
    * @param model = the model class

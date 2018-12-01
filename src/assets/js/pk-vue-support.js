@@ -5,5 +5,8 @@
 //Try a default axios ajax catch 
 //use: .catch(defaxerr);
 function defaxerr(error) {
+  if (error.response.data.systemmsg === "error") {
+    errorDlg(error.response.data.msg,error.response.data.title);
+  }
   console.error("Ajax Error:",error,error.response);
 }

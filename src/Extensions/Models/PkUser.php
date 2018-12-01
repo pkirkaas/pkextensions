@@ -33,6 +33,7 @@ class PkUser extends PkModel
     protected $fillable = [
         'name', 'email', 'password',
     ];
+    public $isResetPassword = false;
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -111,6 +112,56 @@ class PkUser extends PkModel
       return true;
     }
     return $this->password === static::hashPassword(trim($pwd));
+  }
+
+  /** Checks password then hashes & sets. If $password2 === false, it's a
+   * system reset of password. Else, user reset, & password must === password2
+   * and exist and meet any validation reqs.
+   * @param type $password
+   * @param type $password2
+   */
+  public function resetPassword($password, $password2=false) {
+    $password = trim($password);
+    if (!$password || !ne_string($password)) {
+      return false;
+    }
+    if ($password2 !== false) {
+      $password2 = trim ($password2);
+      if ($password2 !== $password) {
+        return false;
+      }
+    }
+    if ($this->passwordMeetsRequirements($password)) {
+      $this->password = static::hashPassword($password);
+      $this->isResetPassword = true;
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /** Overridden in implementing classes - this just makes sure it's a
+   * non-empty string
+   * @param string $password
+   */
+  public function passwordMeetsRequirements($password) {
+    return ne_string($password);
+  }
+
+  public function save(array $args = []) {
+    $iniatts = $this->getAttributes();
+    if (!$this->isResetPassword) {
+      unset($this->password);
+    }
+    if (!$this->email) {
+      unset($this->email);
+    }
+    if (!$this->name) {
+      unset($this->name);
+    }
+    $lastatts = $this->getAttributes();
+    pkdebug("Saving user - start w. ",$iniatts,"end with ",$lastatts);
+    return parent::save($args);
   }
 
     

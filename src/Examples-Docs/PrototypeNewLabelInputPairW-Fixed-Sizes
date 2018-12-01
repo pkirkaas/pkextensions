@@ -1,0 +1,13 @@
+<div class="bg-eee p-1 pk-lbl fw-5 fs--1">User Name</div>
+
+<input name="name" type="text" class="form-control pk-inp">
+
+
+
+
+<div data-tootik="" class="row m-h-1 bg-eef p-h-1">
+  <div class="col-sm-4 bg-eee p-1 pk-lbl fw-5 fs--1">Phone</div>
+  <div class="col-sm-8 d-flex align-items-center justify-content-center inner-border  p-0">
+    <input name="telno" type="text" class="form-control pk-inp">
+  </div>
+</div>

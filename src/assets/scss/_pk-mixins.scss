@@ -346,6 +346,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
       }
     } 
 
+    .w#{$i}em {width: #{$i}em;}
+    .w#{$i}rem {width: #{$i}rem;}
     .br-#{$sz} {border-radius: $foffset !important}
 
     //Heights & widths
