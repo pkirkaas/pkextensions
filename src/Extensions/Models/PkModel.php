@@ -367,6 +367,22 @@ public static function createOrUpdate(array $attributes = []) {
     return $merged;
   }
 
+  /** When saving to DB - fields that should be NULL if they are '' or 0 0
+   * mainly for unique indices - which are ok with duplicate nulls, but not
+   * duplicate empty strings
+   * @var indexed array of field names to convert to nulls on save if empty 
+   */
+  public static $emptyToNull=[];
+
+  /** Combine all $emptyToNull fields from ancestors & traits
+   * 
+   * @return array
+   */
+  public static function getEmptyToNull() {
+    $merged = static::getArraysMerged("emptyToNull",true);
+    if (!$merged) $merged = [];
+    return $merged;
+  }
   /** Returns an array of attributes matching the keys, for AJAX
    * Indexed keys are this objects attributes/properties - entries
    * keyed by a string with value of array are relationship attributes
@@ -2193,6 +2209,15 @@ class $createclassname extends Migration {
     }
     if ($this->emptyStringToNull) $this->convertEmptyStringToNullForNumerics();
     //if ($this->cleanAllText) $this->hpureAllText();
+
+
+    foreach (static::getEmptyToNull() as $emptyToNullField) {
+      if (!$this->$emptyToNullField) {
+        $this->$emptyToNullField = NULL;
+      }
+    }
+
+
 
     #Clean dangerous HTML from specified fields
     foreach (static::$escape_fields as $field) {

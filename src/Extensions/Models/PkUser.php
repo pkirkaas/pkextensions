@@ -42,8 +42,15 @@ class PkUser extends PkModel
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+  /**
+   * Fields that if empty ('' or 0) should be converted to NULL before saving.
+   * Mainly for unique indices, which accept multiple nulls but not multiple ''
+   * @var array of field names
+   */
+  public static $emptyToNull=['name','email'];
   public static $table_field_defs = [
-      'name' => ['type'=>'string', 'methods'=>['nullable','inde']],
+      'name' => ['type'=>'string', 'methods'=>['nullable','unique']],
       'email' => ['type' => 'string', 'methods' => 'unique'],
       'password' =>  ['type'=>'string', 'methods'=>'nullable'],
       'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
