@@ -1388,7 +1388,8 @@ $('body').on('click', '[data-bs4-enc-dialog]', function (event) {
 function errorDlg(msg,title) {
   var opts = {
     title : title || "Error",
-    autoOpen: true
+    autoOpen: true,
+    dialogClass:"jq-error-dialog",
   };
   var selector ="<div class='js-error-dialog'>"
     + msg + "</div>";
@@ -1416,6 +1417,7 @@ function makeDialog(selector, opts) {
     modal: true,
     autoOpen: false,
     width: defaultWidth,
+    position: {my:"top", at:"top", of:".pk-main", offset:"0 100"},
     buttons: {
       //Cancel : function () { $(this).dialog('destroy'); }
       Close: function () {
@@ -1426,7 +1428,7 @@ function makeDialog(selector, opts) {
   var dialogOptions = dialogDefaults;
   //If the below options are property names in the opts arg, use them...
   var overridableOptions = ['modal', 'autoOpen', 'buttons', 'closeOnEscape',
-    'dialogClass', 'title', 'minHeight', 'minWidth'];
+    'dialogClass', 'title', 'minHeight', 'minWidth', 'position'];
   for (var key in overridableOptions) {
     var opt = overridableOptions[key];
     if (opts.hasOwnProperty(opt)) {

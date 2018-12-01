@@ -203,6 +203,39 @@ window.utilityMixin = {
       }
       return false;
     },
+    //I don't like any of those below this one
+    //Takes an array of data keys & an object (?params?), and only overwrites
+    //the data fields if there is a key/value in the object.
+    setData: function(fields, params) {
+      if (!this.isObject(params) || !Array.isArray(fields)) {
+        return;
+      }
+      var me = this;
+      fields.forEach(function(field) {
+        if (typeof params[field] !== 'undefined') {
+          me[field] = params[field];
+        }
+      });
+
+    },
+    /** Takes an array of refs names, checks they exist, then calls the method
+     * on each of them.
+     */
+    callMethodOnRefs: function(refs,method,arg) {
+      if (typeof refs === 'string') {
+        refs = [refs];
+      }
+      if (!Array.isArray(refs)) {
+        console.error("Wrong refs arg to callMethodOnRefs:",refs);
+        return;
+      }
+      var me = this;
+      refs.forEach(function (ref) {
+        if (me.$refs[ref] && me.$refs[ref][method]) {
+          me.$refs[ref][method](arg);
+        }
+      });
+    },
 //Probably better than below. Data can use sensible defaults, & only params that have keys can override first from settings, second from params
     overrideDefaults: function(settings) {
       if (!this.isObject(settings)) {
@@ -1049,8 +1082,102 @@ window.Vue.component('data-item',{
 /** Looks like it wraps a label with associated data value OR input ctl
  * 
  */
+
+window.Vue.component('input-el',{
+  name: 'input-el',
+  template: `
+  <input :type="type" :name="name" :value="value" class="pk-inp lpk-inp"
+      :class="inpclass"  :style="inpstyle">`,
+  props: ['params'],
+  mixins: [window.utilityMixin],
+  data: function() {
+    return {
+      type:"text",
+      name:"",
+      value:"",
+      inpclass:"",
+      inpstyle:"",
+    };
+  },
+  mounted: function() {
+    this.updateData();
+  },
+  methods: {
+    updateData: function() {
+      var datafields = ['type','name','value','inpclass','inpstyle'];
+      //console.log("Calling update data w. params:", this.params);
+      this.setData(datafields, this.params);
+    },
+  },
+  watch: {
+    params: function(oldd, newd) {
+      console.log("In Input el - watching: old:", oldd, "New:",newd);
+      this.updateData();
+    }
+  }
+});
+
+/**
+ * Wraps an input & label. 'params': 
+    'input','input_params','lblcls', 'lblstyle','label','fldcls',
+    'fldstyle','pair_wrap', 'pair_wrap_style'
+     input is the input component = input-el, input_params are required by the inp comp
+     input_params: name, value, type=text, inpclass, inpstyle
+ */
 window.Vue.component('data-label-pair', {
   name: 'data-label-pair',
+  template: `
+  <div class="pair-wrap lpair-wrap" :class="pair_wrap" :style="pair_wrap_style">
+    <div class="pk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
+    <div class="pk-val" :class="fldcls" :style="fldstyle">
+      <component ref="input" :is="input" :params="input_params"></component>
+    </div>
+  </div>
+  `,
+  props: ['params'],
+  mixins: [window.utilityMixin],
+  data: function() {
+    return {
+      input: 'input-el',
+      input_params: {},
+      lblcls:'',
+      lblstyle:'',
+      label:'',
+      fldcls:'',
+      fldstyle:'',
+      pair_wrap:'',
+      pair_wrap_style:'',
+    };
+  },
+  mounted: function() {
+    this.updateData();
+  },
+  methods: {
+    updateData: function() {
+      var datafields = ['input','input_params','lblcls',
+        'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
+      console.log("Calling update data w. params:", this.params);
+      this.setData(datafields, this.params);
+      console.log("Now calling refs to update..");
+      this.$refs.input.updateData();
+
+    },
+  },
+  watch: {
+    params: function(olddata, newdata) {
+      console.log("Watching the change - oldata:",olddata,"NewData:",newdata);
+      this.updateData();
+    }
+  }
+});
+
+
+
+
+
+
+window.Vue.component('olddata-label-pair', {
+  name: 'olddata-label-pair',
   template: `
   <div class="pair-wrap lpair-wrap" :class="pair_wrap" :style="pair_wrap_style">
     <div class="pk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
