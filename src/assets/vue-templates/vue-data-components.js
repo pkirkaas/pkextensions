@@ -1326,7 +1326,7 @@ window. Vue.component('ajax-multicheck-el',{
 
       @click="msavesubmit($event, option.value)"
        :name="name+'[]'"
-      :id="'option_'+option.value">{{selected}}
+      :id="'option_'+option.value">
 <div class="inline" v-html="option.label"></div> 
 
 
@@ -1340,8 +1340,6 @@ window. Vue.component('ajax-multicheck-el',{
       console.log("Clicked on a box. this.value:",this.value,
       "The event:",event,"The Arg:", arg, "This Item?", this.item,
       "selected: ", this.selected);
-      });
-      /*
       axios.post(this.submiturl,
         {model:this.model,
           id:this.id,
@@ -1349,7 +1347,7 @@ window. Vue.component('ajax-multicheck-el',{
           ownerid:this.ownerid,
           foreignkey: this.foreignkey,
           attribute: this.attribute,
-          fields: {[this.name]:this.item},
+          fields: {[this.name]:this.selected},
      }).then(response=>{
        var data = response.data;
        this.id = data.id;
@@ -1359,6 +1357,8 @@ window. Vue.component('ajax-multicheck-el',{
        }
        this.value = value;
      }).catch(defaxerr);
+      });
+      /*
       */
     },
     changesavesubmit(event,action) {
@@ -1389,6 +1389,7 @@ window. Vue.component('ajax-multicheck-el',{
        var valueobj = response.data[this.name];
        var value = Object.values(valueobj);
        console.log("Value?",value);
+       this.selected = value;
        this.value = value;
        /*
        if (this.value == this.checkedvalue) {
