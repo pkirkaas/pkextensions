@@ -351,6 +351,8 @@ window.pinputMixin = {
       options:[],
       checkedvalue:1,
       uncheckedvalue:0,
+      selected:[],
+      item: {option:[1]},
     }; //If input or label width is limited, 
     var data = sdefaults;
     data.fields = Object.keys(sdefaults);
@@ -483,7 +485,7 @@ window.inputMixin = {
          //the other element can take the space. 
     var data = defaults;
     data.defaults = defaults;
-    console.log("INIT DATA:",data);
+    //console.log("INIT DATA:",data);
     return data;
     /*
     return {
@@ -722,7 +724,7 @@ window.ajaxpostingMixin = {
         keys: this.param.keys,
       }; 
       axios.post(url,data).done(results=>{
-        console.log("Success, about to call 'this.loadData() with: ", results.data);
+        //console.log("Success, about to call 'this.loadData() with: ", results.data);
         this.loadData(results.data);}).catch(defaxerr);
         
     }
@@ -1038,7 +1040,7 @@ window.Vue.component('img-comp',{
   },
   methods: {
     showBig: function() {
-      console.log("Clicked on image");
+      //console.log("Clicked on image");
       if (!this.modal) {
         return;
       }
@@ -1117,9 +1119,9 @@ window.Vue.component('del-icon',{
         console.error("Nothing to delete");
         return;
       }
-      console.log("Trying to clear:", this.toclear, "Current:",this.$parent[this.toclear] );
+      //console.log("Trying to clear:", this.toclear, "Current:",this.$parent[this.toclear] );
       this.$parent[this.toclear]=null;
-      console.log("After clear:",this.$parent[this.toclear] );
+      //console.log("After clear:",this.$parent[this.toclear] );
     }
   }
 
@@ -1240,7 +1242,7 @@ window.Vue.component('input-el',{
   },
   watch: {
     params: function(oldd, newd) {
-      console.log("In Input el - watching: old:", oldd, "New:",newd);
+      //console.log("In Input el - watching: old:", oldd, "New:",newd);
       this.updateData();
     }
   }
@@ -1278,6 +1280,128 @@ window.Vue.component('ajax-checkbox-el', {
     */
   },
 });
+// :class="wrapcls" :style="wrapstyle":class="checkrow"
+
+// See an example: https://jsfiddle.net/mimani/y36f3cbm/
+//And super weird about needing an array even of only 1....
+//  https://stackoverflow.com/questions/41821760/vue-input-with-multiple-checkboxes
+/** This will be tricky - multi-select multi-checkbox
+ * Need options, like for select, and will save/post array
+ */
+/*
+ *  <div class='multiselect form-control'>
+  <input type='hidden' :name="name" value=''>
+  <div v-for="(option,idx) in options" class="pk-checkbox" >
+    <input type="checkbox"
+     v-model="item.option"
+     :value="option.value"
+    :checked="isChecked(option.value)"
+      @click="msavesubmit($event,'Clicked')"
+       :name="name+'[]'"
+      :id="'option_'+option.value">
+<div class="inline" v-html="option.label"></div> 
+ * 
+ * // With v-model & :checked..
+ * 
+  <div class='multiselect form-control'>
+  <div v-for="(option,idx) in options" class="pk-checkbox" >
+    <input type="checkbox" :value="option.value"
+    :checked="isChecked(option.value)"
+      @click="msavesubmit($event, value)"
+       :name="name+'[]'"
+      :id="'option_'+option.value">
+<div class="inline" v-html="option.label"></div> 
+ * 
+ */
+window. Vue.component('ajax-multicheck-el',{
+  name: 'ajax-multicheck-el',
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  type: 'multicheck',
+  template: `
+  <div class='multiselect form-control'>
+  <div v-for="(option,idx) in options" class="pk-checkbox" >
+    <input type="checkbox" :value="option.value"
+
+     v-model="selected"
+
+      @click="msavesubmit($event, option.value)"
+       :name="name+'[]'"
+      :id="'option_'+option.value">{{selected}}
+<div class="inline" v-html="option.label"></div> 
+
+
+  </div>
+
+</div>
+  `,
+  methods: {
+    msavesubmit(event,arg) {
+      this.$nextTick(() => {
+      console.log("Clicked on a box. this.value:",this.value,
+      "The event:",event,"The Arg:", arg, "This Item?", this.item,
+      "selected: ", this.selected);
+      });
+      /*
+      axios.post(this.submiturl,
+        {model:this.model,
+          id:this.id,
+          ownermodel:this.ownermodel,
+          ownerid:this.ownerid,
+          foreignkey: this.foreignkey,
+          attribute: this.attribute,
+          fields: {[this.name]:this.item},
+     }).then(response=>{
+       var data = response.data;
+       this.id = data.id;
+       var value = data[this.name];
+       if (this.params.formatin) {
+         value = this[formatin](value);
+       }
+       this.value = value;
+     }).catch(defaxerr);
+      */
+    },
+    changesavesubmit(event,action) {
+      console.log("In changesavesubmit - this.item?", this.item);
+      this.toggleCheckState(event,'changesavesubmit');
+      this.savesubmit(event, 'changesavesubmit');
+    },
+    isChecked: function(arg) {
+      console.log("IN isCHecked, arg:",arg,"This Val:", this.value);
+      if (!Array.isArray(this.value)) {
+        return false;
+      }
+      if (this.value.indexOf(arg.toString()) > -1) {
+        console.log("Got a MATCH");
+        return true;
+      }
+    },
+    initData() {
+      console.log("In the custom multicheck load");
+      axios.post(this.fetchurl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       keys: this.name,
+     }).then(response=>{
+       console.log("Succeeded in fetch, resp:", response);
+       var valueobj = response.data[this.name];
+       var value = Object.values(valueobj);
+       console.log("Value?",value);
+       this.value = value;
+       /*
+       if (this.value == this.checkedvalue) {
+         this.checked=true;
+       } else {
+         this.checked = false;
+       }
+        */
+     }).  catch(defaxerr);
+    },
+  },
+});
+
 
 
 
@@ -1299,8 +1423,6 @@ window. Vue.component('ajax-select-el',{
     </select>
 `,
   });
-
-
 window.Vue.component('ajax-input-el', {
   name: 'ajax-input-el',
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
@@ -1364,16 +1486,16 @@ window.Vue.component('data-label-pair', {
     updateData: function() {
       var datafields = ['input','input_params','lblcls', 'tootik',
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
-      console.log("Calling update data w. params:", this.params);
+      //console.log("Calling update data w. params:", this.params);
       this.setData(datafields, this.params);
-      console.log("Now calling refs to update..");
+      //console.log("Now calling refs to update..");
       this.$refs.input.updateData();
 
     },
   },
   watch: {
     params: function(olddata, newdata) {
-      console.log("Watching the change - oldata:",olddata,"NewData:",newdata);
+      //console.log("Watching the change - oldata:",olddata,"NewData:",newdata);
       this.updateData();
     }
   }
@@ -1418,9 +1540,9 @@ window.Vue.component('olddata-label-pair', {
     this.fldstyle = this.params.fldstyle || '';
     this.pair_wrap = this.params.pair_wrap || '';
     this.pair_wrap_style = this.params.pair_wrap_style || '';
-    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
-    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
-    console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+    //console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+    //console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
+    //console.log("data-label-pair mounted: This field:",this.field,"This.params:",this.params);
   },
     /*
   computed: {
@@ -1471,7 +1593,7 @@ Vue.buildInput = function(params) {
   if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
     return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
   } else if (type === 'select') { // Need inpparams for select:
-    console.log("IN Bld Inp; Params:",params,'val',val);
+    //console.log("IN Bld Inp; Params:",params,'val',val);
     //allownull: default: true - if string, the string display for empty
     var allownull = params.allownull; //Trueish, falseish, or a string placeholder
     if (allownull === undefined) {
@@ -1593,7 +1715,7 @@ Vue.component('delete-btn', {
         if (delfromdom) {
           $(this.$el).closest(delfromdom).remove();
         }
-        console.log("\nDelete Success w. response:\n", response);
+        //console.log("\nDelete Success w. response:\n", response);
       }).catch(defaxerr);
     }
   }
