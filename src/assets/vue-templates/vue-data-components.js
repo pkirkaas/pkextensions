@@ -280,7 +280,7 @@ window.utilityMixin = {
     },
     chunkArr: function(anarr,sz) {
       sz = sz || 2;
-      return _.chunk(anar,sz);
+      return _.chunk(anarr,sz);
     }
   }
 };
@@ -353,6 +353,10 @@ window.pinputMixin = {
       uncheckedvalue:0,
       selected:[],
       item: {option:[1]},
+      wrapclass: '',
+      wrapstyle:'',
+      rowclass: '',
+      rowstyle: '',
     }; //If input or label width is limited, 
     var data = sdefaults;
     data.fields = Object.keys(sdefaults);
@@ -476,10 +480,11 @@ window.inputMixin = {
          //the other element can take the space. 
        var defaults = {
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
-        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        model: null, inpclass: '', formatin: null, formatout: null, 
+        lblclass: '',
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
-        wrapcss: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
+        wrapclass: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
         checked:null, options:[],checkedvalue:1,uncheckedvalue:0,
         lblwidth: null, inpwidth:null}; //If input or label width is limited, 
          //the other element can take the space. 
@@ -1318,8 +1323,9 @@ window. Vue.component('ajax-multicheck-el',{
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   type: 'multicheck',
   template: `
-  <div class='multiselect form-control'>
-  <div v-for="(option,idx) in options" class="pk-checkbox" >
+  <div class='multiselect form-control' :class="wrapclass" :style="wrapstyle">
+  <div v-for="(option,idx) in options" class="pk-checkbox"
+            :class="rowclass" :style="rowstyle">
     <input type="checkbox" :value="option.value"
 
      v-model="selected"
@@ -1455,6 +1461,7 @@ window.Vue.component('ajax-input-el', {
      input_params: name, value, type=text, inpclass, inpstyle
  */
 window.Vue.component('data-label-pair', {
+  inputparams:['options','name','model','id',
   name: 'data-label-pair',
   template: `
   <div class="pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
@@ -2061,15 +2068,17 @@ window.Vue.component('ajax-textarea-input', {
         wrapcss: ''};
         */
   template: `
-  <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
-    <div v-if="label" :style="lblstyle" class='ajax-lbl-css' :class="lblcss" v-html="label"></div>
-    <textarea :style="inpstyle" :type="type"
+  <div class='ajax-wrap-css v-flex full-height' :class="wrapclass" :style="wrapstyle">
+    <div v-if="label" :style="lblstyle" class='pk-lbl lpk-lblb' :class="lblclass" v-html="label"></div>
+    <textarea class="pk-inp form-control flex-grow"
+       :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @enter="savesubmit($event,'enter')"
        @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
-       v-model="value" :name="name" :class="inpcss" class="ajax-inp-css"></textarea>
+       v-model="value" :name="name" >
+     </textarea>
   </div>`,
 });
 
