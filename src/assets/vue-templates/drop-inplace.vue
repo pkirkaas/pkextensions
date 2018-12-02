@@ -1,6 +1,9 @@
 <!-- Drop & immediately upload, in place -->
+<!-- Since I clearly forgot -- I seem to have made this specifically for 
+ separate uploaded/file/media objects, NOT to be included as part of just a 
+regular object, which sucks. -->
 <template>
-  	<div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
+  <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" ><h1>It's Here...</h1>
       <delete-x data-tootik="Delete This?"></delete-x>
       <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
         <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click="fiClicked($event,'fi')">
@@ -13,10 +16,12 @@
 //var app = new Vue({
 export default {
     name: 'drop-inplace',
+    props: ['params'], 
     data() {
       return {
       defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
       image: '',
+      status: this.params.status || '',//'extant' - part of existing object, need only model & ID
       file: null,
       desc: '',
       imgblob: null,
@@ -45,11 +50,12 @@ export default {
         };
       },
     },
-    props: ['params'], 
     mounted: function() {
-      //console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
-      this.logThis();
-      this.initData();
+      this.$nextTick(()=>{
+        console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+        this.logThis();
+        this.initData();
+      });
     },
 
     methods: {
@@ -178,13 +184,18 @@ export default {
         console.log("About to save. These are the values?");
         this.logThis();
         var fd = new FormData();
-        var savekeys = [ //The keys required to save the upload
-          'ownermodel','ownerid','model','foreignkeyname','attribute',
-          'mediatype','uploadopts'];
-        var me = this;
-        savekeys.forEach(function(key) {
-          fd.append(key,me[key]);
-        });
+        if (this.status==='exstant') {
+          var savekeys = ['model','id','name'];
+        } else { //It's a separate media object, with an "owner" object
+          var savekeys = [ //The keys required to save the upload
+            'ownermodel','ownerid','model','foreignkeyname','attribute',
+            'mediatype','uploadopts'];
+         }
+         console.log("We decided the keyse were:", savekeys, "cus status:",this.status);
+         var me = this;
+         savekeys.forEach(function(key) {
+            fd.append(key,me[key]);
+          });
         //this.params.action='typedprofileupload';
         /*
         for (var key in this.params) {

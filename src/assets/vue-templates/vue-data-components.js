@@ -1370,9 +1370,9 @@ window. Vue.component('ajax-multicheck-el',{
   methods: {
     msavesubmit(event,arg) {
       this.$nextTick(() => {
-      console.log("Clicked on a box. this.value:",this.value,
-      "The event:",event,"The Arg:", arg, "This Item?", this.item,
-      "selected: ", this.selected);
+      //console.log("Clicked on a box. this.value:",this.value,
+      //"The event:",event,"The Arg:", arg, "This Item?", this.item,
+      //"selected: ", this.selected);
       axios.post(this.submiturl,
         {model:this.model,
           id:this.id,
@@ -1395,22 +1395,22 @@ window. Vue.component('ajax-multicheck-el',{
       */
     },
     changesavesubmit(event,action) {
-      console.log("In changesavesubmit - this.item?", this.item);
+      //console.log("In changesavesubmit - this.item?", this.item);
       this.toggleCheckState(event,'changesavesubmit');
       this.savesubmit(event, 'changesavesubmit');
     },
     isChecked: function(arg) {
-      console.log("IN isCHecked, arg:",arg,"This Val:", this.value);
+      c//onsole.log("IN isCHecked, arg:",arg,"This Val:", this.value);
       if (!Array.isArray(this.value)) {
         return false;
       }
       if (this.value.indexOf(arg.toString()) > -1) {
-        console.log("Got a MATCH");
+        //console.log("Got a MATCH");
         return true;
       }
     },
     initData() {
-      console.log("In the custom multicheck load");
+      ////console.log("In the custom multicheck load");
       axios.post(this.fetchurl,
       {model:this.model,
        id:this.id,
@@ -1418,10 +1418,10 @@ window. Vue.component('ajax-multicheck-el',{
        ownerid:this.ownerid,
        keys: this.name,
      }).then(response=>{
-       console.log("Succeeded in fetch, resp:", response);
+       //console.log("Succeeded in fetch, resp:", response);
        var valueobj = response.data[this.name];
        var value = Object.values(valueobj);
-       console.log("Value?",value);
+       //console.log("Value?",value);
        this.selected = value;
        this.value = value;
        /*

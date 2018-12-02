@@ -2,6 +2,7 @@
 namespace PkExtensions\Traits;
 use PkExtensions\PkExceptionResponsable;
 use PkExtensions\PkFile;
+use PkExtensions\PkException;
 use PkExtensions\PkFileUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,14 +16,15 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 trait PkUploadTrait {
   
   public static $table_field_defs_UploadTrait =  [
-  'relpath'=>'string',
-  'storagepath'=>'string',
+  'relpath'=>['string','nullable'],
+  'storagepath'=>['string','nullable'],
+  'filetype'=>['string','nullable'],
   'mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
   #Category, like, doc (text & pdf), media (audio, video)
   'cat' => ['type' => 'string', 'methods' => 'nullable'],
-  'mimetype'=>'string',
-  'size'=>'integer',
-  'originalname'=>'string',
+  'mimetype'=>['string','nullable'],
+  'size'=>['integer','nullable'],
+  'originalname'=>['string','nullable'],
   'path'=>['string','nullable'],
   'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
   ];
@@ -203,6 +205,20 @@ trait PkUploadTrait {
      }
     return $atts;
   }
+
+  public function persistFileInfo($fileinfo) {
+    pkdebug("Entered uptlodtrai/persist wi fifing", $fileinfo);
+    if (!is_array($fileinfo)) {
+      throw new PkException(["Fileinfo not an array:", $fileinfo]);
+    }
+    foreach ($fileinfo as $key=>$val) {
+      $this->$key = $val;
+    }
+    $this->save();
+    pkdebug("Leaving - atts:",$this->getAttributes());
+    return true;
+  }
+
     
 
   /** Create object immediately on upload 

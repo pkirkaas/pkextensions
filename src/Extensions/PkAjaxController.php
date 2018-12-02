@@ -479,12 +479,26 @@ abstract class PkAjaxController extends PkController {
    * @params assoc array - type(s), validation(s),  
    */
    public function _upload($params=[]) {
-     //pkdebug("Entered _upload");
+     pkdebug("Entered _upload");
      $types = keyVal('types', $params, ['image']);
      $fus = new PkFileUploadService();
      $uploaded = $fus->upload();
-     //pkdebug("Uploaded: ", $uploaded);
+     pkdebug("Uploaded: ", $uploaded);
      return $uploaded;
+   }
+
+   /** We need lots of info with the upload request, to make sure it's
+    * legit. Also, could be a separate object, or just an entry in an
+    * existing model
+    */
+   public function upload() {
+     pkdebug("In AJaax upload -very exciting - the params:", $this->data);
+     $model= keyVal('model',$this->data);
+     $id= keyVal('id',$this->data);
+     $obj = $model::find($id);
+     $finfo = $this->_upload();
+     pkdebug("Returnd FileInfo...",$finfo);
+     if ($obj->persistFileInfo($finfo)) return $this->success();
    }
 
 

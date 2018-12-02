@@ -259,7 +259,7 @@ class PkFileUploadService {
         'mimetype' => $file->getMimeType(),
         'size'=>$file->getSize(),
         'originalname'=>$file->getClientOriginalName(),
-        'type' => $type,
+        'filetype' => $type,
         'mediatype' => $type,
     ];
     pkdebug("Returning from UploadService: ", $ret);

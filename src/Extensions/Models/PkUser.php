@@ -150,9 +150,12 @@ class PkUser extends PkModel
 
   public function save(array $args = []) {
     $iniatts = $this->getAttributes();
+    /*
     if (!$this->isResetPassword) {
       unset($this->password);
     }
+     * 
+     */
     if (!$this->email) {
       unset($this->email);
     }
