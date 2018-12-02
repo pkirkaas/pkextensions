@@ -206,17 +206,17 @@ window.utilityMixin = {
     //I don't like any of those below this one
     //Takes an array of data keys & an object (?params?), and only overwrites
     //the data fields if there is a key/value in the object.
-    setData: function(fields, params) {
+    setData: function(object,fields, params) {
       if (!this.isObject(params) || !Array.isArray(fields)) {
-        return;
+        return object;
       }
-      var me = this;
+      var me = object;
       fields.forEach(function(field) {
         if (typeof params[field] !== 'undefined') {
           me[field] = params[field];
         }
       });
-
+     return object;
     },
     /** Takes an array of refs names, checks they exist, then calls the method
      * on each of them.
@@ -284,6 +284,32 @@ window.utilityMixin = {
     }
   }
 };
+
+/** To add common characteristics to build ajax inputs to be more
+ * uniform & easier to build, & more compact. Provides some prebuild
+ * configurations, & takes array of the essential elements & populates
+ * them with the commonoalityes
+ */
+window.controlMixin = {
+  methods: {
+    combineToArray(arr,...objs) {
+      if (!Array.isArray(arr)) {
+        console.error("Wrong arg for arr:", arr);
+        return false;
+      }
+      arr.forEach(function(el) {
+        objs.forEach(function(obj){
+          el = _.merge(el,obj);
+        });
+      });
+    }
+  },
+};
+
+
+
+
+
 
 /** For a top-level stand-alone Vue instance that pops up a pk-modal-wrapper button
  * for Modal submission form, &
@@ -365,7 +391,7 @@ window.pinputMixin = {
   },
   mounted() {
       //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
-      this.setData(this.fields, this.params);
+      this.setData(this,this.fields, this.params);
       this.initData();
   },
   methods: {
@@ -1151,6 +1177,7 @@ window.Vue.component('del-icon',{
  *      name
  *    & paramaters necessary
  * */
+/*
 window.Vue.component('data-item',{
   template: `
     <div :class="itmcls" :style="style" v-html="content"></div>
@@ -1214,7 +1241,7 @@ window.Vue.component('data-item',{
   },
 });
 
-
+*/
 /** Looks like it wraps a label with associated data value OR input ctl
  * 
  */
@@ -1242,7 +1269,7 @@ window.Vue.component('input-el',{
     updateData: function() {
       var datafields = ['type','name','value','inpclass','inpstyle'];
       //console.log("Calling update data w. params:", this.params);
-      this.setData(datafields, this.params);
+      this.setData(this,datafields, this.params);
     },
   },
   watch: {
@@ -1461,7 +1488,10 @@ window.Vue.component('ajax-input-el', {
      input_params: name, value, type=text, inpclass, inpstyle
  */
 window.Vue.component('data-label-pair', {
-  inputparams:['options','name','model','id',
+  inputparams:['options','name','model','id','fetchurl',
+    'inpclass','ownermodel','ownerid','submiturl','foreignkey','inpstyle',
+    'checked','checkedvalue','uncheckedvalue','value'],
+
   name: 'data-label-pair',
   template: `
   <div class="pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
@@ -1492,10 +1522,14 @@ window.Vue.component('data-label-pair', {
   },
   methods: {
     updateData: function() {
-      var datafields = ['input','input_params','lblcls', 'tootik',
+      var datafields = ['input','lblcls', 'tootik',
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
+      var inputfields = this.$options.inputparams;
+      this.input_params = 
+        this.setData(this.input_params,inputfields,this.params);
+      //this.setData(this.input_params,this.#
       //console.log("Calling update data w. params:", this.params);
-      this.setData(datafields, this.params);
+      this.setData(this,datafields, this.params);
       //console.log("Now calling refs to update..");
       this.$refs.input.updateData();
 
@@ -1584,66 +1618,6 @@ window.Vue.component('olddata-label-pair', {
  *   width: opt - width in px
  *   style: opt - custom input style
  *   inpatts: opt - arbitrary string of attributes to apply to the string
- */
-Vue.buildInput = function(params) {
-  //console.log("Paramas", params);
-  var reginptypes = ['text','password','color','date','datetime-local', 'email',
-    'month', 'number', 'range', 'search', 'tel', 'time', 'url', 'week'];
-  var defcls = " rt-inp ";
-  var name = params.name;
-  var val = params.val;
-  var placeholder = params.placeholder || '';
-  var inpcls = params.inpcls + defcls ;
-  var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
-          placeholder+'" '+ params.inpatts + ' ';
-  var type = params.type || 'text';
-  //console.log("Build Input: params:",params,"cmnatts:",cmnatts);
-  if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
-    return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
-  } else if (type === 'select') { // Need inpparams for select:
-    //console.log("IN Bld Inp; Params:",params,'val',val);
-    //allownull: default: true - if string, the string display for empty
-    var allownull = params.allownull; //Trueish, falseish, or a string placeholder
-    if (allownull === undefined) {
-      allownull = true;
-    }
-    var options = params.options;
-    //options: object keyed by value=>display
-    var inp = '\n<select '+cmnatts + '>\n';
-    var selected = "";
-    if (allownull) {
-      if (typeof allownull !== 'string') {
-        allownull='';
-      }
-      if (!val) {
-        selected = " selected ";
-      }
-      inp += '  <option value="" '+selected+'>'+allownull+'</options>\n';
-      selected = '';
-    }
-    for (var key in options) {
-      if (key === val) {
-        selected = " selected ";
-      }
-      inp += '  <option value="'+key+'" '+selected+'>'+options[key]+'</options>\n';
-      selected = '';
-    }
-    inp += "</select>\n";
-    return inp;
-  } else if (type === 'checkbox') { //Add hidden empty in case cleared
-    var checkedval = params.inpparams.checkedval || "1";
-    var inp = '<input type="hidden" name="'+name+'"/>\n';
-    var checked = val===checkedval ? " checked " : "";
-    inp += '<input type="checkbox" value="'+htmlEncode(checkedval)+'" '+checked+'/>\n';
-    return inp;
-  } else if (type === 'textarea') { 
-    var inp = '\n<textarea '+cmnatts +'>'+val+'</textarea>\n';
-  } else {
-    throw "Unhandled input type ["+type+"]";
-  }
-};
-
-
 /** It should be positioned absolutely within a relatively positioned
  * element representing a model/db object. The containing object should have
  * data- attributes with model, id, & deletable status.
@@ -2130,20 +2104,6 @@ Vue.component('ajax-checkbox-input',{
       this.toggleCheckState(event,'changesavesubmit');
       this.savesubmit(event, 'changesavesubmit');
     },
-  },
-  /*
-  <input type="hidden" :name="name" value="0">
-    @change="savesubmit($event,'Clicked')" 
-   * 
-   */
-  
-
-  computed: {
-    /*
-    checked() {
-      return !!this.value;
-    }
-    */
   },
 });
 
