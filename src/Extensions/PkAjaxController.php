@@ -416,6 +416,7 @@ abstract class PkAjaxController extends PkController {
 
 
   /** Returns key/value reference sets for selects, etc, like {10:"Happy",20:"Sad"}
+   * In the simplest case, just pass the refclass as refclass
    * 
    */
   public function refinfo() {

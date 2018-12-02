@@ -1280,6 +1280,27 @@ window.Vue.component('ajax-checkbox-el', {
 });
 
 
+
+/**AJAX Load & Save Select */
+//options is an array of objects: {value:value,label:label, rendered by:'
+//<option v-for="(option, idx) in options" :value="option.value" v-html="option.label"></option>
+//CVue.component('pk-select-arr', {
+window. Vue.component('ajax-select-el',{
+  name: 'ajax-select-el',
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  type: 'select',
+  template: `
+  <select 
+    @change="savesubmit($event,'Selected Select')" 
+    @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
+    class="pk-inp lpk-inp" :name="name" :class="inpclass" :style="inpstyle" v-model="value">
+      <option v-for="(option, idx) in options" :value="option.value" v-html="option.label">
+      </option>
+    </select>
+`,
+  });
+
+
 window.Vue.component('ajax-input-el', {
   name: 'ajax-input-el',
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
