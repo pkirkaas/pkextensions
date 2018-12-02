@@ -277,6 +277,10 @@ window.utilityMixin = {
       }
       //console.log(lbl+ " Current this values:",vals);
       return vals;
+    },
+    chunkArr: function(anarr,sz) {
+      sz = sz || 2;
+      return _.chunk(anar,sz);
     }
   }
 };
@@ -300,6 +304,130 @@ window.refreshRefsMixin = {
       }
     }
   }
+};
+
+//For pure AJAX inputs that will be part of a data - pair, so no label, etc
+window.pinputMixin = {
+  /**
+   * 'params' object 
+   *   model:
+   *   id:
+   *   name:
+   *   value:
+   *   tooltip: (opt: Tooltip for intput)
+   *   submiturl: (opt: default: "/ajax/submit")
+   *   fetchurl: (opt: default: "/ajax/fetchattributes"
+   *   formatin: (opt - format method to show the data)
+   *   formatout (opt - format method to submit the data)
+   *   inpcss(opt - css class for the input)
+   *   type(opt - input type)
+   *   ownermodel(opt)
+   *   ownerid (opt)
+   *   label: (opt - label for control - then will be wrapped)
+   *   lblcss:  (opt - css class for input)
+   *   wrapcls:  (opt - css class for input)
+   *   lblstyle: (opt -custom styles for the element)
+   *   wrapstyle: (opt -custom styles for the element)
+   *   inpstyle: (opt -custom styles for the element)
+   *   @atts & noInherit: Possibe way to inject arbitrary atts into an el?
+   * @type object
+   */
+  props: ['params'],
+  data: function () {
+    var sdefaults = {
+      name: null,
+      value:null,
+      id: null,
+      ownermodel: null,
+      type: "text",
+      ownerid: null, 
+      model: null,
+      submiturl:"/ajax/submit",
+      fetchurl: "/ajax/fetchattributes",
+      foreignkey: null,
+      inpclass: '',
+      inpstyle:'', 
+      checked:null,
+      options:[],
+      checkedvalue:1,
+      uncheckedvalue:0,
+    }; //If input or label width is limited, 
+    var data = sdefaults;
+    data.fields = Object.keys(sdefaults);
+    data.defaults=sdefaults;
+    return data;
+  },
+  mounted() {
+      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
+      this.setData(this.fields, this.params);
+      this.initData();
+  },
+  methods: {
+    //Special for checkboxes - usually true/false - & if not checked sends nothing,
+    //so not false. This will both toggle the appearance of the checkbox, AND send
+    //the unchecked value, so can clear
+    setCheckedState() {
+      if(this.value == this.checkedvalue) {
+        this.checked = true;
+      } else {
+        this.checked = false;
+      }
+    },
+    toggleCheckState(event,arg) {
+      //console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
+      if(this.value == this.checkedvalue) {
+        this.value = this.uncheckedvalue;
+        this.checked = false;
+      } else {
+        this.value = this.checkedvalue;
+        this.checked = true;
+      }
+      //console.log("After toggle state, this.checked:",this.checked,"value",this.value);
+    },
+    initData() {
+      axios.post(this.fetchurl,
+      {model:this.model,
+       id:this.id,
+       ownermodel:this.ownermodel,
+       ownerid:this.ownerid,
+       keys: this.name,
+     }).then(response=>{
+       //console.log("Succeeded in fetch, resp:", response);
+       var value = response.data[this.name];
+       if (this.formatin) {
+         value = this[this.formatin](value);
+       }
+       this.value = value;
+       if (this.value == this.checkedvalue) {
+         this.checked=true;
+       } else {
+         this.checked = false;
+       }
+     }).  catch(defaxerr);
+    },
+    savesubmit(event,arg) {
+      if (this.formatout) {
+        this.value = this[this.formatout](this.value);
+      }
+      axios.post(this.submiturl,
+        {model:this.model,
+          id:this.id,
+          ownermodel:this.ownermodel,
+          ownerid:this.ownerid,
+          foreignkey: this.foreignkey,
+          attribute: this.attribute,
+          fields: {[this.name]:this.value},
+     }).then(response=>{
+       var data = response.data;
+       this.id = data.id;
+       var value = data[this.name];
+       if (this.params.formatin) {
+         value = this[formatin](value);
+       }
+       this.value = value;
+     }).catch(defaxerr);
+    },
+  },
 };
 
 /****
@@ -343,7 +471,8 @@ window.inputMixin = {
    */
   props: ['params'],
   data() {
-      var defaults = {
+         //the other element can take the space. 
+       var defaults = {
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
         label: null, tooltip: '', submiturl:"/ajax/submit",
@@ -1117,6 +1246,63 @@ window.Vue.component('input-el',{
   }
 });
 
+window.Vue.component('ajax-checkbox-el', {
+  name: 'ajax-checkbox-el',
+  type: 'checkbox',
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  template: `
+    <input type="checkbox" 
+      @click="changesavesubmit($event,'Clicked')" 
+      class="pk-inp lpk-inp w2em" :name="name" :class="inpclass" :style="inpstyle"
+           v-model="checked" :value="value" >
+`,
+  methods: {
+    changesavesubmit(event,action) {
+      //console.log("In changesavesubmit");
+      this.toggleCheckState(event,'changesavesubmit');
+      this.savesubmit(event, 'changesavesubmit');
+    },
+  },
+  /*
+  <input type="hidden" :name="name" value="0">
+    @change="savesubmit($event,'Clicked')" 
+   * 
+   */
+  
+
+  computed: {
+    /*
+    checked() {
+      return !!this.value;
+    }
+    */
+  },
+});
+
+
+window.Vue.component('ajax-input-el', {
+  name: 'ajax-input-el',
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  /*
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: ''};
+        */
+  template: `
+    <input  :type="type" :style="inpstyle" :class="inpclass"
+       class="pk-inp lpk-inp"
+       @esc="false"
+       @tab="savesubmit($event,'tab')"
+       @enter="savesubmit($event,'enter')"
+       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
+       @blur="savesubmit($event,'blur')"
+       v-model="value" :name="name" >
+  `,
+});
+
+
 /**
  * Wraps an input & label. 'params': 
     'input','input_params','lblcls', 'lblstyle','label','fldcls',
@@ -1127,9 +1313,9 @@ window.Vue.component('input-el',{
 window.Vue.component('data-label-pair', {
   name: 'data-label-pair',
   template: `
-  <div class="pair-wrap lpair-wrap" :class="pair_wrap" :style="pair_wrap_style">
-    <div class="pk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
-    <div class="pk-val" :class="fldcls" :style="fldstyle">
+  <div class="pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
+    <div class="pk-lbl lpk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
+    <div class="pk-val lpk-val" :class="fldcls" :style="fldstyle">
       <component ref="input" :is="input" :params="input_params"></component>
     </div>
   </div>
@@ -1138,6 +1324,7 @@ window.Vue.component('data-label-pair', {
   mixins: [window.utilityMixin],
   data: function() {
     return {
+      tootik: '',
       input: 'input-el',
       input_params: {},
       lblcls:'',
@@ -1154,7 +1341,7 @@ window.Vue.component('data-label-pair', {
   },
   methods: {
     updateData: function() {
-      var datafields = ['input','input_params','lblcls',
+      var datafields = ['input','input_params','lblcls', 'tootik',
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
       console.log("Calling update data w. params:", this.params);
       this.setData(datafields, this.params);
@@ -1694,8 +1881,7 @@ window.Vue.component('resp-tbl', {
 /******************** END  Reactive Tables ************************/
 
 //// Ajax Input Components (Use mixins below)
-
-
+/// Two versions - fancy packaged, & simple to include in pair above
 window.Vue.component('ajax-text-input', {
   name: 'ajax-text-input',
   mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],

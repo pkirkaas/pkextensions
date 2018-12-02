@@ -1,13 +1,23 @@
-<div class="bg-eee p-1 pk-lbl fw-5 fs--1">User Name</div>
+<div class='bg-eee p-1 pk-lbl fw-5 fs--1'>User Name</div>
 
-<input name="name" type="text" class="form-control pk-inp">
+<input name='name' type='text' class='form-control pk-inp'>
 
+ <!-- Open Flex container for this set of inputs -->
+<div class='h-flex fles-wrap'>
 
-
-
-<div data-tootik="" class="row m-h-1 bg-eef p-h-1">
-  <div class="col-sm-4 bg-eee p-1 pk-lbl fw-5 fs--1">Phone</div>
-  <div class="col-sm-8 d-flex align-items-center justify-content-center inner-border  p-0">
-    <input name="telno" type="text" class="form-control pk-inp">
+  <div data-tootik='User Name' class='inline m-h-1 bg-eef p-h-1'>
+    <div class='inline bg-eee p-1 pk-lbl fw-5 fs--1 w-18'>Name</div>
+    <div class='inline  w-39 d-flex align-items-center justify-content-center inner-border  p-0'>
+      <input name='name' type='text' class='form-control pk-inp'>
+    </div>
   </div>
+
+  <div data-tootik='Email' class='inline m-h-1 bg-eef p-h-1'>
+    <div class='inline bg-eee p-1 pk-lbl fw-5 fs--1 w-18'>Email</div>
+    <div class='inline w-39 d-flex align-items-center justify-content-center inner-border  p-0'>
+      <input name='email' type='text' class='form-control pk-inp'>
+    </div>
+  </div>
+
+ <!-- Close Flex container for this set of inputs -->
 </div>
