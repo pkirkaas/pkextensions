@@ -1496,6 +1496,10 @@ class $createclassname extends Migration {
    * @param string $key - the attribute
    * @return string - the transformed value to display
    */
+  public $traitGets=[];
+  public $attGetters =[]; #Any class that wants to catch "gets" registerts the att with the method here.
+
+
   public function __get($key) {
     # This seems pretty obvious - why doesn't Eloquent do it?
     if (!$key) return null;
@@ -1538,6 +1542,20 @@ class $createclassname extends Migration {
       } 
       throw new \Exception("Invalid structured: \n".print_r($structured,1));
     }
+    if (array_key_exists($key,$this->attGetters)) {
+      return $this->attGetters[$key]($key);
+    }
+
+    /** Now check trait gets...
+    //// Hm have to think this through more...
+     if ($this->traitGets === []) {
+       $this->traitGets = static::getExtraMethods('__get');
+     }
+     if (!$this->traigGets) {
+       $this->traitGets = null;
+     } else {
+     }
+     */
     return parent::__get($key);
      /** 7 Nov 18 - NO idea what I wanted to do with "conversion"? */ 
     /*
@@ -2480,6 +2498,10 @@ class $createclassname extends Migration {
    * 'getTableFieldDefsExtra' then execute them and return all
    * the extra defined table field defs - for example, the BuildQueryTrait
    * would define getTableFieldsDefsExtraBuildQueryTrait();
+   * 
+   * I think I'll do the same for PkUploadTrait - so implemening classes can have
+   * several names & types of files, and the PkUpload trait will build several DB
+   * fields for them.
    * 
    * BAD -= See below for alternative
    */

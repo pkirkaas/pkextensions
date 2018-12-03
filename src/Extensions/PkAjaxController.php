@@ -94,6 +94,39 @@ abstract class PkAjaxController extends PkController {
         headers: the response headers
     }
    */
+  public function index() {
+    $this->data = request()->all();
+    $action=keyVal('action',$this->data);
+    switch ($action) {
+      case 'execute':
+          $model = keyVal('model',$this->data);
+          $id = keyVal('id',$this->data);
+          $method = keyVal('method',$this->data);
+          $args = keyVal('args',$this->data);
+          $results = keyVal('results',$this->data);
+          $obj = $model::find($id);
+          if (!is_array($args)) {
+            $args = [$args];
+          }
+          /*
+          if (!$obj instanceOf PkModel) {
+            return $this->error(["No instance found for data:", $this->data]);
+          }
+           * 
+           */
+          $res = call_user_func_array([$obj,$method], $args);
+          if ($results) {
+            return $this->success($res);
+          } else {
+            return $this->success();
+          }
+        default: return $this->error(["Nothing to do with:",$this->data]);
+    }
+    return $this->error("Unspecified Ajax Error - no matching action  w data:".
+        print_r($this->data,1));
+
+  }
+
   public function jsonresponse($data=null,$status=200,$headers=[],$options=true) {
     return static::sjsonresponse($data, $status,$headers,$options);
   }

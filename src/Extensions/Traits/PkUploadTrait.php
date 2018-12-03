@@ -14,8 +14,19 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
  * @author pkirkaas
  */
 trait PkUploadTrait {
+
+  ## New Development in progress - as is, this can only support a single file in
+  # an implementing class. So I will implement a static array implementing classes
+  # implement to name their base files, and this trait will build multiple DB
+  # fields to support. So a profile might have
+  # public static $uploadFileDefs = ["avatar"=>"image", "resume"=>"pdf"], & this would build
+  # avatar_relpath, resume_relpath, avatar_storagepathe, resume_storagepath, etc.
+  # If the implementing class doesn't specify files, we'll just use these one set 
+  #by default
+
+  public static $uploadFileDefsUploadTrait = [];
   
-  public static $table_field_defs_UploadTrait =  [
+  public static $base_table_field_defs_UploadTrait =  [
   'relpath'=>['string','nullable'],
   'storagepath'=>['string','nullable'],
   'filetype'=>['string','nullable'],
@@ -28,7 +39,48 @@ trait PkUploadTrait {
   'path'=>['string','nullable'],
   'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
   ];
-  public $uploadedFile;
+
+  /** Goes through all ancestors & traits to gather a combined array of filenames=>types
+   * 
+   */
+  public static function getUploadFileDefs() {
+    return static::getArraysMerged('uploadFileDefs');
+  }
+
+  public static function getTableFieldDefsExtraUploadTrait() {
+    $uploadFileDefs = static::getUploadFileDefs();
+    if (!$uploadFileDefs) {
+      return static::$base_table_field_defs_UploadTrait;
+    }
+    $names = array_keys($uploadFileDefs);
+    $fieldDefs = [];
+    foreach ($names as $name) {
+      foreach (static::$base_table_field_defs_UploadTrait as $field => $uploadFileDef) {
+        $fieldDefs[$name."_$field"]=$uploadFileDef;
+      }
+    }
+    return $fieldDefs;
+  }
+
+
+  public function manageExtraFile($name) {
+  }
+
+  public static function getEntryNames() {
+    return array_keys(static::getUploadFileDefs());
+  }
+
+  #Returns an array of all the keys of $base_table_field_defs, if !$name,
+  #else the field names with $name prepended
+  public static function getFieldEntryNames($name=null) {
+    $fields = array_keys(static::$base_table_field_defs_UploadTrait);
+    if (!$name) return $fields;
+    foreach ($fields as &$field) {
+      $field = $name.'_'.$field;
+    }
+    return $fields;
+  }
+
   public static $attstofuncs_uploadTrait=[
       'url',
   ];
@@ -47,6 +99,12 @@ trait PkUploadTrait {
    * @throws PkExceptionResponsable
    */
   public function ExtraConstructorPkUploadTrait($args=[]) {
+  #Just to register any extra file name this might be handling
+    $names = static::getEntryNames();
+    if (!$names) return $args;
+    foreach ($names as $name) {
+      $this->attGetters[$name]="manageExraFile";
+    }
 
     if (!isPost() || empty($_FILES)) {
       //pkdebug("No Files?");
@@ -159,6 +217,7 @@ trait PkUploadTrait {
   /** Return the URL for the file
    * @param boolean $check - check if file exists? Default: false
    * @param boolean $deleteonfalse - if checking and no file, delete this? 
+   * 
    */
   public function url($check = false, $deleteonfalse=true) {
     if ($check) {
@@ -166,7 +225,9 @@ trait PkUploadTrait {
         return false;
       }
     }
-    return $this->getBaseUrl().$this->relpath;
+    if ($this->relpath) {
+      return $this->getBaseUrl().$this->relpath;
+    }
   }
 
   /** We want to delete the file as well - but we have to find where Laravel put it...
@@ -175,6 +236,23 @@ trait PkUploadTrait {
   public function delete($cascade = true) {
     Storage::delete($this->relpath);
     return parent::delete($cascade);
+  }
+
+  /** If the uploaded file was part of a larger object, just delete the file entry,
+   * not the entire instance
+   * @param type $name
+   */
+  public function deleteEntry($name=null) {
+    if($name) {
+      $path = $name.'_relpath';
+    } else {
+      $path = "relpath";
+    }
+    Storage::delete($this->$path);
+     foreach(static::getFieldEntryNames($name) as $field) {
+       $this->$field=null;
+     }
+     $this->save();
   }
 
   /** Does the file actually exist?

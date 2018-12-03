@@ -3,9 +3,9 @@
  separate uploaded/file/media objects, NOT to be included as part of just a 
 regular object, which sucks. -->
 <template>
-  <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" ><h1>It's Here...</h1>
+  <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
       <delete-x data-tootik="Delete This?"></delete-x>
-      <div class=" align-center img-wrapper"  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
+      <div class=" align-center img-wrapper "  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
         <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click="fiClicked($event,'fi')">
         <img :src="url || defaulturl" alt="" class="img-upload" @clicked="fiClicked($event,'img')"/>
   </div>
@@ -19,7 +19,8 @@ export default {
     props: ['params'], 
     data() {
       return {
-      defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
+      //defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
+      defaulturl:  "/mixed/img/generic-avatar-1.png" ,
       image: '',
       status: this.params.status || '',//'extant' - part of existing object, need only model & ID
       file: null,
@@ -67,6 +68,16 @@ export default {
         //console.log("The input got the click, ev:",event,"data:", data);
       },
       delete() {
+        if (this.status==='exstant') {
+          axios.post("/ajax", {
+                model:this.model,
+                id:this.id,
+                action:'execute',
+                method:'deleteEntry'}).then(response=>{console.log("Seems to have deleted entry successfully:",
+                   response);
+                   this.initData();
+                 }).catch(defaxerr);
+        } else {
         var delparm = {model:this.model,id:this.id,cascade:true};
         //console.log("About to delete w. params:",delparm);
         //axios.post(this.deleteurl,{model:this.model,id:this.id,cascade:true}).
@@ -76,6 +87,7 @@ export default {
             this.$parent.$refs.dropavatar.initData();
           }).
           catch(error=>{console.error("The delete failed:", error, error.response);});
+        }
       },
       logThis() {
         var comatts = ['defaulturl', 'image', 'file', 'desc', 'imgblob', 'uploadopts', 'mediatype',
@@ -130,7 +142,7 @@ export default {
             //console.log("Search Results:", response);
             var rdata = response.data;
             if (!rdata.id) { //No Match
-              this.url = this.defaulturl;
+              this.url = "/mixed/img/generic-avatar-1.png" ;
               return;
             }
             //console.log("Keystoset?",keystoset);

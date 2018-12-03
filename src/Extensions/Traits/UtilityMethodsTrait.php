@@ -81,6 +81,7 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * can be a classname or object instance
    * $useBaseName - default true - remove Namespace components
    */
+  ## 2018 - Uh, don't think we need to worry about target - being called class!
   public static function usesTrait($traitName, $target = null, $useBaseName=true) {
     if (ne_string($traitName)) {
       $traits = [$traitName];
@@ -91,33 +92,41 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     }
 
     if (!$target) {
-      $target = get_called_class();
-    } else if (is_object($target)) {
-      $target = get_class($target);
-    }
+      $target = static::class;
+    } 
     return usesTrait($traits, $target, $useBaseName);
   }
 
   /** Return all traits used by class */
   public static function getAllTraits($target =null) {
     if (!$target) {
-      $target = get_called_class();
-    } else if (is_object($target)) {
-      $target = get_class($target);
+      $target = static::class;
     }
     return getAllTraits($target);
   }
 
   public static function getTraitMethods($trimtraits=[],$target = null) {
     if (!$target) {
-      $target = get_called_class();
-    } else if (is_object($target)) {
-      $target = get_class($target);
-    }
+      $target = static::class;
+    } 
     $traits = getDirectTraits($target);
     $traits = array_diff($traits, $trimtraits);
     return traitMethods($traits);
   }
+
+  /** Returns all trait methods starting with start. This is a great way to use
+   * trait methods in implementint classes without overriding them or other 
+   * inconveniences. If "plus", must be more than just the prefix
+   * @param string $start
+   * @param boolean $plus
+   */
+  /*** Oh, I already did this..
+  public static function traitMethodsStarting($start,$plus=true) {
+    $methods=[];
+    $methods = static::getTraitMethods();
+  }
+   * *
+   */
     
 
 /** Does THIS SPECIFIC CLASS or used TRAIT define the method?
