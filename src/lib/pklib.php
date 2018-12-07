@@ -3879,9 +3879,10 @@ function usesTrait($traitName, $target, $useBaseName=true) {
  * all the methods for all the traits
  * @param string|array $trait
  * @param array of traits to ignore/remove
- * @return array of methods implemented by the named traits
+ * @param int - any filters to apply, like only static, etc. See ReflectionClass
+ * @return array of NAMES of methods implemented by the named traits
  */
-function traitMethods($traits, $omittraits=[]) {
+function traitMethods($traits, $omittraits=[],$methodFilter = 0) {
   if (!$traits) {
     return [];
   }
@@ -3893,7 +3894,7 @@ function traitMethods($traits, $omittraits=[]) {
   foreach ($traits as $trait) {
     $reflection = new ReflectionClass($trait);
     $traitmethods = array_merge($traitmethods,
-        array_map(function($ar) {return $ar->name;},($reflection->getMethods())));
+        array_map(function($ar) {return $ar->name;},($reflection->getMethods($methodFilter))));
   }
   //pkdebug("Trait Methods:", $traitmethods);
   return array_unique($traitmethods);

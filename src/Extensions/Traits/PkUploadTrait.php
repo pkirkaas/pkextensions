@@ -8,6 +8,71 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
+/*
+class FileProxy {
+  public $name; // The name of the file field 
+  public $type; //The type of the file
+  public $instance; //The instance of the class implemeting PkUploadTrait
+  public $fields; //idx Array of the actual name of the fields - $name_mimetime
+  public $baseFields; //idx Array of the base field names - mimetype
+  public $fieldmap; //Assoc mape baseFieldName => realFieldName
+  public static $uploadstaticmethods;
+  public function __construct($name, $instance) {
+    $this->name = $name;
+    $this->instance = $instance;
+    $this->baseFields = $instance->getFieldEntryNames();
+    $this->fields = $instance->getFieldEntryNames($name);
+    $this->fieldMap = array_combine($this->baseFields,$this->fields);
+    if (!static::$uploadstaticmethods) {
+      static::$uploadstaticmethods=
+        traitMethods(PkUploadTrait::fullTrait(),[],
+            \ReflectionClass::IS_STATIC);
+    }
+  }
+  public function __get($fname) {
+    if (in_array($fname,$this->baseFields)) {
+      $rfname = $this->fieldMap[$fname];
+      return $this->instance->$rfname;
+    } else {
+      return null;
+    }
+  }
+  public static function __callStatic($name,$arguments) {
+    if (in_array($name, static::$uploadstaticmethods)) {
+    }
+  }
+}
+ * 
+ */
+
+/** Experiment with allowing multiple file objects as part of a model
+ * 
+ */
+class FileProxy {
+  use PkUploadTrait;
+  public $baseFields;
+  public $name;
+  public $type; //The type of the file
+  public $fields;
+  public $instance;
+  public $fieldmap; //Assoc mape baseFieldName => realFieldName
+  public function __construct($name, $instance) {
+    $this->name = $name;
+    $this->instance = $instance;
+    $this->baseFields = $instance->getFieldEntryNames();
+    $this->fields = $instance->getFieldEntryNames($name);
+    $this->fieldMap = array_combine($this->baseFields,$this->fields);
+  }
+
+  public function __get($name) {
+    if (in_array($name, $baseFields)) {
+      $realField = static::fldnm($this->name, $name);
+      return $this->instance->$realField;
+    }
+  }
+  
+}
+
 /** This is to be incuded by PkModels. The Pk
 /**
  * Supports uploads - to be used by Models. In turn, uses PkFileUploadService
@@ -23,6 +88,8 @@ trait PkUploadTrait {
   # avatar_relpath, resume_relpath, avatar_storagepathe, resume_storagepath, etc.
   # If the implementing class doesn't specify files, we'll just use these one set 
   #by default
+
+  public static function fullTrait() {return __TRAIT__;}
 
   public static $uploadFileDefsUploadTrait = [];
   
@@ -41,11 +108,18 @@ trait PkUploadTrait {
   ];
 
   /** Goes through all ancestors & traits to gather a combined array of filenames=>types
-   * 
+   *  OR if $name, the expected file type of that field.
    */
-  public static function getUploadFileDefs() {
-    return static::getArraysMerged('uploadFileDefs');
+  public static function getUploadFileDefs($name = null) {
+    $defs = static::getArraysMerged('uploadFileDefs'); 
+    if (!$name) return $defs;
+    return keyVal($name,$defs);
   }
+
+  /** A associative array of "extra" file defs, by name, pointing to the anonymous
+   * proxy object - which is returned by __get on the file name.
+   */
+  public $proxies = [];
 
   public static function getTableFieldDefsExtraUploadTrait() {
     $uploadFileDefs = static::getUploadFileDefs();
@@ -61,9 +135,16 @@ trait PkUploadTrait {
     }
     return $fieldDefs;
   }
+  /*
+   * 
+   */
 
 
   public function manageExtraFile($name) {
+    if (array_key_exists($name, $this->proxies)) {
+      return $this->proxies[$name];
+    }
+    return $this->proxies[$name] = new FileProxy($name, $this);
   }
 
   public static function getEntryNames() {
@@ -103,7 +184,7 @@ trait PkUploadTrait {
     $names = static::getEntryNames();
     if (!$names) return $args;
     foreach ($names as $name) {
-      $this->attGetters[$name]="manageExraFile";
+      $this->attGetters[$name]="manageExtraFile";
     }
 
     if (!isPost() || empty($_FILES)) {
@@ -116,6 +197,8 @@ trait PkUploadTrait {
     return array_merge($args,$extra);
   }
 
+  public function upload($args=[], $name=null) {
+  }
         
 
 
@@ -170,11 +253,23 @@ trait PkUploadTrait {
     }
     return false;
   }
+  public static function fldnm($fname, $name=null) {
+    if (!$name) {
+      return $fname;
+    } else {
+      return $name.'_'.$fname;
+    }
+  }
 
-  public function file_path($deleteonfalse=true) {
-    $fp = static::sfile_path($this->relpath);
+  public function file_path($deleteonfalse=true, $name=null) {
+    $fldname = $this->fldnm('relpath',$name);
+    $fp = static::sfile_path($this->$fldname);
     if ($deleteonfalse && !$fp) {
-      $this->delete();
+      if ($name) {
+        $this->deleteEntry($name);
+      } else {
+        $this->delete();
+      }
     }
     return $fp;
   }
@@ -190,15 +285,17 @@ trait PkUploadTrait {
    * field & just uses first component of mime type
    * @param boolean $mimefirst - skip the type field & just use mime? Default false
    */
-  public function getType($mimefirst = false) {
-    if (!$mimefirst && ne_string($this->mediatype)) {
-      return $this->mediatype;
+  public function getType($mimefirst = false, $name=null) {
+    $fldname = $this->fldnm('mediatype',$name);
+    if (!$mimefirst && ne_string($this->$fldname)) {
+      return $this->$fldname;
     }
-    return $this->mimeMainType();
+    return $this->mimeMainType($name);
   }
 
-  public function mimeMainType() {
-    return static::smimeMainType($this->mimetype);
+  public function mimeMainType($name=null) {
+    $fldname = static::fldnm('mimetype',$name);
+    return static::smimeMainType($this->$fldname);
   }
   public static function smimeMainType($mimetype) {
     if (!ne_string($mimetype)) {
@@ -219,7 +316,7 @@ trait PkUploadTrait {
    * @param boolean $deleteonfalse - if checking and no file, delete this? 
    * 
    */
-  public function url($check = false, $deleteonfalse=true) {
+  public function url($check = false, $deleteonfalse=true,$name = null) {
     if ($check) {
       if (!$this->file_path($deleteonfalse)) {
         return false;
@@ -259,8 +356,8 @@ trait PkUploadTrait {
    * 
    * @param boolean $deleteonfalse Default: True. Delete this if no file
    */
-  public function thisfileexists($deleteonfalse = true) {
-    return !!$this->file_path($deleteonfalse);
+  public function thisfileexists($deleteonfalse = true,$name=null) {
+    return !!$this->file_path($deleteonfalse,$name);
   }
 
   /** If "$this->mediatype" not set, try to guess from mime-type
@@ -284,12 +381,13 @@ trait PkUploadTrait {
     return $atts;
   }
 
-  public function persistFileInfo($fileinfo) {
+  public function persistFileInfo($fileinfo,$name=null) {
     pkdebug("Entered uptlodtrai/persist wi fifing", $fileinfo);
     if (!is_array($fileinfo)) {
       throw new PkException(["Fileinfo not an array:", $fileinfo]);
     }
     foreach ($fileinfo as $key=>$val) {
+      $key = static::fldnm($key,$name);
       $this->$key = $val;
     }
     $this->save();
