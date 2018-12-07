@@ -167,6 +167,9 @@ class PkFileUploadService {
     if (is_array($attribute)) {
       $params = $attribute;
     } else {
+      if (ne_string($attribute)) {
+        $attribute=[$attribute];
+      }
       $params['attribute']=$attribute;
       $params['types']=$types;
     }
@@ -179,15 +182,18 @@ class PkFileUploadService {
     if (ne_string($attribute)) { #Get the named
       return $this->processFile(keyVal($attribute,$allFiles,reset($allFiles)), $params);
     } 
-    if ($attribute == -1) { #we want an array all files, keyed by name
+    if (($attribute == -1) || ne_array($attribute)) { #we want an array all files, keyed by name
       $files = [];
       foreach ($allFiles as $key=>$file) {
-        if ($res = $this->processFile($file,$params)) {
-          $files[$key] = $res;
+        if (($attribute == -1) || in_array($key,$attribute)) {
+          if ($res = $this->processFile($file,$params)) {
+            $files[$key] = $res;
+          }
         }
       }
       return $files;
     }
+    #If no attribute, just the first file
     return $this->processFile(reset($allFiles), $params);
   }
 

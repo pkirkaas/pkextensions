@@ -316,6 +316,11 @@ abstract class PkController extends Controller {
   /** Not an action, but a helper method for actual upload actions
    * @param array $params - details on how to upload
    * REQUIRED: 'model' -> the type of upload model to create
+   * OR existing 'pkinstance', an existing instance using PkUploadTrait
+   * 
+   * TODO - SHOULDN'T REQUIRE TO CREATE A NEW UPLOAD INSTANCE -
+   * SHOULD BE ABLE TO ADD FILE DETAILS TO AN EXISTING INSTANCE
+   * OF A MORE GENERAL MODEL, BASED ON CTL/Field Name
    * 
    * 
    * OPTIONAL:
@@ -323,22 +328,48 @@ abstract class PkController extends Controller {
    *   'att_name' -> if uploaded is typed, the type
    *   'type' -> General type - image/text/video - not required if att_name
    *            
-   * @param type $pkmodel
-   * @param type $ctlName
-   * @param type $attName
+   * @param ClassName $pkmodel - optional - ClassName to create or update
+   * @param int id - opt - if both pkmodel & id, get instance to update 
+   * @param PkModel $pkinstance - optional - an actual instance to update
+   * @param type $ctlName - the key in the posted files array
+   * @param type $attName - the name to call the uploaded file if empty/ ctl
    * @
    * @param type $validationStr
    *  #$ctlName,$attName,$validationStr='image') {
-   * @return instance of PkUploadModelTrait
+   * @return either new instance of PkUploadModelTrait, or updated
    */
   public function _processFileUpload( $params=[]) { #$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
+    $uploadinstance = keyVal('pkinstance', $params);
     $uploadmodel = keyVal('model',$params); #The type/instance to create
-    if (!$uploadmodel::usesTrait(PkUploadTrait::class)) {
-      throw new PkExceptionResponsable("No upload model provided");
+    $id = keyVal('id', $params);
+    if (!$uploadinstance) { //Find or make one
+      if (!$uploadmodel::usesTrait(PkUploadTrait::class)) {
+        throw new PkExceptionResponsable("No upload model provided");
+      }
+      if ($id) {
+        $uploadinstance = $uploadmodel::find($id);
+      } else {
+        $uploadinstance = new $uploadmodel();
+      }
     }
     $uploadService = new PkFileUploadService();
     $uparr = $uploadService->upload($params);
+    /** Returns if single attribute name, returns array of 
+    $ret = [
+        'relpath' => $reldir . basename($path),
+        'storagepath' => $storagepath,
+        'path' => $file->path(),
+        'mimetype' => $file->getMimeType(),
+        'size'=>$file->getSize(),
+        'originalname'=>$file->getClientOriginalName(),
+        'filetype' => $type,
+        'mediatype' => $type,
+    ];
+     * or if none, all array of above array keyed by att names
+     */
+
+    
     $owner = keyVal('owner', $params); #PkModel instance to own upload, if any
     if ($owner)  {
       if ( !$owner instanceOf PkModel) {

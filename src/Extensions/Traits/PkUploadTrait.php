@@ -51,10 +51,8 @@ class FileProxy {
 class FileProxy {
   use PkUploadTrait;
   public $baseFields;
-  public $name;
   public $type; //The type of the file
   public $fields;
-  public $instance;
   public $fieldmap; //Assoc mape baseFieldName => realFieldName
   public function __construct($name, $instance) {
     $this->name = $name;
@@ -65,11 +63,32 @@ class FileProxy {
   }
 
   public function __get($name) {
-    if (in_array($name, $baseFields)) {
+    if ($name === 'url') {
+      return $this->url();
+    }
+    if (in_array($name, $this->baseFields)) {
       $realField = static::fldnm($this->name, $name);
       return $this->instance->$realField;
     }
   }
+  public function __set($name, $value) {
+    if (in_array($name, $this->baseFields)) {
+      $realField = static::fldnm($this->name, $name);
+      $this->instance->$realField = $value;
+    }
+  }
+  
+  public function delete($cascade = true) {
+    $this->instance->deleteEntry($this->name);
+  }
+
+  public function save(Array $args = []) {
+    if (!$this->mediatype) {
+      $this->mediatype = $this->getType(true);
+    }
+    return $this->instance->save($args);
+  }
+
   
 }
 
@@ -106,6 +125,7 @@ trait PkUploadTrait {
   'path'=>['string','nullable'],
   'uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
   ];
+  public $instance;
 
   /** Goes through all ancestors & traits to gather a combined array of filenames=>types
    *  OR if $name, the expected file type of that field.
@@ -122,6 +142,7 @@ trait PkUploadTrait {
   public $proxies = [];
 
   public static function getTableFieldDefsExtraUploadTrait() {
+    $this->instance = $this;
     $uploadFileDefs = static::getUploadFileDefs();
     if (!$uploadFileDefs) {
       return static::$base_table_field_defs_UploadTrait;
@@ -147,8 +168,14 @@ trait PkUploadTrait {
     return $this->proxies[$name] = new FileProxy($name, $this);
   }
 
-  public static function getEntryNames() {
-    return array_keys(static::getUploadFileDefs());
+  /** Returns either all the entry names if any as an array, or,
+   * $name exists & is in the entry names, returns that, or null
+   * @return array|string|null
+   */
+  public static function getEntryNames($name=null) {
+    $names =  array_keys(static::getUploadFileDefs());
+    if (!$name) return $names;
+    if (in_array($name,$names, 1)) return $name;
   }
 
   #Returns an array of all the keys of $base_table_field_defs, if !$name,
@@ -169,7 +196,8 @@ trait PkUploadTrait {
   public static $upload_typesPkUploadTrait = [
 
    ];
-
+   public $name;
+   public $names;
   /** Can accept a uploaded file object, or an array of file info 
    * from PkFileUploadService
    * 
@@ -181,8 +209,8 @@ trait PkUploadTrait {
    */
   public function ExtraConstructorPkUploadTrait($args=[]) {
   #Just to register any extra file name this might be handling
-    $names = static::getEntryNames();
-    if (!$names) return $args;
+    $this->names = $names = static::getEntryNames();
+    //if (!$names) return $args;
     foreach ($names as $name) {
       $this->attGetters[$name]="manageExtraFile";
     }
@@ -197,7 +225,38 @@ trait PkUploadTrait {
     return array_merge($args,$extra);
   }
 
-  public function upload($args=[], $name=null) {
+  /** If Instance already exists, add/replace file info */
+  public function upload($args=[] ) {
+    if (!isPost() || empty($_FILES)) {
+      pkdebug("Tried to add file info, but no data;");
+      return;
+      //throw new PkExceptionResponsable("No valid file for upload");
+    }
+    $us = new PkFileUploadService();
+    $dets = $us->upload(array_merge($args,['attribute'=>$this->names]));
+    if (ne_array($this->names)) {
+      foreach ($this->names as $name) {
+        if (array_key_exists($name,$dets)) {
+          $this->$name->insert($dets[$name]);
+        }
+      }
+    } else {
+      if (ne_string($this->name)) {
+        if (array_key_exists($this->name, $dets)) {
+          $dets = $dets[$this->name];
+        }
+      }
+    }
+    $this->insert($dets);
+    $this->instance->save();
+  }
+
+  public function insert($fileatts=null) {
+    if (!ne_array($fileatts)) return;
+    foreach($fileatts as $fkey=>$fval) {
+      $fkey = static::fldnm($fkey, $this->name);
+      $this->instance->$fkey = $fval;
+    }
   }
         
 
@@ -261,15 +320,10 @@ trait PkUploadTrait {
     }
   }
 
-  public function file_path($deleteonfalse=true, $name=null) {
-    $fldname = $this->fldnm('relpath',$name);
-    $fp = static::sfile_path($this->$fldname);
+  public function file_path($deleteonfalse=true) {
+    $fp = static::sfile_path($this->relpath);
     if ($deleteonfalse && !$fp) {
-      if ($name) {
-        $this->deleteEntry($name);
-      } else {
-        $this->delete();
-      }
+      $this->delete();
     }
     return $fp;
   }
@@ -285,17 +339,15 @@ trait PkUploadTrait {
    * field & just uses first component of mime type
    * @param boolean $mimefirst - skip the type field & just use mime? Default false
    */
-  public function getType($mimefirst = false, $name=null) {
-    $fldname = $this->fldnm('mediatype',$name);
-    if (!$mimefirst && ne_string($this->$fldname)) {
-      return $this->$fldname;
+  public function getType($mimefirst = false) {
+    if (!$mimefirst && ne_string($this->mediatype)) {
+      return $this->mediatype;
     }
-    return $this->mimeMainType($name);
+    return $this->mimeMainType();
   }
 
   public function mimeMainType($name=null) {
-    $fldname = static::fldnm('mimetype',$name);
-    return static::smimeMainType($this->$fldname);
+    return static::smimeMainType($this->mimetype);
   }
   public static function smimeMainType($mimetype) {
     if (!ne_string($mimetype)) {
@@ -316,7 +368,7 @@ trait PkUploadTrait {
    * @param boolean $deleteonfalse - if checking and no file, delete this? 
    * 
    */
-  public function url($check = false, $deleteonfalse=true,$name = null) {
+  public function url($check = false, $deleteonfalse=true) {
     if ($check) {
       if (!$this->file_path($deleteonfalse)) {
         return false;
@@ -356,8 +408,8 @@ trait PkUploadTrait {
    * 
    * @param boolean $deleteonfalse Default: True. Delete this if no file
    */
-  public function thisfileexists($deleteonfalse = true,$name=null) {
-    return !!$this->file_path($deleteonfalse,$name);
+  public function thisfileexists($deleteonfalse = true) {
+    return !!$this->file_path($deleteonfalse);
   }
 
   /** If "$this->mediatype" not set, try to guess from mime-type
@@ -387,7 +439,6 @@ trait PkUploadTrait {
       throw new PkException(["Fileinfo not an array:", $fileinfo]);
     }
     foreach ($fileinfo as $key=>$val) {
-      $key = static::fldnm($key,$name);
       $this->$key = $val;
     }
     $this->save();
