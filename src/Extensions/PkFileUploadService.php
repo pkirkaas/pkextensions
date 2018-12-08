@@ -167,9 +167,12 @@ class PkFileUploadService {
     if (is_array($attribute)) {
       $params = $attribute;
     } else {
-      if (ne_string($attribute)) {
-        $attribute=[$attribute];
-      }
+       if ($attribute === null) {
+         $attribute = 'upload';
+       }
+      //if (ne_string($attribute)) {
+       // $attribute=[$attribute];
+     // }
       $params['attribute']=$attribute;
       $params['types']=$types;
     }
@@ -178,23 +181,26 @@ class PkFileUploadService {
     }
     $allFiles = request()->allFiles();
     $attribute = keyVal('attribute', $params);
-   // pkdebug("Entering upload, FileUploadService, allfiles:", $allFiles, "PARAMS: ", $params);
-    if (ne_string($attribute)) { #Get the named
-      return $this->processFile(keyVal($attribute,$allFiles,reset($allFiles)), $params);
-    } 
-    if (($attribute == -1) || ne_array($attribute)) { #we want an array all files, keyed by name
+   // //pkdebug("Entering upload, FileUploadService, allfiles:", $allFiles, "PARAMS: ", $params);
+      //return $this->processFile(keyVal($attribute,$allFiles,reset($allFiles)), $params);
+    //if (($attribute == -1) || ne_array($attribute)) { #we want an array all files, keyed by name
+    if ($attribute == -1) { #we want an array all files, keyed by name
       $files = [];
       foreach ($allFiles as $key=>$file) {
+        //pkdebug("In loop, files key:", $key );
+
         if (($attribute == -1) || in_array($key,$attribute)) {
           if ($res = $this->processFile($file,$params)) {
-            $files[$key] = $res;
+            $files[$key] = $res + [$key+'_title'=>$attribute];
           }
         }
       }
       return $files;
     }
     #If no attribute, just the first file
-    return $this->processFile(reset($allFiles), $params);
+    //return ['upload'=>$this->processFile(reset($allFiles), $params)];
+    return [$attribute=>$this->processFile(reset($allFiles), $params +
+        [$attribute.'_title'=>$attribute])];
   }
 
     

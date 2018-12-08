@@ -5,6 +5,7 @@ namespace PkExtensions;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use PkExtensions\Models\PkModel;
+use PkExtensions\Traits\PkSelfBuildingTrait;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -14,7 +15,7 @@ use Illuminate\Support\Str;
  * @author pkirk
  */
 class PkCollection extends Collection {
-
+   use PkSelfBuildingTrait;
   /**
    * Just iterates over the instances & returns an array
    * of the of the individuale instance 'fetchAttributes()

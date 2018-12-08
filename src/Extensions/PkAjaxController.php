@@ -97,14 +97,19 @@ abstract class PkAjaxController extends PkController {
   public function index() {
     $this->data = request()->all();
     $action=keyVal('action',$this->data);
+    console("Entering index, data",$this->data);
     switch ($action) {
       case 'execute':
           $model = keyVal('model',$this->data);
           $id = keyVal('id',$this->data);
+          $attribute = keyVal('attribute',$this->data);
           $method = keyVal('method',$this->data);
           $args = keyVal('args',$this->data);
           $results = keyVal('results',$this->data);
           $obj = $model::find($id);
+          if ($attribute) {
+            $obj = $obj->$attribute;
+          }
           if (!is_array($args)) {
             $args = [$args];
           }
@@ -120,6 +125,8 @@ abstract class PkAjaxController extends PkController {
           } else {
             return $this->success();
           }
+        case 'uploadedfile':
+            $model = keyVal($this->data);
         default: return $this->error(["Nothing to do with:",$this->data]);
     }
     return $this->error("Unspecified Ajax Error - no matching action  w data:".
@@ -319,6 +326,9 @@ abstract class PkAjaxController extends PkController {
     if (ne_string($keys)) {
       $keys=[$keys];
     }
+    if (!ne_string($extra)) {
+      $extra = [$extra];
+    }
     if (is_array($keys) && !in_array('id',$keys,1)) {
       $keys[]='id'; #Could be one for an instance, or list for PkCollection
     }
@@ -515,7 +525,8 @@ abstract class PkAjaxController extends PkController {
      pkdebug("Entered _upload");
      $types = keyVal('types', $params, ['image']);
      $fus = new PkFileUploadService();
-     $uploaded = $fus->upload();
+     $title = keyVal('title',$this->data,'upload');
+     $uploaded = $fus->upload($title);
      pkdebug("Uploaded: ", $uploaded);
      return $uploaded;
    }
@@ -531,7 +542,10 @@ abstract class PkAjaxController extends PkController {
      $obj = $model::find($id);
      $finfo = $this->_upload();
      pkdebug("Returnd FileInfo...",$finfo);
-     if ($obj->persistFileInfo($finfo)) return $this->success();
+     $atts = $obj->persistFileInfo($finfo); 
+     pkdebug("Returned atts are:", $atts);
+     if ($atts) return $this->success($atts);
+     return $this->error("Failed to save file");
    }
 
 

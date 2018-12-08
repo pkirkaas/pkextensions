@@ -62,18 +62,27 @@ class FileProxy {
     $this->fieldMap = array_combine($this->baseFields,$this->fields);
   }
 
+  public function fetchattributes() {
+    $ret = [];
+    foreach($this->baseFields as $baseField) {
+      $ret[$baseField]=$this->$basefield;
+    }
+    $ret['url'] = $this->url();
+    return $ret;
+  }
+
   public function __get($name) {
     if ($name === 'url') {
       return $this->url();
     }
     if (in_array($name, $this->baseFields)) {
-      $realField = static::fldnm($this->name, $name);
+      $realField = static::fldnm($name, $this->name);
       return $this->instance->$realField;
     }
   }
   public function __set($name, $value) {
     if (in_array($name, $this->baseFields)) {
-      $realField = static::fldnm($this->name, $name);
+      $realField = static::fldnm($name, $this->name);
       $this->instance->$realField = $value;
     }
   }
@@ -113,6 +122,7 @@ trait PkUploadTrait {
   public static $uploadFileDefsUploadTrait = [];
   
   public static $base_table_field_defs_UploadTrait =  [
+  'title'=>['string','nullable'],
   'relpath'=>['string','nullable'],
   'storagepath'=>['string','nullable'],
   'filetype'=>['string','nullable'],
@@ -142,7 +152,6 @@ trait PkUploadTrait {
   public $proxies = [];
 
   public static function getTableFieldDefsExtraUploadTrait() {
-    $this->instance = $this;
     $uploadFileDefs = static::getUploadFileDefs();
     if (!$uploadFileDefs) {
       return static::$base_table_field_defs_UploadTrait;
@@ -209,6 +218,7 @@ trait PkUploadTrait {
    */
   public function ExtraConstructorPkUploadTrait($args=[]) {
   #Just to register any extra file name this might be handling
+    $this->instance = $this;
     $this->names = $names = static::getEntryNames();
     //if (!$names) return $args;
     foreach ($names as $name) {
@@ -251,6 +261,7 @@ trait PkUploadTrait {
     $this->instance->save();
   }
 
+  /*
   public function insert($fileatts=null) {
     if (!ne_array($fileatts)) return;
     foreach($fileatts as $fkey=>$fval) {
@@ -258,6 +269,8 @@ trait PkUploadTrait {
       $this->instance->$fkey = $fval;
     }
   }
+   * 
+   */
         
 
 
@@ -392,16 +405,12 @@ trait PkUploadTrait {
    * @param type $name
    */
   public function deleteEntry($name=null) {
-    if($name) {
-      $path = $name.'_relpath';
-    } else {
-      $path = "relpath";
-    }
+    $path = static::fldnm('relpath',$name);
     Storage::delete($this->$path);
-     foreach(static::getFieldEntryNames($name) as $field) {
-       $this->$field=null;
-     }
-     $this->save();
+    foreach(static::getFieldEntryNames($name) as $field) {
+      $this->$field=null;
+    }
+    $this->save();
   }
 
   /** Does the file actually exist?
@@ -438,12 +447,23 @@ trait PkUploadTrait {
     if (!is_array($fileinfo)) {
       throw new PkException(["Fileinfo not an array:", $fileinfo]);
     }
+    pkdebug("About to loop keys");
     foreach ($fileinfo as $key=>$val) {
+      if (is_array($val)) {
+        foreach ($val as $skey=>$sval) {
+          $mkey = static::fldnm($skey,$key);
+          //console("Key",$key,"Val:",$val,"skey",$skey,"sval",$sval,"mkey",$mkey);
+          //pkdebug("Key",$key,"Val:",$val,"skey",$skey,"sval",$sval,"mkey",$mkey);
+          $this->$mkey = $sval;
+        }
+      } else {
       $this->$key = $val;
+      }
     }
     $this->save();
-    pkdebug("Leaving - atts:",$this->getAttributes());
-    return true;
+    pkdebug("Leaving - atts:",$this->fetchattributes([],$this->names));
+    return $this->fetchattributes([],$this->names);
+    //return true;
   }
 
     

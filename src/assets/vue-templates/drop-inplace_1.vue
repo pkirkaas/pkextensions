@@ -18,8 +18,6 @@ export default {
     name: 'drop-inplace',
     props: ['params'], 
     data() {
-      console.log("Data/drop-inplace");
-              
       return {
       //defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
       defaulturl:  "/mixed/img/generic-avatar-1.png" ,
@@ -107,10 +105,10 @@ export default {
         return currvals;
       },
       initData(data) { //Data may be empty or have all we need
-        console.log ("Int it start data");
+        
         var me = this;
         var keystoset = ['attribute', 'method', 'args','mediatype','id','url','model'];
-        var searchkeys1 =['model','id','attribute'];
+        var searchkeys1 =['model','id'];
         var searchkeys2 =[ 'ownermodel','ownerid','attribute'];
        //Check data is object & not null
        if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
@@ -146,7 +144,6 @@ export default {
           then(response=> {
             //console.log("Search Results:", response);
             var rdata = response.data;
-            console.log("Search Results:", response.data);
             if (!rdata.id) { //No Match
               this.url = "/mixed/img/generic-avatar-1.png" ;
               return;
@@ -211,9 +208,6 @@ export default {
          }
          savekeys.push('title');
          console.log("We decided the keyse were:", savekeys, "cus status:",this.status);
-
-
-
          var me = this;
          savekeys.forEach(function(key) {
             fd.append(key,me[key]);
