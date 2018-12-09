@@ -54,6 +54,7 @@ class FileProxy {
   public $type; //The type of the file
   public $fields;
   public $fieldmap; //Assoc mape baseFieldName => realFieldName
+  public $fieldtovalue =[];
   public function __construct($name, $instance) {
     $this->name = $name;
     $this->instance = $instance;
@@ -62,11 +63,16 @@ class FileProxy {
     $this->fieldMap = array_combine($this->baseFields,$this->fields);
   }
 
-  public function fetchattributes() {
+  /* IF !full, the unnamespaced atts. If full , with the name */
+  public function fetchattributes($full=false) {
+    if ($full) {
+      return $this->instance->fetchattributes($this->name);
+    }
     $ret = [];
     foreach($this->baseFields as $baseField) {
       $ret[$baseField]=$this->$basefield;
     }
+    //$url = static::fldnm($name, 'url');
     $ret['url'] = $this->url();
     return $ret;
   }
@@ -77,7 +83,7 @@ class FileProxy {
     }
     if (in_array($name, $this->baseFields)) {
       $realField = static::fldnm($name, $this->name);
-      return $this->instance->$realField;
+      return $this->fieldtovalue[$name]=$this->instance->$realField;
     }
   }
   public function __set($name, $value) {
@@ -460,6 +466,7 @@ trait PkUploadTrait {
       $this->$key = $val;
       }
     }
+    pkdebug("About to try & persist fifinfo was:", $fileinfo, "name", $name);
     $this->save();
     pkdebug("Leaving - atts:",$this->fetchattributes([],$this->names));
     return $this->fetchattributes([],$this->names);

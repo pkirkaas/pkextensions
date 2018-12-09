@@ -41,6 +41,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     return $res;
   }
 
+
+
   // God, really thought I did this. Take a associative array of names -> closures,
      //assing the closures to this, key them by name & put them the array, then
      ////implement __call

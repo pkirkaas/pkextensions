@@ -6,6 +6,7 @@ use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use PkExtensions\PkCollection;
+use PkExtensions\PkException;
 use Illuminate\Database\Eloquent\Builder;
 use \Request as RequestFacade;
 //use \Illuminate\Http\Response;
@@ -96,9 +97,12 @@ abstract class PkAjaxController extends PkController {
    */
   public function index() {
     $this->data = request()->all();
-    $action=keyVal('action',$this->data);
+    $data=$this->data;
+    $action=keyVal('action',$data);
     console("Entering index, data",$this->data);
     switch ($action) {
+      case 'chain':
+          return $this->sucess($this->chain());
       case 'execute':
           $model = keyVal('model',$this->data);
           $id = keyVal('id',$this->data);
@@ -537,12 +541,17 @@ abstract class PkAjaxController extends PkController {
     */
    public function upload() {
      pkdebug("In AJaax upload -very exciting - the params:", $this->data);
+     /*
      $model= keyVal('model',$this->data);
      $id= keyVal('id',$this->data);
+     $attribute=keyVal('attribute',$this->data);
      $obj = $model::find($id);
-     $finfo = $this->_upload();
+      * *
+      */
+     $obj = $this->rehydrate($this->base); 
+     $finfo = $this->_upload($this->data);
      pkdebug("Returnd FileInfo...",$finfo);
-     $atts = $obj->persistFileInfo($finfo); 
+     $atts = $obj->persistFileInfo($finfo,$attribute); 
      pkdebug("Returned atts are:", $atts);
      if ($atts) return $this->success($atts);
      return $this->error("Failed to save file");
@@ -626,6 +635,43 @@ abstract class PkAjaxController extends PkController {
       die(json_encode($msg));
   }
 /////////////////  END  LEGACY //////////////////
+  //////    Utility functions //////
+  // Assumes the posted data has an object keyed as base, with model & id
+  //Gets an individual object, or collection if array of IDs
+  public function obj() {
+    $base = keyVal('base',$this->data);
+    if (!$base) { 
+      throw new \Exception ("AJAX data didn't contain 'base'");
+    }
+    $model = keyVal('model',$base);
+    if (!is_a($model, PkModel::class,1)) {
+      throw new \Exception("Base didn't have a valid model: Base: "
+          +print_r($model,1));
+    }
+    $id = keyVal('id',$base);
+    $obj = $model::Find($id);
+    if (!is_a($obj,PkModel::class,1)) {
+      throw new PkException(["Invalid Object in Base:",$base, "Obj", $obj]);
+    }
+    return $obj;
+  }
+
+  //Aplies a sequence or chain of methods to the object
+  public function chain($obj=null) {
+    if (!$obj) $obj = $this->obj();
+    $chain = keyVal('chain',$this->data); //(Array of assoc arrays)
+    if (!$chain) return $obj;
+    #Link is sting attribute or assoc arr ['method'=>?, 'args'=>]
+    foreach ($chain as $link) {
+      if (is_string(link)) {
+        $obj = $obj->$link;
+      } else {
+        $obj= call_user_func_arr([$obj,$link['method']],$link['args']);
+      }
+    }
+    return $obj;
+  }
+
 }
 
 

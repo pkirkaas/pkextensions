@@ -131,6 +131,9 @@ class PkFileUploadService {
       $params['url'] = $href;
       $params['validationStr'] = $validationStr;
     }
+    if (!array_key_exists('title',$params)) {
+      $parms['title']='upload';
+    }
     $href = $params['url'];
     $destpath =sys_get_temp_dir().'/'.uniqid("tfr-",1).'.tmp'; 
     $success = copy($href,$destpath);
@@ -231,6 +234,7 @@ class PkFileUploadService {
       pkdebug("Either wasn't symfony file, or wasn't valid. Type: ".typeOf($file));
       return [];
     }
+    $title=keyVal(title,$params,'upload');
     $types = keyVal('types', $params,'image'); #Allowed major file types
     //pkdebug("This File: ", $file);
     $type = static::isType($file, $types);
@@ -265,14 +269,15 @@ class PkFileUploadService {
      * 
      */
     $ret = [
-        'relpath' => $reldir . basename($path),
-        'storagepath' => $storagepath,
-        'path' => $file->path(),
-        'mimetype' => $file->getMimeType(),
-        'size'=>$file->getSize(),
-        'originalname'=>$file->getClientOriginalName(),
-        'filetype' => $type,
-        'mediatype' => $type,
+        $title.'_relpath' => $reldir . basename($path),
+        $title.'_storagepath' => $storagepath,
+        $title.'_path' => $file->path(),
+        $title.'_mimetype' => $file->getMimeType(),
+        $title.'_size'=>$file->getSize(),
+        $title.'_originalname'=>$file->getClientOriginalName(),
+        $title.'_filetype' => $type,
+        $title.'_mediatype' => $type,
+        $title.'_attribute' => $attribute,
     ];
     pkdebug("Returning from UploadService: ", $ret);
     return $ret;

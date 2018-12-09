@@ -21,7 +21,18 @@ trait PkSelfBuildingTrait {
  */
 
 
-   public static function resotore( $params = []) {
+  /** Params can be an array or json string */
+   public static function rehydrate($params) {
+     return static::restore($params);
+   } 
+   public static function resotore($params) {
+     if (!is_array($params) && ne_string($params)) {
+       $params = json_decode($params, 1);
+       if (!is_array($params)) {
+         throw new \Exception("Couldn't reydrate params");
+       }
+     }
+           
      $id = keyVal('id',$params); //int or list of ints or array of ins
      $model = keyVal('model',$params);
      $collection = keyVal('collection',$params);
@@ -31,7 +42,7 @@ trait PkSelfBuildingTrait {
      #We have what we need to build the instance or instances
      $response = $model::Find($id); ///Could be on, or if many, already a collection
      if (!is_a($response,PkCollection) &&
-         (is_a(static::class,PkCollection) || $collection)) {
+         (is_a(static::class,PkCollection) || $collection || is_array($id))) {
        $response = new PkCollection($response);
      }
      return $response;
@@ -40,18 +51,26 @@ trait PkSelfBuildingTrait {
    /** Returns minimal fields to rebuild the item/collection 
     * 
     */
-   public function restorePoints() {
+   public function deyhdrate($json = 0) {
+     return $this->restorePoints($json);
+   }
+   public function restorePoints($json =0) {
      if (is_collection()) {
       if (!count($this)) return false;
-      return [
+      $ret = [
          'model' => get_class($this[0]),
           'id' => $this->pluck('id')->toArray(),
           'collection' => static::class,
           ];
      } else if ($this->isPkModel()) {
-       return ['id' => $this->id,
+       $ret = ['id' => $this->id,
         'model' => static::class,
          'collection' => false];
+     }
+     if ($json) {
+       return json_enecode($ret, static::$jsonopts);
+     } else {
+       return $ret;
      }
    }
 

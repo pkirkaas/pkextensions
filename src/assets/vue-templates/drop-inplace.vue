@@ -31,6 +31,9 @@ export default {
       imgblob: null,
       uploadopts: this.params.uploadopts | [],
       mediatype: this.params.mediatype || 'image',
+      base: this.params.base || [],
+      chain: this.params.chain || [],
+      
       url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       attribute: this.params.attribute || 'avatar',//the relation name, like avatar
       method: this.params.attribute || 'fetchattributes',
@@ -64,6 +67,12 @@ export default {
       });
     },
 
+/*
+    computed: {
+      chain : function() {//Just the chain of params leading to info
+         return 
+    },
+      */
     methods: {
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
@@ -109,9 +118,10 @@ export default {
       initData(data) { //Data may be empty or have all we need
         console.log ("Int it start data");
         var me = this;
-        var keystoset = ['attribute', 'method', 'args','mediatype','id','url','model'];
-        var searchkeys1 =['model','id','attribute'];
-        var searchkeys2 =[ 'ownermodel','ownerid','attribute'];
+        var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
+        var keystosetnew = ['attribute','title', 'method', 'args','mediatype','id','url','model'];
+        var searchkeys1 =['model','id','title','attribute'];
+        var searchkeys2 =[ 'ownermodel','ownerid','title','attribute'];
        //Check data is object & not null
        if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
          data = {};
@@ -203,7 +213,8 @@ export default {
         this.logThis();
         var fd = new FormData();
         if (this.status==='exstant') {
-          var savekeys = ['model','id','name'];
+          ///var savekeys = ['model','id','name'];
+          var savekeys = ['base','chain', 'title'];
         } else { //It's a separate media object, with an "owner" object
           var savekeys = [ //The keys required to save the upload
             'ownermodel','ownerid','model','foreignkeyname','attribute',
@@ -238,13 +249,7 @@ export default {
           }).
           catch(error=>{console.log("Error saving:",error,error.response);});
       },
-
-      /*
-      removeFile() {
-        this.image = '';
-      }
-      */
-    }
+    },
   }
 </script>
   

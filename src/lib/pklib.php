@@ -1,4 +1,5 @@
 <?php
+use \PkExtensions\Models\PkModel;
 
 /**
  * PKMVC Framework
@@ -2700,6 +2701,20 @@ function isValidImagePath($filePath) {
   return $mimeType;
 }
 
+function lightDbg () {
+  $args = func_get_args();
+  $retargs = [];
+  foreach ($args as $arg) {
+    if (is_scaler($arg)) {
+      $retargs[]=$arg;
+    } else if ($arg instanceOf PkModel) {
+      $retargs[] = $arg->totag();
+    } else {
+      $retargs[] = typeOf($arg) . " size: " . sizeOf($arg);
+    }
+  }
+  return call_user_func_array('pkdebug', $retargs);
+}
 /** If the $filePath is a valid info & can get dimensions, return width/height,
  * else 0/false
  * @param type $filePath
@@ -3923,4 +3938,34 @@ function restoreJson($arg) {
   $res = json_decode($arg,1);
   if (!$res) return $arg;
   return $res;
+}
+
+/**   Look like dupe of above */
+function usesTraits($class, $trait) {
+  return in_array($trait, allTraits($class), 1);
+}
+
+/**** From the manual - all the traits a class (or object) uses */
+function allTraits($class, $autoload = true) {
+    if (is_object($class)) {
+      $class = get_class($class);
+    }
+    $traits = [];
+    // Get traits of all parent classes
+    do {
+        $traits = array_merge(class_uses($class, $autoload), $traits);
+    } while ($class = get_parent_class($class));
+
+    // Get traits of all parent traits
+    $traitsToSearch = $traits;
+    while (!empty($traitsToSearch)) {
+        $newTraits = class_uses(array_pop($traitsToSearch), $autoload);
+        $traits = array_merge($newTraits, $traits);
+        $traitsToSearch = array_merge($newTraits, $traitsToSearch);
+    };
+
+    foreach ($traits as $trait => $same) {
+        $traits = array_merge(class_uses($trait, $autoload), $traits);
+    }
+    return array_unique($traits);
 }
