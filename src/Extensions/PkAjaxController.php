@@ -98,11 +98,19 @@ abstract class PkAjaxController extends PkController {
   public function index() {
     $this->data = request()->all();
     $data=$this->data;
+    pkdebug("Enter Ajax/Index; data:", $data);
+    $model = keyVal('model',$data);
+    $id = keyVal('id',$data);
     $action=keyVal('action',$data);
     console("Entering index, data",$this->data);
     switch ($action) {
       case 'chain':
           return $this->sucess($this->chain());
+      case 'url':
+           $name = keyVal('name', $data);
+           $obj = $model::Find($id);
+           return $obj->url($name);
+           //return $obj->$fname->url;
       case 'execute':
           $model = keyVal('model',$this->data);
           $id = keyVal('id',$this->data);
@@ -541,13 +549,12 @@ abstract class PkAjaxController extends PkController {
     */
    public function upload() {
      pkdebug("In AJaax upload -very exciting - the params:", $this->data);
-     /*
      $model= keyVal('model',$this->data);
      $id= keyVal('id',$this->data);
      $attribute=keyVal('attribute',$this->data);
      $obj = $model::find($id);
-      * *
-      */
+     $finfo = $this->_upload($this->data);
+     $atts = $obj->persistFileInfo($finfo,$attribute); 
      //$obj = $this->rehydrate($this->base()); 
      //if (key_value_exists('model', $this->data)) {
      //  $obj = $this->obj();
@@ -557,6 +564,7 @@ abstract class PkAjaxController extends PkController {
      pkdebug("Returnd FileInfo...",$finfo);
      pkdebug("Returned atts are:", $atts);
      if ($atts) return $this->success($atts);
+     //if ($finfo) return $this->success($finfo);
      return $this->error("Failed to save file");
    }
 

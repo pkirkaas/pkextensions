@@ -387,6 +387,12 @@ trait PkUploadTrait {
    * @param boolean $deleteonfalse - if checking and no file, delete this? 
    * 
    */
+  public function url($name) {
+    pkdebug("In the non function?");
+    $dereg = $name.'_relpath';
+    return $this->getBaseUrl().$this->$dereg;
+  }
+  /*
   public function url($check = false, $deleteonfalse=true) {
     if ($check) {
       if (!$this->file_path($deleteonfalse)) {
@@ -397,6 +403,8 @@ trait PkUploadTrait {
       return $this->getBaseUrl().$this->relpath;
     }
   }
+   * 
+   */
 
   /** We want to delete the file as well - but we have to find where Laravel put it...
    * Shall we just trust the Storage facade?

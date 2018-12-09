@@ -33,7 +33,8 @@ export default {
       mediatype: this.params.mediatype || 'image',
       chain: this.params.chain || [],
       
-      url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
+      //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
+      url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       attribute: this.params.attribute || 'avatar',//the relation name, like avatar
       method: this.params.attribute || 'fetchattributes',
       foreignkeyname: this.params.foreignkeyname,
@@ -49,6 +50,12 @@ export default {
       };
     },
     computed: {
+
+/*
+      url() {
+        return this.params.url;
+      },
+        */
       deleteparams() {
         return {
           model:this.model,
@@ -63,6 +70,7 @@ export default {
         console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
         this.logThis();
         this.initData();
+        this.setUrl();
       });
     },
 
@@ -73,6 +81,14 @@ export default {
     },
       */
     methods: {
+      setUrl() {
+        axios.post('/ajax',{action:'url',name:'avatar',
+                         model:"\\App\\Models\\Bouncer",id:this.id}).then(result=>{
+            console.log("Result from getting URL",result);
+            this.url = result.data;
+            console.log("This.url now: ", this.url);
+          }).catch(error=>{console.error("Failed to get url:",error, error.response);});
+        },
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
           //console.log ("Target was ",event.target," send to file input");

@@ -234,7 +234,7 @@ class PkFileUploadService {
       pkdebug("Either wasn't symfony file, or wasn't valid. Type: ".typeOf($file));
       return [];
     }
-    $title=keyVal(title,$params,'upload');
+    $title=keyVal('title',$params,'upload');
     $types = keyVal('types', $params,'image'); #Allowed major file types
     //pkdebug("This File: ", $file);
     $type = static::isType($file, $types);
@@ -243,7 +243,8 @@ class PkFileUploadService {
       throw new PkExceptionResponsave("The Filetypes Didn't match");
     }
     $resize = keyVal('resize', $params);
-    $reldir = keyVal('reldir');
+    $reldir = keyVal('reldir', $params);
+     $attribute = keyVal('attribute',$params);
     $validationStr = keyVal('validationStr',$params);
     if (ne_string($reldir)) {
       $reldir = pktrailingslashit(pkleadingslashit($reldir));
