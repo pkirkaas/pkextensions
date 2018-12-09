@@ -41,9 +41,9 @@ trait PkSelfBuildingTrait {
      }
      #We have what we need to build the instance or instances
      $response = $model::Find($id); ///Could be on, or if many, already a collection
-     if (!is_a($response,PkCollection) &&
-         (is_a(static::class,PkCollection) || $collection || is_array($id))) {
-       $response = new PkCollection($response);
+     if (!is_a($response,\PkExtensions\PkCollection, 1) &&
+         (is_a(static::class,\PkExtensions\PkCollection, 1) || $collection || is_array($id))) {
+       $response = new \PkExtensions\PkCollection($response);
      }
      return $response;
    }
@@ -51,11 +51,11 @@ trait PkSelfBuildingTrait {
    /** Returns minimal fields to rebuild the item/collection 
     * 
     */
-   public function deyhdrate($json = 0) {
+   public function dehydrate($json = 0) {
      return $this->restorePoints($json);
    }
    public function restorePoints($json =0) {
-     if (is_collection()) {
+     if ($this->isCollection()) {
       if (!count($this)) return false;
       $ret = [
          'model' => get_class($this[0]),
@@ -68,14 +68,14 @@ trait PkSelfBuildingTrait {
          'collection' => false];
      }
      if ($json) {
-       return json_enecode($ret, static::$jsonopts);
+       return json_encode($ret, static::$jsonopts);
      } else {
        return $ret;
      }
    }
 
    public function isCollection() {
-     return is_a(static::class, PkCollection);
+     return is_a(static::class, PkCollection::class, 1);
    }
    public function isPkModel() {
      return $this instanceOf PkModel;
