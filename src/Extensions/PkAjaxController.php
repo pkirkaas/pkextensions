@@ -548,10 +548,13 @@ abstract class PkAjaxController extends PkController {
      $obj = $model::find($id);
       * *
       */
-     $obj = $this->rehydrate($this->base); 
+     //$obj = $this->rehydrate($this->base()); 
+     //if (key_value_exists('model', $this->data)) {
+     //  $obj = $this->obj();
+      // $atts = $obj->persistFileInfo($finfo,$attribute); 
+    // }
      $finfo = $this->_upload($this->data);
      pkdebug("Returnd FileInfo...",$finfo);
-     $atts = $obj->persistFileInfo($finfo,$attribute); 
      pkdebug("Returned atts are:", $atts);
      if ($atts) return $this->success($atts);
      return $this->error("Failed to save file");
@@ -639,16 +642,8 @@ abstract class PkAjaxController extends PkController {
   // Assumes the posted data has an object keyed as base, with model & id
   //Gets an individual object, or collection if array of IDs
   public function obj() {
-    $base = keyVal('base',$this->data);
-    if (!$base) { 
-      throw new \Exception ("AJAX data didn't contain 'base'");
-    }
-    $model = keyVal('model',$base);
-    if (!is_a($model, PkModel::class,1)) {
-      throw new \Exception("Base didn't have a valid model: Base: "
-          +print_r($model,1));
-    }
-    $id = keyVal('id',$base);
+    $id = keyVal('id',$this->data);
+    $model = keyVal('model',$this->data);
     $obj = $model::Find($id);
     if (!is_a($obj,PkModel::class,1)) {
       throw new PkException(["Invalid Object in Base:",$base, "Obj", $obj]);

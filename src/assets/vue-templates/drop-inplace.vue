@@ -31,7 +31,6 @@ export default {
       imgblob: null,
       uploadopts: this.params.uploadopts | [],
       mediatype: this.params.mediatype || 'image',
-      base: this.params.base || [],
       chain: this.params.chain || [],
       
       url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
@@ -214,7 +213,7 @@ export default {
         var fd = new FormData();
         if (this.status==='exstant') {
           ///var savekeys = ['model','id','name'];
-          var savekeys = ['base','chain', 'title'];
+          var savekeys = ['model','id','chain', 'title'];
         } else { //It's a separate media object, with an "owner" object
           var savekeys = [ //The keys required to save the upload
             'ownermodel','ownerid','model','foreignkeyname','attribute',
