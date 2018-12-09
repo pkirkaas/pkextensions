@@ -268,7 +268,7 @@ class PkFileUploadService {
       $this->resize($resize);
     }
      * 
-     */
+
     $ret = [
         $title.'_relpath' => $reldir . basename($path),
         $title.'_storagepath' => $storagepath,
@@ -280,7 +280,19 @@ class PkFileUploadService {
         $title.'_mediatype' => $type,
         $title.'_attribute' => $attribute,
     ];
-    pkdebug("Returning from UploadService: ", $ret);
+skuy    */
+    $ret = [
+'relpath' => $reldir . basename($path),
+'storagepath' => $storagepath,
+'path' => $file->path(),
+'mimetype' => $file->getMimeType(),
+'size'=>$file->getSize(),
+'originalname'=>$file->getClientOriginalName(),
+'filetype' => $type,
+'mediatype' => $type,
+//'attribute' => $attribute,
+    ];
+    pkdebug("Returning from UploadService: ", $ret, "title', $title");
     return $ret;
   }
 
