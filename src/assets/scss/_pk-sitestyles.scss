@@ -630,8 +630,65 @@ img.js-big-picture-button:hover {
 .gr3 { background: linear-gradient( to bottom, #0fb8ad 0%, #1fc8db 51%, #2cb5e8 75%); }
 .gr4 { background: linear-gradient( #0fb8ad, #1fc8db); }
 
+//Gotta get some standard label/input/value templates here...
+//Start w. .pk-pair as wrapper - contains label & either input or val field
+//Where pk-inp & pk-val are subclasses of pk-data
+//Side by side or label over input/val
+//Label can be fixed width, input/val can grow or be fixed
 
+//Defaults over-ridden in individual site SCSS's
+$pk-pair-border: #aaa !default;
+$pk-pair-border-radius: .5em !default;
+$pk-pair-pad: .1em .2em !default;
+$pk-pair-bg: #eef !default;
+$pk-pair-mg: .1em .1em !default;
+$pkp-lbl-color: #008 !default;
+$pkp-lbl-wght: 600 !default;
+$pkp-lbl-pad: .1em .2em !default;
+$pk-lbl-mg: .1em .1em !default;
+$pkp-data-color: #404 !default;
+$pkp-data-bg: #fff !default;
+$pkp-data-pad: .1em .2em !default;
+$pk-data-mg: .1em .1em !default;
+.pk-pair-set { //Group of pk-pairs w. similar appearance
 
+}
+@for $i from 1 through 30 {
+  .pk-pair-set.lw#{$i} .pkp-lbl {width: $i * 1em;}
+}
+.pk-pair {
+  border: $pk-pair-border;
+  border-radius: $pk-border-radius;
+  padding: $pk-pair-pad;
+  margin: $pk-pair-mg;
+  background: $pk-pair-bg;
+  display: flex;
+    .pkp-lbl {
+      color: $pk-lbl-color;
+      font-weight: $pk-lbl-wght;
+      padding: $pk-lbl-pad;
+      margin: $pk-lbl-mg;
+    }
+    .pkp-data {
+      color: $pkp-data-color;
+      background: $pkp-data-color;
+      padding: $pkp-data-pad;
+      margin: $pkp-data-mg;
+      flex-grow: 1;
+    }
+  }
+
+.pk-pair.stacked { //Label over data
+
+}
+.pk-pair.inline { //Label preceeds data
+
+  .pkp-lbl {
+         }
+  .pkp-data {
+
+  }
+}
 
 
 

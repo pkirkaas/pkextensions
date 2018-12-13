@@ -21,6 +21,28 @@ window.Vue.component('pk-input-container',{
 */
 
 const Vue = window.Vue;
+
+/** Creates the custom v-atts directive that allows to insert/create 
+ * arbitrary attributes into an HTML element!!! 
+ * v-atts="dataobj"  - where data obj MUST COME FROM COMPONENT DATA, NOT PROPS,
+ * and the keys of the object are the attributes, & values the att values
+ */
+
+
+Vue.directive('atts', {
+  bind: function (el, binding, vnode) {
+    var value = binding.value;
+    console.log("The bindinging value:", value);
+    if ((typeof value !== 'object') ||  value === null) {
+      return;
+    }
+    for (var att in value) {
+      el.setAttribute(att, value[att]);
+    }
+  },
+});
+
+
 //
 //////////////  Mixins //////////
 window.formatMixin = {

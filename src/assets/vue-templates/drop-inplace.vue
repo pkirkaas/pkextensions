@@ -35,7 +35,7 @@ export default {
       
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
-      attribute: this.params.attribute || 'avatar',//the relation name, like avatar
+      attribute: this.params.attribute || 'resume',//the relation name, like avatar
       method: this.params.attribute || 'fetchattributes',
       foreignkeyname: this.params.foreignkeyname,
       id: this.params.id || null, //The id of the uploaded object
@@ -82,7 +82,7 @@ export default {
       */
     methods: {
       setUrl() {
-        axios.post('/ajax',{action:'url',name:'avatar',
+        axios.post('/ajax',{action:'url',name:'resume',
                          model:"\\App\\Models\\Bouncer",id:this.id}).then(result=>{
             console.log("Result from getting URL",result);
             this.url = result.data;
