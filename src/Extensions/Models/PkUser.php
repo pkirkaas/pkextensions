@@ -294,7 +294,16 @@ class PkUser extends PkModel
 
     /** Log in the user - remember if remember - true */
     public function login($remember = false) {
+      pkdebug("Logging in...");
       Auth::login($this,$remember);
+      $me = Auth::user();
+      if (!$me->logins) {
+        $me->logins = 1;
+      } else {
+        $me->logins++;
+      }
+      $me->lastlogin = unixtimeToSql();
+      $me->save();
       return $this;
     }
 

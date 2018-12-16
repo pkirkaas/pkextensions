@@ -8,6 +8,32 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
+/** Implementing Models define a static array like:
+  public static $uploadFileDefs=['avatar'=>'image', 'resume'=>'doc'];
+ 
+ * This get translated to table field defs like  
+  'avatar_title'=>['string','nullable'],
+  'avatar_relpath'=>['string','nullable'],
+  'avatar_storagepath'=>['string','nullable'],
+  'avatar_filetype'=>['string','nullable'],
+  'avatar_mediatype' => ['type' => 'string', 'methods' => 'nullable'],#Like image,audio
+  #Category, like, doc (text & pdf), media (audio, video)
+  'avatar_cat' => ['type' => 'string', 'methods' => 'nullable'],
+  'avatar_mimetype'=>['string','nullable'],
+  'avatar_size'=>['integer','nullable'],
+  'avatar_originalname'=>['string','nullable'],
+  'avatar_path'=>['string','nullable'],
+  'avatar_uploaddesc' => ['type' => 'string', 'methods' => 'nullable'],
+ * 
+ * and so on for resume...
+ * 
+ * Ideally, $model->avatar->url would return the same as 
+ * $model->url('avatar');
+ */
+
+
+
+
 /*
 class FileProxy {
   public $name; // The name of the file field 
@@ -107,7 +133,7 @@ class FileProxy {
   
 }
 
-/** This is to be incuded by PkModels. The Pk
+/** This is to be included by PkModels. The Pk
 /**
  * Supports uploads - to be used by Models. In turn, uses PkFileUploadService
  * @author pkirkaas

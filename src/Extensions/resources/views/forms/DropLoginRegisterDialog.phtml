@@ -1,5 +1,10 @@
 <?php /*
 Include this just inside the main container (w. BS)
+like:   < ?= pkview("forms.DropLoginRegisterDialog", ['registerform'=>0]);? >
+ * if 'registerform' is null or not set, the "register form" does not 
+ * appear; just a login form.
+ * If set to non-false, invites to register as type "$registerform" 
+ * If set but false/0, just general register.
 */
 $route = $route ?? '/auth/login';
 ?>
@@ -214,7 +219,9 @@ $(function () {
         <div class="shib2">Register/Sign Up</div>
         <div class="v-space-flex full-height p-h-1 p-b-1">
         <div class="lrdlg-link-wrap">
-<div class="shir3 tac">Register as a <?=$registerform?></div>
+<?php if ($registerform) { ?>
+  <div class="shir3 tac">Register as a <?=$registerform?></div>
+<?php } ?>
 <div class="tac section">
 <form method="POST" action="/auth/register">
     <?= csrf_field() ?>

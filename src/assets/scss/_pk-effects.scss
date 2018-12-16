@@ -1,16 +1,13 @@
-/*
-CSS / Styling that when used together create effects, like tooltips, liking someone, etc
-*/
+//CSS / Styling that when used together create effects, like tooltips, liking someone, etc
 
-/** For us with JQuery Dialog Automation */
+// For us with JQuery Dialog Automation
 .js-dialog-content {
   display: none;
 }
 
-/** An element with class drop-hover has display: none, unless
- * the user hovers over a containing element with class 'drop-in'
- * or an immediately preceding sibling element with class 'drop-after'
-*/
+// An element with class drop-hover has display: none, unless
+// the user hovers over a containing element with class 'drop-in'
+// or an immediately preceding sibling element with class 'drop-after'
 
 .drop-hover {
   display: none;
@@ -37,7 +34,7 @@ CSS / Styling that when used together create effects, like tooltips, liking some
   opacity: 1;
 }
 
-/** Speach bubble effects */
+// Speach bubble effects
 div.speech-bubble{
    margin-left: 2em;;
    margin-right: 2em;;
@@ -59,32 +56,29 @@ div.speech-bubble.left {
 div.speech-bubble.right {
    background: #400;
 }
-/*
 // Not browser independent yet - FF & Chrome differ, also w. themselves on refresh
-div.speech-bubble::before,
-div.speech-bubble::after {
-   content:"";
-   position: absolute;
-   width: 0;
-   height: 0;
-   border-top: 1.5em solid transparent;
-   border-bottom: 1.5em solid transparent;
-   margin: 0;
-}
-div.speech-bubble.left::before {
-   border-right: 2.5em solid blue;
-   margin-left: -3.5em;
+//div.speech-bubble::before,
+//div.speech-bubble::after {
+//   content:"";
+//   position: absolute;
+//   width: 0;
+//   height: 0;
+//   border-top: 1.5em solid transparent;
+//   border-bottom: 1.5em solid transparent;
+//   margin: 0;
+//}
+//div.speech-bubble.left::before {
+//   border-right: 2.5em solid blue;
+//   margin-left: -3.5em;
 
-}
-div.speech-bubble.right:after {
-   border-left: 2.5em solid red;
-   margin-left: .5em;
- //  margin-left: 410px;
- //  left: 70%;
-   top: 1.8em;
-}
-*/
-
+//}
+//div.speech-bubble.right:after {
+//   border-left: 2.5em solid red;
+//   margin-left: .5em;
+// //  margin-left: 410px;
+// //  left: 70%;
+//   top: 1.8em;
+//}
 
 
 
@@ -92,7 +86,8 @@ div.speech-bubble.right:after {
 
 
 
-/** Some Bootstrap Mods to make even height columns */
+
+// Some Bootstrap Mods to make even height columns
 .row-eq-height {
   display: -webkit-box;
   display: -webkit-flex;
@@ -110,7 +105,7 @@ div.speech-bubble.right:after {
     vertical-align: top;
 }
 
-/** Management of "Favoriting" & Blocking, in combo with JS / AJAX */
+// Management of "Favoriting" & Blocking, in combo with JS / AJAX
 
 .social-control-container {
   height: 4em;
@@ -131,7 +126,7 @@ div.unfavorited {
   transform: translateY(-.5em);
   margin: auto;
 }
-
+//// Good to here!
 div.unfavorited {
   background-image: url('../img/Full-Empty-Star.svg');
 }
@@ -177,7 +172,7 @@ div.favorite-toggle.unfavorited:hover::after {
 
 
 
-/** Similar with Favoriting, but for blocking */
+// Similar with Favoriting, but for blocking 
 
 
 div.blocked,
@@ -244,7 +239,7 @@ div.blocked:hover::after {
 }
 
 
-/** Some button styling, also for divs, and menus? */
+// Some button styling, also for divs, and menus?
 $default-pkmvc-button: 1 !default;
 @if $default-pkmvc-button == 1 {
   body .pkmvc-button:focus,
@@ -340,7 +335,7 @@ body .light-button {
   }
 
 
-/** Set of behaviors for inline login */
+// Set of behaviors for inline login
 $inline-login-color: #ccf !default;
 .inline-login a{
   color: $inline-login-color;
@@ -394,7 +389,7 @@ form.inline-login.form-inline {
   }
 }
 
-/** Don't remember exactly what key frames were for - some kind of animation - cool*/
+// Don't remember exactly what key frames were for - some kind of animation - cool
 @keyframes pulse {
   0% {
     border: solid red 2px;
@@ -412,23 +407,19 @@ form.inline-login.form-inline {
 img.big-picture-dialog {
   max-width: 70rem;
   max-height: 70rem;
-  /*
-  border-radius: 2rem;
-  border: solid blue 5px;
-  */
+  //border-radius: 2rem;
+  //border: solid blue 5px;
 
 } 
-/** Basic uniform styling for disabled controls - both the native HTML inputs,
- * which bootstrap applies a style to through the pseudo-selector :disabled -
- * but that doesn't work with my compound inputs like "multiselect" Components
- * that want this styling should have the class 'form-control', and have the
- * class 'disabled'
- */
+// Basic uniform styling for disabled controls - both the native HTML inputs,
+ // which bootstrap applies a style to through the pseudo-selector :disabled -
+ // but that doesn't work with my compound inputs like "multiselect" Components
+ // that want this styling should have the class 'form-control', and have the
+ // class 'disabled'
+ ///
 
-/*
-div.multiselect.disabled,
-input[disabled].disabled {
-*/
+//div.multiselect.disabled,
+//input[disabled].disabled {
 .form-control.disabled {
   background-color: #444;
   color: #888;
@@ -449,35 +440,31 @@ input[disabled].disabled {
   } 
 }
 
-/** So far, for automatic delete row buttons */
+// So far, for automatic delete row buttons
 .pk-compact {
   margin: 0;
 }
 
-/** Try Vertical/Horizontal styling for Radio/YesNo set */
+// Try Vertical/Horizontal styling for Radio/YesNo set 
 
 .rs-horizontal .rs-layout {
   display: inline-block;
-  /*
-  margin-left: .5rem;
-  margin-right: .5rem;
-  */
+//  margin-left: .5rem;
+//  margin-right: .5rem;
 }
 
 .rs-yn .radio.rs-layout {
   width: 4rem
 }
 .rs-horizontal .rs-layout.rs-yn label {
-  /*
-  margin-left: 1rem;
-  margin-right: 1rem;
-  min-width: 4rem;
-  */
+  //margin-left: 1rem;
+  //margin-right: 1rem;
+  //min-width: 4rem;
 
 }
-/** To center jQuery UI dialogs - pk-big-picture, but generalizable
- * Need to add "data-dialogClass='pk-big-picture'" to the js-dialog-button 
-*/
+// To center jQuery UI dialogs - pk-big-picture, but generalizable
+// Need to add "data-dialogClass='pk-big-picture'" to the js-dialog-button 
+
 .ui-dialog.ui-widget.pk-big-picture {
   @include absolutecenter;
 }
@@ -519,3 +506,5 @@ input[disabled].disabled {
 }
 
 
+/*
+*/
