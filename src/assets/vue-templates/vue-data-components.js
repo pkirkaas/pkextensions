@@ -426,11 +426,18 @@ window.pinputMixin = {
     return data;
   },
   mounted() {
-      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
+      this.$nextTick(() => {
+      console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.fields, this.params, this.instance);
-      this.initData();
+      this.initData();});
   },
   methods: {
+    doMounted: function() {
+      this.$nextTick(() => {
+      console.log("doMounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
+      this.setData(this,this.fields, this.params, this.instance);
+      this.initData();});
+    },
     //Special for checkboxes - usually true/false - & if not checked sends nothing,
     //so not false. This will both toggle the appearance of the checkbox, AND send
     //the unchecked value, so can clear
@@ -474,6 +481,7 @@ window.pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
+      console.log("Trying to save new data:",this.value);
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
       }
@@ -492,6 +500,7 @@ window.pinputMixin = {
        if (this.params.formatin) {
          value = this[formatin](value);
        }
+       console.log("After save, returned value:",value);
        this.value = value;
      }).catch(defaxerr);
     },
@@ -1493,6 +1502,7 @@ window. Vue.component('ajax-select-el',{
     </select>
 `,
   });
+
 window.Vue.component('ajax-input-el', {
   name: 'ajax-input-el',
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
@@ -1521,7 +1531,7 @@ window.Vue.component('ajax-input-el', {
     'input','input_params','lblcls', 'lblstyle','label','fldcls',
     'fldstyle','pair_wrap', 'pair_wrap_style'
      input is the input component = input-el, input_params are required by the inp comp
-     input_params: name, value, type=text, inpclass, inpstyle
+     input_params: name, value, type=text, inpclass, inpstyle, instance
  */
 window.Vue.component('data-label-pair', {
   inputparams:['options','name','model','id','fetchurl',
@@ -1533,7 +1543,9 @@ window.Vue.component('data-label-pair', {
   <div class="pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
     <div class="pk-lbl lpk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
     <div class="pk-val lpk-val" :class="fldcls" :style="fldstyle">
-      <component ref="input" :is="input" :params="input_params"></component>
+      <component ref="input"
+            :is="input" :params="input_params" :instance="instance">
+      </component>
     </div>
   </div>
   `,
@@ -1542,7 +1554,7 @@ window.Vue.component('data-label-pair', {
   data: function() {
     return {
       tootik: '',
-      input: 'input-el',
+      input: 'ajax-input-el',
       input_params: {},
       lblcls:'',
       lblstyle:'',
@@ -1555,11 +1567,13 @@ window.Vue.component('data-label-pair', {
   },
   mounted: function() {
     this.updateData();
+    console.log("After mounted pair, data:",this.$data,"; params:", this.params,"; instance:", this.instance);
   },
   methods: {
     updateData: function() {
       var datafields = ['input','lblcls', 'tootik',
-        'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
+        'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style',
+      'model','instance', 'id', 'input_params'];
       var inputfields = this.$options.inputparams;
       this.input_params = 
         this.setData(this.input_params,inputfields,this.params, this.instance);
@@ -1567,7 +1581,7 @@ window.Vue.component('data-label-pair', {
       //console.log("Calling update data w. params:", this.params);
       this.setData(this,datafields, this.params);
       //console.log("Now calling refs to update..");
-      this.$refs.input.updateData();
+      //this.$refs.input.updateData();
 
     },
   },
