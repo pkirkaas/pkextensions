@@ -76,7 +76,8 @@ export default {
                 model:this.model,
                 id:this.id,
                 action:'execute',
-                method:'deleteEntry'}).then(response=>{console.log("Seems to have deleted entry successfully:",
+                method:'deleteEntry',
+                args: [this.title]}).then(response=>{console.log("Seems to have deleted entry successfully:",
                    response);
                    this.initData();
                  }).catch(defaxerr);

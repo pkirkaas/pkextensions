@@ -388,8 +388,12 @@ trait PkUploadTrait {
    * 
    */
   public function url($name) {
-    pkdebug("In the non function?");
+    pkdebug("In the non function?"); 
     $dereg = $name.'_relpath';
+    pkdebug("In the non function? derge:",$dereg, $this->$dereg); 
+    if (!$this->$dereg) {
+      return null;
+    }
     return $this->getBaseUrl().$this->$dereg;
   }
   /*

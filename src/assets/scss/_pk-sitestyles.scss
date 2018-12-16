@@ -637,43 +637,47 @@ img.js-big-picture-button:hover {
 //Label can be fixed width, input/val can grow or be fixed
 
 //Defaults over-ridden in individual site SCSS's
-$pk-pair-border: #aaa !default;
-$pk-pair-border-radius: .5em !default;
-$pk-pair-pad: .1em .2em !default;
-$pk-pair-bg: #eef !default;
-$pk-pair-mg: .1em .1em !default;
+$pkp-pair-border: #aaa !default;
+$pkp-pair-border-radius: .5em !default;
+$pkp-pair-pad: .1em .2em !default;
+$pkp-pair-bg: #eef !default;
+$pkp-pair-mg: .1em .1em !default;
 $pkp-lbl-color: #008 !default;
 $pkp-lbl-wght: 600 !default;
 $pkp-lbl-pad: .1em .2em !default;
-$pk-lbl-mg: .1em .1em !default;
+$pkp-lbl-mg: .1em .1em !default;
 $pkp-data-color: #404 !default;
 $pkp-data-bg: #fff !default;
 $pkp-data-pad: .1em .2em !default;
-$pk-data-mg: .1em .1em !default;
+$pkp-data-mg: .1em .1em !default;
 .pk-pair-set { //Group of pk-pairs w. similar appearance
-
+  display: flex;
 }
-@for $i from 1 through 30 {
+@for $i from 1 through 60 { //Sets the fixed width of a label in a set
+  .pk-pair-set.sw#{$i}  {width: $i * 1em;}
   .pk-pair-set.lw#{$i} .pkp-lbl {width: $i * 1em;}
 }
 .pk-pair {
-  border: $pk-pair-border;
-  border-radius: $pk-border-radius;
-  padding: $pk-pair-pad;
-  margin: $pk-pair-mg;
-  background: $pk-pair-bg;
+  border: $pkp-pair-border;
+  border-radius: $pkp-pair-border-radius;
+  padding: $pkp-pair-pad;
+  margin: $pkp-pair-mg;
+  background: $pkp-pair-bg;
+  flex-grow: 1;
   display: flex;
     .pkp-lbl {
-      color: $pk-lbl-color;
-      font-weight: $pk-lbl-wght;
-      padding: $pk-lbl-pad;
-      margin: $pk-lbl-mg;
+      color: $pkp-lbl-color;
+      font-weight: $pkp-lbl-wght;
+      padding: $pkp-lbl-pad;
+      margin: $pkp-lbl-mg;
+      border: solid blue 1px;
     }
     .pkp-data {
       color: $pkp-data-color;
-      background: $pkp-data-color;
+      background: $pkp-data-bg;
       padding: $pkp-data-pad;
       margin: $pkp-data-mg;
+      border: solid red 1px;
       flex-grow: 1;
     }
   }
