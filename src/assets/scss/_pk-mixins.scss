@@ -609,7 +609,7 @@ $base-header-ir: #400 !default;
 // Making site headers - 
 .sh, .shr, .shb, .shib, .shir {
   font-size: $base-header-font-size;
-  @extend .montserrat;
+  @extend .montserrat !optional;
   //font-family: verdana;
   color: $base-header-color;
   font-weight: bold;
@@ -736,8 +736,9 @@ $base-header-ir: #400 !default;
 //Will make a class '.site-button', with the defaults
 @include mk-btn;
 
-@include mk-btn((name:tiny-btn, font-size: .9rem, margin: .3em, padding: .3em))
-@include mk-btn((name:site-btn, font-size: 1rem, margin: .5em, padding: .5em, font-weight: bold))
+@include mk-btn((name:tiny-btn, font-size: .9rem, margin: .3em, padding: .3em));
+
+@include mk-btn((name:site-btn, font-size: 1rem, margin: .5em, padding: .5em, font-weight: bold));
 
 
 /** Some button styling, also for divs, and menus? */
