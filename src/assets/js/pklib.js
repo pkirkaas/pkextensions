@@ -2115,3 +2115,28 @@ function getTemplateHtml(selector) {
 $(function () {
   $(".hide-until-loaded").removeClass('hide-until-loaded');
 });
+
+/** Return the data in a FormData object as an array
+ * - Useful in console.log out put of FD data
+ * @param FormData fd
+ * @param boolean log - if true, console.log the output
+ * @returns array of key/value objects
+ */
+function afd(fd,log) {
+  return arrayFormData(fd, log);
+}
+function arrayFormData(fd, log) {
+  if (!fd) return;
+  if (!(fd instanceof FormData)) {
+    console.error("Passed fd arg was not FormData - fd: ", fd);
+    return;
+  }
+  var retarr = [];
+  for (var pair of fd.entries()) {
+    retarr.push({[pair[0]]:pair[1]});
+  }
+  if (log) {
+    console.log("FormData:",retarr);
+  }
+  return retarr;
+}

@@ -35,7 +35,7 @@ export default {
       
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
-      attribute: this.params.attribute || 'resume',//the relation name, like avatar
+      attribute: this.params.attribute || null,//the relation name, like avatar
       method: this.params.attribute || 'fetchattributes',
       foreignkeyname: this.params.foreignkeyname,
       id: this.params.id || null, //The id of the uploaded object
@@ -75,6 +75,7 @@ export default {
     },
 
 /*
+ * defaxerr
     computed: {
       chain : function() {//Just the chain of params leading to info
          return 
@@ -82,12 +83,12 @@ export default {
       */
     methods: {
       setUrl() {
-        axios.post('/ajax',{action:'url',name:'resume',
-                         model:"\\App\\Models\\Bouncer",id:this.id}).then(result=>{
+        axios.post('/ajax',{action:'url',name:this.title,
+                         model:this.model,id:this.id}).then(result=>{
             console.log("Result from getting URL",result);
             this.url = result.data;
             console.log("This.url now: ", this.url);
-          }).catch(error=>{console.error("Failed to get url:",error, error.response);});
+          }).catch(defaxerr);
         },
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
@@ -102,6 +103,7 @@ export default {
                 model:this.model,
                 id:this.id,
                 action:'execute',
+                args: [this.title],
                 method:'deleteEntry'}).then(response=>{console.log("Seems to have deleted entry successfully:",
                    response);
                    this.initData();
@@ -113,9 +115,9 @@ export default {
         axios.post(this.deleteurl,delparm).
           then(response=>{console.log("The delete was successful:",response);
             this.initData();
-            this.$parent.$refs.dropavatar.initData();
+            //this.$parent.$refs.dropavatar.initData();
           }).
-          catch(error=>{console.error("The delete failed:", error, error.response);});
+          catch(defaxerr);
         }
       },
       logThis() {
@@ -181,7 +183,7 @@ export default {
               me[key] = rdata[key];
             });
           }).
-          catch(error=>{console.error("We had an error with the search:",error,error.response);});
+          catch(defaxerr);
        } else { //Maybe we got good data in data
           for( let key of searchkeys2) {
             if (data[key]) {
@@ -234,12 +236,9 @@ export default {
           var savekeys = [ //The keys required to save the upload
             'ownermodel','ownerid','model','foreignkeyname','attribute',
             'mediatype','uploadopts'];
-         }
-         savekeys.push('title');
-         console.log("We decided the keyse were:", savekeys, "cus status:",this.status);
-
-
-
+        }
+         //savekeys.push('title');
+         console.log("We decided the keys were:", savekeys, "cus status:",this.status);
          var me = this;
          savekeys.forEach(function(key) {
             fd.append(key,me[key]);
@@ -254,7 +253,7 @@ export default {
         //fd.append('desc',this.desc);
         fd.append('extra',JSON.stringify(['url']));
         fd.append('file',this.file,this.file.name);
-        //console.log("In Save, FD:", fd);
+        console.log("In drop-inplace Save, URL:", this.saveurl,"; FD:", afd(fd));
         //var me = this;
         axios.post(this.saveurl,fd).
           then( response=> { console.log("File Upload Save Response:",response.data);
@@ -262,7 +261,7 @@ export default {
           //this.$parent.$refs.dropavatar.initData();
           //this.$emit('refresh');
           }).
-          catch(error=>{console.log("Error saving:",error,error.response);});
+          catch(defaxerr);
       },
     },
   }
