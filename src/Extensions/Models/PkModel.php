@@ -151,6 +151,28 @@ public static function createOrUpdate(array $attributes = []) {
   public function mkInstanceKey($key=null) {
     return 'MDL:'.static::class.":ID:".$this->id.":k:$key";
   }
+
+
+  /** Returns the model name, appropriate for JS */
+  public static function jsclass() {
+    return addslashes('\\'.static::class);
+  }
+
+  /** Returns the model & ID of this instance, suitable
+   * for JSON encoding to JS
+   * @param boolean $jsonencode
+   * @return array|json_encoded array
+   */
+  public function instance($jsonencode=true) {
+    $instance = [
+        //'model'=>static::jsclass(),
+        'model'=>static::class,
+            'id'=>$this->id
+        ];
+    return $jsonencode ?
+        json_encode($instance,static::$jsonopts) : $instance;
+  }
+
   public $instanceCache=[];
   public function getICache($key,$cache=false) {
     $cache = false;

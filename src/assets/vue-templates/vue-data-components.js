@@ -225,17 +225,31 @@ window.utilityMixin = {
       }
       return false;
     },
+    //If tst is not an object, return empty object
+    asObject(tst) {
+      return this.isObject(tst) ? tst : {};
+    },
     //I don't like any of those below this one
-    //Takes an array of data keys & an object (?params?), and only overwrites
+    //Takes an array of data keys & an object (?params?), and a second
+    //object (instance?) and only overwrites
     //the data fields if there is a key/value in the object.
-    setData: function(object,fields, params) {
-      if (!this.isObject(params) || !Array.isArray(fields)) {
+    //"instance" should be {model:mname, id:iid}
+    //If params has a key "instance", should also=> {model:, id:}
+    setData: function(object,fields, params, instance) {
+      if (!(this.isObject(params) || this.isObject(instance)) 
+              || !Array.isArray(fields)) {
         return object;
       }
       var me = object;
+      var pc = this.isObject(params) ? _.cloneDeep(params) : {};
+      var ins = this.isObject(instance) ? 
+          _.cloneDeep(instance) : this.asObject(pc.instance);
+      //Merge / override instance into params
+      pc = Object.assign(pc,ins);
+      //Now 3 ways params can have model/id set 
       fields.forEach(function(field) {
-        if (typeof params[field] !== 'undefined') {
-          me[field] = params[field];
+        if (typeof pc[field] !== 'undefined') {
+          me[field] = pc[field];
         }
       });
      return object;
@@ -380,7 +394,7 @@ window.pinputMixin = {
    *   @atts & noInherit: Possibe way to inject arbitrary atts into an el?
    * @type object
    */
-  props: ['params'],
+  props: ['params','instance'],
   data: function () {
     var sdefaults = {
       name: null,
@@ -413,7 +427,7 @@ window.pinputMixin = {
   },
   mounted() {
       //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params);
-      this.setData(this,this.fields, this.params);
+      this.setData(this,this.fields, this.params, this.instance);
       this.initData();
   },
   methods: {
@@ -1512,7 +1526,7 @@ window.Vue.component('ajax-input-el', {
 window.Vue.component('data-label-pair', {
   inputparams:['options','name','model','id','fetchurl',
     'inpclass','ownermodel','ownerid','submiturl','foreignkey','inpstyle',
-    'checked','checkedvalue','uncheckedvalue','value'],
+    'checked','checkedvalue','uncheckedvalue','value', 'instance'],
 
   name: 'data-label-pair',
   template: `
@@ -1523,7 +1537,7 @@ window.Vue.component('data-label-pair', {
     </div>
   </div>
   `,
-  props: ['params'],
+  props: ['params', 'instance'],
   mixins: [window.utilityMixin],
   data: function() {
     return {
@@ -1548,7 +1562,7 @@ window.Vue.component('data-label-pair', {
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style'];
       var inputfields = this.$options.inputparams;
       this.input_params = 
-        this.setData(this.input_params,inputfields,this.params);
+        this.setData(this.input_params,inputfields,this.params, this.instance);
       //this.setData(this.input_params,this.#
       //console.log("Calling update data w. params:", this.params);
       this.setData(this,datafields, this.params);

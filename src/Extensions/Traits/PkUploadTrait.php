@@ -129,6 +129,9 @@ class FileProxy {
     }
     return $this->instance->save($args);
   }
+  /*
+   * 
+   */
 
   
 }
@@ -469,12 +472,15 @@ trait PkUploadTrait {
    * @param array $args - optional args
    * @return Model
    */
+  /*
   public function save(Array $args = []) {
     if (!$this->mediatype) {
       $this->mediatype = $this->getType(true);
     }
       return parent::save($args);
   }
+   * 
+   */
 
   public static function extensionCheck($atts) {
      if (!is_string($atts['mimetype']) ||
