@@ -243,9 +243,9 @@ window.utilityMixin = {
       var me = object;
       var pc = this.isObject(params) ? _.cloneDeep(params) : {};
       var ins = this.isObject(instance) ? 
-          _.cloneDeep(instance) : this.asObject(pc.instance);
+          _.cloneDeep(instance) : _.cloneDeep(this.asObject(pc.instance));
       //Merge / override instance into params
-      pc = Object.assign(pc,ins);
+      pc = Object.assign({},pc,ins);
       //Now 3 ways params can have model/id set 
       fields.forEach(function(field) {
         if (typeof pc[field] !== 'undefined') {
@@ -1573,13 +1573,13 @@ window.Vue.component('data-label-pair', {
     updateData: function() {
       var datafields = ['input','lblcls', 'tootik',
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style',
-      'model','instance', 'id', 'input_params'];
+      'model', 'id', 'input_params'];
       var inputfields = this.$options.inputparams;
       this.input_params = 
         this.setData(this.input_params,inputfields,this.params, this.instance);
       //this.setData(this.input_params,this.#
       //console.log("Calling update data w. params:", this.params);
-      this.setData(this,datafields, this.params);
+      this.setData(this,datafields, _.cloneDeep(this.params));
       //console.log("Now calling refs to update..");
       //this.$refs.input.updateData();
 
