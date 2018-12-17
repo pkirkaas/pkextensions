@@ -1548,14 +1548,14 @@ window.Vue.component('ajax-textarea-el', {
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
-       @enter="savesubmit($event,'enter')"
-       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
      </textarea>
 `,
 });
 
+       //@keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
+       //@enter="savesubmit($event,'enter')"
 
 
 
