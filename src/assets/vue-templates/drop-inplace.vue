@@ -16,7 +16,8 @@ regular object, which sucks. -->
 //var app = new Vue({
 export default {
     name: 'drop-inplace',
-    props: ['params'], 
+    props: ['params', 'instance'], 
+    //mixins: [window.utilityMixin],
     data() {
       console.log("Data/drop-inplace");
               
@@ -36,6 +37,7 @@ export default {
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       attribute: this.params.attribute || null,//the relation name, like avatar
+      name: this.params.name || null,//the relation name, like avatar
       method: this.params.attribute || 'fetchattributes',
       foreignkeyname: this.params.foreignkeyname,
       id: this.params.id || null, //The id of the uploaded object
@@ -68,6 +70,8 @@ export default {
     mounted: function() {
       this.$nextTick(()=>{
         console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+        var fields = Object.keys(this.$data);
+        this.setData(this,fields,this.params,this.instance);
         this.logThis();
         this.initData();
         this.setUrl();
@@ -82,11 +86,52 @@ export default {
     },
       */
     methods: {
+      isObject(tst) { 
+        if ((typeof tst === 'object') && (tst !== null)) {
+          return tst;
+        }
+        return false;
+      },
+      //If tst is not an object, return empty object
+      asObject(tst) {
+        return this.isObject(tst) ? tst : {};
+      },
+      //I don't like any of those below this one
+      //Takes an array of data keys & an object (?params?), and a second
+      //object (instance?) and only overwrites
+      //the data fields if there is a key/value in the object.
+      //"instance" should be {model:mname, id:iid}
+      //If params has a key "instance", should also=> {model:, id:}
+      setData: function(object,fields, params, instance) {
+        if (!(this.isObject(params) || this.isObject(instance)) 
+                || !Array.isArray(fields)) {
+          return object;
+        }
+        var me = object;
+        var pc = this.isObject(params) ? _.cloneDeep(params) : {};
+        var ins = this.isObject(instance) ? 
+            _.cloneDeep(instance) : _.cloneDeep(this.asObject(pc.instance));
+        //Merge / override instance into params
+        pc = Object.assign({},pc,ins);
+        //Now 3 ways params can have model/id set 
+        fields.forEach(function(field) {
+          if (typeof pc[field] !== 'undefined') {
+            me[field] = pc[field];
+          }
+        });
+        if (object.name) {
+          object.title = object.name;
+        }
+
+        return object;
+      },
       setUrl() {
+        // Totally NOT general - specific for now
         axios.post('/ajax',{action:'url',name:this.title,
                          model:this.model,id:this.id}).then(result=>{
             console.log("Result from getting URL",result);
-            this.url = result.data;
+            this.url = result.data.url || this.defaulturl;
+            this.status = result.data.status;
             console.log("This.url now: ", this.url);
           }).catch(defaxerr);
         },
@@ -98,7 +143,7 @@ export default {
         //console.log("The input got the click, ev:",event,"data:", data);
       },
       delete() {
-        if (this.status==='exstant') {
+        if (this.status==='extant') {
           axios.post("/ajax", {
                 model:this.model,
                 id:this.id,
@@ -229,9 +274,9 @@ export default {
         console.log("About to save. These are the values?");
         this.logThis();
         var fd = new FormData();
-        if (this.status==='exstant') {
+        if (this.status==='extant') {
           ///var savekeys = ['model','id','name'];
-          var savekeys = ['model','id','chain', 'title'];
+          var savekeys = ['model','id','chain', 'title', 'name'];
         } else { //It's a separate media object, with an "owner" object
           var savekeys = [ //The keys required to save the upload
             'ownermodel','ownerid','model','foreignkeyname','attribute',

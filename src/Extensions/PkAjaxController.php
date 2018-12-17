@@ -107,9 +107,10 @@ abstract class PkAjaxController extends PkController {
       case 'chain':
           return $this->sucess($this->chain());
       case 'url':
+        //TOTALLY NOT GENERAL!!!!!!!!!!!
            $name = keyVal('name', $data);
            $obj = $model::Find($id);
-           return $obj->url($name);
+           return $this->success(['status'=>'extant', 'url'=>$obj->url($name)]);
            //return $obj->$fname->url;
       case 'execute':
           $model = keyVal('model',$this->data);

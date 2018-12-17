@@ -314,6 +314,8 @@ $grid-gutter-width:          1.875rem !default; // 30px
   .w#{$i}pc {width: $i * 1%;}
   .height#{$i}pc {height: $i * 1%;}
   .h#{$i}pc {height: $i * 1%;}
+  .h#{$i} {height: $i * 1em;}
+  .w#{$i} {widt: $i * 1em;}
 }
 
 

@@ -1390,6 +1390,10 @@ window.Vue.component('ajax-checkbox-el', {
 <div class="inline" v-html="option.label"></div> 
  * 
  */
+/*
+ * Currently only works if the PkModel field is as below:
+  public static $jsonfields=['shift_j'];
+*/
 window. Vue.component('ajax-multicheck-el',{
   name: 'ajax-multicheck-el',
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
@@ -1415,9 +1419,9 @@ window. Vue.component('ajax-multicheck-el',{
   methods: {
     msavesubmit(event,arg) {
       this.$nextTick(() => {
-      //console.log("Clicked on a box. this.value:",this.value,
-      //"The event:",event,"The Arg:", arg, "This Item?", this.item,
-      //"selected: ", this.selected);
+      console.log("Clicked on a box. this.value:",this.value,
+      "The event:",event,"The Arg:", arg, "This Item?", this.item,
+      "selected: ", this.selected);
       axios.post(this.submiturl,
         {model:this.model,
           id:this.id,
@@ -1434,7 +1438,10 @@ window. Vue.component('ajax-multicheck-el',{
          value = this[formatin](value);
        }
        this.value = value;
+       console.log("The Response from clicking on AJAX MULTI:",response);
      }).catch(defaxerr);
+      /*
+        */
       });
       /*
       */
@@ -1445,7 +1452,7 @@ window. Vue.component('ajax-multicheck-el',{
       this.savesubmit(event, 'changesavesubmit');
     },
     isChecked: function(arg) {
-      c//onsole.log("IN isCHecked, arg:",arg,"This Val:", this.value);
+      //console.log("IN isCHecked, arg:",arg,"This Val:", this.value);
       if (!Array.isArray(this.value)) {
         return false;
       }
@@ -1455,7 +1462,7 @@ window. Vue.component('ajax-multicheck-el',{
       }
     },
     initData() {
-      ////console.log("In the custom multicheck load");
+      console.log("In the custom multicheck load; data:", this.$data);
       axios.post(this.fetchurl,
       {model:this.model,
        id:this.id,
@@ -1465,8 +1472,9 @@ window. Vue.component('ajax-multicheck-el',{
      }).then(response=>{
        //console.log("Succeeded in fetch, resp:", response);
        var valueobj = response.data[this.name];
+       console.log("ValueObj?",valueobj);
        var value = Object.values(valueobj);
-       //console.log("Value?",value);
+       console.log("Value?",value);
        this.selected = value;
        this.value = value;
        /*
@@ -1525,6 +1533,31 @@ window.Vue.component('ajax-input-el', {
   `,
 });
 
+window.Vue.component('ajax-textarea-el', {
+  name: 'ajax-textarea-el',
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  /*
+        name: null, id: null, ownermodel: null, type: null, ownerid: null, 
+        model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
+        label: null, tooltip: '', submiturl:"/ajax/submit",
+        fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
+        wrapcss: ''};
+        */
+  template: `
+    <textarea class="pk-inp form-control flex-grow"
+       :class="inpclass" :style="inpstyle" :type="type"
+       @esc="false"
+       @tab="savesubmit($event,'tab')"
+       @enter="savesubmit($event,'enter')"
+       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
+       @blur="savesubmit($event,'blur')"
+       v-model="value" :name="name" >
+     </textarea>
+`,
+});
+
+
+
 
 /**
  * Wraps an input & label. 'params': 
@@ -1542,7 +1575,7 @@ window.Vue.component('data-label-pair', {
   template: `
   <div class="pk-pair pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
     <div class="pkp-lbl pk-lbl lpk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
-    <div class="pk-val lpk-val pkp-dat" :class="fldcls" :style="fldstyle">
+    <div class="pk-val lpk-val pkp-data" :class="fldcls" :style="fldstyle">
       <component ref="input"
             :is="input" :params="input_params" :instance="instance">
       </component>

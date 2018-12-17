@@ -52,6 +52,7 @@ Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delet
 Route::any('ajax/save', ['as' => 'ajax_save', 'uses'=> 'AjaxController@save']);
 Route::any('ajax/upload', ['as' => 'ajax_upload', 'uses'=> 'AjaxController@upload']);
 Route::any('ajax/toggle', ['as' => 'ajax_toggle', 'uses'=> 'AjaxController@toggle']);
+Route::any('ajax', ['as' => 'ajax_index', 'uses'=> 'AjaxController@index']);
 Route::any('ajax/modelattributes', ['as' => 'ajax_modelattributes', 'uses'=> 'AjaxController@modelattributes']);
 Route::any('ajax/fetchattributes', ['as' => 'ajax_fetchattributes', 'uses'=> 'AjaxController@fetchattributes']);
 Route::any('ajax/set', ['as' => 'ajax_set', 'uses'=> 'AjaxController@set']);
