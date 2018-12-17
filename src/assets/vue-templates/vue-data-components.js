@@ -1540,9 +1540,9 @@ window.Vue.component('data-label-pair', {
 
   name: 'data-label-pair',
   template: `
-  <div class="pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
-    <div class="pk-lbl lpk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
-    <div class="pk-val lpk-val" :class="fldcls" :style="fldstyle">
+  <div class="pk-pair pair-wrap lpair-wrap" :data-tootik="tootik" :class="pair_wrap" :style="pair_wrap_style">
+    <div class="pkp-lbl pk-lbl lpk-lbl" :class="lblcls" :style="lblstyle" v-html="label"></div>
+    <div class="pk-val lpk-val pkp-dat" :class="fldcls" :style="fldstyle">
       <component ref="input"
             :is="input" :params="input_params" :instance="instance">
       </component>

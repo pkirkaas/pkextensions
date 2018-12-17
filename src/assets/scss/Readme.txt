@@ -99,7 +99,7 @@ CAN COMBINE IN A ROW CONTAINING FIXED WIDTH LABEL & stretching inputs:
   <div class="fi-resize">...</div>
   <div class="fi-resize">...</div>
 </div>
-
+(See below for paired label/data/inputs, & sets)
 
 d-none-below-#{$bp} //Hide below
 
@@ -123,5 +123,16 @@ oswald lato roboto open-sans montserrat raleway
 droid-sans s-sans-pro 
 
 
+Input sets (with or without Vue) - ALL pairs in the set 50 em & all labels 20:
+<div class="pk-set lw20 sw50">
+  <div class="pk-pair">
+    <div class="pkp-lbl">Name:</div>
+    <div class=pkp-data pk-inp"><input type="text" name=.../></div>
+  </div>
+  <div class="pk-pair">
+    <div class="pkp-lbl">Email:</div>
+    <div class=pkp-data pk-inp"><input type="text" name=.../></div>
+  </div>
+</div>
 
 

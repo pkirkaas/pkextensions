@@ -653,10 +653,18 @@ $pkp-data-mg: .1em .1em !default;
 .pk-pair-set { //Group of pk-pairs w. similar appearance
   display: flex;
 }
-@for $i from 1 through 60 { //Sets the fixed width of a label in a set
+@for $i from 1 through 60 { //Fixed width of label or pair in a set or pair
   .pk-pair-set.sw#{$i}  {width: $i * 1em;}
   .pk-pair-set.lw#{$i} .pkp-lbl {width: $i * 1em;}
+  .pk-pair.sw#{$i}  {width: $i * 1em;}
+  .pk-pair.lw#{$i} .pkp-lbl {width: $i * 1em;}
 }
+//Example: 
+//      <data-label-pair
+//        :params="{name:'email',label:'Email:',
+//        instance:instance, pair_wrap:'lw20'}">
+//      </data-label-pair>
+// - class="pk-pair lw20" makes the label 20em
 .pk-pair {
   border: $pkp-pair-border;
   border-radius: $pkp-pair-border-radius;
