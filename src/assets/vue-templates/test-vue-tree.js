@@ -10,21 +10,23 @@
 // Module Tree Component
 Vue.component('module-tree', {
   name: 'module-tree',
+  props: ['model'],
   template: '#module-tree-template',
-  store: store,
   data: function () {
     return {
-      treeData: window.fbkgbl.vueModuleTree,
-      model: window.fbkgbl.vueModuleTree,
+      //treeData: model,
+      //model: model,
       open: true,
       top: true,
     };
+  },
+  mounted: function() {
+    console.log("In mounted of module-tree, model:",model);
   },
 });
 
 // Module Item component
 Vue.component('module-item', {
-  store: store,
   template: '#module-item-template',
   props: ['model', 'top'],
   data: function () {
@@ -89,9 +91,6 @@ Vue.component('module-item', {
         }
         return false;
       } // it's a leaf/casepoint, is it selected?
-      if (this.$store.state.cparr.indexOf(pmodel.casepoint) !== -1) {
-        return true;
-      }
     },
 
     //Does the folder or leaf have ALL casepoints in selected-casepoints?
@@ -104,9 +103,6 @@ Vue.component('module-item', {
         }
         return true;
       } // it's a leaf/casepoint, is it selected?
-      if (this.$store.state.cparr.indexOf(pmodel.casepoint) !== -1) {
-        return true;
-      }
     },
 
     toggle: function () {
@@ -115,7 +111,6 @@ Vue.component('module-item', {
       }
     },
     appendPointRow: function(cpt) {
-      this.$store.commit('addPt',cpt);
     },
 
     openAndRecursivelyAdd: function (amodel) {
@@ -136,7 +131,6 @@ Vue.component('module-item', {
         });
       } else if (amodel.casepoint) {
         if (removePts) {
-          this.$store.commit('removePt',amodel.casepoint);
         } else {
           this.appendPointRow(amodel.casepoint);
         }
@@ -179,7 +173,6 @@ Vue.component('module-item', {
       } else {  // It's a leaf-point - add it
         var el = this.$el;
         if (this.modelHasSelected( this.model)) {
-          this.$store.commit('removePt',this.model.casepoint);
         } else {
           this.appendPointRow(this.model.casepoint);
         }

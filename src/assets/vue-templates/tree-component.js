@@ -149,6 +149,7 @@ class TreeNode {
     }
   }
   simple_object() {
+    //console.log("Okay, calling/compiling");
     var children = {};
     for (var key in this.children) {
       children[key] = this.children[key].simple_object(); 
@@ -158,7 +159,9 @@ class TreeNode {
       label: this.label,
       tooltip: this.tooltip,
       data: this.data,
-      name: this.name,
+      name: this.label,
+      //type:"WHATEVER",
+      level: this.depth(),
       children: children,
       }
     return obj;
@@ -236,7 +239,7 @@ class TreeNodes  {
       for (var key in this.root.children) {
         children[key] = this.root.children[key].simple_object(); 
       }
-      return children;
+      return {children:children};
     }
 
     json_export() {
