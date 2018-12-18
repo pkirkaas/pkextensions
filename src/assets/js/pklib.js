@@ -1941,10 +1941,20 @@ function isObject(obj) {
  * @returns boolean - true if 'empty', else false
  */
 function isEmpty(avar) {
-  return (avar === undefined) || !avar || (isObject(avar) && !Object.keys(avar).length);
+  return (avar === undefined) || !avar ||
+  ((isObject(avar) && !Object.keys(avar).length)) ||
+  (Array.isArray(avar) && !avar.length);
 }
 function isjQuery(obj) {
   return (obj && (obj instanceof jQuery || obj.constructor.prototype.jquery));
+}
+
+/** Since JSON gets converted sometimes to JS Object instead of array, need another
+ * way to count. Non collections/interaterables return calse */
+function icount(avar) {
+  if (!avar) return false;
+  if (typeof avar === 'object') return Object.keys(avar).length;
+  if (Array.isArray(avar)) return avar.length;
 }
 
 /** Returns the maximum outerHeight of elements in avar
