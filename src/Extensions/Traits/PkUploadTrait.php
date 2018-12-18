@@ -172,7 +172,25 @@ trait PkUploadTrait {
   ];
   public $instance;
 
-  /** Goes through all ancestors & traits to gather a combined array of filenames=>types
+  public static function getBaseTableFieldDefs($withtype = null) {
+    if ($withtype) {
+      return static::$base_table_field_defs_UploadTrait;
+    }
+    return array_keys(static::$base_table_field_defs_UploadTrait);
+  }
+
+
+
+
+  /** Returns array base field names plus  - stripped of name -
+   * like, not 'avatar_mimetype', just 'mimetype'.
+   * @param boolean $name - if string, then $name_mimetype
+   */
+  public static function getFileKeys($name=null) {
+
+  }
+
+  /** Goes through all ancestors & traits to gather a combined array of filenames=>types, 
    *  OR if $name, the expected file type of that field.
    */
   public static function getUploadFileDefs($name = null) {
@@ -186,9 +204,19 @@ trait PkUploadTrait {
    */
   public $proxies = [];
 
-  public static function getTableFieldDefsExtraUploadTrait() {
+  /** Returns the base keys for the file info, or named - including url.
+   * 
+   * @param  boolean|string $named - if false, just the base names,
+   *  like ['mimetype', 'cat',... ] . If true, return all, like
+   *  ['avatar_mimetype, resume_mimetype,...] if just a string, should be 
+   * one of the types, returns only those - $named='avatar',
+   * return ['avatar_mimetype, avatar_size, etc 
+   * default = true, all fully qualified keys the base keys
+   * @return indexed array of file description defs
+   */
+  public static function getTableFieldDefsExtraUploadTrait($named = true) {
     $uploadFileDefs = static::getUploadFileDefs();
-    if (!$uploadFileDefs) {
+    if (!$uploadFileDefs || $named===false) {
       return static::$base_table_field_defs_UploadTrait;
     }
     $names = array_keys($uploadFileDefs);
@@ -214,6 +242,7 @@ trait PkUploadTrait {
 
   /** Returns either all the entry names if any as an array, or,
    * $name exists & is in the entry names, returns that, or null
+   * // This the extra file names/types - like 'avatar'=>image, resume
    * @return array|string|null
    */
   public static function getEntryNames($name=null) {
@@ -223,6 +252,7 @@ trait PkUploadTrait {
   }
 
   #Returns an array of all the keys of $base_table_field_defs, if !$name,
+  #like ('mimetype', 'cat', 'desc', etc, (or avatar_mimetime, ...etc)
   #else the field names with $name prepended
   public static function getFieldEntryNames($name=null) {
     $fields = array_keys(static::$base_table_field_defs_UploadTrait);
@@ -330,6 +360,24 @@ trait PkUploadTrait {
     $keyvalarr = static::getFiles();
     return static::setUploadModelProperties($keyvalarr[1], $keyvalarr[0]);
   }
+
+  /** Returns array of ['url'=>,$this->$name_url, 'mimetype'>$this->$name_mime_typem cat, etc, unless
+   * @param assoc arr of ['mediatype'=>$name_mediatype_value
+   */
+  public function getMediaInfo($name = "upload") {
+    $entryFiles = static::getUploadFileDefs();
+    //if (!in_array($name = array_keys($entryFiles);
+    $baseKeys = array_keys(static::getBaseTableFieldDefs());
+    $retarr = [];
+    foreach ($baseKeys as $baseKey) {
+      $rearr[$baseKey] = $this->$name."_".$baseKey;
+    }
+    $retarr['url'] = $this->url($name);
+    $retarr['epxtype'] = $entryFiles[$name];
+    pkdebug("GetMediaInfo: name: |$name| retarr:",$retarr);
+    return $retarr;
+  }
+
   
   /** Implementing classes can define their own upload types & combine them 
    * with the default from the trait
@@ -458,6 +506,7 @@ trait PkUploadTrait {
       $this->$field=null;
     }
     $this->save();
+    return $this->getMediaInfo($name);
   }
 
   /** Does the file actually exist?

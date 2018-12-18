@@ -107,10 +107,13 @@ abstract class PkAjaxController extends PkController {
       case 'chain':
           return $this->sucess($this->chain());
       case 'url':
+      case 'get_media_info':
         //TOTALLY NOT GENERAL!!!!!!!!!!!
            $name = keyVal('name', $data);
            $obj = $model::Find($id);
-           return $this->success(['status'=>'extant', 'url'=>$obj->url($name)]);
+           pkdebug("Result of getMediaInfo:",   ['status'=>'extant'] + $obj->getMediaInfo($name));
+           return $this->success(
+              ['status'=>'extant'] + $obj->getMediaInfo($name));
            //return $obj->$fname->url;
       case 'execute':
           $model = keyVal('model',$this->data);
@@ -118,7 +121,7 @@ abstract class PkAjaxController extends PkController {
           $attribute = keyVal('attribute',$this->data);
           $method = keyVal('method',$this->data);
           $args = keyVal('args',$this->data);
-          $results = keyVal('results',$this->data);
+          $results = keyVal('results',$this->data,true);
           $obj = $model::find($id);
           if ($attribute) {
             $obj = $obj->$attribute;

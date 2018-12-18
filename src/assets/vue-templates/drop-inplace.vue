@@ -151,7 +151,8 @@ export default {
                 args: [this.title],
                 method:'deleteEntry'}).then(response=>{console.log("Seems to have deleted entry successfully:",
                    response);
-                   this.initData();
+                   this.initData(response.data);
+                   this.url = response.data.url;
                  }).catch(defaxerr);
         } else {
         var delparm = {model:this.model,id:this.id,cascade:true};
@@ -178,7 +179,7 @@ export default {
         return currvals;
       },
       initData(data) { //Data may be empty or have all we need
-        console.log ("Int it start data");
+        console.log ("Int it start data:", data);
         var me = this;
         var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
         var keystosetnew = ['attribute','title', 'method', 'args','mediatype','id','url','model'];
