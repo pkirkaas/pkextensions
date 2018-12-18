@@ -1,3 +1,66 @@
+/**
+*  @param simple object dataitem  containing the constant label, and the data for the cell
+* (either for input/update, or for display). 
+* @param datastruct - {dataitem:{labal:label, data:data}, datastructarr:datastructarr}
+  @param object/function dataformat - responsible for representing the data -
+  *as inputs, one, several, formatting...
+  @return tree structure for complicated nested selection & comments
+*/
+
+var cnt = 0;
+const TreeCell = class {
+  constructor(datastruct, dataformat, dataextract) {
+    if (!datastruct) {
+      return;
+    }
+    //console.log("Cnt:",cnt++, "data struct:", datastruct);
+    var dataitem = datastruct.dataitem;
+    var datastructarr = datastruct.datastructarr;
+    //console.log('Data Item:',dataitem);
+    this.label = datastruct.dataitem.label;
+
+    this.dataextract = dataextract;
+    this.data = dataformat(datastruct.dataitem.data);
+    
+
+    if (!Array.isArray(datastruct.datastructarr) || !datastruct.datastructarr.length) {
+      //console.log("Doesn't think I'm an array?", datastruct.datastructarr);
+      return;
+    }
+    this.children = [];
+    datastruct.datastructarr.forEach(ndatastruct=> {
+      //console.log("Looping!");
+      this.children.push(new TreeCell(ndatastruct,dataformat,dataextract));
+    });
+  }
+  restore(path=[0]) {
+    //console.log("Trying to restore - the obj:",this);
+    var arr = [];
+
+    var i=0;
+    if (Array.isArray(this.children) && this.children.length) {
+      this.children.forEach(function(child) {
+        arr.push(child.restore(path[i++]));
+      });
+    }
+
+    var exp = {datitem:{label:this.label,data: this.dataextract(this.data)},
+        path:path, arr:arr};
+    return exp;
+  }
+}
+
+function dataformat(data) {
+  return [data];
+}
+
+function dataextract(data) {
+  if (!Array.isArray(data) || !data.length) {
+    //console.log("Data extracted is:", data);
+    throw "In Extract, data was supposed be array but is not";
+  }
+  return data[0];
+}
 ////////////////////
 
 var dataform = {
@@ -19,7 +82,7 @@ var nodes = [
   {path:[0,1], label:"Mobile",},
   {path:[0,1,0], label:"iOS",},
   {path:[0,1,1], label:"Android",},
-  {path:[0,1,1], label:"Multiplatform",},
+  {path:[0,1,2], label:"Multiplatform",},
   {path:[0,2], label:"Application",},
   {path:[0,3], label:"Engineering",},
   {path:[0,3,0], label:"Elictrical Engineering",},
@@ -60,6 +123,9 @@ var settings = {
   }
 }
 
+settings.filter = settings.filter.bind(settings);
+settings.reset = settings.reset.bind(settings);
+
 
 class TreeNode {
   constructor(init) {
@@ -71,6 +137,7 @@ class TreeNode {
     this.next = null;
     this.prev = null;
   }
+  
   depth() {
     return this.path.length -1; //Zero based
   }
@@ -80,7 +147,22 @@ class TreeNode {
     } else {
       return this.path[n];
     }
-  };
+  }
+  simple_object() {
+    var children = {};
+    for (var key in this.children) {
+      children[key] = this.children[key].simple_object(); 
+    }
+    var obj = {
+      path: this.path,
+      label: this.label,
+      tooltip: this.tooltip,
+      data: this.data,
+      name: this.name,
+      children: children,
+      }
+    return obj;
+  }
 }
 
 class TreeNodes  {
@@ -89,28 +171,34 @@ class TreeNodes  {
      this.treeNodes = {};
      this.root = {children:{}};
      treeNodes.sort(this.orderbypath);
+     //console.log("Num TNs:,",treeNodes.length);
+
      //var tmparr = [];
      treeNodes.forEach(el => {
+       //console.log("Iterating els:,", el); 
        var tn = new TreeNode(el);
        this.place(tn);
      });
      //console.log("This treenodes:", this.treeNodes);
      //Now traverse & build
    }
-  place(tn) {
+
+   place(tn) {
      var depth = tn.depth();
      var parent = this.root;
+     //console.log("Depth for ",tn,"is",depth);
      for (var i = 0 ; i <= depth ; i++) {
        var s = tn.segment(i);
        var last = (i === depth);
        if (last) {
          tn.parent = parent;
          if (parent.children[s]) {
+           //console.log("Parent:", parent, "me", tn,"s",s,"i",i, 'depth', depth, "other guy", parent.children[s]);
            if (parent.children[s].placeholder) {
              tn.children = parent.children[s].children;
-           } 
-         } else {
-           throw "Duplicate entry for this treeNode;";
+           }  else {
+             throw "Duplicate entry for this treeNode;";
+           }
          }
          parent.children[s] = tn;
          return;
@@ -143,8 +231,28 @@ class TreeNodes  {
       }
       return a.path.length - b.path.length;
     }
+    simple_object() {
+      var children = {};
+      for (var key in this.root.children) {
+        children[key] = this.root.children[key].simple_object(); 
+      }
+      return children;
+    }
+
+    json_export() {
+      return JSON.stringify(this.simple_object());
+    }
 }
 
-var treeNodes = new TreeNodes(nodes);
+
+//var lvl1 = nodes.filter(settings.filter);
+//console.log("lvl1 = ",lvl1, " Now sort?");
+//lvl1.sort(orderbypath);
 
 
+//First, get & order all the top level skills:
+//var top = nodes.filter(
+
+
+window.TreeNode = TreeNode;
+window.TreeNodes = TreeNodes;
