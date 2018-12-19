@@ -1,5 +1,4 @@
 /* 
- *
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -22,7 +21,7 @@ Vue.component('module-tree', {
     };
   },
   mounted: function() {
-    console.log("NO! In the separate JS!!!! In mounted of module-tree, model:",model);
+    console.log("In mounted of module-tree, model:",model);
   },
 });
 
@@ -39,7 +38,9 @@ Vue.component('module-item', {
   },
   computed: {
     isFolder: function () {
-      return this.model && !isEmpty(this.model.children);
+      return this.model && this.model.children &&
+        (
+        this.model.children.length
     },
     nodeClass: function() {
       return {
@@ -156,12 +157,12 @@ Vue.component('module-item', {
       //}
     },
     checkboxClick: function () {
-      console.log("we have clicked the checkbox");
+      // console.log("we have clicked the checkbox");
       var me = this;
         this.recursivelyToggle(this.model, this.allSelected);
     },
     processClick: function () {
-      console.log("Single click on Module tree");
+      //console.log("Single click on Module tree");
       if (this.isFolder) {
         var me = this;
         setTimeout(function(){

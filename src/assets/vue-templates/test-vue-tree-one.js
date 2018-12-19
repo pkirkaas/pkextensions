@@ -11,25 +11,16 @@
 // Module Tree Component
 Vue.component('module-tree', {
   name: 'module-tree',
-  props: ['model'],
+  props: ['model', 'top', 'innerc'],
   template: '#module-tree-template',
+  /*
   data: function () {
     return {
-      //treeData: model,
-      //model: model,
       open: true,
       top: true,
     };
   },
-  mounted: function() {
-    console.log("NO! In the separate JS!!!! In mounted of module-tree, model:",model);
-  },
-});
-
-// Module Item component
-Vue.component('module-item', {
-  template: '#module-item-template',
-  props: ['model', 'top'],
+  */
   data: function () {
     return {
       open: this.top,

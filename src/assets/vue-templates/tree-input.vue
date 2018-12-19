@@ -1,41 +1,65 @@
-/* 
- *
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
-/*  ***********  Module/Case/Point Selection Components ***********************/
-//-----------------------------------------------------------------------
+<!--  #############   Module Selection Templates #################################  -->
+<!-- the module tree template -->
+<template>
+<ul v-if="!innerc" id="tree-input-root" class='triangle-tree'>
+<h2 class="bg400 fceee">Yes, this is the combined</h2>
+    <tree-input
+      class="item"
+      :top="true"
+      :innerc="true"
+      :model="model">
+    </tree-input>
+  </ul>
 
-// Module Tree Component
-Vue.component('module-tree', {
-  name: 'module-tree',
-  props: ['model'],
-  template: '#module-tree-template',
+  <li v-else>
+      <div v-if="model">
+        <div :class="this.nodeClass" @click.stop="triangleClick"></div>
+        <div style="display: inline-block;" @click="checkboxClick">
+            <input type='checkbox' class='module-tree-checkbox'
+              :class="inputCheckbox" :checked.prop="hasSelected"
+                :indeterminate.prop='isIndeterminate'
+        @click="processClick"
+        />
+        {{model.name}}
+    </div>
+
+    <ul v-show="open" v-if="isFolder">
+      <tree-input
+        class="item"
+        v-for="model in model.children" :key=model.id
+        :model="model"
+        :top="false"
+        :innerc="true"
+        >
+      </tree-input>
+    </ul>
+    </div>
+  </li>
+</template>
+
+
+<script>
+export default {
+  name: 'tree-input',
+  props: ['model', 'top', 'innerc'],
+  /*
   data: function () {
     return {
-      //treeData: model,
-      //model: model,
       open: true,
       top: true,
     };
   },
-  mounted: function() {
-    console.log("NO! In the separate JS!!!! In mounted of module-tree, model:",model);
-  },
-});
-
-// Module Item component
-Vue.component('module-item', {
-  template: '#module-item-template',
-  props: ['model', 'top'],
+  */
   data: function () {
     return {
       open: this.top,
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
     }
+  },
+  mounted: function() {
+    console.log("From the one page Tree vue template");
   },
   computed: {
     isFolder: function () {
@@ -179,78 +203,5 @@ Vue.component('module-item', {
       }
     },
   }
-});
-/*  ***********  END Module Selection Components ***********************/
-
-
-
-/** Takes a flat Cat/Module/Case/Point data object & builds a Vue Data tree to display 
- * in VueTree. entries is an optional array/keyed obj of array or keyed object of user
- * submitted image entries that have the point guid so they can be attached to the appropriate
- * point and ordered by dated.
- * Both points & entries can be either a flat keyed object or an array -
- * they will be converted to arrays. Furthermore, arrays are objects that can have properties,
- * so entries could be [ptarr].entries
- * @param extras - optional object whose keys/attributes you add to all nodes of the tree-
- * this can be esp useful with adding methods...
- * @param student - optional, if present, the student's results if any for the module 
- * are attached.
- *
- */
-window.mkVueTreeFromPoints = function(points,extras, student) {
-  if (isEmpty(extras)) {
-    extras = {};
-  }
-  var vueTree = {
-    name: "Modules",
-    type: 'Root',
-    level: 0,
-    children: [],
-  };
-  Object.assign(vueTree,extras);
-  _.values(points).forEach(function(point) {
-    var mnameobj = mkOrReturnObjInArrayWithAttName(
-      vueTree.children, 
-      point.module_name,
-      Object.assign({type:'module','level':1,module_guid:point.module_guid,
-        modres:getModResFromStud(student,point.module_guid 
-        ),coverImage: 
-          //modulesObj[point.module_guid].coverImage, },extras));
-          window.modulesObj[point.module_guid] ? window.modulesObj[point.module_guid].coverImage : null,
-           },extras));
-
-    var cnameobj = mkOrReturnObjInArrayWithAttName(mnameobj.children, point.case_name,
-      Object.assign({type:'case','level':2,case_guid:point.case_guid},extras));
-
-    var pnameobj = mkOrReturnObjInArrayWithAttName(cnameobj.children, point.point_name,
-      Object.assign({type:'point','level':3,point_guid:point.point_guid},extras));
-
-    delete pnameobj.children;
-    pnameobj.casepoint = point;
-  });
-  mkOrderedTree(vueTree);
-  return vueTree;
 }
-
-/* Takes a recursive tree object composed of AT LEAST nodes like:
- * node[orderby] = string
- * node[arratt] = [similar nodes]
-  */
-window.mkOrderedTree = function(tree, orderby, arratt) {
-  if (!orderby) orderby = 'name';
-  if (!arratt) arratt = 'children';
-  if (!Array.isArray(tree[arratt]) || !tree[arratt].length) {
-    return;
-  }
-  tree[arratt].forEach(function (node) {
-    mkOrderedTree(node, orderby, arratt);
-  });
-
-  window.compFunc = function(a, b) {
-    //return a[orderby].localeCompare(b[orderby]);
-    return sortAlphaNumCI(a[orderby], b[orderby]);
-  }
-  tree[arratt].sort(compFunc);
-}
-
-
+</script>

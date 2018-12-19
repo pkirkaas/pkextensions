@@ -168,6 +168,15 @@ class TreeNode {
   }
 }
 
+
+/** Builds and Contains the Tree Node objects from array data 
+ * Will probably be bound to a single JSON field, so the entire Tree
+ * will probably be attached to a single DB field, & this component will probably
+ * be responsible for combining static info (like labels & tooltips & values for
+ * the unselected boxes) with the user data. Can also be used for input or output
+ * @type type
+ */
+
 class TreeNodes  {
   // Could be data, or an arry of treeNode instances
    constructor(treeNodes) {
