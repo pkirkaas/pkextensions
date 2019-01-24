@@ -2192,3 +2192,139 @@ Vue.component('ajax-checkbox-input',{
 
 
 //// END Ajax Input Components (Use mixins below)
+
+/// Start JSON bulder components
+
+Vue.component('jbld-el',{
+  mixins:[window.utilityMixin],
+  props:['pkey','jbval'],
+  template: `
+    <div class="jbld-el" :class="mtype">
+      <div v-if="canAdd" class='add-jbval-container'>
+        <h1>Yes, we can add something here</h1>
+      </div>
+
+      <div v-if="isScalar" class="jb-input-wrap jb-wrap">
+         <input v-model="jbval">
+      </div>
+
+      <div v-if="canAdd" v-for="(mkey,mval) in jbval" class="jb-wrap" :class="mytype">
+        <div v-if="isObj" class="jb-obj-el-key">{{mkey}}</div>
+        <jbld-el :pkey="mkey" :jbval="mval"></jbld-el>
+      </div>
+    </div>
+  `,
+  data: function() {
+    return { tpkey: null, tval: null};
+  },
+  computed: {
+    mytype: function() {
+      if (this.jbval === null) return 'null';
+      if (Array.isArray(this.jbval)) return 'list';
+      if (isObject(this.jbval)) return 'object';
+      return 'scalar';
+    },
+    canAdd: function (){
+      return Array.isArray(this.jbval) ||isObject(this.jbval);
+    },
+    isScalar: function() {
+      return !this.isObject(this.jbval);
+    },
+    isArray: function() {
+      return Array.isArray(this.jbval);
+    },
+    isObj: function() {
+      return !Array.isArray(this.jbval) && this.isObject(this.jbval);
+    },
+  },
+  methods: {
+    addJbl: function(value,key) {
+      if ((this.mytype === 'scalar') || (this.mytype === 'null')) {
+        console.error("Trying to add item to scalar :",this.jbval);
+        throw "jbld-el.addJbl: trying to add element to scalar";
+      }
+      if (this.mytype === 'list') {
+        this.jbval.push(value);
+        return;
+      }
+      if (this.mytype === 'object') {
+        if (!key) {
+          console.error("Trying add element without a key: ",key);
+          throw "Trying add element without a key";
+        }
+        if (isObject(key)) {
+          console.error("Trying use an object for a key: ",key);
+          throw "Trying add an object key";
+        }
+        this.jbval[key]=value;
+        return;
+      }
+      console.error("Shouldn't have got here: jbval",this.jbval);
+      throw "Didn't catch this type: "+typeof this.jbval;
+    },
+    changeEntry: function(key,value) {
+      if ((this.mytype === 'scalar') || (this.mytype === 'null')) {
+        console.error("Trying to add item to scalar :",this.jbval);
+        throw "jbld-el.addJbl: trying to add element to scalar";
+      }
+      if (this.mytype === 'list') {
+        this.jbval.splice(key,1,value);
+        return;
+      }
+      if (this.mytype === 'object') {
+        if (!key) {
+          console.error("Trying add element without a key: ",key);
+          throw "Trying add element without a key";
+        }
+        if (isObject(key)) {
+          console.error("Trying use an object for a key: ",key);
+          throw "Trying add an object key";
+        }
+        this.jbval[key]=value;
+        return;
+      }
+      console.error("Shouldn't have got here: jbval",this.jbval);
+      throw "Didn't catch this type: "+typeof this.jbval;
+    },
+    deleteEntry: function(key) {
+      if ((this.mytype === 'scalar') || (this.mytype === 'null')) {
+        console.error("Trying to add item to scalar :",this.jbval);
+        throw "jbld-el.addJbl: trying to add element to scalar";
+      }
+      if (this.mytype === 'list') {
+        this.jbval.splice(key,1);
+        return;
+      }
+      if (this.mytype === 'object') {
+        if (!key) {
+          console.error("Trying add element without a key: ",key);
+          throw "Trying add element without a key";
+        }
+        if (isObject(key)) {
+          console.error("Trying use an object for a key: ",key);
+          throw "Trying add an object key";
+        }
+        this.jbval[key]=value;
+        return;
+      }
+      console.error("Shouldn't have got here: jbval",this.jbval);
+      throw "Didn't catch this type: "+typeof this.jbval;
+    }
+  },
+});
+
+/*
+Vue.component('jbld-obj', {
+  template: `
+    <div class='jbld-obj'>
+      <div class='jbld-obj-el' v-for="(ekey, eval) in obj">
+        <div class="jbld-ekey jbld-pt">{{ekey}}</div>
+        <div class="jbld-eval jbld"
+      </div>
+    </div>
+  `,
+  data: function() {
+    return {obj:{}};
+  },
+});
+*/

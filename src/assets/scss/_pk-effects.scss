@@ -506,5 +506,59 @@ img.big-picture-dialog {
 }
 
 
+
+///////////////  Classes for changing state by JS - checkboxes & triangles
+
+.box, .triangle {
+  display: inline;
+  cursor: pointer;
+}
+
+// Three checkboxes states
+.box.all-selected {
+  content: "\2611";
+  font-size: 1.2em;
+}
+.box.none-selected {
+  content: "\25A2";
+  font-size: 0.85em;
+}
+.box.some-selected {
+  content: "\25A3";
+}
+
+//Triangles depending if tree branch is open....
+
+
+ul.triangle-tree li div.box.some-selected::before {
+  content: "\25A3";
+  padding-right: 2px;
+}
+ul.triangle-tree li div.box.all-selected::before {
+  content: "\2611";
+  font-size: 1.2em;
+}
+ul.triangle-tree li div.box.none-selected::before {
+  content: "\2610";
+  font-size: 1.4em;
+}
+
+ul.triangle-tree li div.open:before,
+ul.triangle-tree li.open:before {
+  content: "\25BE";
+  font-size: 1.7em;
+}
+ul.triangle-tree li div.closed:before,
+ul.triangle-tree li.closed:before {
+  content: "\25B8";
+  font-size: 1.7em;
+}
+ul.triangle-tree li div.leaf:before,
+ul.triangle-tree li.leaf:before {
+  content: '\2008';
+  padding-right: 0.75em;
+}
+
+
 /*
 */

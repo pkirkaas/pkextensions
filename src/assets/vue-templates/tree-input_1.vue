@@ -1,4 +1,4 @@
-
+<!-- Copy before I make major changes 23 Jan 19 -->
 <!--  #############   Tree Selection Control #################################  -->
 <!--
 This is a complex, recursive tree form input, configurable in many ways.
@@ -9,7 +9,7 @@ Each "model" node has up to 6 properties:
   name - the name/key of this node 
   selected - 2 or 3 states? true/false/indeterminate
      if true, submit name:value
-     if false, submit name:unset
+     if false, submit nameunset
      if indeterminate submit nothing - that is
   children - array of children submodels
 -->
@@ -29,15 +29,11 @@ Each "model" node has up to 6 properties:
       <div v-if="model">
         <div :class="this.nodeClass" @click.stop="triangleClick"></div>
         <div style="display: inline-block;" @click="checkboxClick">
-          <!--
             <input type='checkbox' class='module-tree-checkbox'
               :class="inputCheckbox" :checked.prop="hasSelected"
                 :indeterminate.prop='isIndeterminate'
         @click="processClick"
         />
-          -->
-          <div class='module-tree-box' :class="inputCheckbox">
-        </div>
         {{model.name}}
     </div>
 
@@ -57,10 +53,6 @@ Each "model" node has up to 6 properties:
 
 
 <script>
-
-var x = 3;
-
-
 export default {
   name: 'tree-input',
   props: ['model', 'top', 'innerc'],
@@ -102,7 +94,11 @@ export default {
       }
       return false;
     },
-    //inputCheckbox: function() { },
+    inputCheckbox: function() {
+
+
+
+    },
     checkboxClass: function() {
 
       return {
@@ -154,7 +150,6 @@ export default {
     appendPointRow: function(cpt) {
     },
 
-/*
     openAndRecursivelyAdd: function (amodel) {
       if (amodel.children && amodel.children.length) {
         var me = this;
@@ -165,13 +160,6 @@ export default {
         this.appendPointRow(amodel.casepoint);
       }
     },
-    */
-    //This was to automatically select all subnodes when
-    // a parent node is selected - but don't necessarilly 
-    //want to do that
-    //In fact, maybe the other way? When a child node is
-    //Selected, make sure all ancestor nodes are selected
-    
     recursivelyToggle: function (amodel, removePts) {
       if (amodel.children && amodel.children.length) {
         var me = this;
@@ -209,7 +197,6 @@ export default {
       var me = this;
         this.recursivelyToggle(this.model, this.allSelected);
     },
-    /*
     processClick: function () {
       console.log("Single click on Module tree");
       if (this.isFolder) {
@@ -228,7 +215,6 @@ export default {
         }
       }
     },
-    */
   }
 }
 </script>
@@ -244,7 +230,6 @@ export default {
 }
 
 /* / Three checkboxes states */
-/*
 .box.all-selected {
   content: "\2611";
   font-size: 1.2em;
@@ -256,12 +241,10 @@ export default {
 .box.some-selected {
   content: "\25A3";
 }
-*/
 
 /* Triangles depending if tree branch is open.... */
-/* So all the content (triangle & box) is on the box div */
 
-/**  The box state */
+
 ul.triangle-tree li div.box.some-selected::before {
   content: "\25A3";
   padding-right: 2px;
@@ -275,7 +258,6 @@ ul.triangle-tree li div.box.none-selected::before {
   font-size: 1.4em;
 }
 
-/** The triangle state */
 ul.triangle-tree li div.open:before,
 ul.triangle-tree li.open:before {
   content: "\25BE";
