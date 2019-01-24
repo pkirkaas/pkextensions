@@ -23,6 +23,7 @@ Abstract class PkAdminController extends PkController {
    * }
    */
   public function _treeEditPage($treeNames = []) {
+    /*
     if (ne_string($treeNames)) {
       $treeNames = [$treeNames];
     }
@@ -33,7 +34,9 @@ Abstract class PkAdminController extends PkController {
         $treePanes[] = $this._treeEditPane($treeName);
       }
     }
-    return view('admin.treeedit',["treePanes"=>$treePanes]);
+     * */
+    return view('admin.treeedit');
+    //return view('admin.treeedit',["treePanes"=>$treePanes]);
   }
   /** This is a single pane, used to edit a single tree file */
   public function _treeEditPane($treeName) {

@@ -75,3 +75,27 @@ div .rt-lblcls {
   flex-direction: column;
 }
 
+//To support dynamic creation of JSON objects
+// .jbld is the base for the builder components
+div.jbld {
+}
+input.jbld-scalar {
+  @extend .pk-inp !optional;
+}
+
+div.jbld-arr {
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+
+
+
+
+
+
+
+
+

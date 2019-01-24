@@ -1,15 +1,28 @@
+<h1>In Tree Pane</h1>
+<h1> Loading PHTML without running Vue</h1>
 <div class="section editpane">
   <div id="vuemnt">
-  <h1>Edit <b>$treeName</b> tree</h1>
+  <h1>Edit tree</h1>
   
+  <json-tree :jbval="atree"></json-tree>
   </div>
 </div>
 <script>
+$(function () {
   var ued = new Vue({
     el: "#vuemnt",
     data: {
+      atree:{
+        treename:{
+          key1:{arr1:["val1","val2","val3","val4"], scalar1:"hello"},
+          key2:"scalar2",
+        }
+      }
       //allTreeInfo: allTreeInfo,
     },
   });
+  });
 </script>
+<?php /*
+ */ ?>
 

@@ -2195,11 +2195,10 @@ Vue.component('ajax-checkbox-input',{
 
 /// Start JSON bulder components
 
+/*
 Vue.component('jbld-el',{
-  mixins:[window.utilityMixin],
-  props:['pkey','jbval'],
   template: `
-    <div class="jbld-el" :class="mtype">
+    <div class="jbld-el" :class="mytype">
       <div v-if="canAdd" class='add-jbval-container'>
         <h1>Yes, we can add something here</h1>
       </div>
@@ -2208,14 +2207,19 @@ Vue.component('jbld-el',{
          <input v-model="jbval">
       </div>
 
-      <div v-if="canAdd" v-for="(mkey,mval) in jbval" class="jb-wrap" :class="mytype">
+      <div v-if="canAdd" v-for="(mval,mkey) in jbval" class="jb-wrap" :class="mytype">
         <div v-if="isObj" class="jb-obj-el-key">{{mkey}}</div>
         <jbld-el :pkey="mkey" :jbval="mval"></jbld-el>
       </div>
     </div>
   `,
+  mixins:[window.utilityMixin],
+  props:['pkey','jbval'],
   data: function() {
     return { tpkey: null, tval: null};
+  },
+  created: function() {
+    console.log("On Create - pkey:",this.pkey,"; jbval",this.jbval);
   },
   computed: {
     mytype: function() {
@@ -2312,6 +2316,7 @@ Vue.component('jbld-el',{
     }
   },
 });
+*/
 
 /*
 Vue.component('jbld-obj', {
