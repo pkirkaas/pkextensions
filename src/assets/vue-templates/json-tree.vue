@@ -1,9 +1,11 @@
 
 <template>
     <div class="jbld-el" :class="mytype">
+      <!--
       <div v-if="canAdd" class='add-jbval-container'>
         <h1>Yes, we can add something here</h1>
       </div>
+      -->
 
       <div v-if="isScalar" class="jb-input-wrap jb-wrap">
          <input v-model="jbval">
