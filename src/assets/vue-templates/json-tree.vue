@@ -1,17 +1,19 @@
 <!-- Component for visually building JSON/JS Objects -->
 <template>
     <div class="jbld-el" :class="mytype">
-      <div class="jbld-del-btn"  @click="deleteFromParent">Delete</div>
-      <div v-if="canAdd" class='add-jbval-container'>
-        <div class='add-lbl' @click="showNew = ! showNew">New?</div>
-        <div v-show="showNew" class="new-wrap">
-          <div v-if='isObj' class='new-key-wrap'>
-            <div class='new-key-lbl'>Key:</div>
-            <input v-if="isObj" class='key-inp' v-model='newkey'>
+      <div class="mod-el-wrap">
+        <div class="jbld-del-btn"  @click="deleteFromParent">Delete</div>
+        <div v-if="canAdd" class='add-jbval-container'>
+          <div class='add-lbl' @click="showNew = ! showNew">New?</div>
+          <div v-show="showNew" class="new-wrap">
+            <div v-if='isObj' class='new-key-wrap'>
+              <div class='new-key-lbl'>Key:</div>
+              <input v-if="isObj" class='key-inp' v-model='newkey'>
+            </div>
+            <div class='add-btn' @click='addType("scalar")'>Scalar?</div>
+            <div class='add-btn' @click='addType("list")'>Array?</div>
+            <div class='add-btn' @click='addType("object")'>Object?</div>
           </div>
-          <div class='add-btn' @click='addType("scalar")'>Scalar?</div>
-          <div class='add-btn' @click='addType("list")'>Array?</div>
-          <div class='add-btn' @click='addType("object")'>Object?</div>
         </div>
       </div>
 
@@ -152,8 +154,8 @@ export default {
     return { 
       tpkey: null, 
       tval: null,
-      newkey = null,
-      showNew = false,
+      newkey: null,
+      showNew: false,
     };
   },
   created: function() {
@@ -301,20 +303,27 @@ export default {
 <style>
 .jbld-el {
   border: solid grey 1px;
-  margin-left: 5px;
 }
 
 .jbld-el.object {
   display: flex;
+  margin-left: 5px;
+}
+
+.jbld-el.list {
+  display: flex;
+  flex-direction: column;
 }
 /*
 
 " :class="mytype">
       <div v-if="isScalar" class="jb-input-wrap jb-wrap">
 */
-.jb-obj-el-key {
+.jb-el-key {
   border: solid yellow 1px;
-
+  display: inline-block;
+  color:white;
+  background-color:black;
 }
 
 .jb-input-wrap jb-wrap {
@@ -338,5 +347,33 @@ export default {
   border: solid black 1px;
   background-color: red;
   color: white;
+}
+
+.mod-el-wrap {
+  display: inline-flex;
+  flex-direction: column;
+  border: solid #aaa 1px;
+  background-color: #ccc;
+}
+.add-jbval-container {
+  display: inline-flex;
+  flex-direction: column;
+  background-color: #eee;
+}
+.add-lbl {
+  display: inline-block;
+  background-color: #faa;
+}
+.add-btn {
+  display: inline-block;
+  border: solid blue 1px;
+  background-color: #ddf;
+}
+.new-key-wrap {
+  display: inline-block;
+}
+.new-key-lbl {
+  display: inline-block;
+  background-color: #faf;
 }
 </style>
