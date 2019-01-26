@@ -1,18 +1,26 @@
-
+<!-- Component for visually building JSON/JS Objects -->
 <template>
     <div class="jbld-el" :class="mytype">
-      <!--
+      <div class="jbld-del-btn"  @click="deleteFromParent">Delete</div>
       <div v-if="canAdd" class='add-jbval-container'>
-        <h1>Yes, we can add something here</h1>
+        <div class='add-lbl' @click="showNew = ! showNew">New?</div>
+        <div v-show="showNew" class="new-wrap">
+          <div v-if='isObj' class='new-key-wrap'>
+            <div class='new-key-lbl'>Key:</div>
+            <input v-if="isObj" class='key-inp' v-model='newkey'>
+          </div>
+          <div class='add-btn' @click='addType("scalar")'>Scalar?</div>
+          <div class='add-btn' @click='addType("list")'>Array?</div>
+          <div class='add-btn' @click='addType("object")'>Object?</div>
+        </div>
       </div>
-      -->
 
       <div v-if="isScalar" class="jb-input-wrap jb-wrap">
          <input v-model="jbval">
       </div>
 
       <div v-if="canAdd" v-for="(mval,mkey) in jbval" class="jb-wrap" :class="mytype">
-        <div v-if="isObj" class="jb-obj-el-key">{{mkey}}</div>
+        <div class="jb-el-key">{{mkey}}</div>
         <json-tree :pkey="mkey" :jbval="mval"></json-tree>
       </div>
     </div>
@@ -136,24 +144,17 @@ window.utilityMixin = {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 export default {
   name: 'json-tree',
   mixins:[window.utilityMixin],
   props:['pkey','jbval'],
   data: function() {
-    return { tpkey: null, tval: null};
+    return { 
+      tpkey: null, 
+      tval: null,
+      newkey = null,
+      showNew = false,
+    };
   },
   created: function() {
     console.log("On Create - pkey:",this.pkey,"; jbval",this.jbval);
@@ -162,11 +163,11 @@ export default {
     mytype: function() {
       if (this.jbval === null) return 'null';
       if (Array.isArray(this.jbval)) return 'list';
-      if (isObject(this.jbval)) return 'object';
+      if (this.isObject(this.jbval)) return 'object';
       return 'scalar';
     },
     canAdd: function (){
-      return Array.isArray(this.jbval) ||isObject(this.jbval);
+      return this.isObject(this.jbval);
     },
     isScalar: function() {
       return !this.isObject(this.jbval);
@@ -179,6 +180,43 @@ export default {
     },
   },
   methods: {
+    addType(type) {
+      if (this.isScalar) {
+        console.error("Trying add to a scalar");
+        throw "Trying add to a scalar";
+      }
+      var newel;
+      switch (type) {
+        case 'list':
+          newel = [];
+          break;
+        case 'scalar':
+          newel = '';
+          break;
+        case 'object':
+          newel = {};
+          break;
+        default:
+          console.error("Trying add unknown element type:",type);
+          throw "Trying add unknown element type: "+type;
+      }
+      if (this.isObj) {
+        if (!this.newkey) {
+          console.error("Trying add element without a key: ",key);
+          throw "Trying add element without a key";
+        }
+        this.jbval[this.newkey]=newel;
+        this.newkey = null;
+        return;
+      }
+      if (this.isArray) {
+        this.jbval.push(newel);
+        this.newkey = null;
+        return;
+      }
+      console.error("Trying add element - but I don't know my type!",this.jbval);
+      throw "Trying add element to unknown type";
+    },
     addJbl: function(value,key) {
       if ((this.mytype === 'scalar') || (this.mytype === 'null')) {
         console.error("Trying to add item to scalar :",this.jbval);
@@ -227,10 +265,13 @@ export default {
       console.error("Shouldn't have got here: jbval",this.jbval);
       throw "Didn't catch this type: "+typeof this.jbval;
     },
+    deleteFromParent() {
+      this.$parent.deleteEntry(this.pkey);
+    },
     deleteEntry: function(key) {
       if ((this.mytype === 'scalar') || (this.mytype === 'null')) {
-        console.error("Trying to add item to scalar :",this.jbval);
-        throw "json-tree.addJbl: trying to add element to scalar";
+        console.error("Trying to delete item from scalar :",this.jbval);
+        throw "json-tree.addJbl: trying to delete element from scalar";
       }
       if (this.mytype === 'list') {
         this.jbval.splice(key,1);
@@ -238,14 +279,14 @@ export default {
       }
       if (this.mytype === 'object') {
         if (!key) {
-          console.error("Trying add element without a key: ",key);
-          throw "Trying add element without a key";
+          console.error("Trying delete element without a key: ",key);
+          throw "Trying delete element without a key";
         }
         if (isObject(key)) {
           console.error("Trying use an object for a key: ",key);
           throw "Trying add an object key";
         }
-        this.jbval[key]=value;
+        Vue.delete(this.jbval,key);
         return;
       }
       console.error("Shouldn't have got here: jbval",this.jbval);
@@ -262,6 +303,10 @@ export default {
   border: solid grey 1px;
   margin-left: 5px;
 }
+
+.jbld-el.object {
+  display: flex;
+}
 /*
 
 " :class="mytype">
@@ -269,6 +314,7 @@ export default {
 */
 .jb-obj-el-key {
   border: solid yellow 1px;
+
 }
 
 .jb-input-wrap jb-wrap {
@@ -282,6 +328,15 @@ export default {
 
 .jb-wrap.object {
   display: flex;
+  flex-direction: column;
   border: solid blue 1px;
+}
+.jbld-del-btn {
+  display: inline-block;
+  padding: 2px;
+  margin: 2px;
+  border: solid black 1px;
+  background-color: red;
+  color: white;
 }
 </style>

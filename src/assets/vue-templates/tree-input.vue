@@ -36,7 +36,7 @@ Each "model" node has up to 6 properties:
         @click="processClick"
         />
           -->
-          <div class='module-tree-box' :class="inputCheckbox">
+          <div class='module-tree-box' :class="checkboxClass">
         </div>
         {{model.name}}
     </div>
