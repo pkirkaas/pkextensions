@@ -2,7 +2,7 @@
 <!--  #############   Tree Selection Control #################################  -->
 <!--
 This is a complex, recursive tree form input, configurable in many ways.
-Each "model" node has up to 6 properties:
+Each "treenode" node has up to 6 properties:
   label - The label of the node
   value - the value of the node IF IT IS SELECTED (default: 1)
   unset - the value if unselected (default: 0)
@@ -11,26 +11,27 @@ Each "model" node has up to 6 properties:
      if true, submit name:value
      if false, submit name:unset
      if indeterminate submit nothing - that is
-  nodes - array of nodes submodels
+  nodes - array of nodes subtreenodes
 -->
 <!-- the module tree template -->
 <template>
 <ul v-if="!innerc" id="tree-input-root" class='triangle-tree' :class="editable">
 <h2 class="bg400 fceee">Yes, this is the combined</h2>
-<div class="tst-btn" @click="dumpTree">Dump Object</div>
+<div class="tst-btn" @click="presavesubmit($event,'Top Submit')">Submit via Ajax</div>
     <tree-input
       class="item"
       :top="true"
       :innerc="true"
-      :model="model"
-      :name="name"
-      :edit="edit || vedit"
-      :ajax="ajax">
+      :treenode="treenode"
+      :edit="edit"
+      :ajax="ajax"
+      :params="params"
+      >
     </tree-input>
   </ul>
 
   <li v-else>
-      <div v-if="model">
+      <div v-if="treenode">
         <div :class="this.nodeClass" @click.stop="triangleClick"></div>
         <div style="display: inline-block;" @click="checkboxClick">
           <!--
@@ -42,17 +43,18 @@ Each "model" node has up to 6 properties:
           -->
           <div class='module-tree-box' :class="checkboxClass">
         </div>
-        {{model.label}}
+        {{treenode.label}}
     </div>
 
     <ul v-show="open" v-if="isFolder">
       <tree-input
         class="item"
-        v-for="model in model.nodes" :key=model.id
-        :model="model"
-        :edit="edit || vedit"
+        v-for="treenode in treenode.nodes" :key=treenode.id
+        :treenode="treenode"
+        :edit="edit"
         :top="false"
         :innerc="true"
+        :noprocess="true"
         >
       </tree-input>
     </ul>
@@ -62,41 +64,28 @@ Each "model" node has up to 6 properties:
 
 
 <script>
-
-//require('../../node_modules/assets/vue-templates/vue-data-components.js');
+window.Vue = require('vue');
 require('./vue-data-components.js');
 //import { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin }
   // from '/vue-data-components' ;
-   //from '../../node_modules/assets/vue-templates/vue-data-components.js';
- //  from '../../node_modules/assets/vue-templates/vue-data-components';
-
-//"C:\www\Laravels\StartupHookup\laravel\node_modules\assets\vue-templates\vue-data-components.js"
-
 export default {
   name: 'tree-input',
-  props: ['model', 'top', 'innerc', 'edit','ajax','name'],
+  //Might take most other props out if using params...
+  props: ['noprocess','treenode', 'top', 'innerc', 'edit','ajax','params'],
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
-  /*
   data: function () {
     return {
-      open: true,
-      top: true,
-    };
-  },
-  */
-  data: function () {
-    return {
-      vedit: this.edit,
       open: this.top,
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
     }
   },
+
+
   mounted: function() {
-    /*
-    console.log("From the one page Tree vue template - this.edit: ",this.edit, "this.model:", this.model, "this.top",this.top,"this.innerc", this.innerc,"this.vedit", this.vedit);
-    */
+//    console.log("This treenode:", this.treenode);
   },
+
   computed: {
     editable: function() {
       return {
@@ -105,7 +94,7 @@ export default {
       };
     },
     isFolder: function () {
-      return this.model && !isEmpty(this.model.nodes);
+      return this.treenode && !isEmpty(this.treenode.nodes);
     },
     nodeClass: function() {
       return {
@@ -139,29 +128,53 @@ export default {
       }
     },
     isSelected: function() {
-      return this.model.selected;
+      return this.treenode.selected;
     },
     deSelected: function() {
-      return !this.model.selected;
+      return !this.treenode.selected;
     },
     hasSelected: function() {
-      return this.modelHasSelected(this.model);
+      return this.treenodeHasSelected(this.treenode);
     },
     allSelected: function() {
-      return this.modelAllSelected(this.model);
+      return this.treenodeAllSelected(this.treenode);
     }
 
   },
   methods: {
+    presavesubmit: function(event,arg) {
+      if (this.top) {
+        console.error("Shouldn't be able to call presave submit from here");
+        return;
+      } //Have to prepare top treenode for submitting. Just try?
+      //console.log("The top treenode is:", this.treenode);
+      this.value = this.treenode;
+      this.savesubmit(event,arg);
+    },
+    overrideInitData: function() {
+      //console.log("In tree, overriding init");
+      return true;
+    },
+    stopProcessing: function() {
+      return this.noprocess || (this.top && !this.ajax);
+    },
+
     getTop: function() {
       if (this.top) return this;
       return this.$parent.getTop();
     },
+///// These methods ONLY EVER EXECUTED BY TOP LEVEL EL
+   
+
+
+
+
+///// END  These methods ONLY EVER EXECUTED BY TOP LEVEL EL
     //Does the folder or leaf have a casepoint in selected-casepoints?
-    modelHasSelected: function(pmodel) {
-      if (pmodel && pmodel.nodes && pmodel.nodes.length) { //Not leaf
-        for (var i=0; i < pmodel.nodes.length ; i++) {
-          if (this.modelHasSelected(pmodel.nodes[i])) {
+    treenodeHasSelected: function(ptreenode) {
+      if (ptreenode && ptreenode.nodes && ptreenode.nodes.length) { //Not leaf
+        for (var i=0; i < ptreenode.nodes.length ; i++) {
+          if (this.treenodeHasSelected(ptreenode.nodes[i])) {
             return true;
           }
         }
@@ -170,15 +183,15 @@ export default {
     },
 
    dumpTree() {
-     console.log("The Model:", this.model);
-     //console.log("The raw tree?",this.model.getTreeRoot());
+     //console.log("The treenode:", this.treenode);
+     //console.log("The raw tree?",this.treenode.getTreeRoot());
    },
 
     //Does the folder or leaf have ALL casepoints in selected-casepoints?
-    modelAllSelected: function(pmodel) {
-      if (pmodel && pmodel.nodes && pmodel.nodes.length) { //Not leaf
-        for (var i=0; i < pmodel.nodes.length ; i++) {
-          if (!this.modelAllSelected(pmodel.nodes[i])) {
+    treenodeAllSelected: function(ptreenode) {
+      if (ptreenode && ptreenode.nodes && ptreenode.nodes.length) { //Not leaf
+        for (var i=0; i < ptreenode.nodes.length ; i++) {
+          if (!this.treenodeAllSelected(ptreenode.nodes[i])) {
             return false;
           }
         }
@@ -195,14 +208,14 @@ export default {
     },
 
 /*
-    openAndRecursivelyAdd: function (amodel) {
-      if (amodel.nodes && amodel.nodes.length) {
+    openAndRecursivelyAdd: function (atreenode) {
+      if (atreenode.nodes && atreenode.nodes.length) {
         var me = this;
-        amodel.nodes.forEach(function (child) {
+        atreenode.nodes.forEach(function (child) {
           me.openAndRecursivelyAdd(child);
         });
-      } else if (amodel.casepoint) {
-        this.appendPointRow(amodel.casepoint);
+      } else if (atreenode.casepoint) {
+        this.appendPointRow(atreenode.casepoint);
       }
     },
     */
@@ -212,16 +225,16 @@ export default {
     //In fact, maybe the other way? When a child node is
     //Selected, make sure all ancestor nodes are selected
     
-    recursivelyToggle: function (amodel, removePts) {
-      if (amodel.nodes && amodel.nodes.length) {
+    recursivelyToggle: function (atreenode, removePts) {
+      if (atreenode.nodes && atreenode.nodes.length) {
         var me = this;
-        amodel.nodes.forEach(function (child) {
+        atreenode.nodes.forEach(function (child) {
           me.recursivelyToggle(child, removePts);
         });
-      } else if (amodel.casepoint) {
+      } else if (atreenode.casepoint) {
         if (removePts) {
         } else {
-          this.appendPointRow(amodel.casepoint);
+          this.appendPointRow(atreenode.casepoint);
         }
       }
     },
@@ -233,34 +246,34 @@ export default {
     //       me.singleClick = true;
     //   }, 500);
     //   if (this.isFolder) { //Recursively open & add points
-    //     //this.recursivelyToggle(this.model, this.hasSelected);
-    //     this.recursivelyToggle(this.model, this.allSelected);
+    //     //this.recursivelyToggle(this.treenode, this.hasSelected);
+    //     this.recursivelyToggle(this.treenode, this.allSelected);
     //   }
     // },
 
     triangleClick: function () {
       this.toggle();
       //if (this.singleClick == true) {
-        //this.recursivelyToggle(this.model, this.hasSelected);
+        //this.recursivelyToggle(this.treenode, this.hasSelected);
       //}
     },
     whereAmI: function() {
-      console.log("Am I at the top? Top", this.top,"Size of model:");
+      //console.log("Am I at the top? Top", this.top,"Size of treenode:");
     },
     checkboxClick: function () {
       console.log("we have clicked the checkbox");
       var mytop=this.getTop();
-      mytop.whereAmI();
+      //mytop.whereAmI();
       
       if (!this.edit) {
         console.log("Not Editable");
         return;
       }
-      this.model.selected = !this.model.selected;
+      this.treenode.selected = !this.treenode.selected;
       if (this.ajax) { //Submit & refresh...
       }
       //var me = this;
-      //this.recursivelyToggle(this.model, this.allSelected);
+      //this.recursivelyToggle(this.treenode, this.allSelected);
     },
     /*
     processClick: function () {
@@ -275,9 +288,9 @@ export default {
         }, 500);
       } else {  // It's a leaf-point - add it
         var el = this.$el;
-        if (this.modelHasSelected( this.model)) {
+        if (this.treenodeHasSelected( this.treenode)) {
         } else {
-          this.appendPointRow(this.model.casepoint);
+          this.appendPointRow(this.treenode.casepoint);
         }
       }
     },

@@ -236,7 +236,14 @@ var utilityMixin = {
     //the data fields if there is a key/value in the object.
     //"instance" should be {model:mname, id:iid}
     //If params has a key "instance", should also=> {model:, id:}
+    //Implementing classes can override here
+    overrideSetData: function(object,fields, params, instance) {
+      return false; //Set to true to prevent any default 
+    },
     setData: function(object,fields, params, instance) {
+      if (this.overrideSetData(object,fields, params, instance) === true) {
+        return;
+      }
       if (!(this.isObject(params) || this.isObject(instance)) 
               || !Array.isArray(fields)) {
         return object;
@@ -430,13 +437,18 @@ var pinputMixin = {
     return data;
   },
   mounted() {
+     if (this.stopProcessing()) return;
       this.$nextTick(() => {
       console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.fields, this.params, this.instance);
       this.initData();});
   },
   methods: {
+    stopProcessing: function() {//Overridable in implementors
+      return false;
+    },
     doMounted: function() {
+     if (this.stopProcessing()) return;
       this.$nextTick(() => {
       console.log("doMounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.fields, this.params, this.instance);
@@ -463,7 +475,16 @@ var pinputMixin = {
       }
       //console.log("After toggle state, this.checked:",this.checked,"value",this.value);
     },
+    overrideInitData: function() {
+      return false;
+    },
     initData() {
+      if (this.overrideInitData() === true) {
+        console.log ("Overrode - not initting");
+        return;
+      }
+     if (this.stopProcessing()) return;
+      console.log ("Nothing is stopping this!");
       axios.post(this.fetchurl,
       {model:this.model,
        id:this.id,
@@ -486,6 +507,7 @@ var pinputMixin = {
     },
     savesubmit(event,arg) {
       console.log("Trying to save new data:",this.value);
+      if (this.stopProcessing()) return;
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
       }

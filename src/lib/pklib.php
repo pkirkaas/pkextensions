@@ -3992,3 +3992,7 @@ function is_exactly_a($var1, $var2) {
   if (is_object($var2)) $var2 = get_class($var2);
   return is_a($var1,$var2,1) && is_a($var2,$var1,1);
 }
+
+function &arref(&$arr, $key) {
+   return $arr[$key];
+}

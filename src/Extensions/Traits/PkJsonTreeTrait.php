@@ -86,18 +86,18 @@ trait PkJsonTreeTrait {
   }
 
   public static function _addDefaults(Array &$nodes = [], Array $defaults=[], $donull=true){
+    if (!$nodes || !is_array($nodes)) return;
     foreach ($nodes as &$node) {
       foreach ($defaults as $dkey => $dval) {
         if (!array_key_exists($dkey,$node) || (($node[$dkey] === null) && $donull)) {
           $node[$dkey] = $dval;
         }
       }
-      if (ne_array('nodes',$node)) {
+      if (array_key_exists('nodes',$node)) {
         static::_addDefaults($node['nodes'],$defaults,$donull);
       }
     }
   }
-
 
   /** 
    * Builds the base, virgin node key, absent any intialization or customer

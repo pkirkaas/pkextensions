@@ -1563,7 +1563,7 @@ class $createclassname extends Migration {
     /** This section is for JSON fields as array objects so they can be
      * passed by reference & set like "$this->jsfld['key'] = $aval;"
      */
-    if ($jclass = $static::getJsonFields($key)) {
+    if ($jclass = static::getJsonFields($key)) {
       $structured = $this->attributes[$key] ?? null;
       if ($structured instanceOf $jclass) {
         return $structured;
