@@ -232,13 +232,16 @@ var utilityMixin = {
     },
     //I don't like any of those below this one
     //Takes an array of data keys & an object (?params?), and a second
-    //object (instance?) and only overwrites
+    //
     //the data fields if there is a key/value in the object.
     //"instance" should be {model:mname, id:iid}
     //If params has a key "instance", should also=> {model:, id:}
     //Implementing classes can override here
     overrideSetData: function(object,fields, params, instance) {
       return false; //Set to true to prevent any default 
+    },
+    postSetData: function(object,fields, params, instance) {
+      return object;
     },
     setData: function(object,fields, params, instance) {
       if (this.overrideSetData(object,fields, params, instance) === true) {
@@ -260,7 +263,10 @@ var utilityMixin = {
           me[field] = pc[field];
         }
       });
-     return object;
+     return this.postSetData(object, fields, params, instance);
+    },
+    report(stuff) {
+      console.log("Component Name:",this.componentname,"this keys:",Object.keys(this), "this.$data keys:", Object.keys(this.$data),"stuff:",stuff);
     },
     /** Takes an array of refs names, checks they exist, then calls the method
      * on each of them.
@@ -478,6 +484,8 @@ var pinputMixin = {
     overrideInitData: function() {
       return false;
     },
+    postInitData: function() {
+    },
     initData() {
       if (this.overrideInitData() === true) {
         console.log ("Overrode - not initting");
@@ -494,6 +502,9 @@ var pinputMixin = {
      }).then(response=>{
        //console.log("Succeeded in fetch, resp:", response);
        var value = response.data[this.name];
+       if (this.name === 'tskills_m') {
+         console.log("The value response:", value);
+       }
        if (this.formatin) {
          value = this[this.formatin](value);
        }
@@ -503,6 +514,7 @@ var pinputMixin = {
        } else {
          this.checked = false;
        }
+       this.postInitData();
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {

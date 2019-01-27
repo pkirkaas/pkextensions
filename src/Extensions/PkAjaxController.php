@@ -102,7 +102,6 @@ abstract class PkAjaxController extends PkController {
     $model = keyVal('model',$data);
     $id = keyVal('id',$data);
     $action=keyVal('action',$data);
-    console("Entering index, data",$this->data);
     switch ($action) {
       case 'chain':
           return $this->sucess($this->chain());
@@ -273,7 +272,6 @@ abstract class PkAjaxController extends PkController {
    */
   public function submit() {
     pkdebug("Enter Submit with:",$this->data);
-    console("Enter Submit with:",$this->data);
     $fields = $this->data['fields'] ?? null; //Should be an array
     if (!$fields || !is_array($fields)) {
       throw new PkException(["No fields submitted to submit. Data:",$this->data]);

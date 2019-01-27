@@ -22,10 +22,10 @@ Each "treenode" node has up to 6 properties:
       class="item"
       :top="true"
       :innerc="true"
-      :treenode="treenode"
       :edit="edit"
       :ajax="ajax"
       :params="params"
+      :depth="depth + 1"
       >
     </tree-input>
   </ul>
@@ -52,6 +52,7 @@ Each "treenode" node has up to 6 properties:
         v-for="treenode in treenode.nodes" :key=treenode.id
         :treenode="treenode"
         :edit="edit"
+        :depth="depth + 1"
         :top="false"
         :innerc="true"
         :noprocess="true"
@@ -71,16 +72,19 @@ require('./vue-data-components.js');
 export default {
   name: 'tree-input',
   //Might take most other props out if using params...
-  props: ['noprocess','treenode', 'top', 'innerc', 'edit','ajax','params'],
+  //props: ['noprocess', 'top', 'innerc', 'treenode', 'edit','ajax','params'],
+  props: {noprocess:true, top:true, innerc:true,
+    treenode:[], edit:false,ajax:false,params:{}, depth:0},
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   data: function () {
     return {
+      componentname: "tree-input",
       open: this.top,
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
+  //    treenode:[],
     }
   },
-
 
   mounted: function() {
 //    console.log("This treenode:", this.treenode);
@@ -151,14 +155,36 @@ export default {
       this.value = this.treenode;
       this.savesubmit(event,arg);
     },
+    /*
     overrideInitData: function() {
       //console.log("In tree, overriding init");
       return true;
     },
+    */
     stopProcessing: function() {
-      return this.noprocess || (this.top && !this.ajax);
+      return this.noprocess || !this.top || !this.ajax;
+    },
+    postInitData: function() {
+      this.report(['In postInitData this, depth:',this.depth]);
+      this.getTop().report(['In postInitData top, depth:',this.getTop().depth]);
+      if (this.stopProcessing() || !this.top) {
+        return;
+      }
+      if (this.value && Array.isArray(this.value)) {
+        this.treenode={nodes:this.value};
+      } else if (this.isObject(this.value)) {
+        this.treenode = this.value;
+      }
     },
 
+    //  this.setData(this,this.fields, this.params, this.instance);
+    /*
+    postSetData: function(object,fields, params, instance) {
+      if (this.
+      this.treenode
+      return object;
+    },
+    */
     getTop: function() {
       if (this.top) return this;
       return this.$parent.getTop();
