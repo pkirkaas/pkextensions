@@ -45,7 +45,7 @@ Vue.directive('atts', {
 
 //
 //////////////  Mixins //////////
-window.formatMixin = {
+var formatMixin = {
   methods: {
     formatDate: function(dt,fmt) {
       if ((typeof dt === 'object') && (dt !== null)) {
@@ -140,6 +140,7 @@ window.formatMixin = {
     }
   }
 };
+window.formatMixin = formatMixin;
 
 /////   Table make Mixin //////////
 
@@ -217,7 +218,7 @@ window.tableMixin = {
 };
 
 //Simple stuff, like non-null object, & not empty
-window.utilityMixin = {
+var utilityMixin = {
   methods: {
     isObject(tst) { 
       if ((typeof tst === 'object') && (tst !== null)) {
@@ -320,13 +321,14 @@ window.utilityMixin = {
     }
   }
 };
+window.utilityMixin = utilityMixin;
 
 /** To add common characteristics to build ajax inputs to be more
  * uniform & easier to build, & more compact. Provides some prebuild
  * configurations, & takes array of the essential elements & populates
  * them with the commonoalityes
  */
-window.controlMixin = {
+var controlMixin = {
   methods: {
     combineToArray(arr,...objs) {
       if (!Array.isArray(arr)) {
@@ -342,6 +344,7 @@ window.controlMixin = {
   },
 };
 
+window.controlMixin = controlMixin;
 
 
 
@@ -354,7 +357,7 @@ window.controlMixin = {
  * LQP/apps/resources/... activeprofile.blade.php, PostComponents.vue,
  *  & post_button.phtml for examples
  */
-window.refreshRefsMixin = {
+var refreshRefsMixin = {
   methods: { // (But this is also in the mixin reloadRefsMixin)
     setReloadRefs: function (reloadrefs) {
       if (reloadrefs) {
@@ -367,9 +370,10 @@ window.refreshRefsMixin = {
     }
   }
 };
+window.refreshRefsMixin = refreshRefsMixin;
 
 //For pure AJAX inputs that will be part of a data - pair, so no label, etc
-window.pinputMixin = {
+var pinputMixin = {
   /**
    * 'params' object 
    *   model:
@@ -507,6 +511,7 @@ window.pinputMixin = {
   },
 };
 
+window.pinputMixin = pinputMixin;
 /****
  * //////////   Start of individual inputs/controls that submit/fetch AJAX directly
  * // Input/TextArea - as soon as lose focus, select as soon as select, checkbox
@@ -2190,7 +2195,7 @@ Vue.component('ajax-checkbox-input',{
   },
 });
 
-
+export { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin } ;
 //// END Ajax Input Components (Use mixins below)
 
 /// Start JSON bulder components

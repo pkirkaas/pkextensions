@@ -126,7 +126,10 @@ trait PkJsonTreeTrait {
   }
 
   public static function makeDefaultMergedDataTree(Array $data=[]) {
-    $skipKeys = static::$skipKeys ?? [];
+    $skipKeys = [];
+    if (isset(static::$skipKeys)) {
+      $skipKeys = static::$skipKeys;
+    }
     return static::makeMergedDataTree(static::defaultTree(),[],$data);
   }
   /**
@@ -136,12 +139,13 @@ trait PkJsonTreeTrait {
    *    if true, even keys that exist in defaultValues not in custom will not be added
    * @return array of enhanced nodes
    */
-  public static function defaultTree(Array $customDefaults = [], $replace=true) {
+  public static function defaultTree(Array $customDefaults = [], $replace=false) {
+    $defaults=[];
     if (ne_array($customDefaults)) {
       $defaults = normalizeConfigArray($customDefaults);
     }
-    if (!$replace) {
-      $defaultValues = normalizeConfigArray(static::$defaultValues ?? []);
+    if (!$replace && isset(static::$defaultValues)) {
+      $defaultValues = normalizeConfigArray(static::$defaultValues);
       $defaults = array_merge($defaults, $defaultValues);
     }
     if (!ne_array($defaults)) {

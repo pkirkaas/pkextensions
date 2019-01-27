@@ -22,9 +22,9 @@ Each "model" node has up to 6 properties:
       class="item"
       :top="true"
       :innerc="true"
-      :model="model">
-      :name="name">
-      :edit="edit">
+      :model="model"
+      :name="name"
+      :edit="edit || vedit"
       :ajax="ajax">
     </tree-input>
   </ul>
@@ -50,7 +50,7 @@ Each "model" node has up to 6 properties:
         class="item"
         v-for="model in model.nodes" :key=model.id
         :model="model"
-        :edit="edit"
+        :edit="edit || vedit"
         :top="false"
         :innerc="true"
         >
@@ -63,12 +63,19 @@ Each "model" node has up to 6 properties:
 
 <script>
 
-var x = 3;
+//require('../../node_modules/assets/vue-templates/vue-data-components.js');
+require('./vue-data-components.js');
+//import { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin }
+  // from '/vue-data-components' ;
+   //from '../../node_modules/assets/vue-templates/vue-data-components.js';
+ //  from '../../node_modules/assets/vue-templates/vue-data-components';
 
+//"C:\www\Laravels\StartupHookup\laravel\node_modules\assets\vue-templates\vue-data-components.js"
 
 export default {
   name: 'tree-input',
-  props: ['model', 'top', 'innerc'],
+  props: ['model', 'top', 'innerc', 'edit','ajax','name'],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   /*
   data: function () {
     return {
@@ -79,13 +86,16 @@ export default {
   */
   data: function () {
     return {
+      vedit: this.edit,
       open: this.top,
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
     }
   },
   mounted: function() {
-    console.log("From the one page Tree vue template");
+    /*
+    console.log("From the one page Tree vue template - this.edit: ",this.edit, "this.model:", this.model, "this.top",this.top,"this.innerc", this.innerc,"this.vedit", this.vedit);
+    */
   },
   computed: {
     editable: function() {
@@ -143,6 +153,10 @@ export default {
 
   },
   methods: {
+    getTop: function() {
+      if (this.top) return this;
+      return this.$parent.getTop();
+    },
     //Does the folder or leaf have a casepoint in selected-casepoints?
     modelHasSelected: function(pmodel) {
       if (pmodel && pmodel.nodes && pmodel.nodes.length) { //Not leaf
@@ -230,8 +244,14 @@ export default {
         //this.recursivelyToggle(this.model, this.hasSelected);
       //}
     },
+    whereAmI: function() {
+      console.log("Am I at the top? Top", this.top,"Size of model:");
+    },
     checkboxClick: function () {
       console.log("we have clicked the checkbox");
+      var mytop=this.getTop();
+      mytop.whereAmI();
+      
       if (!this.edit) {
         console.log("Not Editable");
         return;
