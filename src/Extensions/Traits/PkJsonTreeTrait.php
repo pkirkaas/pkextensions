@@ -2,7 +2,7 @@
 /*
  * Assumes a JSON tree structure like:
  * 
- public static $nodes = [
+ public static $defaultNodes = [
   ['label'=>"Technical Development", 'key'=>'td', "nodes"=>[
       ["label"=>"Web", 'key'=>'web', "nodes"=> [
         ["label"=>"Back End", 'key'=>'be', "nodes" => [
@@ -10,9 +10,12 @@
           ["label" => "JavaScript/Node.js", 'key'=>'js', ],
           ["label" => "PHP", 'key'=>'php', ],
  * // Defaults per node - if idx array, def values are null, else the value
- public static $defaults = ["value"=>1,"unset"=>0,"selected"];
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ public static $defaultValues = ["value"=>1,"unset"=>0,"selected"];
+ * 
+ * Build the default tree with 
+ * $defTree = static::defaultTree(); (although you can use other defaults)
+ * 
+ * Very likely used by descendants of PkJsonArrayObject, but maybe others??
  */
 
 namespace PkExtensions\Traits;
@@ -94,6 +97,59 @@ trait PkJsonTreeTrait {
       }
     }
   }
+
+
+  /** 
+   * Builds the base, virgin node key, absent any intialization or customer
+   * values. To construct/reconstruct a model object from the DB, merge with
+   * the data array there, remembering the skipKeys array for "label" & such
+   * 
+   public __construct($data) { //Where $data is array, json string, or nothing
+      $array = PkJsonArrayObject::arrayify($data);
+   * 
+   
+   }
+   */ 
+  /** 
+   * Allows a single class to make many kinds of base trees
+   * @param array $baseNodes
+   * @param array $defaults
+   * @param array $data
+   * @param array $skipKeys
+   * @return type
+   */
+  public static function makeMergedDataTree(
+      Array $baseNodes = [], Array $defaults = [], Array $data=[], Array $skipKeys=[]) {
+    $baseTree = static::addDefaults($baseNodes,$defaults);
+    $mergedTree = static::mergeTrees($baseTree,$data,$skipKeys);
+    return $mergedTree;
+  }
+
+  public static function makeDefaultMergedDataTree(Array $data=[]) {
+    $skipKeys = static::$skipKeys ?? [];
+    return static::makeMergedDataTree(static::defaultTree(),[],$data);
+  }
+  /**
+   *  
+   * @param array $customDefaults - opt 
+   * @param boolean $replace - replace normal defaults? Will override anyway, but
+   *    if true, even keys that exist in defaultValues not in custom will not be added
+   * @return array of enhanced nodes
+   */
+  public static function defaultTree(Array $customDefaults = [], $replace=true) {
+    if (ne_array($customDefaults)) {
+      $defaults = normalizeConfigArray($customDefaults);
+    }
+    if (!$replace) {
+      $defaultValues = normalizeConfigArray(static::$defaultValues ?? []);
+      $defaults = array_merge($defaults, $defaultValues);
+    }
+    if (!ne_array($defaults)) {
+      return static::$defaultNodes;
+    }
+    return static::addDefaults(static::$defaultNodes,$defaults);
+  }
+
   /**Build tree from $nodes & $defaults. Depends on $nodes each having similar
    * $nodes under the 'nodes' key -- or?
    */
@@ -119,5 +175,4 @@ trait PkJsonTreeTrait {
   }
    * *
    */
-  //put your code here
 }
