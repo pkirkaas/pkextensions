@@ -527,8 +527,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   /** Like above, only works for instance properties, not just static
    * @param string $arrayName - the instance property name
    * @param boolean $idx (default: false) - Is the property array indexed? In 
-   * which case new values are added. If false/assoc, the child/descendent key
-   * values REPLACE the ancestor key values
+   * which case new values are added & duplicate values removed.
+   * If false/assoc, the child/descendent key values REPLACE the ancestor key values
    */
   //  DO I NEED THIS?
   public static function getInstanceAncestorArraysMerged($arrayName, $idx=false) {

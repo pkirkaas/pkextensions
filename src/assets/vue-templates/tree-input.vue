@@ -11,17 +11,21 @@ Each "model" node has up to 6 properties:
      if true, submit name:value
      if false, submit name:unset
      if indeterminate submit nothing - that is
-  children - array of children submodels
+  nodes - array of nodes submodels
 -->
 <!-- the module tree template -->
 <template>
-<ul v-if="!innerc" id="tree-input-root" class='triangle-tree'>
+<ul v-if="!innerc" id="tree-input-root" class='triangle-tree' :class="editable">
 <h2 class="bg400 fceee">Yes, this is the combined</h2>
+<div class="tst-btn" @click="dumpTree">Dump Object</div>
     <tree-input
       class="item"
       :top="true"
       :innerc="true"
       :model="model">
+      :name="name">
+      :edit="edit">
+      :ajax="ajax">
     </tree-input>
   </ul>
 
@@ -38,14 +42,15 @@ Each "model" node has up to 6 properties:
           -->
           <div class='module-tree-box' :class="checkboxClass">
         </div>
-        {{model.name}}
+        {{model.label}}
     </div>
 
     <ul v-show="open" v-if="isFolder">
       <tree-input
         class="item"
-        v-for="model in model.children" :key=model.id
+        v-for="model in model.nodes" :key=model.id
         :model="model"
+        :edit="edit"
         :top="false"
         :innerc="true"
         >
@@ -83,8 +88,14 @@ export default {
     console.log("From the one page Tree vue template");
   },
   computed: {
+    editable: function() {
+      return {
+        "is-editable": this.edit,
+        "not-editable": !this.edit,
+      };
+    },
     isFolder: function () {
-      return this.model && !isEmpty(this.model.children);
+      return this.model && !isEmpty(this.model.nodes);
     },
     nodeClass: function() {
       return {
@@ -107,11 +118,21 @@ export default {
 
       return {
         box: true,
+        'all-selected': this.isSelected,
+        'none-selected': !this.isSelected,
+        /*
         'all-selected': this.allSelected,
         'none-selected': !this.hasSelected,
         'some-selected': !this.allSelected && this.hasSelected,
+      */
         // 'blue-highlight': this.hasSelected,
       }
+    },
+    isSelected: function() {
+      return this.model.selected;
+    },
+    deSelected: function() {
+      return !this.model.selected;
     },
     hasSelected: function() {
       return this.modelHasSelected(this.model);
@@ -124,9 +145,9 @@ export default {
   methods: {
     //Does the folder or leaf have a casepoint in selected-casepoints?
     modelHasSelected: function(pmodel) {
-      if (pmodel && pmodel.children && pmodel.children.length) { //Not leaf
-        for (var i=0; i < pmodel.children.length ; i++) {
-          if (this.modelHasSelected(pmodel.children[i])) {
+      if (pmodel && pmodel.nodes && pmodel.nodes.length) { //Not leaf
+        for (var i=0; i < pmodel.nodes.length ; i++) {
+          if (this.modelHasSelected(pmodel.nodes[i])) {
             return true;
           }
         }
@@ -134,11 +155,16 @@ export default {
       } // it's a leaf/casepoint, is it selected?
     },
 
+   dumpTree() {
+     console.log("The Model:", this.model);
+     //console.log("The raw tree?",this.model.getTreeRoot());
+   },
+
     //Does the folder or leaf have ALL casepoints in selected-casepoints?
     modelAllSelected: function(pmodel) {
-      if (pmodel && pmodel.children && pmodel.children.length) { //Not leaf
-        for (var i=0; i < pmodel.children.length ; i++) {
-          if (!this.modelAllSelected(pmodel.children[i])) {
+      if (pmodel && pmodel.nodes && pmodel.nodes.length) { //Not leaf
+        for (var i=0; i < pmodel.nodes.length ; i++) {
+          if (!this.modelAllSelected(pmodel.nodes[i])) {
             return false;
           }
         }
@@ -156,9 +182,9 @@ export default {
 
 /*
     openAndRecursivelyAdd: function (amodel) {
-      if (amodel.children && amodel.children.length) {
+      if (amodel.nodes && amodel.nodes.length) {
         var me = this;
-        amodel.children.forEach(function (child) {
+        amodel.nodes.forEach(function (child) {
           me.openAndRecursivelyAdd(child);
         });
       } else if (amodel.casepoint) {
@@ -173,9 +199,9 @@ export default {
     //Selected, make sure all ancestor nodes are selected
     
     recursivelyToggle: function (amodel, removePts) {
-      if (amodel.children && amodel.children.length) {
+      if (amodel.nodes && amodel.nodes.length) {
         var me = this;
-        amodel.children.forEach(function (child) {
+        amodel.nodes.forEach(function (child) {
           me.recursivelyToggle(child, removePts);
         });
       } else if (amodel.casepoint) {
@@ -206,8 +232,15 @@ export default {
     },
     checkboxClick: function () {
       console.log("we have clicked the checkbox");
-      var me = this;
-        this.recursivelyToggle(this.model, this.allSelected);
+      if (!this.edit) {
+        console.log("Not Editable");
+        return;
+      }
+      this.model.selected = !this.model.selected;
+      if (this.ajax) { //Submit & refresh...
+      }
+      //var me = this;
+      //this.recursivelyToggle(this.model, this.allSelected);
     },
     /*
     processClick: function () {
@@ -292,5 +325,14 @@ ul.triangle-tree li.leaf:before {
   padding-right: 0.75em;
 }
 
+.tst-btn {
+    font-size: large;
+    color: red;
+    font-weight: bold;
+    padding: 10px;
+    margin: 10px;
+    border: solid blue 2px;
+    background-color: #aff;
+}
 
 </style>

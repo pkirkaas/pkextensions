@@ -22,9 +22,22 @@ define('MYSQL_MINDATE', '1000-01-01');
 
 function console() {
   if (!class_exists("ChromePhp")) {
+    /** Have to install the Chrome Extension - but have to include the chromePHP
+     * file one & only once - doesn't work w. regular laravel. So install by:
+     * composer require ccampbell/chromephp
+     * then, either in index.php:
+     * //require_once ("../vendor/ccampbell/chromephp/ChromePhp.php");
+     * or try in composer.json:
+     * autoload: {
+     *         "files": [
+          "vendor/ccampbell/chromephp/ChromePhp.php"
+        ]
+     * 
+     */
     pkdebug("What! ChromePhp doesn't exist?");
     return;
   }
+  pkdebug("CALLING CONSOLE ChromePhp!");
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
   ChromePhp::log($out);
@@ -3965,4 +3978,17 @@ function allTraits($class, $autoload = true) {
         $traits = array_merge(class_uses($trait, $autoload), $traits);
     }
     return array_unique($traits);
+}
+
+/** Compares objects or classes or class names - returns true if they
+ * are identical - not subclasses, else false. Can take class names or 
+ * objects
+ * @param mixed $var1 - 
+ * @param mixed $var2
+ * @return boolean - true if identical class, else false
+ */
+function is_exactly_a($var1, $var2) {
+  if (is_object($var1)) $var1 = get_class($var1);
+  if (is_object($var2)) $var2 = get_class($var2);
+  return is_a($var1,$var2,1) && is_a($var2,$var1,1);
 }

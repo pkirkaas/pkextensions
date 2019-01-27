@@ -7,7 +7,6 @@
   @return tree structure for complicated nested selection & comments
 */
 
-/*
 var cnt = 0;
 const TreeCell = class {
   constructor(datastruct, dataformat, dataextract) {
@@ -168,214 +167,17 @@ class TreeNode {
     return obj;
   }
 }
-*/
 
-/** New Tree Node, built by TreeNodes
- * 
- * @type type
- * @param init - simple JS data object for the node
- * @param extrakeys - if present, extrakeys to set/return with this node
- *   if an array, just set the node keys if present in init.
- *   if an object, use the object keys for the keys, & obj values for default
- *   if none exists in the init structure
- */
-class TreeNode {
-  constructor(init,extrakeys) {
-    this.exportkeys = ["label",'key',"tooltip","name","value","data","selected"];
-    this.extrakeys = [];
-    for (let key of this.exportkeys) {
-      this[key] = init[key];
-    }
-    //Check extrakeys 
-    if (extrakeys && typeof extrakeys === 'object' && !Array.isArray(extrakeys)) {
-      this.extrakeydefaults = extrakeys;
-      this.extrakeys = Object.keys(extrakeys);
-      for (key in extrakeys) {
-        if (init.hasOwnProperty(key)) {
-          this[key] = init[key];
-        } else {
-          this[key] = extrakeys[key];
-        }
-      }
-    } else if (Array.isArray(extrakeys)) {
-      this.extrakeys = extrakeys;
-      for (let key of extrakeys) {
-        this[key] = init[key];
-      }
-    }
-      
-
-/*
-    this.label = init.label;
-    this.tooltip = init.tooltip;
-    this.name = init.name;
-    this.value = init.value;
-    this.data = init.data;
-    this.selected=init.selected;
-    */
-    //this.next = null;
-    //this.prev = null;
-    this.path = init.path;
-    this.parent = init.parent;
-    this.nodes = [];
-    if (Array.isArray(init.nodes)) {
-      this.nodes = init.nodes;
-    }
-  }
-
-  exportData() {
-    var nodearr = [];
-    this.nodes.foreach(node=> {
-      nodearr.push(node.exportData());
-    });
-    var retsimp = {};
-    this.exportkeys.forEach(akey=> {
-      retsimp[akey] = this[akey];
-    });
-    this.extrakeys.forEach(akey=> {
-      retsimp[akey] = this[akey];
-    });
-  }
-}
 
 /** Builds and Contains the Tree Node objects from array data 
  * Will probably be bound to a single JSON field, so the entire Tree
  * will probably be attached to a single DB field, & this component will probably
  * be responsible for combining static info (like labels & tooltips & values for
  * the unselected boxes) with the user data. Can also be used for input or output
- * @param object base - the underlying tree structure, as an array of nodes, or
- * object w. key=>nodes array, like:
- *   with each node containing info, & possible another array of nodes, as:
- * [
-    { "label": "Technical Development", key:'td', "nodes": [
-      { "label": "Web", key:'web', "nodes": [
-        { "label": "Back End", key:'be', "nodes": [
-          { "label": "Python", key:"py", },
-          { "label": "JavaScript/Node.js", key:"js", },
-
- * @param object nodedefault - extra info each node will be populated with
- *   if not in the original structure - like maybe:
- *   {value:1, unset: 0, selected: false} - or if array, just create the keys
- * @param object data: - The user data from the DB - in a similar structure, but
- *   usually only with {selected:true} for relevant nodes
- *   
- * Will combine inputs & build JS tree structure of TreeNode as above
- * 
- * New TreeNodes
+ * @type type
  */
-class TreeNodes {
-  constructor(base,nodedefault,data) {
-    if (!Array.isArray(data)) {
-      data = this.toObject(data);
-      //if (data.hasOwnProperty('nodes') && Array.isArray(data.nodes)) {
-      if ('nodes' in data && Array.isArray(data.nodes)) {
-        data = data.nodes;
-      } else {
-        data = [];
-      }
-    }
-    nodedefault = this.toObject(nodedefault);
-    this.nodedefault = nodedefault;
-    this.nodedefaultkeys = Object.keys(nodedefault);
-    console.log("In Construct: nodedefault:",nodedefault,"this.nodedefault:", this.nodedefault,
-    "this.nodedefaultkeys:",this.nodedefaultkeys);
-    this.root = {nodes:[]};
-    //console.log("In TreeNodes constructor; base:",base);
-    if (!base || typeof base !== 'object') return;
-    if (!Array.isArray(base)) {
-      var nodes = base.nodes;
-      if (!Array.isArray(nodes)) return;
-    } else {
-      var nodes = base;
-    }
-    var treeNodes = [];
-    nodes.forEach(node=>{
-      //console.log("In TreeNodes constructor, looping, node is:",node, "data is:", data);
-      treeNodes.push(this.buildNode(node,data));
-    });
-    this.root.nodes = treeNodes;
-  }
 
-  /** return avar as an object - empty if not an obj, if keeparr,
-   * & avar is array, return as array, as is; else
-   * return object w.keys as array values, with null values
-   * 
-   * @param any avar
-   * @param boolean keeparr
-   * @returns object
-   */
-  toObject(avar, keeparr) {
-    if (!avar || typeof avar !== 'object') {
-      return {};
-    }
-    if (Array.isArray(avar) && !keeparr) {
-      var ret = {};
-      avar.forEach(el=>{ret[el]=null;});
-      return ret;
-    }
-    return avar;
-  }
-
-/** Sdata is one array level above sbase, to find the key in the array */
-  buildNode(sbase,sdata) {
-    var ret = {};
-    var lsdata = this.getKeyEntry(sdata,sbase.key);
-    if (this.hasNodes(sbase)) {
-      var mynodes = [];
-      sbase.nodes.forEach((nd,idx)=>{
-        //var tmpsdata = this.getKeyEntry(sdata,nd.key);
-        mynodes.push(this.buildNode(nd,lsdata));
-      });
-      ret.nodes = mynodes;
-    }
-    var allkeys = new Set(Object.keys(sbase).concat(Object.keys(lsdata)).concat(this.nodedefaultkeys));
-    //console.log("allkeys:",allkeys);
-    //for (let bkey in allkeys) {
-    allkeys.forEach(bkey => {
-      //console.log("In allkeys loop, bkey:",bkey);
-      if (bkey !== 'nodes') {
-        //if (lsdata.hasOwnProperty(bkey)) {
-        if (bkey  in lsdata) {
-          ret[bkey]=lsdata[bkey];
-        //} else if (sbase.hasOwnProperty(bkey)) {
-        } else if (bkey in sbase) {
-          ret[bkey]=sbase[bkey];
-        } else {
-          ret[bkey]=this.nodedefault[bkey];
-        }
-      }
-    });
-    return ret;
-  }
-  getTreeRoot() {
-    return this.root;
-  }
-
-  getKeyEntry(sdata,akey) {
-    var noentry = {};
-    if (!Array.isArray(sdata)) {
-      return noentry;
-    }
-    sdata.forEach((el,akey) => {
-      if (typeof el === 'object' && (el.key === akey)) {
-        return el;
-      }
-    });
-    return noentry;
-  }
-
-
-  hasNodes(anobj) {
-    if (anobj && typeof anobj === 'object' &&
-      anobj.nodes && Array.isArray(anobj.nodes) && anobj.nodes.length) {
-     return true;
-   }
-   return false;
- }
-}
-
-
-class TreeNodesOld  {
+class TreeNodes  {
   // Could be data, or an arry of treeNode instances
    constructor(treeNodes) {
      this.treeNodes = {};

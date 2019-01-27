@@ -603,9 +603,19 @@ public static function createOrUpdate(array $attributes = []) {
   }
   public static $jsonfields=[];
   public static function getJsonFields($tst=null) {
-    $jsonfields = static::getArraysMerged('jsonfields');
-    if (!$tst) return $jsonfields;
-    return in_array($tst,$jsonfields,1);
+    $closure = function() {
+      return normalizeConfigArray(static::getArraysMerged('jsonfields'));
+    };
+    $normJsonFields = static::getCached('normJsonFields',$closure);
+    //$jsonfields = static::getArraysMerged('jsonfields');
+    if (!$tst) return $normJsonFields;
+    if (array_key_exists($tst,$normJsonFields)) {
+      if($val = $normJsonFields[$tst]) {
+        return $val; //The specialized JSON class
+      }
+      return  "PkExtensions\PkJsonArrayObject";
+    }
+    return false;
   }
 
   /** Super flexible - can define a table field in static $table_field_defs = [
@@ -1553,17 +1563,17 @@ class $createclassname extends Migration {
     /** This section is for JSON fields as array objects so they can be
      * passed by reference & set like "$this->jsfld['key'] = $aval;"
      */
-    if (static::getJsonFields($key)) {
+    if ($jclass = $static::getJsonFields($key)) {
       $structured = $this->attributes[$key] ?? null;
-      if ($structured instanceOf PkJsonArrayObject) {
+      if ($structured instanceOf $jclass) {
         return $structured;
       } else if (!$structured) {
-        return ($this->attributes[$key] = new PkJsonArrayObject());
+        return ($this->attributes[$key] = new $jclass());
       } else if (ne_string($structured)) {
         $structured = json_decode($structured,1);
       }
       if (is_array($structured)) {
-        return ($this->attributes[$key]=new PkJsonArrayObject($structured));
+        return ($this->attributes[$key]=new $jclass($structured));
       } 
       throw new \Exception("Invalid structured: \n".print_r($structured,1));
     }
@@ -1640,12 +1650,23 @@ class $createclassname extends Migration {
   }
   public function getAttributeValue($key) {
     if (!$key) return null;
-    if (static::getJsonFields($key)) {
+    if ($jsoncls = static::getJsonFields($key)) {
       $value = $this->attributes[$key];
-      if (is_arrayish($value)) {
-        $value = json_encode($value, static::$jsonopts);
+      if (!is_arrayish($value)) {
+        return $value;
       }
-      return $value;
+      if ($value instanceOf PkJsonArrayObject) {
+        return $value->__toString();
+      }
+      if (is_array($value)) {
+        if (is_exactly_a($jsoncls,PkJsonArrayObject::class)) {
+          return  json_encode($value, static::$jsonopts);
+        } else {
+          $jsonvalue = new $jsoncls($value);
+          return $jsonvalue->__toString();
+        }
+      }
+      throw new PkException(["Shouldn't be here, with json value for key [$key]",$value]);
     }
     return parent::getAttributeValue($key);
   }

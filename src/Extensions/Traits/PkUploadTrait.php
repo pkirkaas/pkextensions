@@ -374,7 +374,7 @@ trait PkUploadTrait {
     }
     $retarr['url'] = $this->url($name);
     $retarr['epxtype'] = $entryFiles[$name];
-    pkdebug("GetMediaInfo: name: |$name| retarr:",$retarr);
+    //pkdebug("GetMediaInfo: name: |$name| retarr:",$retarr);
     return $retarr;
   }
 
@@ -465,9 +465,9 @@ trait PkUploadTrait {
    * 
    */
   public function url($name) {
-    pkdebug("In the non function?"); 
+    //pkdebug("In the non function?"); 
     $dereg = $name.'_relpath';
-    pkdebug("In the non function? derge:",$dereg, $this->$dereg); 
+    //pkdebug("In the non function? derge:",$dereg, $this->$dereg); 
     if (!$this->$dereg) {
       return null;
     }
@@ -542,11 +542,11 @@ trait PkUploadTrait {
   }
 
   public function persistFileInfo($fileinfo,$name=null) {
-    pkdebug("Entered uptlodtrai/persist wi fifing", $fileinfo);
+    //pkdebug("Entered uptlodtrai/persist wi fifing", $fileinfo);
     if (!is_array($fileinfo)) {
       throw new PkException(["Fileinfo not an array:", $fileinfo]);
     }
-    pkdebug("About to loop keys");
+    //pkdebug("About to loop keys");
     foreach ($fileinfo as $key=>$val) {
       if (is_array($val)) {
         foreach ($val as $skey=>$sval) {
@@ -559,9 +559,9 @@ trait PkUploadTrait {
       $this->$key = $val;
       }
     }
-    pkdebug("About to try & persist fifinfo was:", $fileinfo, "name", $name);
+    //pkdebug("About to try & persist fifinfo was:", $fileinfo, "name", $name);
     $this->save();
-    pkdebug("Leaving - atts:",$this->fetchattributes([],$this->names));
+    //pkdebug("Leaving - atts:",$this->fetchattributes([],$this->names));
     return $this->fetchattributes([],$this->names);
     //return true;
   }

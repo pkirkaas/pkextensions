@@ -94,7 +94,7 @@ $(function () {
   $(document).on('click', function(event) {
     if (!$(event.target).closest('div.login-register-dialog').length &&
       !$(event.target).hasClass("log-reg-pop")) {
-      console.log("We think we clicked outside the demo dialog");
+    //  console.log("We think we clicked outside the demo dialog");
       $("div.login-register-dialog").hide();
       return;
     }

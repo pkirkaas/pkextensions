@@ -1,6 +1,7 @@
 <!-- Component for visually building JSON/JS Objects -->
 <template>
     <div class="jbld-el" :class="mytype">
+      <div v-if="isTop" class="jbld-top">I'm top dog!</div>
       <div class="mod-el-wrap">
         <div class="jbld-del-btn"  @click="deleteFromParent">Delete</div>
         <div v-if="canAdd" class='add-jbval-container'>
@@ -180,13 +181,20 @@ export default {
     isObj: function() {
       return !Array.isArray(this.jbval) && this.isObject(this.jbval);
     },
+    isTop: function() {
+      return pkey === null;
+    }
   },
   methods: {
+    logThis: function() {
+      console.log("The jbval:",this.jbval);
+    },
     addType(type) {
       if (this.isScalar) {
         console.error("Trying add to a scalar");
         throw "Trying add to a scalar";
       }
+      this.showNew = false;
       var newel;
       switch (type) {
         case 'list':
@@ -314,6 +322,10 @@ export default {
   display: flex;
   flex-direction: column;
 }
+
+.jbld-el.scalar {
+  display: inline-flex;
+}
 /*
 
 " :class="mytype">
@@ -328,6 +340,7 @@ export default {
 
 .jb-input-wrap jb-wrap {
   border: solid green 1px;
+  display: inline-block;
 }
 .jb-wrap.list {
   display: flex;
@@ -375,5 +388,19 @@ export default {
 .new-key-lbl {
   display: inline-block;
   background-color: #faf;
+}
+.key-inp {
+  display: inline-block;
+}
+.jbld-top {
+  font-size: 25px;
+  font-weight: bold;
+  color: red;
+  border: solid blue 2px;
+  padding: 5px;
+  margin: 10px;
+  text-align: center;
+  background-color: #0ff;
+
 }
 </style>
