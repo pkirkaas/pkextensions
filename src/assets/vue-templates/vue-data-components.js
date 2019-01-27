@@ -266,7 +266,7 @@ var utilityMixin = {
      return this.postSetData(object, fields, params, instance);
     },
     report(stuff) {
-      console.log("Component Name:",this.componentname,"this keys:",Object.keys(this), "this.$data keys:", Object.keys(this.$data),"stuff:",stuff);
+      console.log("Component Name:",this.componentname, "this.$data", this.$data,"stuff:",stuff);
     },
     /** Takes an array of refs names, checks they exist, then calls the method
      * on each of them.

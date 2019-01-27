@@ -26,6 +26,7 @@ Each "treenode" node has up to 6 properties:
       :ajax="ajax"
       :params="params"
       :depth="depth + 1"
+      :treenodeprop.sync="treenode"
       >
     </tree-input>
   </ul>
@@ -49,8 +50,8 @@ Each "treenode" node has up to 6 properties:
     <ul v-show="open" v-if="isFolder">
       <tree-input
         class="item"
-        v-for="treenode in treenode.nodes" :key=treenode.id
-        :treenode="treenode"
+        v-for="atreenode in treenode.nodes" :key=treenode.id
+        :treenodeprop.sync="atreenode"
         :edit="edit"
         :depth="depth + 1"
         :top="false"
@@ -73,12 +74,13 @@ export default {
   name: 'tree-input',
   //Might take most other props out if using params...
   //props: ['noprocess', 'top', 'innerc', 'treenode', 'edit','ajax','params'],
-  props: {noprocess:true, top:true, innerc:true,
-    treenode:[], edit:false,ajax:false,params:{}, depth:0},
+  props: {noprocess:false, top:true, innerc:true,
+    treenodeprop:{}, edit:false,ajax:false,params:{}, depth:0},
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   data: function () {
     return {
       componentname: "tree-input",
+      treenode: {},
       open: this.top,
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
@@ -87,7 +89,8 @@ export default {
   },
 
   mounted: function() {
-//    console.log("This treenode:", this.treenode);
+    this.treenode = _.cloneDeep(this.treenodeprop);
+    console.log("This treenode:", this.treenode, "TrenodeProp:", this.treenodeprop, "depth",this.depth,"key");
   },
 
   computed: {
@@ -147,12 +150,21 @@ export default {
   },
   methods: {
     presavesubmit: function(event,arg) {
-      if (this.top) {
+      console.log("Trying AJAX submit");
+      if (!this.top) {
         console.error("Shouldn't be able to call presave submit from here");
         return;
       } //Have to prepare top treenode for submitting. Just try?
       //console.log("The top treenode is:", this.treenode);
+      console.log("This.treenode:",this.treenode,"this.treenodeprop:", this.treenodeprop);
+      var children = this.$children;
+      console.log("Children:",children);
       this.value = this.treenode;
+      var tst = this.buildTreenodeFromChildren();
+      console.log("First run tnfk: ",tst);
+      var mynodes = tst.nodes[0].nodes;
+      console.log("mynodes:",mynodes);
+      this.value = mynodes;
       this.savesubmit(event,arg);
     },
     /*
@@ -166,15 +178,26 @@ export default {
     },
     postInitData: function() {
       this.report(['In postInitData this, depth:',this.depth]);
-      this.getTop().report(['In postInitData top, depth:',this.getTop().depth]);
-      if (this.stopProcessing() || !this.top) {
-        return;
-      }
-      if (this.value && Array.isArray(this.value)) {
-        this.treenode={nodes:this.value};
-      } else if (this.isObject(this.value)) {
-        this.treenode = this.value;
-      }
+      console.log('inpostinidata thisvalue:',this.value);
+      //this.getTop().report(['In postInitData top, depth:',this.getTop().depth]);
+      //if (this.stopProcessing() || !this.top) {
+       // return;
+     // }
+      //if (this.value && Array.isArray(this.value)) {
+       // this.treenode={nodes:this.value};
+      //} else if (this.isObject(this.value)) {
+        //this.treenode = Object.values(this.value);
+        //this.treenode={nodes:this.value};
+//        Vue.set(this,'treenode',this.value);
+        this.treenode = {nodes:Object.values(this.value)};
+        console.log("Treenode now:", this.treenode, "this. treenodeprop:", this.treenodeprop);
+        this.$forceUpdate();
+
+        //Object.values(this.value).forEach((el,idx)=>{
+         // this.treenode[idx] = el;
+        //});
+
+     // }
     },
 
     //  this.setData(this,this.fields, this.params, this.instance);
@@ -286,6 +309,16 @@ export default {
     whereAmI: function() {
       //console.log("Am I at the top? Top", this.top,"Size of treenode:");
     },
+    buildTreenodeFromChildren: function() {
+      var kids = this.$children;
+      var nodes = [];
+      kids.forEach(el=>{
+        nodes.push(el.buildTreenodeFromChildren());
+      });
+      var treenode = _.cloneDeep(this.treenode);
+      treenode.nodes = _.cloneDeep(nodes);
+      return treenode; 
+    },
     checkboxClick: function () {
       console.log("we have clicked the checkbox");
       var mytop=this.getTop();
@@ -296,6 +329,8 @@ export default {
         return;
       }
       this.treenode.selected = !this.treenode.selected;
+      this.$emit('update:treenode', this.treenode);
+      this.$emit('update:treenodeprop', this.treenode);
       if (this.ajax) { //Submit & refresh...
       }
       //var me = this;
