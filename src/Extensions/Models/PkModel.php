@@ -966,7 +966,7 @@ class $createclassname extends Migration {
 
   /** Get all the defined table field names (attributes) from the static
    * class, without needing an instance.
-   * @return array of table field names.
+   * @return indexed array of table field names.
    */
   
   public static function getStaticAttributeNames() {
@@ -1591,6 +1591,12 @@ class $createclassname extends Migration {
      } else {
      }
      */
+    #all trait gets
+      $res =  $this->__gets($key);
+      if (!didFail($res)) {
+        return $res;
+      }
+
     return parent::__get($key);
      /** 7 Nov 18 - NO idea what I wanted to do with "conversion"? */ 
     /*
@@ -1670,6 +1676,23 @@ class $createclassname extends Migration {
     }
     return parent::getAttributeValue($key);
   }
+  public function __set($key,$value) {
+    $res = $this__sets($key,$value);
+    if (didFail($res)) {
+       parent::__set($key,$value);
+    }
+  }
+
+
+  /*
+    public function __set($name,$value) {
+      try {
+        $this->__sets($name,$value);
+      } catch (\Exception $e) {
+        return parent::__set($name,$value);
+      }
+    }
+   * */
 
     /*
     public function __set($name,$value) {
@@ -1685,6 +1708,10 @@ class $createclassname extends Migration {
 
   public function __call($method, $args = []) {
     #First see if it's a dynamic method in this class...
+    $res = $this->__calls($method,$args);
+    if (!didFail($res)) {
+      return $res;
+    }
 
     if (static::getDynamicMethod($method)) {
       return $this->callDynamicMethod($method, $args);
@@ -2258,6 +2285,7 @@ class $createclassname extends Migration {
    */
   public function save(array $opts = []) {
     $this->RunExtraMethods("_save", $opts);
+    $this->saves($opts);
     foreach ($this->getAttributes() as $key => &$value) {
       if (is_arrayish($value)) {
         $this->attributes[$key] = json_encode($value, static::$jsonopts);

@@ -1,6 +1,7 @@
 <?php
 namespace PkExtensions\Traits;
 use Undefined;
+use Failure;
 use PkExtensions\Models\PkModel;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Carbon\Carbon;
@@ -824,21 +825,78 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
  * the trait methods like "_saveSpecialTrait()"
  * Then in the class that implements the trait, and already has a save method,
  * just call "$this->RunExtraMethods('_save', $opts);"
+ * Need to do many versions of this, including one that returns the first non
+ * failure - especially for __getTrait() & __setTraits() - next one
  * @param string $fnpre - the prefix of the methods to call
  * @param mixed $attributes - argument to send to methods
  * @return mixed - the attributes
  */
-  public function RunExtraMethods($fnpre,$attributes = null) {
+  public function RunExtraMethods($fnpre, ...$args) {
     $methods = static::getExtraMethods($fnpre);
     if ($methods) {
       //pkdebug("Constructors? ", $constructors, "This Class:", get_class($this));
       foreach ($methods as $method) {
-        $this->$method($attributes);
+        $this->$method(...$args);
       }
     }
-    return $attributes;
+    return $args;
   }
 
+  public function saves(...$args) {
+    return $this->RunExtraMethods('save',...$args);
+  }
 
+  /** These methods must return "failure()", which is an instance of Failure,
+   * if they don't succeed - like trait __getSpecTrait($key) {
+   *     // if match key, return value, but if not don't call parent, return failure(); 
+   * @param type $fnpre
+   * @param type $args
+   */
+  public function firstSuccessExtraMethods($fnpre, ...$args) {
+    $methods = static::getExtraMethods($fnpre);
+    if ($methods) {
+      foreach ($methods as $method) {
+        $res = $this->$method(...$args);
+        if (!didFail($res)) {
+          return $res;
+        }
+      }
+    }
+    return failure();
+  }
 
+  /** ... but __set doesn't return anything, so the __setTrait methods will have to
+   * throw exceptions if no match...
+   */
+  public function firstSuccessExtraMethodsExceptions($fnpre, ...$args) {
+    $methods = static::getExtraMethods($fnpre);
+    if ($methods) {
+      foreach ($methods as $method) {
+        try {
+          $this->$method(...$args);
+          return;
+        } catch (\Exception $e) {
+        }
+      }
+    }
+    throw new \Exception("No method succeeded");
+  }
+  public function __gets($key) {
+    return $this->firstSuccessExtraMethods('__get',$key);
+  }
+
+  public function __calls($key,$args) {
+    return $this->firstSuccessExtraMethods('__call',$key,$args);
+  }
+
+  /** #NO? All the trait __set methods must throw an exception if they
+   *  #No? don't succeed
+   * Same as w. get - just return failure() if they don succeed
+   * @param string $key
+   * @param mixed $val
+   */
+  public function __sets($key,$val) {
+    //$this->firstSuccessExtraMethodsExceptions('__set',$key,$val);
+    return $this->firstSuccessExtraMethods('__set',$key,$val);
+  }
 }

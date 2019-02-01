@@ -39,11 +39,24 @@ namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
 
 Trait PolymorphicMorphTrait {
+  # Implementing class must declare static $morphFrom model; ex:
+  # public static $morphFrom = 'App\Models\User';
   public static function getMorphName() {
     $class = static::class;
     if (property_exists('morphName', $class)) return static::$morphName;
     return strtolower(baseName(static::getMorphFrom()));
   }
+  /** Returns the parent instance, of whatever type 
+   * Among other things, used to get the real attribut/column names of parent
+   */
+  public function morphbase() {
+    //return $this->morphOne(static::getMorphFrom(),getMorphBaseKeyForMe());
+    $obj = $this->morphOne(static::getMorphFrom(),getMorphBaseKeyForMe()); 
+    return $obj;
+  }
+
+
+
 
   public function __call($method, $args=[]) {
     if (strtolower($method) === strtolower(static::getMorphName())) {

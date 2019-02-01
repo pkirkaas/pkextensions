@@ -144,8 +144,7 @@ export default {
       return this.treenodeHasSelected(this.treenode);
     },
     allSelected: function() {
-      return this.treenodeAllSelected(this.treenode);
-    }
+      r
 
   },
   methods: {
@@ -184,7 +183,8 @@ export default {
        // return;
      // }
       //if (this.value && Array.isArray(this.value)) {
-       // this.treenode={nodes:this.value};
+       // this.treenode={nodes:this.value};eturn this.treenodeAllSelected(this.treenode);
+    }
       //} else if (this.isObject(this.value)) {
         //this.treenode = Object.values(this.value);
         //this.treenode={nodes:this.value};

@@ -76,6 +76,46 @@ Class Undefined {
   }
 }
 
+/** This is for functions/methods that might legitimately return null or false
+ * without failing - an instance of Failure can be returned instead. Like,
+ * if you want the value of a key in an array - it might legitimaly be false or
+ * null, a valid return - but if the key doesn't exist, it's a failure, return
+ * this.
+ */
+Class Failure {
+  public $msg='Failure';
+  public function getMsg() {
+    return displayData($msg);
+  }
+  public function __construct($msg = null) {
+    if ($msg !== null) {
+      $this->msg = $msg;
+    }
+  }
+}
+
+  /** So not every every method returning a failure needs to know/use the
+   * the Failure class, just the ones listening for it 
+   * @param mixed $msg
+   * @return \Failure
+   */
+  function failure($msg=null) {
+    return new Failure($msg);
+  }
+  /** And namespaces don't have to know about Failure to check, either
+   * 
+   * @param mixed|Failure $res - the result from another function to check
+   * for failure
+   * @return boolean
+   */
+  function didFail($res) {
+    if ($res instanceOf Failure) {
+      return true;
+    }
+    return false;
+  }
+
+
 /** Time/Interval logging section - for profiling */
 class TimeLogger {
   // Stores moments (in micro seconds) with string key
@@ -781,6 +821,36 @@ function appLogReset($reset = null) {
     $staticReset = false;
   }
   return $staticReset;
+}
+
+/** Request Info - URL, Type, params, etc.
+* @return string - w. the req info
+*/
+function pkReqInfoStr(){
+  $host = $_SERVER['HTTP_HOST'];
+  $requestURI = $_SERVER['REQUEST_URI'];
+  $method = $_SERVER['REQUEST_METHOD'];
+  //In Laravel, already drained request
+  /*
+  $params = $_REQUEST;
+  $paramStr = pkvardump($params);
+  $reqInfoStr = "
+Request: $host/$requestURI
+Method: $method
+Params: 
+$paramStr
+";
+*/
+
+  $reqInfoStr = "$method: $host/$requestURI\n";
+  return $reqInfoStr;
+}
+
+/**
+ * Outputs the reqinfo to the log
+ */
+function pkReqInfo($logpath=null) {
+  pkdebugOut(pkReqInfoStr(),$logpath);
 }
 
 /** Outputs to the destination specified by $useDebugLog
@@ -2202,7 +2272,7 @@ function var_export_square($var, $depth = 0, $indent = '  ') {
  * @param mixed $data
  * @param int $level
  * @param int $indent
- * @return string - readable deescription of the data
+ * @return string - readable description of the data
  */
 function displayData($data, $level = 0, $indent = 2) {
   $offset = str_repeat(' ', $level * $indent);
