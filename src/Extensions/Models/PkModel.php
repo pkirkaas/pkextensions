@@ -1538,6 +1538,11 @@ class $createclassname extends Migration {
   public function __get($key) {
     # This seems pretty obvious - why doesn't Eloquent do it?
     if (!$key) return null;
+      $res =  $this->__gets($key);
+      if (!didFail($res)) {
+        pkdebug("GETS Return for [$key]:",$res);
+        return $res;
+      }
     if (in_array($key,array_keys($this->attstocalcs),1)) {
       //pkdebug("Returning existing value for [$key]");
       return $this->attstocalcs[$key];
@@ -1592,10 +1597,13 @@ class $createclassname extends Migration {
      }
      */
     #all trait gets
+    /*
       $res =  $this->__gets($key);
       if (!didFail($res)) {
         return $res;
       }
+     * *
+     */
 
     return parent::__get($key);
      /** 7 Nov 18 - NO idea what I wanted to do with "conversion"? */ 
@@ -1677,7 +1685,7 @@ class $createclassname extends Migration {
     return parent::getAttributeValue($key);
   }
   public function __set($key,$value) {
-    $res = $this__sets($key,$value);
+    $res = $this->__sets($key,$value);
     if (didFail($res)) {
        parent::__set($key,$value);
     }

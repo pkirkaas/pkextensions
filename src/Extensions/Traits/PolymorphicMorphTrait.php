@@ -3,6 +3,8 @@
  * This (PolymorphicMorphTrait) is implemented/used by Models that will extend/morph
  * common base Model
  * Example: Common Base: User.  Extended 'Morph' type: Borrower, Lender.
+ * So this is implemented by the "Morph" model - Borrower or Lender
+ * PolymorphiceBaseTrait is implmented by the "Base", or User.
  */
 
 /** Supports the Morphing extensions that share a common base model. By definition,
@@ -39,6 +41,7 @@ namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
 
 Trait PolymorphicMorphTrait {
+  use PkProxiedAttributesTrait;
   # Implementing class must declare static $morphFrom model; ex:
   # public static $morphFrom = 'App\Models\User';
   public static function getMorphName() {
@@ -51,8 +54,9 @@ Trait PolymorphicMorphTrait {
    */
   public function morphbase() {
     //return $this->morphOne(static::getMorphFrom(),getMorphBaseKeyForMe());
-    $obj = $this->morphOne(static::getMorphFrom(),getMorphBaseKeyForMe()); 
-    return $obj;
+    $relation = $this->morphOne(static::getMorphFrom(),static::getMorphBaseKeyForMe());
+    $this->setProxyRelationship($relation);
+    return $relation;
   }
 
 
@@ -65,12 +69,23 @@ Trait PolymorphicMorphTrait {
     return parent::__call($method, $args);
   }
 
+  /*
   public function __get($key) {
     //pkdebug("KEY", $key);
     if (strtolower($key) === strtolower(static::getMorphName())) {
        return $this->getRelationValue('traitTypeMorphOne');
     }
      return parent::__get($key);
+  }
+   * 
+   */
+  public function __getPM($key) {
+    //pkdebug("KEY", $key);
+    if (strtolower($key) === strtolower(static::getMorphName())) {
+       return $this->getRelationValue('traitTypeMorphOne');
+    }
+     //return parent::__get($key);
+    return failure();
   }
   /*
    * 
