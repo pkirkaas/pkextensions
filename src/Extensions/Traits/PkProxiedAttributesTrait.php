@@ -35,8 +35,10 @@ trait PkProxiedAttributesTrait {
           $except,static::getFieldNames());
     }
     $proxiedClass = static::$proxiedClass;
-    pkdebug("proxiedKeys:",static::$proxiedKeys, "ProxiedClass", static::$proxiedClass,
+    /* pkdebug("proxiedKeys:",static::$proxiedKeys, "ProxiedClass", static::$proxiedClass,
       "MyFields:",static::getFieldNames(),"User field Names",$proxiedClass::getFieldNames());
+     * *
+     */
     return static::$proxiedKeys;
   }
   public function setProxyRelationship($relation) {
@@ -51,7 +53,8 @@ trait PkProxiedAttributesTrait {
    * @param type $key
    */
   public function __getPT($key) {
-    pkdebug("In the __getPT, ky:[$key]");
+    //pkdebug("In the __getPT, ky:[$key]");
+    //echo "In PAT GET, KEY: $key\n";
     if (in_array($key,static::proxyAtts(),1)) {
       return $this->proxyInstance->$key;
     } else {
@@ -71,13 +74,15 @@ trait PkProxiedAttributesTrait {
     }
     return static::$allKeys;
   }
+  /*
   public function getAttributeNames($andPropertyNames = false) {
     $attNames = parent::getAttributeNames($andPropertyNames);
     $attNames = array_merge($attNames,static::proxyAtts());
-    pkdebug("Atttributed Names:",$attNames);
+    //pkdebug("Atttributed Names:",$attNames);
     return $attNames;
 
   }
+   * */
 
 
 }

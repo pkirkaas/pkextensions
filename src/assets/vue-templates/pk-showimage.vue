@@ -107,27 +107,6 @@ export default {
   
 
 <style>
-  * {
-  font-family: 'Arial';
-  font-size: 12px;
-}
-
-*,
-*:after,
-*:before {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-touch-callout: none;
-}
-
-/*
-html, body {
-	height: 100%;
-  text-align: center;
-}
-*/
 
 .btn {
   background-color: #d3394c;

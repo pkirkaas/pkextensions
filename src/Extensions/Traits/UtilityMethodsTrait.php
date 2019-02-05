@@ -798,6 +798,9 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * "ExtraConstructors" or "_save"
    */
   public static function getExtraMethods($fnpre) {
+    if ($fnpre === '__get') {
+      //echo "In gem for key: $fnpre";
+    }
     $cacheclosure = function() use ($fnpre) {
      // pkdebug("Building constructors for : ".static::class);
      // echo "\nIn The extra constructors closure...\n";
@@ -810,6 +813,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
           $methods[] = $traitmethod;
         }
       }
+      //echo "Returning\n";
+      //print_r($methods);
       return $methods;
     };
 
@@ -881,7 +886,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     }
     throw new \Exception("No method succeeded");
   }
-  public function __gets($key) {
+  public function __xgets($key) {
+    //echo "In ___gest: key $key\n";
     return $this->firstSuccessExtraMethods('__get',$key);
   }
 

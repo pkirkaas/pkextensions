@@ -428,6 +428,7 @@ public static function createOrUpdate(array $attributes = []) {
 
   //public function 
   public function fetchAttributes($keys = [],$extra=[]) {
+    pkdebug("In fa");
     if (!$keys) {
        $keys = array_merge($this->attributeNames,$this->getExtraAttributeNames);
     } else if (is_string($keys)) {
@@ -814,7 +815,7 @@ class $createclassname extends Migration {
     fwrite($fp, $migrationtablecontent);
     fclose($fp);
     array_map('unlink', glob("$migrationprevdir/*Pkcreate*.php"));
-    echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
+    //echo ("Entering bmfd for Class ".static::class . "  ".__FUNCTION__.' '.__LINE__);
     return "Migration Table [$migrationfile] Created\n";
   }
 
@@ -1536,12 +1537,16 @@ class $createclassname extends Migration {
 
 
   public function __get($key) {
+      //echo "In PK Get, KEY $key\n";
     # This seems pretty obvious - why doesn't Eloquent do it?
     if (!$key) return null;
-      $res =  $this->__gets($key);
+      //echo "In PK Get, KEY $key\n";
+      $res =  $this->__xgets($key);
       if (!didFail($res)) {
         pkdebug("GETS Return for [$key]:",$res);
         return $res;
+      } else {
+        ////echo "Didn;t find anything!\n";
       }
     if (in_array($key,array_keys($this->attstocalcs),1)) {
       //pkdebug("Returning existing value for [$key]");
