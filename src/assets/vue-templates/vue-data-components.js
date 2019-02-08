@@ -29,7 +29,7 @@ const Vue = window.Vue;
  */
 
 
-Vue.directive('atts', {
+window.Vue.directive('atts', {
   bind: function (el, binding, vnode) {
     var value = binding.value;
     console.log("The bindinging value:", value);

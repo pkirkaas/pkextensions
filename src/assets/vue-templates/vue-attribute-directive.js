@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-Vue.directive('atts',{
+window.Vue.directive('atts',{
   bind: function (el, binding, vnode) {
     var value = binding.value;
     if ((typeof value !== 'object') ||  value === null) {
