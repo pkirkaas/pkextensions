@@ -8,7 +8,7 @@ class ClearAll extends Command {
         parent::__construct();
     }
     public function handle() {
-      $this->call('config:clear');
+      $this->call('config:cache');
       $this->call('cache:clear');
       $this->call('view:clear');
       $this->call('route:clear');

@@ -7,7 +7,7 @@ use App\Models\Contact;
 @section('content')
 <div class='info template contact'>
   <h1>Contact Us</h1>
-  <h2>{!! PkHtml::mailto(env('CONTACT_EMAIL'), 'Email us') !!} or submit the Contact Form below</h2>
+  <h2>{!! PkHtml::mailto(config('app.contact_email'), 'Email us') !!} or submit the Contact Form below</h2>
   {!!PkForm::open()!!}
   <h4 class='h-1-2-3 italic text-align-center'>All fields are optional, but remember to give us some contact info if you want a response</h4>
 

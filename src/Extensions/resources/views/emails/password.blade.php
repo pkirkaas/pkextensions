@@ -9,7 +9,7 @@
         font-weight: bold;
         font-family: verdana;
         font-style: oblique;
-        '>{{env('SITE_NAME')}}
+        '>{{config('app.site_name')}}
   </span>.
 
 <p>If it wasn't you, just ignore this email.

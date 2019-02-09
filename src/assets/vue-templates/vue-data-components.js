@@ -525,14 +525,18 @@ var pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
-      console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
+      //console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
       if (this.stopProcessing()) return;
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
       }
+      /*
+       * Wanted to accept the "enter" input anyway, and THEN save, in a textarea
+       * but doesn't seem easy..
       if (arg === 'textarea' && typeof this.value === 'string') {
-        this.value += "\n";
+        this.value += "\nHallelluea\n\nx\n";
       }
+      */
       axios.post(this.submiturl,
         {model:this.model,
           id:this.id,
@@ -1601,14 +1605,15 @@ window.Vue.component('ajax-textarea-el', {
     <textarea class="pk-inp form-control flex-grow"
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
-       @enter="savesubmit($event,'textarea')"
        @tab="savesubmit($event,'tab')"
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
      </textarea>
 `,
 });
+       //@keyup.enter="savesubmit($event,'textarea')" 
 
+       //@enter="savesubmit($event,'textarea')"
        //@keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        //@enter="savesubmit($event,'enter')"
 
@@ -2160,7 +2165,8 @@ window.Vue.component('resp-tbl', {
 /******************** END  Reactive Tables ************************/
 
 //// Ajax Input Components (Use mixins below)
-/// Two versions - fancy packaged, & simple to include in pair above
+/// Two versions - ajax-XXX-input are wrapped, fancy packaged, & 
+///  ajax-XXX-el are the raw inputs, simple to include in pair above
 window.Vue.component('ajax-text-input', {
   name: 'ajax-text-input',
   mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
