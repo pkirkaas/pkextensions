@@ -428,7 +428,6 @@ public static function createOrUpdate(array $attributes = []) {
 
   //public function 
   public function fetchAttributes($keys = [],$extra=[]) {
-    pkdebug("In fa");
     if (!$keys) {
        $keys = array_merge($this->attributeNames,$this->getExtraAttributeNames);
        if (method_exists($this,'getLocalAttributeNames')) {

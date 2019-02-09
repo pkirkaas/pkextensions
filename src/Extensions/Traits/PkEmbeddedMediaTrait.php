@@ -36,7 +36,7 @@ trait PkEmbeddedMediaTrait {
     foreach ($entries as $entry) foreach (array_keys(static::$entry_appends) as $eap) {
       $ret[] = $entry.$eap;
     }
-    pkdebug ("Extra attribute names: ", $ret);
+//    pkdebug ("Extra attribute names: ", $ret);
     return $ret;
   }
 
@@ -46,10 +46,10 @@ trait PkEmbeddedMediaTrait {
       $fieldend = strrpos($key,'_');
       $field = substr($key, 0, $fieldend);
       $append = substr($key,$fieldend);
-      pkdebug("Field: [$field], append: [$append]");
-      //$method = $entry_appends[$append] ?? null;
-      //return $this->$method($field);
-      return "hello";
+      $method = static::$entry_appends[$append] ?? null;
+      $url = $this->$method($field);
+      pkdebug("Field: [$field], append: [$append], method: [$method], url: [$url]");
+      return $url;
     }
     return parent::__get($key);
   }

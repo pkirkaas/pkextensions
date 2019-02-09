@@ -26,10 +26,11 @@ Feb 2019 - So Fix
 
 <script>
 //var app = new Vue({
+require ("./vue-data-components.js");
 export default {
     name: 'drop-inplace',
     props: ['params', 'instance'], 
-    //mixins: [window.utilityMixin],
+    mixins: [window.utilityMixin],
     data() {
       console.log("Data/drop-inplace");
               
@@ -91,7 +92,7 @@ export default {
         this.setData(this,fields,this.params,this.instance);
         this.logThis();
         this.initData();
-        this.setUrl();
+        //this.setUrl();
         console.log("In drop-inplace mounted, data:", this.$data);
       });
     },
@@ -104,45 +105,7 @@ export default {
     },
       */
     methods: {
-      isObject(tst) { 
-        if ((typeof tst === 'object') && (tst !== null)) {
-          return tst;
-        }
-        return false;
-      },
-      //If tst is not an object, return empty object
-      asObject(tst) {
-        return this.isObject(tst) ? tst : {};
-      },
-      //I don't like any of those below this one
-      //Takes an array of data keys & an object (?params?), and a second
-      //object (instance?) and only overwrites
-      //the data fields if there is a key/value in the object.
-      //"instance" should be {model:mname, id:iid}
-      //If params has a key "instance", should also=> {model:, id:}
-      setData: function(object,fields, params, instance) {
-        if (!(this.isObject(params) || this.isObject(instance)) 
-                || !Array.isArray(fields)) {
-          return object;
-        }
-        var me = object;
-        var pc = this.isObject(params) ? _.cloneDeep(params) : {};
-        var ins = this.isObject(instance) ? 
-            _.cloneDeep(instance) : _.cloneDeep(this.asObject(pc.instance));
-        //Merge / override instance into params
-        pc = Object.assign({},pc,ins);
-        //Now 3 ways params can have model/id set 
-        fields.forEach(function(field) {
-          if (typeof pc[field] !== 'undefined') {
-            me[field] = pc[field];
-          }
-        });
-        if (object.name) {
-          object.title = object.name;
-        }
-
-        return object;
-      },
+      /*
       setUrl() {
         // Totally NOT general - specific for now
         axios.post('/ajax',{action:'url',name:this.title,
@@ -153,6 +116,7 @@ export default {
             console.log("This.url now: ", this.url);
           }).catch(defaxerr);
         },
+    */
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
           //console.log ("Target was ",event.target," send to file input");
@@ -211,7 +175,11 @@ export default {
           if (this.name && isEmpty(this.fetchargs)) {
             var att =  this.name + '_url';
             this.urlmap.url = att;
-            this.fetchargs = {keys:[att]};
+            this.fetchargs = {
+              model:this.model,
+              id: this.id,
+              keys:[att],
+            };
           }
           axios.post(this.fetchurl,this.fetchargs).
           then(response=> {
