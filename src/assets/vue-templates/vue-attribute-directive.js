@@ -8,6 +8,7 @@
 
 window.Vue.directive('atts',{
   bind: function (el, binding, vnode) {
+    console.log("Binding in vue-att-dir.js");
     var value = binding.value;
     if ((typeof value !== 'object') ||  value === null) {
       return;

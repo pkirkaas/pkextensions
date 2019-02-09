@@ -21,7 +21,7 @@ Included as a component with a single prop object "params"
 </template>
 
 <script>
-require('./vue-data-components.js');
+//require('./vue-data-components.js');
 export default {
   //props: ['form', 'formdata', 'componentdata', 'extraparams','batts'],
   /** Single prop: 'params' - with 2 sub-objects - form & slotparams
