@@ -1,6 +1,6 @@
 <?php
 /** Mis-named 'upload' - also includes managing files from other external sources
- * like images from external URLs
+ * like images from external URLs - manages media 
  * Knows NOTHING of Models, just processes uploads/copies, validates, stores,
  * & returns array of file info
  */
@@ -17,6 +17,7 @@ use PkExtensions\PkExceptionResponsave;
 use \Eventviva\ImageResize;
 //use PkValidator; #The Facade that is actually a validator factory
 use Validator; #The Facade that is actually a validator factory
+use Storage;
 
 /**
  * PkFileUploadService - uploads & sanitizes file, returns an array of its
@@ -27,11 +28,11 @@ use Validator; #The Facade that is actually a validator factory
  * validation, resize, type rules, etc.
  * @author pkirk
  */
-
+ //   SymfonyFile guessExtension() returns extension based on mime-type
 class PkFileUploadService {
   #Some pre-defined types & corresponding mime-type rules
 
-  public $typearr = [
+  public static $typearr = [
       'image' => 'file|image',
       'video' => 'file|mimes:ogg,mpeg,mp4,3gpp,webm',
       'audio' => 'file|mimes:mp3,wav,flac',
@@ -146,6 +147,28 @@ class PkFileUploadService {
   }
 
   /**
+   * Uploads a file from a URL to a tmp dir
+   * More sense to return the raw file from here & supload, then
+   * validate
+   * @param string $url - the URL
+   * @return PkFile || false
+   */
+  public static function sfetchFromUrl($url) {
+    $destpath =sys_get_temp_dir().'/'.uniqid("tfr-",1).'.tmp'; 
+    $success = copy($url,$destpath);
+    if (!$success || !file_exists($destpath)) {
+      pkdebug ("Failed to fetch file from [$url] to [$destpath]");
+      return false;
+    }
+    return new PkFile($destpath);
+  }
+
+  public static function sdelete($relpath) {
+    Storage::delete($relpath);
+  }
+  
+
+  /**
    * Retrieves the request & tries to upload the file. If types are given, only      
    *allows one of those types, if no type, uploads anything. But still tries to determine
    * the mime type via PHP. 
@@ -206,6 +229,111 @@ class PkFileUploadService {
         [$attribute.'_title'=>$attribute])];
   }
 
+  /**
+   * Takes an array of parameters & either uploads a file or includes the 
+   * URL, performs validation if specified, resizing if specified
+   * @param assoc array $params
+   *   url: string URL/rel URL or empty
+   *   uploadurl: boolean: true - upload from URL, else just enter
+   *   attribute: string|empty - the FILES key, or just the first entry
+   *   type: string or empty - if uploading, verifies the general type
+   *   validators: empty
+   * @return string relative path or filename 
+   */
+  public static function intake($params = []) {
+    $url = $params['url'] ?? null;
+    if ($url) { #Relative or absolute {
+      if (!($params['uploadurl']??null)) { #Either external URL or local file
+        return $url;
+      } # Fetch file from URL
+      $sfile = static::sfetchFromUrl($url);
+    } else { #Uploading from a POST
+      $sfile = static::supload($params);
+    }
+    if (!$sfile || ! ($sfile instanceOf SymfonyFile)) {
+      return false;
+    }
+    #Imported/uploaded file. Any validation/transformation/resizing?
+    $sfile = static::sprocess($sfile,$params);
+    $fname = uniqid("tfr-",1).noextbase($sfile->getOriginalName()).
+        '.'.$sfile->guessExtension();
+    $path = $sfile->store('public',$fname);
+    return $path;
+    #Validated & transformed, in tmp dir - rename & move to storage dir
+  }
+
+  /**
+   * Optionally validate & transform (resize) the file
+   * @param SymfonyFile $sfile
+   * @param assoc array $params
+   * @return SymfonyFile || errors
+   */
+  public static function sprocess($sfile,$params=[]) {
+    $sfile = static::svalidate($sfile,$params);
+    if ($sfile instanceOf SymfonyFile) {
+      $sfile = static::stransform($sfile,$params);
+    }
+    return $sfile;
+  }
+
+  /**
+   * Optionally alidate the file
+   * @param SymfonyFile $sfile
+   * @param assoc array $params
+   *   type: string type | empty
+   * 
+   * @return SymfonyFile || errors
+   */
+  public static function svalidate($sfile, $params=[]) {
+    $type = $params['type'] ?? null;
+    if (!$type) {
+      return $sfile;
+    }
+    $typearr = static::$typearr;
+    if (ne_string($type)) {
+      if (in_array($type,array_keys($typearr), 1)) { #Laravel validator rule
+        $rule = $typearr[$type];
+        $validator = Validator::make(['key'=>$sfile],['key'=>$rule]);
+        if ($validator->fails()) {
+          return $validator->messages();
+        }
+        return $sfile;
+      }
+    }
+  }
+
+  public static function stransform($sfile, $params=[]) {
+    return $sfile;
+  }
+
+  /** Uploads from a post
+   * 
+   * @param assoc array $params
+   *   attribute: string || null - the key of the posted file, else the first
+   * @return 
+   */
+  public static function supload($params=[]) {
+    $allFiles = request()->allFiles();
+    $attribute = keyVal('attribute', $params);
+    if ($attribute) {
+      $file = $allFiles[$attribute]??null;
+    } else {
+      $file = reset($allFiles);
+    }
+    if ($file instanceOf SymfonyFile) {
+      return $file;
+    }
+  }
+
+  /*
+  public static function storagePath($relpath, $subdir='public') {
+    $storagepath = $file->store($subdir));
+  }
+  public static function truePath($relpath,$subdir='public') {
+    $path = base_path('storage/app/' .$relpath;
+  }
+   * 
+   */
     
 
   /*

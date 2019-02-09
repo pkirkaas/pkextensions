@@ -1502,6 +1502,21 @@ function isUrl($url) {
 }
 
 
+/**
+ * Returns just the base string in a path - no components
+ * no extensions
+ * @param string $str - a path - url or file or string
+ * @return string - just the base. Ex:
+ * "http://something/or/other.html.exe" => "other"
+ * "nothing" => "nothing"
+ */
+function noextbase ($str) {
+ $str = basename($str);
+ $off = strpos($str,'.');
+ if ($off === false) return $str;
+ return substr($str, 0, $off);
+}
+
 function cln_arr_val(Array $arr, $key, $filter = FILTER_SANITIZE_STRING) {
   if (!array_key_exists($key, $arr)) {
     return null;

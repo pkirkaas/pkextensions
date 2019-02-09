@@ -110,7 +110,7 @@ abstract class PkAjaxController extends PkController {
         //TOTALLY NOT GENERAL!!!!!!!!!!!
            $name = keyVal('name', $data);
            $obj = $model::Find($id);
-           pkdebug("Result of getMediaInfo:",   ['status'=>'extant'] + $obj->getMediaInfo($name));
+           //pkdebug("Result of getMediaInfo:",   ['status'=>'extant'] + $obj->getMediaInfo($name));
            return $this->success(
               ['status'=>'extant'] + $obj->getMediaInfo($name));
            //return $obj->$fname->url;

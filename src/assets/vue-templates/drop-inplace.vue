@@ -5,6 +5,14 @@ regular object, which sucks.
 
 Feb 2019 - So Fix
 
+@params:
+  attribute: string: name of the relation, or null, an embedded file
+    if embedded, simple:
+      model, id, fetchargs, deleteargs, saveargs  
+        if have name, assume mapping of url to {name}_url, don't need fetch args
+
+  
+
 -->
 <template>
   <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
@@ -34,9 +42,14 @@ export default {
       title:  this.params.title || 'upload',
       desc: '',
       imgblob: null,
+      fetchargs:{},
+      saveargs:{},
+      delargs:{},
+      urlmap:{},//What returned attribute to use for URL - default: {name}_url
+
       uploadopts: this.params.uploadopts | [],
       mediatype: this.params.mediatype || 'image',
-      chain: this.params.chain || [],
+      //chain: this.params.chain || [],
       
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
@@ -79,6 +92,7 @@ export default {
         this.logThis();
         this.initData();
         this.setUrl();
+        console.log("In drop-inplace mounted, data:", this.$data);
       });
     },
 
@@ -183,15 +197,41 @@ export default {
         return currvals;
       },
       initData(data) { //Data may be empty or have all we need
+        
         console.log ("Init it start data:", data);
         var me = this;
         var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
-        var keystosetnew = ['attribute','title', 'method', 'args','mediatype','id','url','model'];
         var searchkeys1 =['model','id','title','attribute'];
         var searchkeys2 =[ 'ownermodel','ownerid','title','attribute'];
         //Check data is object & not null
         if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
           data = {};
+        }
+        if (!this.attribute) { //Embedded - direct fetch
+          if (this.name && isEmpty(this.fetchargs)) {
+            var att =  this.name + '_url';
+            this.urlmap.url = att;
+            this.fetchargs = {keys:[att]};
+          }
+          axios.post(this.fetchurl,this.fetchargs).
+          then(response=> {
+            //console.log("Search Results:", response);
+            var rdata = response.data;
+            console.log("Search Results:", response.data);
+            var url =rdata[this.urlmap.url]; 
+            if (!url) { //No Match
+              this.url = "/mixed/img/generic-avatar-1.png" ;
+              return;
+            }
+            this.url = url;
+            return;
+
+            //console.log("Keystoset?",keystoset);
+            //keystoset.forEach(function(key) {
+             // me[key] = rdata[key];
+            //});
+          }).
+          catch(defaxerr);
         }
        //Check if we have enough to query
         var all = true;
@@ -281,7 +321,8 @@ export default {
         var fd = new FormData();
         if (this.status==='extant') {
           ///var savekeys = ['model','id','name'];
-          var savekeys = ['model','id','chain', 'title', 'name'];
+          //var savekeys = ['model','id','chain', 'title', 'name'];
+          var savekeys = ['model','id', 'title', 'name'];
         } else { //It's a separate media object, with an "owner" object
           var savekeys = [ //The keys required to save the upload
             'ownermodel','ownerid','model','foreignkeyname','attribute',

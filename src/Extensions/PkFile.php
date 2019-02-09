@@ -1,6 +1,7 @@
 <?php
 /*
  * Extends Laravel "File" to inlcude features of UploadedFile, like, "isValid"
+ * Also, 
  */
 
 namespace PkExtensions;

@@ -431,6 +431,9 @@ public static function createOrUpdate(array $attributes = []) {
     pkdebug("In fa");
     if (!$keys) {
        $keys = array_merge($this->attributeNames,$this->getExtraAttributeNames);
+       if (method_exists($this,'getLocalAttributeNames')) {
+         $keys += $this->getLocalAttributeNames();
+       }
     } else if (is_string($keys)) {
       $keys = [$keys];
     }

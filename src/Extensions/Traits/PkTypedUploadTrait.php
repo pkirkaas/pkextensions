@@ -5,7 +5,7 @@
  * are conflicts loading/using that trait twice
  */
 namespace PkExtensions\Traits;
-use PkExtensions\PkUploadService;
+use PkExtensions\PkFileUploadService;
 use PkExtensions\Traits\PkJsonFieldTrait;
 /** To compose Typed Model & Upload traits for co-functionality
  * 
@@ -28,7 +28,7 @@ trait PkTypedUploadTrait {
    */
   public static function makeUploadType($def, $uploadparams=[]) {
     $uploadparams['types'] = keyVal('type',$uploadparams,keyVal('type',$def));
-    $uploadService = new PkUploadService();
+    $uploadService = new PkFileUploadService();
     $res = $uploadService($uploadparams);
     $res['att_label']=keyVal('att_label',$def);
     $uploadClass = $def['model'];

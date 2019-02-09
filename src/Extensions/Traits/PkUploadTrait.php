@@ -6,6 +6,7 @@ use PkExtensions\PkException;
 use PkExtensions\PkFileUploadService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PkValidator;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 ## Currently creates multiple DB field names - intended for one-to-many or
@@ -405,8 +406,8 @@ trait PkUploadTrait {
     return base_path("storage/app/$subdir");
   }
 
-  public static function sfile_path($relpath) {
-    $fp = static::storage_dir().$relpath;
+  public static function sfile_path($relpath,$subdir='public') {
+    $fp = static::storage_dir($subdir).$relpath;
     if (file_exists($fp)) {
       return $fp;
     }
