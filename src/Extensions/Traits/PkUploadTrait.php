@@ -8,6 +8,10 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
+## Currently creates multiple DB field names - intended for one-to-many or
+# retlationship uploads - but could also want uploading directly into the 
+#object instance.
+
 /** Implementing Models define a static array like:
   public static $uploadFileDefs=['avatar'=>'image', 'resume'=>'doc'];
  

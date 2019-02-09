@@ -32,7 +32,7 @@ const Vue = window.Vue;
 window.Vue.directive('atts', {
   bind: function (el, binding, vnode) {
     var value = binding.value;
-    console.log("The bindinging value:", value);
+    //console.log("The bindinging value:", value);
     if ((typeof value !== 'object') ||  value === null) {
       return;
     }
@@ -385,6 +385,14 @@ var refreshRefsMixin = {
 };
 window.refreshRefsMixin = refreshRefsMixin;
 
+
+/////////////////////////// Feb 2019
+///////// TWO TYPES OF AJAX INPUT CONTROLS - BOTH DEFINE savesubmit
+////////  one called ajax_select_el, & ajax_select_input
+//// Don't know which I liked - think it was ajax_XXX_el
+
+
+
 //For pure AJAX inputs that will be part of a data - pair, so no label, etc
 var pinputMixin = {
   /**
@@ -445,7 +453,7 @@ var pinputMixin = {
   mounted() {
      if (this.stopProcessing()) return;
       this.$nextTick(() => {
-      console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
+      //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.fields, this.params, this.instance);
       this.initData();});
   },
@@ -456,7 +464,7 @@ var pinputMixin = {
     doMounted: function() {
      if (this.stopProcessing()) return;
       this.$nextTick(() => {
-      console.log("doMounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
+      //console.log("doMounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.fields, this.params, this.instance);
       this.initData();});
     },
@@ -492,7 +500,6 @@ var pinputMixin = {
         return;
       }
      if (this.stopProcessing()) return;
-      console.log ("Nothing is stopping this!");
       axios.post(this.fetchurl,
       {model:this.model,
        id:this.id,
@@ -518,10 +525,13 @@ var pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
-      console.log("Trying to save new data:",this.value);
+      console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
       if (this.stopProcessing()) return;
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
+      }
+      if (arg === 'textarea' && typeof this.value === 'string') {
+        this.value += "\n";
       }
       axios.post(this.submiturl,
         {model:this.model,
@@ -687,6 +697,7 @@ window.inputMixin = {
       catch(defaxerr);
     },
     savesubmit(event,arg) {
+      console.log("Trying to save new data w. input/input:",this.value, "For this event:",event,"With this arg:",arg);
       //console.log ("Save submit event",event,"Arg:",arg);
       this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
       if (this.formatout) {
@@ -1458,9 +1469,11 @@ window. Vue.component('ajax-multicheck-el',{
   methods: {
     msavesubmit(event,arg) {
       this.$nextTick(() => {
+        /*
       console.log("Clicked on a box. this.value:",this.value,
       "The event:",event,"The Arg:", arg, "This Item?", this.item,
       "selected: ", this.selected);
+        */
       axios.post(this.submiturl,
         {model:this.model,
           id:this.id,
@@ -1477,7 +1490,7 @@ window. Vue.component('ajax-multicheck-el',{
          value = this[formatin](value);
        }
        this.value = value;
-       console.log("The Response from clicking on AJAX MULTI:",response);
+       //console.log("The Response from clicking on AJAX MULTI:",response);
      }).catch(defaxerr);
       /*
         */
@@ -1501,7 +1514,7 @@ window. Vue.component('ajax-multicheck-el',{
       }
     },
     initData() {
-      console.log("In the custom multicheck load; data:", this.$data);
+      //console.log("In the custom multicheck load; data:", this.$data);
       axios.post(this.fetchurl,
       {model:this.model,
        id:this.id,
@@ -1511,9 +1524,9 @@ window. Vue.component('ajax-multicheck-el',{
      }).then(response=>{
        //console.log("Succeeded in fetch, resp:", response);
        var valueobj = response.data[this.name];
-       console.log("ValueObj?",valueobj);
+       //console.log("ValueObj?",valueobj);
        var value = Object.values(valueobj);
-       console.log("Value?",value);
+       //console.log("Value?",value);
        this.selected = value;
        this.value = value;
        /*
@@ -1582,10 +1595,13 @@ window.Vue.component('ajax-textarea-el', {
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
         wrapcss: ''};
         */
+  //Saves textarea on enter, but sends the extra arg 'textarea', so savesubmit
+  //will also add a newline/enter 
   template: `
     <textarea class="pk-inp form-control flex-grow"
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
+       @enter="savesubmit($event,'textarea')"
        @tab="savesubmit($event,'tab')"
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
@@ -1639,7 +1655,7 @@ window.Vue.component('data-label-pair', {
   },
   mounted: function() {
     this.updateData();
-    console.log("After mounted pair, data:",this.$data,"; params:", this.params,"; instance:", this.instance);
+    //console.log("After mounted pair, data:",this.$data,"; params:", this.params,"; instance:", this.instance);
   },
   methods: {
     updateData: function() {
@@ -1649,12 +1665,28 @@ window.Vue.component('data-label-pair', {
       var inputfields = this.$options.inputparams;
       this.input_params = 
         this.setData(this.input_params,inputfields,this.params, this.instance);
+/*
+      console.log("This input params after 1st set data: ",this.input_params);
+      if (this.isObject(this.input_params) 
+          && typeof this.input_params.input === 'string' 
+          &&  this.input_params.input.includes('checkbox')) {
+        if (this.input_params.fldcls && typeof this.input_params.fldcls === 'string'){
+          this.input_params.fldcls += ' checkbox-wrap ';
+        } else if (isEmpty(this.input_params.fldcls)) {
+            this.input_params.fldcls=' checkbox-wrap ';
+        }
+      }
+      */
       //this.setData(this.input_params,this.#
       //console.log("Calling update data w. params:", this.params);
       this.setData(this,datafields, _.cloneDeep(this.params));
-      //console.log("Now calling refs to update..");
-      //this.$refs.input.updateData();
-
+      if (typeof this.input === 'string' && this.input.includes('checkbox')) {
+        if (isEmpty(this.fldcls)) { 
+          this.fldcls = ' checkbox-wrap ';
+        } else if (typeof this.fldcls === 'string') {
+          this.fldcls += ' checkbox-wrap ';
+        }
+      }
     },
   },
   watch: {
@@ -2170,8 +2202,6 @@ window.Vue.component('ajax-textarea-input', {
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
-       @enter="savesubmit($event,'enter')"
-       @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
      </textarea>

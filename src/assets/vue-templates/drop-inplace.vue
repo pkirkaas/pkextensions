@@ -1,7 +1,11 @@
 <!-- Drop & immediately upload, in place -->
 <!-- Since I clearly forgot -- I seem to have made this specifically for 
  separate uploaded/file/media objects, NOT to be included as part of just a 
-regular object, which sucks. -->
+regular object, which sucks. 
+
+Feb 2019 - So Fix
+
+-->
 <template>
   <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
       <delete-x data-tootik="Delete This?"></delete-x>
@@ -179,16 +183,16 @@ export default {
         return currvals;
       },
       initData(data) { //Data may be empty or have all we need
-        console.log ("Int it start data:", data);
+        console.log ("Init it start data:", data);
         var me = this;
         var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
         var keystosetnew = ['attribute','title', 'method', 'args','mediatype','id','url','model'];
         var searchkeys1 =['model','id','title','attribute'];
         var searchkeys2 =[ 'ownermodel','ownerid','title','attribute'];
-       //Check data is object & not null
-       if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
-         data = {};
-       }
+        //Check data is object & not null
+        if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
+          data = {};
+        }
        //Check if we have enough to query
         var all = true;
         var querydata ={};
@@ -203,12 +207,12 @@ export default {
          if (!all) { //We don't have enough to query
            all=true;
            querydata = {};
-          for( let key of searchkeys2) {
-            var tmp = data[key] || me[key];
-            if (!tmp) {
-              all=false;
-              break;
-            }
+           for( let key of searchkeys2) {
+             var tmp = data[key] || me[key];
+             if (!tmp) {
+               all=false;
+               break;
+             }
            querydata[key]=tmp;
          }
        }

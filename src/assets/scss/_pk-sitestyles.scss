@@ -260,6 +260,18 @@ input.pk-inp {
     box-shadow: 0px 0px 15px 5px rgba(255, 255, 190, .75); 
   }
 }
+select.pk-inp,
+input.pk-inp {
+  display: inline-flex;
+}
+
+div.pk-pair div.checkbox-wrap.pkp-data {
+  //display: inline-block;
+  display: flex;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-grow: 0 !important;
+}
 body div div form div select.pk-inp {
    &:not([size]):not([multiple]) {
     height: 1.7 * $input-font-size;
@@ -638,18 +650,18 @@ img.js-big-picture-button:hover {
 
 //Defaults over-ridden in individual site SCSS's
 $pkp-pair-border: #aaa !default;
-$pkp-pair-border-radius: .5em !default;
-$pkp-pair-pad: .1em .2em !default;
-$pkp-pair-bg: #eef !default;
+$pkp-pair-border-radius: 0 !default;
+$pkp-pair-pad: .1em .1em !default;
+$pkp-pair-bg: transparent !default;
 $pkp-pair-mg: .1em .1em !default;
 $pkp-lbl-color: #008 !default;
-$pkp-lbl-wght: 600 !default;
-$pkp-lbl-pad: .1em .2em !default;
-$pkp-lbl-mg: .1em .1em !default;
+$pkp-lbl-wght: 400 !default;
+$pkp-lbl-pad: .05em .1em !default;
+$pkp-lbl-mg: .05em .1em !default;
 $pkp-data-color: #404 !default;
 $pkp-data-bg: #fff !default;
-$pkp-data-pad: .1em .2em !default;
-$pkp-data-mg: .1em .1em !default;
+$pkp-data-pad: .05em .1em !default;
+$pkp-data-mg: .05em .05em !default;
 .pk-pair-set { //Group of pk-pairs w. similar appearance
   display: flex;
 }
@@ -677,14 +689,12 @@ $pkp-data-mg: .1em .1em !default;
       font-weight: $pkp-lbl-wght;
       padding: $pkp-lbl-pad;
       margin: $pkp-lbl-mg;
-      border: solid blue 1px;
     }
     .pkp-data {
       color: $pkp-data-color;
       background: $pkp-data-bg;
       padding: $pkp-data-pad;
       margin: $pkp-data-mg;
-      border: solid red 1px;
       flex-grow: 1;
     }
   }
