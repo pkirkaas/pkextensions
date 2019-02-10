@@ -441,6 +441,7 @@ var pinputMixin = {
       type: "text",
       ownerid: null, 
       model: null,
+      vrule:'required|url', //Validation rule for v-validate
       submiturl:"/ajax/submit",
       fetchurl: "/ajax/fetchattributes",
       foreignkey: null,
@@ -458,7 +459,7 @@ var pinputMixin = {
       rowstyle: '',
     }; //If input or label width is limited, 
     var data = sdefaults;
-    data.fields = Object.keys(sdefaults);
+    data.kfields = Object.keys(sdefaults);
     data.defaults=sdefaults;
     return data;
   },
@@ -466,8 +467,9 @@ var pinputMixin = {
      if (this.stopProcessing()) return;
       this.$nextTick(() => {
       //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
-      this.setData(this,this.fields, this.params, this.instance);
+      this.setData(this,this.kfields, this.params, this.instance);
       this.initData();});
+      console.log("After mounted, this$data:",this.$data);
   },
   methods: {
     stopProcessing: function() {//Overridable in implementors
@@ -477,7 +479,7 @@ var pinputMixin = {
      if (this.stopProcessing()) return;
       this.$nextTick(() => {
       //console.log("doMounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
-      this.setData(this,this.fields, this.params, this.instance);
+      this.setData(this,this.kfields, this.params, this.instance);
       this.initData();});
     },
     //Special for checkboxes - usually true/false - & if not checked sends nothing,
@@ -537,6 +539,7 @@ var pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
+      console.log("This errors:",this.errors,"this vrule:",this.vrule);
       //console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
       if (this.stopProcessing()) return;
       if (this.formatout) {
@@ -618,6 +621,7 @@ window.inputMixin = {
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpclass: '', formatin: null, formatout: null, 
         lblclass: '',
+        vrule: 'required|url', //v-validate rule
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
         wrapclass: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
@@ -713,6 +717,7 @@ window.inputMixin = {
       catch(defaxerr);
     },
     savesubmit(event,arg) {
+      console.log("This errors:",this.errors,"this vrule:",this.vrule);
       console.log("Trying to save new data w. input/input:",this.value, "For this event:",event,"With this arg:",arg);
       //console.log ("Save submit event",event,"Arg:",arg);
       this.showThisFromDefaults(this.defaults,"InpCtl About to submit");
@@ -1396,7 +1401,7 @@ window.Vue.component('ajax-checkbox-el', {
   type: 'checkbox',
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   template: `
-    <input type="checkbox" 
+    <input type="checkbox" v-validate="vrule" 
       @click="changesavesubmit($event,'Clicked')" 
       class="pk-inp lpk-inp w2em" :name="name" :class="inpclass" :style="inpstyle"
            v-model="checked" :value="value" >
@@ -1569,7 +1574,7 @@ window. Vue.component('ajax-select-el',{
   mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
   type: 'select',
   template: `
-  <select 
+  <select  v-validate="vrule" 
     @change="savesubmit($event,'Selected Select')" 
     @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
     class="pk-inp lpk-inp" :name="name" :class="inpclass" :style="inpstyle" v-model="value">
@@ -1590,7 +1595,7 @@ window.Vue.component('ajax-input-el', {
         wrapcss: ''};
         */
   template: `
-    <input  :type="type" :style="inpstyle" :class="inpclass"
+    <input  :type="type" :style="inpstyle" :class="inpclass" v-validate="vrule" 
        class="pk-inp lpk-inp"
        @esc="false"
        @tab="savesubmit($event,'tab')"
@@ -1614,7 +1619,7 @@ window.Vue.component('ajax-textarea-el', {
   //Saves textarea on enter, but sends the extra arg 'textarea', so savesubmit
   //will also add a newline/enter 
   template: `
-    <textarea class="pk-inp form-control flex-grow"
+    <textarea class="pk-inp form-control flex-grow" v-validate="vrule" 
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
@@ -2192,7 +2197,7 @@ window.Vue.component('ajax-text-input', {
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='ajax-lbl-css' :class="lblcss" v-html="label"></div>
-    <input :style="inpstyle" :type="type"
+    <input :style="inpstyle" :type="type" v-validate="vrule" 
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @enter="savesubmit($event,'enter')"
@@ -2216,7 +2221,7 @@ window.Vue.component('ajax-textarea-input', {
   template: `
   <div class='ajax-wrap-css v-flex full-height' :class="wrapclass" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='pk-lbl lpk-lblb' :class="lblclass" v-html="label"></div>
-    <textarea class="pk-inp form-control flex-grow"
+    <textarea class="pk-inp form-control flex-grow" v-validate="vrule" 
        :class="inpclass" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
@@ -2239,7 +2244,7 @@ Vue.component('ajax-select-input',{
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" class='ajax-lbl-css' :class="lblcss" :style="lblstyle" v-html="label"></div>
-  <select 
+  <select  v-validate="vrule" 
     @change="savesubmit($event,'Selected Select')" 
     @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
     class="ajax-select-css" :name="name" :class="inpcss" :style="inpstyle" v-model="value">
@@ -2258,7 +2263,7 @@ Vue.component('ajax-checkbox-input',{
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" class='ajax-chcbxlbl-css' :class="lblcss" :style="lblstyle" v-html="label">
     </div>
-    <input type="checkbox" 
+    <input type="checkbox"  v-validate="vrule" 
       @click="changesavesubmit($event,'Clicked')" 
       class="ajax-chcbxinp-css" :name="name" :class="inpcss" :style="inpstyle"
            v-model="checked" :value="value" >

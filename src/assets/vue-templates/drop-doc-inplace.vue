@@ -20,7 +20,8 @@ Embeddeds have the convention that the
 <template>
   <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
       <delete-x data-tootik="Delete This?"></delete-x>
-      <div class=" align-center embed-wrapper "  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
+      <h2 class="border m-2 p-1 bg-aaa"  @click="fiClicked($event,'fi')">Try Clicking</h2>
+      <div class=" align-center embed-wrapper "   @click="fiClicked($event,'fi')">
         <input class="abs-hidden click-target" type="file" name="doc" @change="onChange" @click="fiClicked($event,'fi')">
 
    <div class='embed-wrapper tac'  @clicked="fiClicked($event,'doc')" data-tootik='Click to Upload'>

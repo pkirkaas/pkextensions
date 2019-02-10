@@ -595,11 +595,14 @@ a.embed-cover {
   overflow: hidden;
   height: $embed-height;
   width: $embed-width;
+  z-index: 100000;
 }
 iframe.doc,
 embed.doc {
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 0;
 }
 /*
 */
