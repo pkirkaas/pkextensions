@@ -247,12 +247,15 @@ abstract class PkAjaxController extends PkController {
       $modfield = keyVal('modfield',$this->data);
       $values =  [$modfield, keyVal('value',$this->data,'')];
     } else  {
-      $values = keyVal('values',$this->data);
+      $values = restoreJson(keyVal('values',$this->data));
     }
     $instance = $model::find($id);
+    /*
     if (ne_string($values)) {
       $values = json_decode($values,1);
     }
+     * *
+     */
     if (ne_array($values)) {
       foreach ($values as $key=>$value) {
         $instance->$key = $value;
@@ -342,8 +345,13 @@ abstract class PkAjaxController extends PkController {
   }
 
   /** Fetch attributes as specified by the model, instance id (or IDS), and 
-   * model keys
-   * @param model -string- the model to search
+   * model keys - or could be the relationships belonging to the parent - or
+   * other eloquent collection
+   * @param foreign_key - string name - opt - if missing but foreign model provided, default
+   * @param foreign_model: If present & foreign key missing, default
+   * @param foreign_id - value
+   * @param string|null - relationship name, from the foreign model's perspective
+   * @param model - string- the model to search
    * @param id - single id for single instance, list for collection, empty for all - UNLESS
    * @param searchkeys: if set, array of searchkeys=>values for "where"
    * @param orderby array of fields=>asc or desc
@@ -356,58 +364,12 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
-    //PkDebug("Enter Fetchattrures with data:", $this->data, "Request Method:", $_SERVER['REQUEST_METHOD']);
-    $obj=null;
-    $extra = restoreJson(keyVal('extra',$this->data));
-    $keys = restoreJson(keyVal('keys',$this->data));
-    if (ne_string($keys)) {
-      $keys=[$keys];
+    $result = parent::fetchtAttributes($this->data);
+    if (is_array($result)) {
+      return $this->success($result);
+    } else {
+      return $this->error(['msg'=>$result]);
     }
-    if (!ne_string($extra)) {
-      $extra = [$extra];
-    }
-    if (is_array($keys) && !in_array('id',$keys,1)) {
-      $keys[]='id'; #Could be one for an instance, or list for PkCollection
-    }
-    $orderby = keyVal('orderby',$this->data);
-    $model = keyVal('model',$this->data);
-    $searchkeys  = keyVal('searchkeys',$this->data);
-    if ($model) {
-      $id = keyVal('id',$this->data);
-      if ($id) {
-        $obj = $model::find($id);
-      } else if ($searchkeys){
-        $obj = $model::multiWhere($searchkeys);
-      } else {
-        $obj = $model::all();
-      }
-      if ($obj instanceOf Builder) {
-        $obj = $obj->get();
-      }
-      if ((! $obj instanceOf PkModel) && $orderby) {
-        $obj = $obj->multiOrderby($orderby);
-      }
-    } else { #Don't know this model - search by owner & relationship
-      $ownermodel=keyVal('ownermodel', $this->data);
-      $ownerid = keyVal('ownerid',$this->data);
-      $attribute=keyVal('attribute',$this->data);
-      $obj = $ownermodel::find($ownerid)->$attribute;
-      $keys[]='totag';
-    }
-    //pkdebug("TypeOF obj:",typeof($obj));
-    if ($obj) {
-      if ($obj instanceOf Builder) {
-        $obj = $obj->get();
-      }
-      if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
-        $obj = new PkCollection($obj);
-      }
-      //pkdebug("TypeOF obj AFTER Conv:",typeof($obj));
-      $atts = $obj->fetchAttributes($keys,$extra);
-      //pkdebug ("Rerting got atts of: ",$atts);
-      return $this->success($atts);
-    }
-    return $this->success([]);
   }
 
 /** 

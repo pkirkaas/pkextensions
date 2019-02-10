@@ -116,6 +116,7 @@ fi-fixed: grow, shrink 0. Set a width as well.
 fi-resize: grow, shrink 1
 fg - flex-grow:1
 fs - flex-shrink: 1
+fw - flex-wrap: wrap
 
 
 Fonts:

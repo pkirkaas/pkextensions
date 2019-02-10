@@ -44,11 +44,13 @@ window.Vue.directive('atts', {
 
 
 /// Just to not break the app when v-validate is not installed
+/*
 window.Vue.directive('validate', {
   bind: function (el, binding, vnode) {
     return;
   },
 });
+*/
 
 
 
@@ -382,7 +384,6 @@ window.controlMixin = controlMixin;
 
 
 var vValidatorMixin = {
-/*
   methods: {
     getMyError: function(vmId) { //Checks errors & only reports for THIS input
       if ((!this.errors || typeof this.errors !== 'object') || !this.errors.items.length) {
@@ -420,6 +421,7 @@ var vValidatorMixin = {
     return errmsgobj;
     }
   }
+/*
 */
 };
 
@@ -597,13 +599,13 @@ var pinputMixin = {
     },
     savesubmit(event,arg) {
       console.log("This errors:",this.errors,"this vrule:",this.vrule, "this._uid:", this._uid);
-      /*
       var errobj = this.getMyFormattedError(this._uid);
       if (errobj) {
         console.log("In savesubmit, errorobj:",errobj,"this.error_class:",this.error_class,"thiserror_msg",this.error_msg);
         return false;
       }
 
+      /*
       console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
       */
       if (this.stopProcessing()) return;
@@ -783,7 +785,11 @@ window.inputMixin = {
       catch(defaxerr);
     },
     savesubmit(event,arg) {
-      //this.getMyFormattedError();
+      var errobj = this.getMyFormattedError();
+      if (errobj) {
+        console.log("In savesubmit, errorobj:",errobj,"this.error_class:",this.error_class,"thiserror_msg",this.error_msg);
+        return false;
+      }
       console.log("This errors:",this.errors,"this vrule:",this.vrule);
       console.log("Trying to save new data w. input/input:",this.value, "For this event:",event,"With this arg:",arg);
       //console.log ("Save submit event",event,"Arg:",arg);

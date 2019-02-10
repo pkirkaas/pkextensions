@@ -180,6 +180,25 @@ containing block needs to be positioned relatively*/
 .align-flex-items-start {
   align-items: flex-start;
 }
+
+.justify-end {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.justify-start {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.justify-around {
+  display: flex;
+  justify-content: space-around;
+}
+.justify-between {
+  display: flex;
+  justify-content: space-between;
+}
 .h-flex { //Just to be consistent
   display: flex;
 }
@@ -207,6 +226,8 @@ containing block needs to be positioned relatively*/
 
 .nfg,.fg0 { flex-grow: 0; }
 .nfs, .fs0 { flex-shrink: 0; }
+
+.fw {flex-wrap:wrap;}
 
 .flex-rowwrap {
   display:flex;

@@ -34,6 +34,7 @@ use PkExtensions\PkExceptionResponsable;
 use PkExtensions\Traits\UtilityMethodsTrait;
 use PkExtensions\Traits\PkUploadTrait;
 use PkExtensions\Traits\PkHasTypedModelTrait;
+use PkExtensions\Traits\PkAjaxQueryTrait;
 use PkExtensions\Traits\PkTypedUploadTrait;
 use Illuminate\Http\UploadedFile;
 use Request;
@@ -44,7 +45,7 @@ use \Auth;
 use PkHtml;
 
 abstract class PkController extends Controller {
-  use UtilityMethodsTrait;
+  use UtilityMethodsTrait, PkAjaxQueryTrait;
 
   public function __construct($args = null) {
     $this->middleware(function ($request, $next) {

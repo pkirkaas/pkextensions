@@ -587,13 +587,17 @@ public static function createOrUpdate(array $attributes = []) {
 
 
   /**
-   * Get the table associated with the model.
+   * Get the table associated with the model. - Or another model - if passed
    * Because the Eloquent Model class needs an instance to get a table name...
+   * @param string|null $model_name - if false, table for this model, else that one
    * @return string
    */
-  public static function getTableName() {
+  public static function getTableName($model_name=null) {
+    if (!$model_name) {
+      $model_name = static::class;
+    }
     return str_replace( '\\', '',
-        Str::snake(Str::plural(class_basename(static::class))));
+        Str::snake(Str::plural(class_basename($model_name))));
     /*
     static $tableNames = [];
     $class = static::class;
@@ -1760,6 +1764,24 @@ class $createclassname extends Migration {
     }
     return $builder;
   }
+
+
+  /** This can be built up, but now uses defaults - returns an eloquent
+   * builder for this model for all instances owned by the foreign model
+   * @param string $foreign_model - owning / 1 side of the many
+   * @param scalar $foreign_key - the ID of the owning instance
+   * @return EloquentBuilder
+   */
+  public static function allOwnedBy($foreign_model, $foreign_key) {
+    $owner = $foreign_model::find($foreign_key);
+    $default_rel = static::getTableName();
+    pkdebug ("The return from AllOwned - should be a builder", $owner->$default_rel());
+    return $owner->$default_rel();
+  }
+
+
+
+
 
   /**
    *
