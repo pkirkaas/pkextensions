@@ -20,12 +20,12 @@ Embeddeds have the convention that the
 <template>
   <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
       <delete-x data-tootik="Delete This?"></delete-x>
-      <h2 class="border m-2 p-1 bg-aaa"  @click="fiClicked($event,'fi')">Try Clicking</h2>
+      <h2 class="border m-2 p-1 bg-aaa" data-tootik="Drag your resmue here or click to uploa" @click="fiClicked($event,'fi')">Upload your resume</h2>
       <div class=" align-center embed-wrapper "   @click="fiClicked($event,'fi')">
         <input class="abs-hidden click-target" type="file" name="doc" @change="onChange" @click="fiClicked($event,'fi')">
 
    <div class='embed-wrapper tac'  @clicked="fiClicked($event,'doc')" data-tootik='Click to Upload'>
-      <iframe :src="url || defaulturl" @clicked="fiClicked($event,'doc')" class='doc inline doc-upload' >
+      <iframe v-if="url" :src="url || defaulturl" @clicked="fiClicked($event,'doc')" class='doc inline doc-upload' >
       </iframe>
   </div>
   </div>

@@ -372,7 +372,47 @@ var controlMixin = {
 window.controlMixin = controlMixin;
 
 
+var vValidatorMixin = {
+  methods: {
+    getMyError: function(vmId) { //Checks errors & only reports for THIS input
+      if ((!this.errors || typeof this.errors !== 'object') || !this.errors.items.length) {
+        return false;
+      }
+      console.log("getMyError:  After no obj no arr before Iteration");
+      var result = false;
+      this.errors.items.forEach(function(item){
+        console.log("In iteration, item:",item,"item.vmId",item.vmId,"typeof item.vmId",
+        typeof item.vmId, "vmId",vmId, "typeof vmid", typeof vmId);
+        if (item.vmId === vmId) {
+          console.log("Match & return item:", item);
+          result = item;
+          return item;
+        }
+      });
+      return result;
+  },
+  getMyFormattedError: function(vmId) { //Returns {error_class:input errcls, errmsg:errmsg
+    var item = this.getMyError(vmId);
+    console.log("In getMyFormatted error, item:", item);
+    if (!item) {
+      this.error_class='';
+      this.error_msg='';
+      return false;
+    }
+    var errmsgobj = {
+      error_class:"input is-danger",
+      error_msg: ` <i class="fa fa-warning"></i>
+        <span class="help is-danger">${item.msg}</span>`
+    };
+    this.error_class=errmsgobj.error_class;
+    this.error_msg=errmsgobj.error_msg;
+    console.log("Returning error msg obj:",errmsgobj);
+    return errmsgobj;
+    }
+  }
+};
 
+window.vValidatorMixin = vValidatorMixin;
 
 
 /** For a top-level stand-alone Vue instance that pops up a pk-modal-wrapper button
@@ -435,13 +475,15 @@ var pinputMixin = {
   data: function () {
     var sdefaults = {
       name: null,
+      error_class:'',
+      error_msg:'',
       value:null,
       id: null,
       ownermodel: null,
       type: "text",
       ownerid: null, 
       model: null,
-      vrule:'required|url', //Validation rule for v-validate
+      vrule:'', //Validation rule for v-validate
       submiturl:"/ajax/submit",
       fetchurl: "/ajax/fetchattributes",
       foreignkey: null,
@@ -469,7 +511,11 @@ var pinputMixin = {
       //console.log("Mounted AJaxTextInput, defaults:",this.defaults,"Params:",this.params,"Instance?",this.instance);
       this.setData(this,this.kfields, this.params, this.instance);
       this.initData();});
-      console.log("After mounted, this$data:",this.$data);
+      //console.log("After mounted, this$data:",this.$data);
+      if (this.params.vrule  || (this.name === 'facebook_url') || (this.name === 'linkedin_url') 
+              || (this.params.name==='facebook_url')) {
+        console.log("this params:", this.params,"this.vrule:",this.vrule,"this 4data:",this.$data);
+      }
   },
   methods: {
     stopProcessing: function() {//Overridable in implementors
@@ -539,8 +585,14 @@ var pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
-      console.log("This errors:",this.errors,"this vrule:",this.vrule);
-      //console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
+      console.log("This errors:",this.errors,"this vrule:",this.vrule, "this._uid:", this._uid);
+      var errobj = this.getMyFormattedError(this._uid);
+      if (errobj) {
+        console.log("In savesubmit, errorobj:",errobj,"this.error_class:",this.error_class,"thiserror_msg",this.error_msg);
+        return false;
+      }
+
+      console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
       if (this.stopProcessing()) return;
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
@@ -618,10 +670,11 @@ window.inputMixin = {
   data() {
          //the other element can take the space. 
        var defaults = {
+        error_class:'', error_msg:'',
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpclass: '', formatin: null, formatout: null, 
         lblclass: '',
-        vrule: 'required|url', //v-validate rule
+        vrule: '', //v-validate rule
         label: null, tooltip: '', submiturl:"/ajax/submit",
         fetchurl: "/ajax/fetchattributes", attribute: null, foreignkey: null,
         wrapclass: '', inpstyle:'', wrapstyle:'', lblstyle:'',value: null,
@@ -717,6 +770,7 @@ window.inputMixin = {
       catch(defaxerr);
     },
     savesubmit(event,arg) {
+      this.getMyFormattedError();
       console.log("This errors:",this.errors,"this vrule:",this.vrule);
       console.log("Trying to save new data w. input/input:",this.value, "For this event:",event,"With this arg:",arg);
       //console.log ("Save submit event",event,"Arg:",arg);
@@ -1368,7 +1422,7 @@ window.Vue.component('input-el',{
   <input :type="type" :name="name" :value="value" class="pk-inp lpk-inp"
       :class="inpclass"  :style="inpstyle">`,
   props: ['params'],
-  mixins: [window.utilityMixin],
+  mixins: [window.utilityMixin, window.vValidatorMixin],
   data: function() {
     return {
       type:"text",
@@ -1396,15 +1450,20 @@ window.Vue.component('input-el',{
   }
 });
 
+
+    //<input type="checkbox" v-validate="vrule" 
 window.Vue.component('ajax-checkbox-el', {
   name: 'ajax-checkbox-el',
   type: 'checkbox',
-  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin, window.vValidatorMixin],
   template: `
-    <input type="checkbox" v-validate="vrule" 
+  <div>
+    <input type="checkbox" 
       @click="changesavesubmit($event,'Clicked')" 
-      class="pk-inp lpk-inp w2em" :name="name" :class="inpclass" :style="inpstyle"
+      class="pk-inp lpk-inp w2em" :name="name" :class="inpclass+' '+error_class" :style="inpstyle"
            v-model="checked" :value="value" >
+      <div v-show="error_msg" v-html="error_msg"></div>
+  </div>
 `,
   methods: {
     changesavesubmit(event,action) {
@@ -1467,13 +1526,13 @@ window.Vue.component('ajax-checkbox-el', {
 */
 window. Vue.component('ajax-multicheck-el',{
   name: 'ajax-multicheck-el',
-  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin, window.vValidatorMixin],
   type: 'multicheck',
   template: `
   <div class='multiselect form-control' :class="wrapclass" :style="wrapstyle">
   <div v-for="(option,idx) in options" class="pk-checkbox"
             :class="rowclass" :style="rowstyle">
-    <input type="checkbox" :value="option.value"
+    <input type="checkbox" :value="option.value" :class="error_class"
 
      v-model="selected"
 
@@ -1481,6 +1540,7 @@ window. Vue.component('ajax-multicheck-el',{
        :name="name+'[]'"
       :id="'option_'+option.value">
 <div class="inline" v-html="option.label"></div> 
+  <div v-show="error_msg" v-html="error_msg"></div>
 
 
   </div>
@@ -1571,22 +1631,26 @@ window. Vue.component('ajax-multicheck-el',{
 //CVue.component('pk-select-arr', {
 window. Vue.component('ajax-select-el',{
   name: 'ajax-select-el',
-  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin, window.vValidatorMixin],
   type: 'select',
   template: `
-  <select  v-validate="vrule" 
+  <div>
+  <select  
     @change="savesubmit($event,'Selected Select')" 
     @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
-    class="pk-inp lpk-inp" :name="name" :class="inpclass" :style="inpstyle" v-model="value">
+    class="pk-inp lpk-inp" :name="name" :class="inpclass+' '+error_class"
+      :style="inpstyle" v-model="value">
       <option v-for="(option, idx) in options" :value="option.value" v-html="option.label">
       </option>
     </select>
+  <div v-show="error_msg" v-html="error_msg"></div>
+  </div>
 `,
   });
 
 window.Vue.component('ajax-input-el', {
   name: 'ajax-input-el',
-  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin, window.vValidatorMixin],
   /*
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
@@ -1595,7 +1659,8 @@ window.Vue.component('ajax-input-el', {
         wrapcss: ''};
         */
   template: `
-    <input  :type="type" :style="inpstyle" :class="inpclass" v-validate="vrule" 
+  <div>
+    <input  :type="type" :style="inpstyle" :class="inpclass+' '+error_class" v-validate="vrule"
        class="pk-inp lpk-inp"
        @esc="false"
        @tab="savesubmit($event,'tab')"
@@ -1603,12 +1668,14 @@ window.Vue.component('ajax-input-el', {
        @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
+  <div v-show="error_msg" v-html="error_msg"></div>
+  </div>
   `,
 });
 
 window.Vue.component('ajax-textarea-el', {
   name: 'ajax-textarea-el',
-  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.pinputMixin, window.formatMixin, window.vValidatorMixin],
   /*
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
@@ -1619,13 +1686,16 @@ window.Vue.component('ajax-textarea-el', {
   //Saves textarea on enter, but sends the extra arg 'textarea', so savesubmit
   //will also add a newline/enter 
   template: `
-    <textarea class="pk-inp form-control flex-grow" v-validate="vrule" 
-       :class="inpclass" :style="inpstyle" :type="type"
+  <div>
+    <textarea class="pk-inp form-control flex-grow" 
+       :class="inpclass+' '+error_class" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
      </textarea>
+  <div v-show="error_msg" v-html="error_msg"></div>
+  </div>
 `,
 });
        //@keyup.enter="savesubmit($event,'textarea')" 
@@ -1646,7 +1716,7 @@ window.Vue.component('ajax-textarea-el', {
 window.Vue.component('data-label-pair', {
   inputparams:['options','name','model','id','fetchurl',
     'inpclass','ownermodel','ownerid','submiturl','foreignkey','inpstyle',
-    'checked','checkedvalue','uncheckedvalue','value', 'instance'],
+    'checked','checkedvalue','uncheckedvalue','value', 'instance','vrule'],
 
   name: 'data-label-pair',
   template: `
@@ -1667,6 +1737,7 @@ window.Vue.component('data-label-pair', {
       input: 'ajax-input-el',
       input_params: {},
       lblcls:'',
+      vrule:'',
       lblstyle:'',
       label:'',
       fldcls:'',
@@ -1683,7 +1754,7 @@ window.Vue.component('data-label-pair', {
     updateData: function() {
       var datafields = ['input','lblcls', 'tootik',
         'lblstyle','label','fldcls','fldstyle','pair_wrap', 'pair_wrap_style',
-      'model', 'id', 'input_params'];
+      'model', 'id', 'input_params', 'vrule'];
       var inputfields = this.$options.inputparams;
       this.input_params = 
         this.setData(this.input_params,inputfields,this.params, this.instance);
@@ -1708,6 +1779,9 @@ window.Vue.component('data-label-pair', {
         } else if (typeof this.fldcls === 'string') {
           this.fldcls += ' checkbox-wrap ';
         }
+      }
+      if (this.input_params.name === 'facebook_url') {
+        console.log("pair-wrap: this#data:", this.$data,"this.params:", this.params,"this.input_params:", this.input_params);
       }
     },
   },
@@ -2186,7 +2260,7 @@ window.Vue.component('resp-tbl', {
 ///  ajax-XXX-el are the raw inputs, simple to include in pair above
 window.Vue.component('ajax-text-input', {
   name: 'ajax-text-input',
-  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin, window.vValidatorMixin],
   /*
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
@@ -2197,20 +2271,21 @@ window.Vue.component('ajax-text-input', {
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='ajax-lbl-css' :class="lblcss" v-html="label"></div>
-    <input :style="inpstyle" :type="type" v-validate="vrule" 
+    <input :style="inpstyle" :type="type" 
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @enter="savesubmit($event,'enter')"
        @keyup.enter="savesubmit($event,'EnterKeyUp on TextInput')" 
        @blur="savesubmit($event,'blur')"
-       v-model="value" :name="name" :class="inpcss" class="ajax-inp-css">
+       v-model="value" :name="name" :class="inpcss+' '+error_class" class="ajax-inp-css">
+  <div v-show="error_msg" v-html="error_msg"></div>
   </div>`,
 });
 
 
 window.Vue.component('ajax-textarea-input', {
   name: 'ajax-textarea-input',
-  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin, window.vValidatorMixin],
   /*
         name: null, id: null, ownermodel: null, type: null, ownerid: null, 
         model: null, inpcss: '', formatin: null, formatout: null, lblcss: '',
@@ -2221,13 +2296,14 @@ window.Vue.component('ajax-textarea-input', {
   template: `
   <div class='ajax-wrap-css v-flex full-height' :class="wrapclass" :style="wrapstyle">
     <div v-if="label" :style="lblstyle" class='pk-lbl lpk-lblb' :class="lblclass" v-html="label"></div>
-    <textarea class="pk-inp form-control flex-grow" v-validate="vrule" 
-       :class="inpclass" :style="inpstyle" :type="type"
+    <textarea class="pk-inp form-control flex-grow" 
+       :class="inpclass+' '+error_class" :style="inpstyle" :type="type"
        @esc="false"
        @tab="savesubmit($event,'tab')"
        @blur="savesubmit($event,'blur')"
        v-model="value" :name="name" >
      </textarea>
+  <div v-show="error_msg" v-html="error_msg"></div>
   </div>`,
 });
 
@@ -2239,34 +2315,37 @@ window.Vue.component('ajax-textarea-input', {
 //CVue.component('pk-select-arr', {
 Vue.component('ajax-select-input',{
   name: 'ajax-select-input',
-  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin, window.vValidatorMixin],
   type: 'select',
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" class='ajax-lbl-css' :class="lblcss" :style="lblstyle" v-html="label"></div>
-  <select  v-validate="vrule" 
+  <select  
     @change="savesubmit($event,'Selected Select')" 
     @keyup.enter="savesubmit($event,'EnterKeyUp on Select')" 
-    class="ajax-select-css" :name="name" :class="inpcss" :style="inpstyle" v-model="value">
+    class="ajax-select-css" :name="name" :class="inpcss+' '+error_class"
+      :style="inpstyle" v-model="value">
       <option v-for="(option, idx) in options" :value="option.value" v-html="option.label">
       </option>
     </select>
+  <div v-show="error_msg" v-html="error_msg"></div>
   </div>
 `,
   });
 
 Vue.component('ajax-checkbox-input',{
   name: 'ajax-checkbox-input',
-  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin],
+  mixins: [window.utilityMixin, window.inputMixin, window.formatMixin, window.vValidatorMixin],
   type: 'checkbox',
   template: `
   <div class='ajax-wrap-css' :class="wrapcss" :style="wrapstyle">
     <div v-if="label" class='ajax-chcbxlbl-css' :class="lblcss" :style="lblstyle" v-html="label">
     </div>
-    <input type="checkbox"  v-validate="vrule" 
+    <input type="checkbox"  
       @click="changesavesubmit($event,'Clicked')" 
-      class="ajax-chcbxinp-css" :name="name" :class="inpcss" :style="inpstyle"
+      class="ajax-chcbxinp-css" :name="name" :class="inpcss+' '+error_class" :style="inpstyle"
            v-model="checked" :value="value" >
+  <div v-show="error_msg" v-html="error_msg"></div>
   </div>
 `
   /*
@@ -2282,7 +2361,7 @@ Vue.component('ajax-checkbox-input',{
   },
 });
 
-export { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin } ;
+export { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin,vValidatorMixin  } ;
 //// END Ajax Input Components (Use mixins below)
 
 /// Start JSON bulder components

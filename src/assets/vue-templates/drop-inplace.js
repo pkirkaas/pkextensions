@@ -7,7 +7,7 @@ window.dropInPlaceMixin = {
     props: ['params', 'instance'], 
     mixins: [window.utilityMixin],
     data() {
-      console.log("Data/drop-inplace");
+      //console.log("Data/drop-inplace");
               
       return {
       //defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
@@ -64,8 +64,8 @@ window.dropInPlaceMixin = {
     },
     mounted: function() {
       this.$nextTick(()=>{
-        console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
-        this.defaulturl  = this.$options.extraoptions.defaulturl;
+        //console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+        //this.defaulturl  = this.$options.extraoptions.defaulturl;
         this.mediatype  = this.$options.extraoptions.type;
         var fields = Object.keys(this.$data);
         this.setData(this,fields,this.params,this.instance);
@@ -73,7 +73,7 @@ window.dropInPlaceMixin = {
         this.logThis();
         this.initData();
         //this.setUrl();
-        console.log("In drop-inplace mounted, data:", this.$data);
+        //console.log("In drop-inplace mounted, data:", this.$data);
       });
     },
     methods: {
@@ -99,8 +99,8 @@ window.dropInPlaceMixin = {
       fiClicked(event, data) {
 
         //if (event.target === "img.img-upload") {
-         console.log ("Target was ",event.target," send to file input");
-          $(event.target).cousin('input.click-target','div.drop').trigger('click');
+         //console.log ("Target was ",event.target," send to file input");
+         // $(event.target).cousin('input.click-target','div.drop').trigger('click');
         ////}
         //console.log("The input got the click, ev:",event,"data:", data);
       },
@@ -160,6 +160,7 @@ window.dropInPlaceMixin = {
       setEmbeddedData(data) {
         data = this.asObject(data);
         var url = data[this.urlmap.url];
+        //console.log("setEmbedded Data, this$datta:",this.$data,"Passed data:",data,"url",url);
         if (!url)  {
           url = this.defaulturl;
         }
@@ -168,12 +169,12 @@ window.dropInPlaceMixin = {
       },
 
       initData(data) { //Data may be empty or have all we need
-        console.log ("Init it start data:", data);
+        //console.log ("Init it start data:", data);
         var me = this;
         if (this.embedded) {
           axios.post(this.fetchurl, {model:this.model,id:this.id,keys:[this.urlmap.url]}).
             then(response=> {
-              console.log("Response data for set url",response.data);
+              //console.log("Response data for set url",response.data);
               this.setEmbeddedData(response.data);
           }).catch(defaxerr);
           return;
@@ -222,12 +223,12 @@ window.dropInPlaceMixin = {
        }
        if (all) {//We have a query set
          querydata.extra=JSON.stringify(['url','model']);
-        console.log("In initData, trying to query:", querydata);
+        //console.log("In initData, trying to query:", querydata);
         axios.post(this.fetchurl,querydata).
           then(response=> {
             //console.log("Search Results:", response);
             var rdata = response.data;
-            console.log("Search Results:", response.data);
+            //console.log("Search Results:", response.data);
             if (!rdata.id) { //No Match
               this.url = "/mixed/img/generic-avatar-1.png" ;
               return;
@@ -255,14 +256,14 @@ window.dropInPlaceMixin = {
       },
       onChange(e) {
         var files = e.target.files;
-        console.log("Change triggered - files?",files);
+        //console.log("Change triggered - files?",files);
         this.createFile(files[0]);
       },
       createFile(file) {
         //if (file && !file.type.match('image.*')) {
         if (file && (this.fileType(file.type) !== this.mediatype)) {
-          console.log("The file filetype: ",file.type,"this.fileType: ", this.fileType(file.type),
-          "this.mediatype:", this.mediatype);
+          //console.log("The file filetype: ",file.type,"this.fileType: ", this.fileType(file.type),
+          //"this.mediatype:", this.mediatype);
           alert('Select file of type '+this.mediatype);
           return;
         }
@@ -283,7 +284,7 @@ window.dropInPlaceMixin = {
         this.saveFile();
       },
       saveFile() {
-        console.log("About to save. These are the values? this.$data:", this.$data, "this.name", this.name);
+        //console.log("About to save. These are the values? this.$data:", this.$data, "this.name", this.name);
         //this.logThis();
 
         if (!this.isObject(this.file)) {
@@ -337,11 +338,11 @@ window.dropInPlaceMixin = {
             'mediatype','uploadopts'];
         }
          //savekeys.push('title');
-         console.log("We decided the keys were:", savekeys, "cus status:",this.status);
+         //console.log("We decided the keys were:", savekeys, "cus status:",this.status);
          var me = this;
          savekeys.forEach(function(key) {
             fd.append(key,me[key]);
-            console.log("Key:",key,"me[key]",me[key]);
+            //console.log("Key:",key,"me[key]",me[key]);
           });
         //this.params.action='typedprofileupload';
         /*
@@ -351,7 +352,7 @@ window.dropInPlaceMixin = {
         */
         //fd.append('desc',this.desc);
         fd.append('extra',JSON.stringify(['url']));
-        console.log("In drop-inplace Save, URL:", this.saveurl,"; FD:", afd(fd));
+        //console.log("In drop-inplace Save, URL:", this.saveurl,"; FD:", afd(fd));
         //var me = this;
         axios.post(this.saveurl,fd).
           then( response=> { console.log("File Upload Save Response:",response.data);
