@@ -18,12 +18,15 @@ Embeddeds have the convention that the
 
 -->
 <template>
-  <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
+  <div class="drop display-inline align-center" @click.stop="fiClicked($event,'img')" 
+       @dragover.prevent @drop="onDrop" >
       <delete-x data-tootik="Delete This?"></delete-x>
-      <div class=" align-center img-wrapper "  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
-        <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click="fiClicked($event,'fi')">
-        <img :src="url || defaulturl" alt="" class="img-upload" @clicked="fiClicked($event,'img')"/>
-  </div>
+      <div class=" align-center img-wrapper "  data-tootik="Click or Drop your profile image here" @click.stop="fiClicked($event,'fi')">
+        <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click.stop="fiClicked($event,'fi')">
+        <img :src="url || defaulturl" alt="" class="img-upload" @click.stop="fiClicked($event,'img')"/>
+      </div>
+      <!--
+          -->
   </div>
 </template>
 

@@ -39,8 +39,7 @@ Vue.component('module-item', {
   computed: {
     isFolder: function () {
       return this.model && this.model.children &&
-        (
-        this.model.children.length
+        this.model.children.length;
     },
     nodeClass: function() {
       return {

@@ -43,6 +43,15 @@ window.Vue.directive('atts', {
 });
 
 
+/// Just to not break the app when v-validate is not installed
+window.Vue.directive('validate', {
+  bind: function (el, binding, vnode) {
+    return;
+  },
+});
+
+
+
 //
 //////////////  Mixins //////////
 var formatMixin = {
@@ -373,6 +382,7 @@ window.controlMixin = controlMixin;
 
 
 var vValidatorMixin = {
+/*
   methods: {
     getMyError: function(vmId) { //Checks errors & only reports for THIS input
       if ((!this.errors || typeof this.errors !== 'object') || !this.errors.items.length) {
@@ -410,6 +420,7 @@ var vValidatorMixin = {
     return errmsgobj;
     }
   }
+*/
 };
 
 window.vValidatorMixin = vValidatorMixin;
@@ -586,6 +597,7 @@ var pinputMixin = {
     },
     savesubmit(event,arg) {
       console.log("This errors:",this.errors,"this vrule:",this.vrule, "this._uid:", this._uid);
+      /*
       var errobj = this.getMyFormattedError(this._uid);
       if (errobj) {
         console.log("In savesubmit, errorobj:",errobj,"this.error_class:",this.error_class,"thiserror_msg",this.error_msg);
@@ -593,6 +605,7 @@ var pinputMixin = {
       }
 
       console.log("Trying to save new data w. pinput/el:",this.value, "For this event:",event,"With this arg:",arg);
+      */
       if (this.stopProcessing()) return;
       if (this.formatout) {
         this.value = this[this.formatout](this.value);
@@ -770,7 +783,7 @@ window.inputMixin = {
       catch(defaxerr);
     },
     savesubmit(event,arg) {
-      this.getMyFormattedError();
+      //this.getMyFormattedError();
       console.log("This errors:",this.errors,"this vrule:",this.vrule);
       console.log("Trying to save new data w. input/input:",this.value, "For this event:",event,"With this arg:",arg);
       //console.log ("Save submit event",event,"Arg:",arg);
@@ -1781,7 +1794,7 @@ window.Vue.component('data-label-pair', {
         }
       }
       if (this.input_params.name === 'facebook_url') {
-        console.log("pair-wrap: this#data:", this.$data,"this.params:", this.params,"this.input_params:", this.input_params);
+        //console.log("pair-wrap: this#data:", this.$data,"this.params:", this.params,"this.input_params:", this.input_params);
       }
     },
   },

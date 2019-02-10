@@ -85,7 +85,7 @@ export default {
       leaf: false,
       singleClick: true, //To distinguish between single-click & dbl
   //    treenode:[],
-    }
+    };
   },
 
   mounted: function() {
@@ -144,7 +144,7 @@ export default {
       return this.treenodeHasSelected(this.treenode);
     },
     allSelected: function() {
-      r
+    },
 
   },
   methods: {
@@ -184,7 +184,6 @@ export default {
      // }
       //if (this.value && Array.isArray(this.value)) {
        // this.treenode={nodes:this.value};eturn this.treenodeAllSelected(this.treenode);
-    }
       //} else if (this.isObject(this.value)) {
         //this.treenode = Object.values(this.value);
         //this.treenode={nodes:this.value};
@@ -322,8 +321,6 @@ export default {
     checkboxClick: function () {
       console.log("we have clicked the checkbox");
       var mytop=this.getTop();
-      //mytop.whereAmI();
-      
       if (!this.edit) {
         console.log("Not Editable");
         return;
@@ -333,30 +330,8 @@ export default {
       this.$emit('update:treenodeprop', this.treenode);
       if (this.ajax) { //Submit & refresh...
       }
-      //var me = this;
-      //this.recursivelyToggle(this.treenode, this.allSelected);
     },
-    /*
-    processClick: function () {
-      console.log("Single click on Module tree");
-      if (this.isFolder) {
-        var me = this;
-        setTimeout(function(){
-          if (me.singleClick) {
-            me.open = !me.open
-          }
-          //me.singleClick = true;
-        }, 500);
-      } else {  // It's a leaf-point - add it
-        var el = this.$el;
-        if (this.treenodeHasSelected( this.treenode)) {
-        } else {
-          this.appendPointRow(this.treenode.casepoint);
-        }
-      }
-    },
-    */
-  }
+  },
 }
 </script>
 

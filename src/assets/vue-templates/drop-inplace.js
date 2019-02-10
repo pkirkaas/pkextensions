@@ -2,6 +2,7 @@
  * The shared mixin for "drop-inplace" components
  */
 require("./vue-data-components.js");
+
 window.dropInPlaceMixin = {
     name: 'drop-inplace',
     props: ['params', 'instance'], 
@@ -10,8 +11,8 @@ window.dropInPlaceMixin = {
       //console.log("Data/drop-inplace");
               
       return {
-      //defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
-      defaulturl: null,//  "/mixed/img/generic-avatar-1.png" ,
+      defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
+      //defaulturl: null,//  "/mixed/img/generic-avatar-1.png" ,
       status: this.params.status || '',//'extant' - part of existing object, need only model & ID
       file: null,
       title:  this.params.title || 'upload',
@@ -63,9 +64,10 @@ window.dropInPlaceMixin = {
       },
     },
     mounted: function() {
+      console.log("Mounted");
       this.$nextTick(()=>{
         //console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
-        //this.defaulturl  = this.$options.extraoptions.defaulturl;
+        this.defaulturl  = this.$options.extraoptions.defaulturl;
         this.mediatype  = this.$options.extraoptions.type;
         var fields = Object.keys(this.$data);
         this.setData(this,fields,this.params,this.instance);
@@ -96,11 +98,14 @@ window.dropInPlaceMixin = {
           }
         }
       },
+      testHandler(event) {
+        console.log("Clicked on the test handler");
+      },
       fiClicked(event, data) {
 
         //if (event.target === "img.img-upload") {
-         //console.log ("Target was ",event.target," send to file input");
-         // $(event.target).cousin('input.click-target','div.drop').trigger('click');
+//         console.log ("Target was ",event.target," send to file input");
+         $(event.target).cousin('input.click-target','div.drop').trigger('click');
         ////}
         //console.log("The input got the click, ev:",event,"data:", data);
       },
@@ -248,7 +253,7 @@ window.dropInPlaceMixin = {
         }
       },
       onDrop: function(e) { //Just want to upload & save it right away
-        //console.log("Just dropped something - what?",e);
+        console.log("Just dropped something - what?",e);
         e.stopPropagation();
         e.preventDefault();
         var files = e.dataTransfer.files;
