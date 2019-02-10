@@ -230,21 +230,44 @@ abstract class PkAjaxController extends PkController {
    * Sets an instance field (or array of fields?)
    * @param id = the instance ID
    * @param model = the model class
+   * //Old but supported
    * @param modfield - the field to set
    * @param value - the value to set it to
+   * 
+   * @param assoc array values [key=>value] array
    * @return - the instance attributes, with $instance[setfield] = $setfield;
    * 
    */
   public function set() {
+    pkdebug("Enter set, data:",$this->data);
     $model = $this->data['model'];
     $id = $this->data['id'];
-    $modfield =  $this->data['modfield'];
-    $value = keyVal('value',$this->data,'');
+    $modfield = null;
+    if (array_key_exists('modfield',$this->data)) {
+      $modfield = keyVal('modfield',$this->data);
+      $values =  [$modfield, keyVal('value',$this->data,'')];
+    } else  {
+      $values = keyVal('values',$this->data);
+    }
     $instance = $model::find($id);
-    $instance->$modfield = $value;
+    if (ne_string($values)) {
+      $values = json_decode($values,1);
+    }
+    if (ne_array($values)) {
+      foreach ($values as $key=>$value) {
+        $instance->$key = $value;
+      }
+      $instance->save();
+    }
+    if ($modfield) {
+      $instance->modfield=$modfield;
+    }
     $instance->save();
-    $instance->modfield=$modfield;
-    return $this->success($instance);
+    pkdebug("Save this:",$instance->fetchAttributes());
+    $instance = $model::find($id);
+    pkdebug("Returned this:",$instance->fetchAttributes());
+
+    return $this->success($instance->fetchAttributes());
   }
 
   /** Simpler than attributes (below) - just for 1 model, 1 instance, uses

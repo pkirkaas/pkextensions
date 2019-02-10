@@ -11,6 +11,7 @@ Feb 2019 - So Fix
       model, id, fetchargs, deleteargs, saveargs  
         if have name, assume mapping of url to {name}_url, don't need fetch args
 
+Embeddeds have the convention that the 
   
 
 -->
@@ -55,18 +56,21 @@ export default {
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       url: '',//this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
       attribute: this.params.attribute || null,//the relation name, like avatar
-      name: this.params.name || null,//the relation name, like avatar
-      method: this.params.attribute || 'fetchattributes',
+      relation: this.params.relation || null, // same as attribute,
+      name: this.params.name || null,//the or relation name, like avatar
+      method: this.params.method,
       foreignkeyname: this.params.foreignkeyname,
       id: this.params.id || null, //The id of the uploaded object
       model: this.params.model || null, //The upload model 
       ownerid: this.params.ownerid,
       ownermodel: this.params.ownermodel,
       action: this.params.action,
-      method: this.params.method,
       saveurl: this.params.saveurl || '/ajax/upload',
+      seturl: this.params.saveurl || '/ajax/set',
       fetchurl: this.params.fetchurl || '/ajax/fetchattributes',
       deleteurl: this.params.deleteurl || '/ajax/delete',
+      embedded: this.params.embedded,
+      degree: 0,// 0 => embedded, 1 => 1 to 1,, 2=>1 to many 
       };
     },
     computed: {
@@ -90,33 +94,33 @@ export default {
         console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
         var fields = Object.keys(this.$data);
         this.setData(this,fields,this.params,this.instance);
+        this.adjustData();
         this.logThis();
         this.initData();
         //this.setUrl();
         console.log("In drop-inplace mounted, data:", this.$data);
       });
     },
-
-/*
- * defaxerr
-    computed: {
-      chain : function() {//Just the chain of params leading to info
-         return 
-    },
-      */
     methods: {
-      /*
-      setUrl() {
-        // Totally NOT general - specific for now
-        axios.post('/ajax',{action:'url',name:this.title,
-                         model:this.model,id:this.id}).then(result=>{
-            console.log("Result from getting URL",result);
-            this.url = result.data.url || this.defaulturl;
-            this.status = result.data.status;
-            console.log("This.url now: ", this.url);
-          }).catch(defaxerr);
-        },
-    */
+      adjustData() {//Based on initial data settings, adjust others
+        if (!this.attribute && !this.relation) {
+          this.degree=0;
+          this.embedded = true;
+          if (this.name && isEmpty(this.urlmap)) {
+            this.urlmap = {url:this.name+'_url'};
+          }
+        } else {
+          if (this.relation) {
+            this.attribute = this.relation;
+          } else if (this.attribute) {
+            this.relation = this.attribute;
+          }
+          this.embedded = false;
+          if (!this.degree) {
+            this.degree = 1;
+          }
+        }
+      },
       fiClicked(event, data) {
         //if (event.target === "img.img-upload") {
           //console.log ("Target was ",event.target," send to file input");
@@ -125,13 +129,30 @@ export default {
         //console.log("The input got the click, ev:",event,"data:", data);
       },
       delete() {
+        if (this.embedded) { //Embedded - don't delete object, just field
+          var dargs = {
+            model: this.model,
+            id: this.id,
+            values: {
+              [this.name]:null,
+            },
+          };
+
+          axios.post(this.seturl, dargs).
+            then(response=>{console.log("Seems to have deleted entry successfully:",
+                  response);
+                  this.setEmbeddedData(response.data);
+            }).catch(defaxerr);
+          return;
+        }
         if (this.status==='extant') {
           axios.post("/ajax", {
                 model:this.model,
                 id:this.id,
                 action:'execute',
                 args: [this.title],
-                method:'deleteEntry'}).then(response=>{console.log("Seems to have deleted entry successfully:",
+                method:'deleteEntry'}).
+                   then(response=>{console.log("Seems to have deleted entry successfully:",
                    response);
                    this.initData(response.data);
                    this.url = response.data.url;
@@ -160,15 +181,33 @@ export default {
         //console.log("This is:",currvals);
         return currvals;
       },
+      setEmbeddedData(data) {
+        data = this.asObject(data);
+        var url = data[this.urlmap.url];
+        if (!url)  {
+          url = this.defaulturl;
+        }
+        this.url = url;
+        return;
+      },
+
       initData(data) { //Data may be empty or have all we need
-        
         console.log ("Init it start data:", data);
         var me = this;
-        var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
+        if (this.embedded) {
+          axios.post(this.fetchurl, {model:this.model,id:this.id,keys:[this.urlmap.url]}).
+            then(response=> {
+              console.log("Response data for set url",response.data);
+              this.setEmbeddedData(response.data);
+          }).catch(defaxerr);
+          return;
+        } else {
+          var keystoset = ['attribute', 'title', 'method', 'args','mediatype','id','url','model'];
+        }
         var searchkeys1 =['model','id','title','attribute'];
         var searchkeys2 =[ 'ownermodel','ownerid','title','attribute'];
         //Check data is object & not null
-        if ((typeof data !== 'object') || (data === null)) { //Make an empty data object
+        if (!this.isObject(data)) {
           data = {};
         }
         if (!this.attribute) { //Embedded - direct fetch
@@ -181,25 +220,6 @@ export default {
               keys:[att],
             };
           }
-          axios.post(this.fetchurl,this.fetchargs).
-          then(response=> {
-            //console.log("Search Results:", response);
-            var rdata = response.data;
-            console.log("Search Results:", response.data);
-            var url =rdata[this.urlmap.url]; 
-            if (!url) { //No Match
-              this.url = "/mixed/img/generic-avatar-1.png" ;
-              return;
-            }
-            this.url = url;
-            return;
-
-            //console.log("Keystoset?",keystoset);
-            //keystoset.forEach(function(key) {
-             // me[key] = rdata[key];
-            //});
-          }).
-          catch(defaxerr);
         }
        //Check if we have enough to query
         var all = true;
@@ -262,7 +282,7 @@ export default {
         this.createFile(files[0]);
       },
       createFile(file) {
-        if (!file.type.match('image.*')) {
+        if (file && !file.type.match('image.*')) {
           alert('Select an image');
           return;
         }
@@ -271,7 +291,6 @@ export default {
         var reader = new FileReader();
         var blobreader = new FileReader();
         var vm = this;
-
         blobreader.onload = function(e) {
           vm.imgblog = e.target.result;
         }
@@ -284,9 +303,50 @@ export default {
         this.saveFile();
       },
       saveFile() {
-        console.log("About to save. These are the values?");
-        this.logThis();
+        console.log("About to save. These are the values? this.$data:", this.$data, "this.name", this.name);
+        //this.logThis();
+
+        if (!this.isObject(this.file)) {
+          console.error("Somehow trying to save non-existant file");
+          return;
+        }
         var fd = new FormData();
+        fd.append('file',this.file,this.file.name);
+        if (this.embedded) {
+          fd.append('model',this.model);
+          fd.append('id',this.id);
+          fd.append('values',JSON.stringify({[this.name]:"1"}));
+          /*
+          var args = {
+            model: this.model,
+            id : this.id,
+            values: {[this.name]:"1"},
+            fd:fd,
+          };
+    */
+          /*
+          axios.post(this.seturl,args,
+            header: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+          axios({method:"post",
+                url:this.seturl,
+                data:fd,
+                header: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'multipart/form-data',
+                },
+    */
+          axios.post(this.seturl,fd,
+            { header: {
+              'Accept': 'application/json',
+              'Content-Type': 'multipart/form-data',
+            }, }).then(response=>{
+            this.setEmbeddedData(response.data);
+          }).catch(defaxerr);
+          return;
+        }
         if (this.status==='extant') {
           ///var savekeys = ['model','id','name'];
           //var savekeys = ['model','id','chain', 'title', 'name'];
@@ -311,7 +371,6 @@ export default {
         */
         //fd.append('desc',this.desc);
         fd.append('extra',JSON.stringify(['url']));
-        fd.append('file',this.file,this.file.name);
         console.log("In drop-inplace Save, URL:", this.saveurl,"; FD:", afd(fd));
         //var me = this;
         axios.post(this.saveurl,fd).

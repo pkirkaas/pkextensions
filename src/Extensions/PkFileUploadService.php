@@ -241,6 +241,7 @@ class PkFileUploadService {
    * @return string relative path or filename 
    */
   public static function intake($params = []) {
+    pkdebug("Params:",$params);
     $url = $params['url'] ?? null;
     if ($url) { #Relative or absolute {
       if (!($params['uploadurl']??null)) { #Either external URL or local file
@@ -255,9 +256,16 @@ class PkFileUploadService {
     }
     #Imported/uploaded file. Any validation/transformation/resizing?
     $sfile = static::sprocess($sfile,$params);
-    $fname = uniqid("tfr-",1).noextbase($sfile->getOriginalName()).
+    /*
+    $fname = uniqid("tfr-",1).noextbase($sfile->getClientOriginalName()).
         '.'.$sfile->guessExtension();
-    $path = $sfile->store('public',$fname);
+     * 
+     */
+    $fname = uniqid("tfr-",1);//.noextbase($sfile->getClientOriginalName()).
+        //'.'.$sfile->guessExtension();
+    $path = $sfile->store('public/'.$fname);
+    $surl = Storage::url($path);
+    pkdebug("surl", $surl);
     return $path;
     #Validated & transformed, in tmp dir - rename & move to storage dir
   }
@@ -314,6 +322,7 @@ class PkFileUploadService {
    */
   public static function supload($params=[]) {
     $allFiles = request()->allFiles();
+    pkdebug("All files:", $allFiles, "PARAMS",$params);
     $attribute = keyVal('attribute', $params);
     if ($attribute) {
       $file = $allFiles[$attribute]??null;

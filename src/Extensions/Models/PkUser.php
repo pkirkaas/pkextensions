@@ -163,7 +163,7 @@ class PkUser extends PkModel
       unset($this->name);
     }
     $lastatts = $this->getAttributes();
-    pkdebug("Saving user - start w. ",$iniatts,"end with ",$lastatts);
+    //pkdebug("Saving user - start w. ",$iniatts,"end with ",$lastatts);
     return parent::save($args);
   }
 
@@ -173,10 +173,10 @@ class PkUser extends PkModel
   }
   /** Have to overrisde for polymormphic types */
   public function delete($cascade = true) {
-    pkdebug("About to try to delete myself & my polys");
+    //pkdebug("About to try to delete myself & my polys");
     $loggedin = $this->isLoggedIn();
     $res = parent::delete($cascade);
-    pkdebug("Wow, the general result of user delete wasl ",$res);
+    //pkdebug("Wow, the general result of user delete wasl ",$res);
     if ($loggedin) {
       Auth::logout();
     }
@@ -237,15 +237,15 @@ class PkUser extends PkModel
      * @return boolean
      */
     public static function auth(PkUser $user = null) {
-      pkdebug("User Type:".typeOf($user).'; ID: '. $user->id);
+      //pkdebug("User Type:".typeOf($user).'; ID: '. $user->id);
       if (!static::instantiated($user)) {
         $user = Auth::user();
         pkdebug("Not Instantiated? Get Auth: User Type:".typeOf($user).'; ID: '. $user->id);
       }
       $me = Auth::user();
-      pkdebug("Me Type:".typeOf($me).'; ID: '. $me->id);
+      //pkdebug("Me Type:".typeOf($me).'; ID: '. $me->id);
       if ($me != $user && !$me->isAdmin()) return  false;
-      pkdebug("About to return User");
+      //pkdebug("About to return User");
       return $user;
     }
 
@@ -269,7 +269,7 @@ class PkUser extends PkModel
       if (!$ident) {
         $ident = Request::all();
       }
-      pkdebug("Ident:", $ident);
+      //pkdebug("Ident:", $ident);
       if (is_array($ident)) {
         $password = keyVal('password',$ident);
         $remember = keyVal('remember',$ident);
@@ -294,7 +294,7 @@ class PkUser extends PkModel
 
     /** Log in the user - remember if remember - true */
     public function login($remember = false) {
-      pkdebug("Logging in...");
+      //pkdebug("Logging in...");
       Auth::login($this,$remember);
       $me = Auth::user();
       if (!$me->logins) {
