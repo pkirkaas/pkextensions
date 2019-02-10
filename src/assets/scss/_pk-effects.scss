@@ -560,5 +560,46 @@ ul.triangle-tree li.leaf:before {
 }
 
 
+
+/*****   To show resumes in an iframe & overlay a link */
+// I don't know how to size an embed
+
+.upload-icon-label.embed {
+  position: relative;
+  top: -40px;
+}
+
+.upload-input.embed {
+  position: relative;
+  top: -30px;
+}
+
+$embed-height: 300px !default;
+$embed-width: 200px !default;
+a.embed-cover {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  height: $embed-height - 50px;
+  width: $embed-width;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  background-color: transparent;
+}
+.embed-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: $embed-height;
+  width: $embed-width;
+}
+iframe.doc,
+embed.doc {
+  width: 100%;
+  height: 100%;
+}
 /*
 */

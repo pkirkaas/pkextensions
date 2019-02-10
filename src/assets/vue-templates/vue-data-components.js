@@ -328,6 +328,18 @@ var utilityMixin = {
       //console.log(lbl+ " Current this values:",vals);
       return vals;
     },
+    fileType(mimetype) {
+      if (!mimetype || typeof mimetype !== 'string') return false;
+      if (mimetype.match('image.*')) {
+        return 'image';
+      }
+      if (mimetype.match('text.*|.*pdf|.*doc')) {
+        return 'doc';
+      }
+      return mimetype;
+    },
+
+    /** To divide arrays into equal units of subarrays */
     chunkArr: function(anarr,sz) {
       sz = sz || 2;
       return _.chunk(anarr,sz);

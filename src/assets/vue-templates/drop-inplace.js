@@ -1,36 +1,8 @@
-<!-- Drop & immediately upload, in place -->
-<!-- Default is images, but support PDF -->
-
-<!-- Since I clearly forgot -- I seem to have made this specifically for 
- separate uploaded/file/media objects, NOT to be included as part of just a 
-regular object, which sucks. 
-
-Feb 2019 - So Fix
-
-@params:
-  attribute: string: name of the relation, or null, an embedded file
-    if embedded, simple:
-      model, id, fetchargs, deleteargs, saveargs  
-        if have name, assume mapping of url to {name}_url, don't need fetch args
-
-Embeddeds have the convention that the 
-  
-
--->
-<template>
-  <div class="drop display-inline align-center" @dragover.prevent @drop="onDrop" >
-      <delete-x data-tootik="Delete This?"></delete-x>
-      <div class=" align-center img-wrapper "  data-tootik="Click or Drop your profile image here" @click="fiClicked($event,'fi')">
-        <input class="abs-hidden click-target" type="file" name="image" @change="onChange" @click="fiClicked($event,'fi')">
-        <img :src="url || defaulturl" alt="" class="img-upload" @clicked="fiClicked($event,'img')"/>
-  </div>
-  </div>
-</template>
-
-<script>
-//var app = new Vue({
-require ("./vue-data-components.js");
-export default {
+/* 
+ * The shared mixin for "drop-inplace" components
+ */
+require("./vue-data-components.js");
+window.dropInPlaceMixin = {
     name: 'drop-inplace',
     props: ['params', 'instance'], 
     mixins: [window.utilityMixin],
@@ -39,8 +11,7 @@ export default {
               
       return {
       //defaulturl: this.params.defaulturl ||  "/mixed/img/generic-avatar-1.png" ,
-      defaulturl:  "/mixed/img/generic-avatar-1.png" ,
-      image: '',
+      defaulturl: null,//  "/mixed/img/generic-avatar-1.png" ,
       status: this.params.status || '',//'extant' - part of existing object, need only model & ID
       file: null,
       title:  this.params.title || 'upload',
@@ -52,7 +23,7 @@ export default {
       urlmap:{},//What returned attribute to use for URL - default: {name}_url
 
       uploadopts: this.params.uploadopts | [],
-      mediatype: this.params.mediatype || 'image',
+      mediatype: this.params.mediatype,
       //chain: this.params.chain || [],
       
       //url: this.params.url ||  "/mixed/img/generic-avatar-1.png" ,
@@ -94,6 +65,8 @@ export default {
     mounted: function() {
       this.$nextTick(()=>{
         console.log("AS SOON AS MOUNTED: dnd.vue Mounted, Params:",this.params, "This.url:", this.url);
+        this.defaulturl  = this.$options.extraoptions.defaulturl;
+        this.mediatype  = this.$options.extraoptions.type;
         var fields = Object.keys(this.$data);
         this.setData(this,fields,this.params,this.instance);
         this.adjustData();
@@ -124,8 +97,9 @@ export default {
         }
       },
       fiClicked(event, data) {
+
         //if (event.target === "img.img-upload") {
-          //console.log ("Target was ",event.target," send to file input");
+         console.log ("Target was ",event.target," send to file input");
           $(event.target).cousin('input.click-target','div.drop').trigger('click');
         ////}
         //console.log("The input got the click, ev:",event,"data:", data);
@@ -281,11 +255,15 @@ export default {
       },
       onChange(e) {
         var files = e.target.files;
+        console.log("Change triggered - files?",files);
         this.createFile(files[0]);
       },
       createFile(file) {
-        if (file && !file.type.match('image.*')) {
-          alert('Select an image');
+        //if (file && !file.type.match('image.*')) {
+        if (file && (this.fileType(file.type) !== this.mediatype)) {
+          console.log("The file filetype: ",file.type,"this.fileType: ", this.fileType(file.type),
+          "this.mediatype:", this.mediatype);
+          alert('Select file of type '+this.mediatype);
           return;
         }
         this.file = file;
@@ -385,132 +363,5 @@ export default {
       },
     },
   }
-</script>
-  
-
-<style>
-  * {
-  font-family: 'Arial';
-  font-size: 12px;
-}
-.drop {
-    height: auto;
-    width: auto;
-}
-
-*,
-*:after,
-*:before {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  -webkit-touch-callout: none;
-}
-
-.abs-hidden {
-  position: absolute;
-  visibility: hidden;
-}
-
-/*
-html, body {
-	height: 100%;
-  text-align: center;
-}
-
-.btn {
-  background-color: #d3394c;
-  border: 0;
-  color: #fff;
-  cursor: pointer;
-  display: inline-block;
-  font-weight: bold;
-  padding: 15px 35px;
-  position: relative;
-}
-
-.btn:hover {
-  background-color: #722040;
-}
-
-input[type="file"] {
-  position: absolute;
-  opacity: 0;
-  z-index: -1;
-}
-*/
-
-.align-center {
-  text-align: center;
-}
-
-.helper {
-  /*
-  height: 100%;
-  */
-  display: inline-block;
-  vertical-align: middle;
-  width: 0;
-}
-
-.hidden {
-  display: none !important;
-}
-
-.hidden.image {
-  display: inline-block !important;
-}
-
-.display-inline {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-img.img-upload {
-  border: 1px solid #f6f6f6;
-  display: inline-block;
-  width: 200px;
-  height: auto;
-  /*
-  max-width: 200px;
-  max-height: 200px;
-  */
-}
-div.pk-dragndrop-container {
-  position: relative;
-  margin-left: auto;
-  margin-right: auto;
-  display: inline-flex;
-  border: #555 solid 1px;
-  border-radius: .5em;
-  padding: .5em;
-  background: #aaa;
-  text-align: center;
-}
-
-textarea.text-desc {
-  background: white;
-  border: solid #aaa 1px;
-  border-radius: 5px;
-  padding: .3em;
-  width: 200px;
-  height: 60px;
-}
-
-.img-wrapper {
-    position: relative;
-}
-
-div.drop {
-  width: auto;
-  /*
-  width: 200px;
-  height: auto;
-  */
-}
-
-
-</style>
 
 
