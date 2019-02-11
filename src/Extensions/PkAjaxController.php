@@ -227,6 +227,49 @@ abstract class PkAjaxController extends PkController {
     return $this->success($instance);
   }
 
+  /** Create  new instance, at least need model, & usually additional params
+   * @params:
+   *   model - string - PkModel name
+   *   foreign_model
+   *   foreign_key - value of the foreign key
+   *   foreign_key_name - if not default from the foreign model name
+   *   params - assoc array of key/values
+   * @return json of new instance or false
+   *   
+   */
+  public function newinstance() {
+    $model = request('model'); #A string
+    if (! ($modal instanceOf PkModel)) {
+      pkdebug("Failed Create [$model] not instance of PkModel");
+      return false;
+    }
+    $foreign_model = request('foreign_model');
+    $foreign_key_name = request('foreign_key_name');
+    $foreign_key = request('foreign_key'); // value
+    $paramarr = request('paramarr'); # An assoc array of keys=>values
+    if (!$paramarr || !is_array_assoc($paramarr)) {
+      $paramarr = [];
+    }
+    if ($foreign_model && $foreign_key) {
+      if (is_subclass_of($foreign_model, PkModel::class)) { //Instantiate
+        $parent=$foreign_model::find($foreign_key);
+        if (($parent instanceOf PkModel)) {
+          return $this->success($model::
+              createIn($parent,$paramarr,$foreign_key_name)->fetchAttributes());  
+        }
+      }
+      pkdebug ("FAILED to create - foreign_model [$foreign_model], 
+          foreign_key: [$foreign_key]");
+      return false;
+        ## Should check for relationship name, but now just assume the 
+        #default
+    } #Foreign model is not a PkModel name -  
+    if ($foreign_key_name && $foreign_key) {
+      $paramarr[$foreign_key_name]=$foreign_key;
+    }
+    return $this->success($model::Create($paramarr)->fetchAttributes());
+  }
+
   /** 
    * Sets an instance field (or array of fields?)
    * @param id = the instance ID

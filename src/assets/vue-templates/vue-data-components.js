@@ -1942,7 +1942,7 @@ Vue.component('delete-btn', {
     del: function() {
     
       var delfromdom=this.params.delfromdom;
-      if (delfromdom && !(typeof delfromdom === 'string')) {
+      if (delfromdom && (typeof delfromdom !== 'string')) {
         delfromdom = ".js-resp-row";
       }
       if (!this.params.model && this.params.classname) {
@@ -1970,6 +1970,47 @@ Vue.component('delete-btn', {
           $(this.$el).closest(delfromdom).remove();
         }
         //console.log("\nDelete Success w. response:\n", response);
+      }).catch(defaxerr);
+    }
+  }
+}); 
+
+//***************   Creat New Btn ****************** 
+// Minimum requires a model - Most cases the "foreign_model" & 'foreign_key", & 
+// perhaps some additional required info before creating. 
+// Good to have a reference to a parent or method to refresh after
+// creating
+// Maybe add optional mapping from the param names used to create 
+// the instance to the keys expected by the requestor
+Vue.component('new-btn', {
+  name: 'new-btn',
+  template: `
+   <div :class="btncls"
+      @click.stop="new()">
+      New</div>
+`,
+  props:['params'],
+  computed: {
+    btncls: function (){
+      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";}
+  },
+ 
+  methods: {
+    new: function() { // Make a new instance
+      var notify=this.params.notify; // A function or array of functions to call
+
+      var url = this.params.url || "/ajax/newinstance";
+      var params = {
+        model: this.params.model,
+        foreign_model: this.params.foreign_model,
+        foreign_key: this.params.foreign_key,
+        foreign_key_name: this.params.foreign_key_name,
+        paramarr:  this.params.paramarr,
+      };
+      axios.post(url,params).then(response=> {
+        //Apparent success - if 
+        console.log("Created new instance - refresh");
+        if (notify) notify();
       }).catch(defaxerr);
     }
   }

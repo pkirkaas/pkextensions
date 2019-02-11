@@ -50,6 +50,7 @@ Route::any('auth/logout', ['as' => 'auth_logout',
 //Ajax Routes for common PkAjaxController
 Route::any('ajax/delete', ['as' => 'ajax_delete', 'uses'=> 'AjaxController@delete']);
 Route::any('ajax/save', ['as' => 'ajax_save', 'uses'=> 'AjaxController@save']);
+Route::any('ajax/newinstance', ['as' => 'ajax_newinstance', 'uses'=> 'AjaxController@newinstance']);
 Route::any('ajax/upload', ['as' => 'ajax_upload', 'uses'=> 'AjaxController@upload']);
 Route::any('ajax/toggle', ['as' => 'ajax_toggle', 'uses'=> 'AjaxController@toggle']);
 Route::any('ajax', ['as' => 'ajax_index', 'uses'=> 'AjaxController@index']);
