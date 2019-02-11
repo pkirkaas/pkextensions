@@ -239,9 +239,9 @@ abstract class PkAjaxController extends PkController {
    */
   public function newinstance() {
     $model = request('model'); #A string
-    if (! ($modal instanceOf PkModel)) {
+    if (! $model ) {
       pkdebug("Failed Create [$model] not instance of PkModel");
-      return false;
+      return $this->error("Failed Create [$model] not instance of PkModel");
     }
     $foreign_model = request('foreign_model');
     $foreign_key_name = request('foreign_key_name');
@@ -260,7 +260,8 @@ abstract class PkAjaxController extends PkController {
       }
       pkdebug ("FAILED to create - foreign_model [$foreign_model], 
           foreign_key: [$foreign_key]");
-      return false;
+      return "FAILED to create - foreign_model [$foreign_model], 
+          foreign_key: [$foreign_key]";
         ## Should check for relationship name, but now just assume the 
         #default
     } #Foreign model is not a PkModel name -  

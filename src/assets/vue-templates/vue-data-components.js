@@ -1975,6 +1975,21 @@ Vue.component('delete-btn', {
   }
 }); 
 
+
+
+Vue.component('tst-btn', {
+  name: 'new-btn',
+  template: `
+   <div @click="recieveClick(event)">
+      Test</div>
+`,
+  methods: {
+    recieveClick: function(event) {
+      console.log("I recieved a click event from", event);
+    },
+  },
+});
+
 //***************   Creat New Btn ****************** 
 // Minimum requires a model - Most cases the "foreign_model" & 'foreign_key", & 
 // perhaps some additional required info before creating. 
@@ -1985,18 +2000,14 @@ Vue.component('delete-btn', {
 Vue.component('new-btn', {
   name: 'new-btn',
   template: `
-   <div :class="btncls"
-      @click.stop="new()">
+   <div class= " pkmvc-button inline m-v-1 m-h-1"
+      @click.stop="newinstance()">
       New</div>
 `,
   props:['params'],
-  computed: {
-    btncls: function (){
-      return this.params.btncls || " pkmvc-button inline m-v-1 m-h-1";}
-  },
  
   methods: {
-    new: function() { // Make a new instance
+    newinstance: function() { // Make a new instance
       var notify=this.params.notify; // A function or array of functions to call
 
       var url = this.params.url || "/ajax/newinstance";
