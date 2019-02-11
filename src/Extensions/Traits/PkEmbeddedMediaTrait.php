@@ -48,7 +48,7 @@ trait PkEmbeddedMediaTrait {
       $append = substr($key,$fieldend);
       $method = static::$entry_appends[$append] ?? null;
       $url = $this->$method($field);
-      pkdebug("Field: [$field], append: [$append], method: [$method], url: [$url]");
+      //pkdebug("Field: [$field], append: [$append], method: [$method], url: [$url]");
       return $url;
     }
     return parent::__get($key);
@@ -56,7 +56,7 @@ trait PkEmbeddedMediaTrait {
 
   public function __set($key,$val) {
     if (in_array($key,array_keys(static::getMediaEntries()),1)) {
-       pkdebug("KEY: [$key], VAL is: ",$val);
+       //pkdebug("KEY: [$key], VAL is: ",$val);
       if (!$val) {
         $this->deleteEntry($key);
         parent::__set($key,null);
@@ -68,7 +68,7 @@ trait PkEmbeddedMediaTrait {
         } else if (ne_string($val)) {
           $params=['url'=>$val];
         } else if (is_array($val)){
-          pkdebug("val is: ",$val);
+          //pkdebug("val is: ",$val);
           $params = $val;
         } else {
           $params = [];
@@ -80,7 +80,7 @@ trait PkEmbeddedMediaTrait {
         if (ne_string($result)) {
           parent::__set($key,$result);
           $this->save();
-          pkdebug("Leaving set - key: [$key], value of this->key:",$this->$key);
+          //pkdebug("Leaving set - key: [$key], value of this->key:",$this->$key);
           return;
           /*
           $this->$key = $result;
@@ -110,7 +110,7 @@ trait PkEmbeddedMediaTrait {
     }
     $url = Storage::url($segment);
     //$url = PkFileUploadService::sfile_path($segment,$subdir);
-    pkdebug("The generated URL: [$url]");
+    //pkdebug("The generated URL: [$url]");
     return $url ?? $default;
   }
 
@@ -140,7 +140,7 @@ trait PkEmbeddedMediaTrait {
   public function createEntry($field,$params=[]) {
     $this->deleteEntry($field);
     $result = PkFileUploadService::intake($params);
-    pkdebug("Result is:",$result);
+    //pkdebug("Result is:",$result);
     if (ne_string($result)) {
       $this->$field = $result;
     } else { 

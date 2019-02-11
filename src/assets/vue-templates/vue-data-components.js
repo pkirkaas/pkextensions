@@ -1767,6 +1767,9 @@ window.Vue.component('data-label-pair', {
   },
   mounted: function() {
     this.updateData();
+    if (this.params.model==="\\App\\Models\\BouncerReference") {
+      console.log("This.params:",this.params);
+    }
     //console.log("After mounted pair, data:",this.$data,"; params:", this.params,"; instance:", this.instance);
   },
   methods: {

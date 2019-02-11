@@ -9,6 +9,9 @@
 namespace PkExtensions\Traits;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Models\PkUser;
+use Illuminate\Database\Eloquent\Builder;
+use PkExtensions\PkCollection;
+use App\Models\BouncerReference;
 
 /**
  *
@@ -39,7 +42,7 @@ trait PkAjaxQueryTrait {
    * Only need 'ownermodel', 'ownerid', & 'attribute'(relationship)
    * @return array - results - or string with error message
  */
-  public function fetchAttributes($data) {
+  public function traitFetchAttributes($data) {
     if (!$data) {
       return [];
     }
@@ -47,26 +50,37 @@ trait PkAjaxQueryTrait {
       return "Invalid data type of data: ".typeOf($data);
     }
     //PkDebug("Enter Fetchattrures with data:", $this->data, "Request Method:", $_SERVER['REQUEST_METHOD']);
-    $obj=null;
     $model = keyVal('model',$this->data);
+    //$bn = basename($model);
+    //pkdebug ("basename of [$model] is: [$bn]");
+    $show = (basename($model) == "BouncerReference");
+    if ($show) pkdebug("Data", $data);
     $id = keyVal('id',$this->data);
     $foreign_key = keyVal('foreign_key',$this->data);
     $foreign_model = keyVal('foreign_model',$this->data);
     $relationship  = keyVal('relationship',$this->data);
+    $searchkeys  = keyVal('searchkeys',$this->data);
     $extra = restoreJson(keyVal('extra',$this->data));
     $keys = restoreJson(keyVal('keys',$this->data));
+    $orderby = keyVal('orderby',$this->data);
     if (ne_string($keys)) {
       $keys=[$keys];
     }
     if (!ne_string($extra)) {
       $extra = [$extra];
     }
-    if (is_array($keys) && !in_array('id',$keys,1)) {
-      $keys[]='id'; #Could be one for an instance, or list for PkCollection
+    if (!$searchkeys || !is_array($searchkeys)) {
+      $searchkeys = [];
+    }
+    if ($id && in_array('id',array_keys($searchkeys),1)) {
+      return "Error - id exists both as an independent parameter & part of searchkeys";
+    }
+    if ($id) {
+      $searchkeys['id']=$id;
     }
     #MINIMUM need either 'model' OR ALL OF foreign_model, foreign_key & relationship
     if (!$model && !($foreign_model && $foreign_key && $relationship)) {
-        return $this->error(['msg'=>"Insufficient parameters","params"=>$this->data]);
+        return "Insufficient parameters: ".json_encode(data);
     }
     if ($model) {
       if ($foreign_key && $foreign_model) {
@@ -74,60 +88,29 @@ trait PkAjaxQueryTrait {
       } else {
         $builder = $model::query();
       }
-      if ($id) {
-        if (is_scalar($id)) {
-          $builder->where('id',$id);
-        } else if (is_array_idx($id)) {
-          $builder->whereIn('id', $id);
-        } else {
-          return $this->error("Invalid type for 'id': ".typeOf($id));
-        }
-      } #We have the builder - now do we have any searches/filters? 
-      
-      if (is_array_assoc($searchkeys)) {
-        foreach ($searchkeys as $skey=>$sval) {
-          if (is_array_idx($sval)) {
-            $builder->whereIn($skey,$sval);
-          } else if (is_simple($sval)) {
-            $builder ->where($skey,$sval);
-          } else {
-            return $this->error("Invalid type for search value: ".typeOf($sval));
-          }
-        }
-      } #Done with filters for now - orderBy?
-      
-      $orderby = keyVal('orderby',$this->data);
-        } else if ($searchkeys){
-          $obj = $model::multiWhere($searchkeys);
-        } else {
-          $obj = $model::all();
-        }
-        if ($obj instanceOf Builder) {
-          $obj = $obj->get();
-        }
-        if ((! $obj instanceOf PkModel) && $orderby) {
-          $obj = $obj->multiOrderby($orderby);
-        }
+      PkModel::multiWhere($searchkeys, $builder);
+      PkModel::multiOrderby($orderby, $builder);
+      $pkCollection = $builder->get();
     } else { #Don't know this model - search by owner & relationship
-      $ownermodel=keyVal('ownermodel', $this->data);
-      $ownerid = keyVal('ownerid',$this->data);
-      $attribute=keyVal('attribute',$this->data);
-      $obj = $ownermodel::find($ownerid)->$attribute;
-      $keys[]='totag';
-    }
-    //pkdebug("TypeOF obj:",typeof($obj));
-    if ($obj) {
-      if ($obj instanceOf Builder) {
-        $obj = $obj->get();
+      $sortaBuilder = $foreign_model::find($foreign_key)->$relationship();
+      if ($searchkeys && is_array_assoc($searchkeys)) {
+        $sortaBuilder = PkModel($searchKeys, $sortaBuilder);
       }
-      if (($obj instanceOf Collection) && (! $obj instanceOf PkCollection)) {
-        $obj = new PkCollection($obj);
-      }
-      //pkdebug("TypeOF obj AFTER Conv:",typeof($obj));
-      $atts = $obj->fetchAttributes($keys,$extra);
-      //pkdebug ("Rerting got atts of: ",$atts);
-      return $this->success($atts);
+      $sortaBuilder = PkModel::multiOrderby($orderby, $sortaBuilder);
+      $pkCollection = $sortaBuilder->get();
     }
-    return $this->success([]);
+    if (!($pkCollection instanceOf PkCollection) || !count($pkCollection)) {
+      //if ($show) pkdebug("No collection - data: ",$data,"pkCollection: ",$pkCollection);
+      return [];
+    }
+    #Now we hava a non-empty PkCollection of Eloquent instances
+    #Iterate through them & apply the extra keys & relationships to get
+    #the full data structure
+    $atts = $pkCollection->fetchAttributes($keys,$extra);
+    if ($id) { //Was only expectect data from a singe object
+      $atts = $atts[0];
+    }
+    if ($show) pkdebug ("Rerting got atts of: ",$atts);
+    return $atts;
   }
 }

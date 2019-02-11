@@ -6,6 +6,7 @@ use \PkExtensions\Models\PkModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use PkExtensions\PkCollection;
+//use PkExtensions\Traits\PkAjaxQueryTrait;
 use PkExtensions\PkException;
 use Illuminate\Database\Eloquent\Builder;
 use \Request as RequestFacade;
@@ -364,7 +365,7 @@ abstract class PkAjaxController extends PkController {
    * @return array - results
    */
   public function fetchattributes() {
-    $result = parent::fetchtAttributes($this->data);
+    $result = $this->traitFetchAttributes($this->data);
     if (is_array($result)) {
       return $this->success($result);
     } else {

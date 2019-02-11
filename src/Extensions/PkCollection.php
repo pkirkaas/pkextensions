@@ -26,6 +26,9 @@ class PkCollection extends Collection {
    public function fetchAttributes($keys=[],$extra=[]) {
      $retarr=[];
      foreach ($this as $instance) {
+       if (!$instance instanceOf PkModel) {
+         continue;
+       }
        $retarr[]=$instance->fetchAttributes($keys,$extra);
      }
      return $retarr;

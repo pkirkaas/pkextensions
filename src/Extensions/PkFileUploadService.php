@@ -241,7 +241,7 @@ class PkFileUploadService {
    * @return string relative path or filename 
    */
   public static function intake($params = []) {
-    pkdebug("Params:",$params);
+   // pkdebug("Params:",$params);
     $url = $params['url'] ?? null;
     if ($url) { #Relative or absolute {
       if (!($params['uploadurl']??null)) { #Either external URL or local file
@@ -265,7 +265,7 @@ class PkFileUploadService {
         //'.'.$sfile->guessExtension();
     $path = $sfile->store('public/'.$fname);
     $surl = Storage::url($path);
-    pkdebug("surl", $surl);
+    //pkdebug("surl", $surl);
     return $path;
     #Validated & transformed, in tmp dir - rename & move to storage dir
   }
@@ -322,7 +322,7 @@ class PkFileUploadService {
    */
   public static function supload($params=[]) {
     $allFiles = request()->allFiles();
-    pkdebug("All files:", $allFiles, "PARAMS",$params);
+    //pkdebug("All files:", $allFiles, "PARAMS",$params);
     $attribute = keyVal('attribute', $params);
     if ($attribute) {
       $file = $allFiles[$attribute]??null;
@@ -429,7 +429,7 @@ skuy    */
 'mediatype' => $type,
 //'attribute' => $attribute,
     ];
-    pkdebug("Returning from UploadService: ", $ret, "title', $title");
+    //pkdebug("Returning from UploadService: ", $ret, "title', $title");
     return $ret;
   }
 

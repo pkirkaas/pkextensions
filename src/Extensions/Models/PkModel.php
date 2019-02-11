@@ -1748,19 +1748,44 @@ class $createclassname extends Migration {
 
   /** Creates a builder searchin matches on multiple
    * key=>val conditions
-   * @param array $keyvals
+   * @param array $keyvals - the arrays to search with
+   * @param $builder null|Builder - If null, makes a new Builder from the 
+   * current Model, but can also add filters to an existing builder
+   * Don't want to check if it's instance of Builder cuz could be
+   * a relationship
+   * @return Builder|string error message
    */
-  public static function multiWhere($keyvals) {
-    $builder = static::query();
+  public static function multiWhere($keyvals,$builder=null) {
+    if (!$builder) {
+      $builder = static::query();
+    }
+    if (is_array_assoc($keyvals)) {
+      foreach ($keyvals as $skey=>$sval) {
+        if (is_array_idx($sval)) {
+          $builder->whereIn($skey,$sval);
+        } else if (is_simple($sval)) {
+          $builder ->where($skey,$sval);
+        } else {
+          return "Invalid type for search value: ".typeOf($sval);
+        }
+      }
+    }
+    /*
     foreach ($keyvals as $key=>$val) {
       $builder->where($key,$val);
     }
+     */
     return $builder;
   }
-  public static function multiOrderby($keyvals) {
-    $builder = static::query();
-    foreach ($keyvals as $key=>$val) {
-      $builder->orderBy($key,$val);
+
+  public static function multiOrderby($keyvals, $builder=null) {
+    if (!$builder) {
+      $builder = static::query();
+    }
+    if ($keyvals && is_array_assoc($keyvals)) {
+      foreach ($keyvals as $key=>$val) {
+        $builder->orderBy($key,$val);
+      }
     }
     return $builder;
   }
