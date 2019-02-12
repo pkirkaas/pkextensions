@@ -80,7 +80,7 @@ trait PkAjaxQueryTrait {
     }
     #MINIMUM need either 'model' OR ALL OF foreign_model, foreign_key & relationship
     if (!$model && !($foreign_model && $foreign_key && $relationship)) {
-        return "Insufficient parameters: ".json_encode(data);
+        return "Insufficient parameters: ".json_encode($data);
     }
     if ($model) {
       if ($foreign_key && $foreign_model) {
