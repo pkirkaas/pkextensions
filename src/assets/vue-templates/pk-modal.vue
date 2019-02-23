@@ -14,7 +14,7 @@ props: {params: {cname: content component name
  -->
 <template>
  <transition name="modal">
-  <div class='modal-backdrop'>
+  <div class='pkmodal-backdrop'>
     <div class='input-container'>
   <div class='modal-container input-container' id="input-container" 
        :class="modalparams.modalContainerCls">
@@ -265,7 +265,7 @@ export default {
     border-radius: .5em;
 
   }
-    .modal-backdrop {
+    .pkmodal-backdrop {
     position: fixed;
     top: 0;
     bottom: 0;
@@ -275,5 +275,6 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 500;
   }
 </style>

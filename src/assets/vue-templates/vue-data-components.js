@@ -1725,7 +1725,7 @@ window.Vue.component('ajax-textarea-el', {
 
 
 
-/**
+/** //Keeping for backwards compat. Moving to data-label-set
  * Wraps an input & label. 'params': 
     'input','input_params','lblcls', 'lblstyle','label','fldcls',
     'fldstyle','pair_wrap', 'pair_wrap_style'
@@ -1815,7 +1815,53 @@ window.Vue.component('data-label-pair', {
   }
 });
 
+/** Like data-label-pair above, but based on more experience. Takes 3 object
+ * params - 
+ *   vparams: for the value, 
+ *   lparams: for label, & 
+ *   wparams: for wrapper
+ * ?? Should the data only be inputs, or display also ?
+ * Default formatting - wrapper is flex (inline-flex?) - label is flex-grow: 0,
+ * value/input is flex-grow: 1
+ */
+window.Vue.component('value-label-set', {
+  name: 'data-label-set',
+  template: `
+  <div class="dls-wrap-cls" :class="wrap_cls" v-atts="wrap_atts" :style="wrap_style">
+    <div class="dls-lbl-cls" :class="lbl_cls" v-atts="lbl_atts" :style="lbl_style" v-html="label"></div>
+    <div class="dls-val-cls" :class="val_cls" v-atts="val_atts" :style="val_style" v-html="val"></div>
+  </div>
+   `,
+  /*
+  props: ['lparams', 'dparams','wparams'],
+  */
+  props: {
+    lparams:{type:Object, default: {},},
+    dparams:{type:Object, default: {},},
+    wparams:{type:Object, default: {},},
+  },
+  data: function() {
+    return {
+      wrap_cls: wparams.wrap_cls,
+      wrap_atts: wparams.wrap_atts,
+      wrap_style: wparams.wrap_style,
+      label: lparams.label,
+      lbl_atts:lparams.lbl_atts,
+      lbl_cls:lparams.lbl_cls,
+      lbl_style:lparams.lbl_style,
+      val: this.constructVal(vparams),
+      val_atts:vparams.val_atts,
+      val_cls:vparams.val_cls,
+      val_style:vparams.val_style,
+    };
+  },
+  methods: {
+    constructVal: function(vparams) { // Eventually do something clever
+      return vparams.val;
+    }
+  }
 
+});
 
 
 
