@@ -61,22 +61,34 @@ class PkLibConfig {
 
 }
 
+/** Does nothing - so can be used in place of a real object, and no references
+ * to it will cause an error. Has a single construction option - to return
+ * new instances of itself so references can be chained, or just return null.
+ */
 Class Undefined {
+  private $chain = true;
+  public function __construct($chain = true) {
+    $this->$chain = $chain;
+  }
 
   public function __get($x) {
-    return new Undefined();
+    if ($this->chain) {
+      return new Undefined();
+    }
+    return null;
   }
   public function __set($x, $y) {
   }
   public function __call($method, $args) {
-    return new Undefined();
+    if ($this->chain) {
+      return new Undefined();
+    }
+    return null;
   }
   public function __toString() {
     return '';
   }
-}
-
-/** This is for functions/methods that might legitimately return null or false
+}/** This is for functions/methods that might legitimately return null or false
  * without failing - an instance of Failure can be returned instead. Like,
  * if you want the value of a key in an array - it might legitimaly be false or
  * null, a valid return - but if the key doesn't exist, it's a failure, return
