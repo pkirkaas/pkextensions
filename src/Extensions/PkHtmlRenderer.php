@@ -1439,6 +1439,7 @@ class PkHtmlRenderer extends PartialSet {
     'valAtts' => [],
     'critAtts' => [],
     'valType' => 'text',
+    'comptype' => 'numeric',
     'critType' => 'select',
     'label' => '',
     'valVal' => null,
@@ -1447,6 +1448,7 @@ class PkHtmlRenderer extends PartialSet {
 
     ];
 
+pkdebug("Params:",$params);
     $appendableOpts = ['wrapClass', 'labelClass', 'critClass', 'valClass'];
     $tmpOpts = [];
     foreach ($appendableOpts as $apOpt) {
@@ -1457,6 +1459,8 @@ class PkHtmlRenderer extends PartialSet {
     }
 
     $params = array_merge($defaults, $params);
+    $comptype = $params['comptype'];
+    $noval = ($comptype === 'exists') || ($comptype === 'boolean');
     $basename = keyVal('basename', $params);
     $params['critname'] = keyVal('critname', $params, $basename.'_crit');
     $params['valname'] = keyVal('valname', $params, $basename.'_val');
@@ -1475,7 +1479,10 @@ class PkHtmlRenderer extends PartialSet {
         //$this->div($params['label'], $params['labelClass']);
         $this->rawcontent($params['label']);
         $this->rawcontent(PkForm::select($params['critname'],$params['criteriaSet'], $params['critVal'], $params['critAtts']));
+
+if (!$noval) {
         $this->rawcontent(PkForm::text($params['valname'], $params['valVal'], $params['valAtts']));
+}
       $this->RENDERCLOSE();
     $this->RENDERCLOSE();
 

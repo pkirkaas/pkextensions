@@ -177,7 +177,11 @@ trait BuildQueryTrait {
    */
 
   public static $queryFieldDefCacheKey = 'baseKeyedQueryTableFieldDefs';
-  /** Gets the flattened array to use for building migration code */
+  /** Gets the flattened array to use for building migration code table creation
+   * Interestingly, the keys of this array will the the keys of interest in the 
+   POSTed search data, so we can use them to filter the POST data only for
+   real criteria
+  */
   public static function getTableFieldDefsExtraBuildQuery() {
     $fqd = static::getFullQueryDef();
     $fieldDefSet = [];
@@ -188,6 +192,15 @@ trait BuildQueryTrait {
     //return call_user_func_array('array_merge', $idxArr);
     if (!is_array($fieldDefSet) || !count($fieldDefSet)) return [];
     return call_user_func_array('array_merge', $fieldDefSet);
+  }
+
+  /** Takes a dirty array (like  POST) and returns only those key/value
+   * sets that are usable in a query
+   * 
+   */
+  public static function filterToCritArr($dirtyArr) {
+    if (!is_array($dirtyArr)) return [];
+    return array_intersect_key($dirtyArr,static::getTableFieldDefsExtraBuildQuery());
   }
 
   /** This returns an array keyed by basename=>array of all defs for that basename
@@ -478,10 +491,45 @@ trait BuildQueryTrait {
     return false;
   }
 
+/** For Sting DB comparison. The "crit" I symbolize with is 
+     'string' => [
+          '0' => "Don't Care",
+          'LIKE' => 'Is',
+          '%LIKE' => 'Starts With',
+          'LIKE%' => 'Ends With',
+          '%LIKE%' => 'Contains',
+          but it's really the $val that needs to be
+          surrounded by %
+*/
+  public static function likify($val,$crit) {
+    if ($crit === 'LIKE') {
+      return $val;
+    }  else if ($crit === '%LIKE') {
+      return "%".$val;
+    } else if ($crit === 'LIKE%') {
+      return $val.'%';
+    } else if ($crit === '%LIKE%'){
+      return "%".$val."%";
+    }
+  }
+
   /** Just combines the 'buildQueryOnModel' method, executes it, then
-   * runs the filters on the collection.
+   * runs the filters on the collection.  If there is no query set, but in
+   * a POST, use it to buildl query
+   *
+   *ALL WRONG TRY - QUERY SETS ARE KEYED BY THEIR BASENAME
    */
-  public function executeSearch() {
+  public function executeSearch($querySets = null) {
+    /*
+    if ($querySets && is_array($querySets)) {
+      $this->querySets = static::filterToCritArr($querySets);
+    } else if (isPost()) {
+      $this->querySets = static::filterToCritArr(request()->all());
+    }
+    */
+
+//$adefs = static::getTableFieldDefsExtraBuildQuery();
+//pkdebug("The adefs collection",$adefs);
     $collection = $this->buildQueryOnModel()->get();
     //$sz = count($collection);
     //pkdebug("Just ran query from BQT: SZ: $sz");
@@ -643,6 +691,22 @@ trait BuildQueryTrait {
       //pkdebug("root is:", $root, "critset:", $critset);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
+        if ($comptype === 'string') {
+          $val = $critset['val'];
+          $crit = $critset['crit'];
+          $val = static::likify($val,$crit);
+          $query->where($root,'like',$val);
+          continue;
+        }
+
+
+
+
+
+
+
+
+
         if (method_exists($this, 'customCompare' . $comptype)) {
 
             #The $critset is roughly:
@@ -720,11 +784,8 @@ trait BuildQueryTrait {
             $critset['crit'], $critset['val'], $critset['param']);
       }
     }
-    /*
-    pkdbgtm("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
+    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
         "Query to SQL:", $query->toSql());
-     * 
-     */
     return $query;
   }
 
@@ -820,11 +881,14 @@ trait BuildQueryTrait {
   ## I want executeQuery to process 3 things - sql queries, PkMatch objs, and
   ## any custom filter methods defined on the Query Model
 
+#SHOULD do what I want - take a flat array, like age_crit, age_val, age_param & return [age=>['crit'
+
 
   ### !!TODO!! May 2018 - MatchFilters don't work anymore... In addition,
   #  Have to distinguish between SQL query filters & match set/method
   ## Filters. AND - Don't build filter if "don't care"
-  public function buildQuerySets(Array $arr = []) {
+  public function buildQuerySets(Array $arr = []) { #Should also work from controller
+    $arr = static::filterToCritArr($arr);
     //if ($this->matchObjs === null) {
       //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
     //}
@@ -835,13 +899,18 @@ trait BuildQueryTrait {
         #To use Accessors/Mutators
         //$arr = $this->getAttributes();
         $arr = $this->getAccessorAttributes();
+      } else if (isPost()) {
+        $arr = static::filterToCritArr(request()->all());
       }
     }
-    if (empty($arr)) return [];
+    if (empty($arr)) {
+        return [];
+    }
     $sets = [];
     $clear = false;
-    if (array_key_exists('submit', $arr) && ($arr['submit'] == 'clear'))
+    if (array_key_exists('submit', $arr) && ($arr['submit'] == 'clear')) {
         $clear = true;
+    }
     foreach ($arr as $key => $val) {
       #Does it end in '_crit'?
       $root = removeEndStr($key, '_crit');
@@ -1046,11 +1115,12 @@ public static function buildSearchControlArray($opts = null) {
     }
     $basename = $params['basename'];
     $queryDef = static::getFullQueryDef($basename);
+    $comptype = $queryDef['comptype'] ?? 'numeric';
     $label = $queryDef['label'] ?? $queryDef['desc'] ?? ucfirst($basename);
     if (!array_key_exists('label', $params)) {
       $params['label'] =  $label;
     }
-    pkdebug("queryDef:", $queryDef);
+    //pkdebug("queryDef:", $queryDef);
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
       $criteriaSet = keyVal('criteriaSet', $queryDef);
@@ -1063,13 +1133,14 @@ public static function buildSearchControlArray($opts = null) {
         }
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
-        $comptype = keyVal('comptype', $queryDef, 'numeric');
+        //$comptype = keyVal('comptype', $queryDef, 'numeric');
         $criteriaSet = static::getCriteriaSets($comptype);
     //pkdebug("criteriaSet:", $criteriaSet);
       }
     }
     //pkdebug("criteriaSet:", $criteriaSet);
     $params['criteriaSet'] = $criteriaSet;
+    $params['comptype'] = $comptype;
     /*
     $fieldDefArr = keyVal('field_defs', $queryDef);
     if (ne_array($fieldDefArr)) {
