@@ -1001,28 +1001,56 @@ trait BuildQueryTrait {
     return $trimmedCollection;
   }
 
+/** Uses ALL the query defs & the build htmlQueryControl below to return a
+ * complete array of ALL the html search components defined in $search_field_defs,
+ * which can just be called in the controller & inserted into the search form view
+ @return assoc array keyed by search fields, with the value of the html control for it
+ */
+public static function buildSearchControlArray($opts = null) {
+  $fields =  static::getSearchFields();
+  $ctls = [];
+  foreach ($fields as $field) {
+    $ctls[$field]=static::htmlQueryControl($field);
+  }
+  return $ctls;
+}
+
+
+
+
+
   /** For use in Query Forms - makes a full query control
    * from the field name and comparison type, with $params
    *
    * For now, only handle simple _crit, _val comparisons
    * with $params['basename']
    *
-   * @param assoc array $params:
+   * @param assoc array | string $params:
+   *   If string, the basename to build the search control for
+       If assoc arry, ['basename'=>$basename, opt 'label'=>$label
    *   @paramParam: string 'basename' (required): The basename of the field to search - like,
    *   'annual_income' - will build a criteria select box called "annual_income_crit'
    *      ("<", ">", etc)
    *    and a value input box named 'annual_income_val'
+   if Label in params, uses that. If absent, uses desc from param def. If absent, upercases first letter of basename for Label
    *
    * @paramParam string 'label' (optional, suggested) - the label for the control
-   *
+   * If $params
    *
    * @return string HTML to make the control
    */
 
   public static function htmlQueryControl($params=[]) {
+    if (is_string($params)) {
+      $params=['basename'=>$params];
+    }
     $basename = $params['basename'];
     $queryDef = static::getFullQueryDef($basename);
-    //pkdebug("queryDef:", $queryDef);
+    $label = $queryDef['label'] ?? $queryDef['desc'] ?? ucfirst($basename);
+    if (!array_key_exists('label', $params)) {
+      $params['label'] =  $label;
+    }
+    pkdebug("queryDef:", $queryDef);
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
       $criteriaSet = keyVal('criteriaSet', $queryDef);

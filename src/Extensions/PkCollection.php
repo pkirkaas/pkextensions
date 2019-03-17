@@ -68,9 +68,7 @@ class PkCollection extends Collection {
           return in_array('*',$key) ? Arr::collapse($result) : $result;
         }
         if (($target instanceOf \PkExtensions\Models\PkModel)) {
-          pkdebug("Target instance intane of PkModel? Key: ", $key, "SEGMENT:", $segment);
           $target = $target->$segment;
-          pkdebug("After deref: Target is:", typeOf($target), $target);
         } else if (Arr::accessible($target) && Arr::exists($target, $segment)) {
           $target = $target[$segment];
         } elseif (is_object($target) && isset($target->{$segment})) {
@@ -80,7 +78,6 @@ class PkCollection extends Collection {
         }
         $lseg = $segment;
       }
-    pkdebug("Returning [$target] , of segment [$lseg]");
     return $target;
   }
  
