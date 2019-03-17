@@ -198,7 +198,10 @@ trait BuildQueryTrait {
    * sets that are usable in a query
    * 
    */
-  public static function filterToCritArr($dirtyArr) {
+  public static function filterToCritArr($dirtyArr = null) {
+    if (!$dirtyArr && isPost()) { #Check if we are in a POST, if so, clean & return it
+      $dirtyArr = request()->all();
+    }
     if (!is_array($dirtyArr)) return [];
     return array_intersect_key($dirtyArr,static::getTableFieldDefsExtraBuildQuery());
   }
@@ -656,18 +659,16 @@ trait BuildQueryTrait {
     #$querySets includes both attribute=>'property' types, which are eloquent/SQL suitable,
     #as well as attribute=>'method', which should go to PkMatch filters
     foreach ($querySets as $root => $critset) {
-      if (static::emptyCrit($critset['crit']) || static::emptyVal($critset['val'])) {
+      $crit = $critset['crit'];
+      $val = $critset['val'];
+      $comptype = $critset['comptype'];
+      if (static::emptyCrit($critset['crit']) || (static::emptyVal($critset['val']) && !static::noval($comptype))) {
         continue;
       }
       if ($critset['def']['attribute'] === 'method') {
         #add to PkMatch set & continue
         $matchObj = PkMatch::mkMatchObj(
               static::getFullQueryDef($root)+['field_set'=>$critset],$root);
-        /*
-        pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset,
-            "matchObj: ", $matchObj);
-         * *
-         */
         if ($matchObj) {
           $this->addMatchObj($root,$matchObj);
         }
@@ -747,7 +748,6 @@ trait BuildQueryTrait {
 
           } else if ($critset['crit'] === 'BETWEEN') {
             //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
-     // pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
             //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
             $min = to_int(keyVal('minval', $critset['val']), -PHP_INT_MAX);
             $max = to_int(keyVal('maxval', $critset['val']), PHP_INT_MAX);
@@ -784,8 +784,10 @@ trait BuildQueryTrait {
             $critset['crit'], $critset['val'], $critset['param']);
       }
     }
+    /*
     pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
         "Query to SQL:", $query->toSql());
+    */
     return $query;
   }
 
@@ -887,6 +889,7 @@ trait BuildQueryTrait {
   ### !!TODO!! May 2018 - MatchFilters don't work anymore... In addition,
   #  Have to distinguish between SQL query filters & match set/method
   ## Filters. AND - Don't build filter if "don't care"
+###!!!!  BUT DO BUILD FILTER WITHOUT VALUES FOR EXISTENTIAL QUERIES
   public function buildQuerySets(Array $arr = []) { #Should also work from controller
     $arr = static::filterToCritArr($arr);
     //if ($this->matchObjs === null) {
@@ -919,6 +922,8 @@ trait BuildQueryTrait {
       if (!$this->isValidCriterion($key)) continue;
       #We COULD get static::getBasenameQueryDef($root) now, and see if we have supplimental info
       $comptype = static::comptype($root);
+      $noval = static::noval($comptype);
+
       $maxvalfield = $root . '_maxval'; #For 'BETWEEN'comparison
       $minvalfield = $root . '_minval'; #For 'BETWEEN'comparison
       $valfield = $root . '_val';
@@ -940,7 +945,7 @@ trait BuildQueryTrait {
         $rootMatch->minval=$valval['minval'] = to_int(keyVal('minval', $valval), -PHP_INT_MAX);
       }
       if (array_key_exists($valfield, $arr)) $valval = $arr[$valfield];
-      if ($valval === null) continue;
+      if (($valval === null) && !$noval) continue;
       //if (!array_key_exists($valfield, $arr)) continue;
       $paramfield = $root . '_param';
       $arr[$paramfield] = keyVal($paramfield, $arr);
@@ -1074,12 +1079,17 @@ trait BuildQueryTrait {
  * complete array of ALL the html search components defined in $search_field_defs,
  * which can just be called in the controller & inserted into the search form view
  @return assoc array keyed by search fields, with the value of the html control for it
+# $refresh means to restore the data from a post if we have it.
  */
-public static function buildSearchControlArray($opts = null) {
+public static function buildSearchControlArray($refresh = null) {
+  $data = null;
+  if ($refresh) { #Clean the POST
+    $data = static::filterToCritArr();
+  }
   $fields =  static::getSearchFields();
   $ctls = [];
   foreach ($fields as $field) {
-    $ctls[$field]=static::htmlQueryControl($field);
+    $ctls[$field]=static::htmlQueryControl($field, $data);
   }
   return $ctls;
 }
@@ -1105,40 +1115,43 @@ public static function buildSearchControlArray($opts = null) {
    *
    * @paramParam string 'label' (optional, suggested) - the label for the control
    * If $params
-   *
+   * @param array $values - optional - to populate the control with intitial data
    * @return string HTML to make the control
    */
 
-  public static function htmlQueryControl($params=[]) {
+  public static function htmlQueryControl($params=[], $values=[]) {
     if (is_string($params)) {
       $params=['basename'=>$params];
     }
+    $presets = [];
     $basename = $params['basename'];
+    if ($values) { #only get the relevant params for this basename
+      foreach ($values as $key=>$value) {
+        if (startsWith($key,$basename)) {
+          $presets[$key]=$value;
+        }
+      }
+    }
     $queryDef = static::getFullQueryDef($basename);
     $comptype = $queryDef['comptype'] ?? 'numeric';
     $label = $queryDef['label'] ?? $queryDef['desc'] ?? ucfirst($basename);
     if (!array_key_exists('label', $params)) {
       $params['label'] =  $label;
     }
-    //pkdebug("queryDef:", $queryDef);
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
       $criteriaSet = keyVal('criteriaSet', $queryDef);
-    //pkdebug("criteriaSet:", $criteriaSet);
       if (!$criteriaSet) {
         $criteria = keyVal('criteria', $queryDef);
         if (ne_arrayish($criteria)) {
           $criteriaSet = keyVal('criteriaSet',$criteria);
-    //pkdebug("criteriaSet:", $criteriaSet);
         }
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
         //$comptype = keyVal('comptype', $queryDef, 'numeric');
         $criteriaSet = static::getCriteriaSets($comptype);
-    //pkdebug("criteriaSet:", $criteriaSet);
       }
     }
-    //pkdebug("criteriaSet:", $criteriaSet);
     $params['criteriaSet'] = $criteriaSet;
     $params['comptype'] = $comptype;
     /*
@@ -1162,11 +1175,9 @@ public static function buildSearchControlArray($opts = null) {
     }
      *
      */
-    $tmpCtl =  PkHtmlRenderer::buildQuerySet($params);
-    //pkdebug("TMPCTL: \n$tmpCtl\n");
+    $tmpCtl =  PkHtmlRenderer::buildQuerySet($params,$presets);
 
-    return PkHtmlRenderer::buildQuerySet($params);
-    //pkdebug("The QueryDef for [ $basename ]:", $fieldDef);
+    return PkHtmlRenderer::buildQuerySet($params,$presets);
   }
 
   /*

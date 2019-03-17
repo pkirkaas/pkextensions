@@ -60,6 +60,11 @@ Trait CriteriaSetsTrait {
       ],
   ];
 
+/** Existential queries that don't require values */
+  public static function noval($comptype) {
+    return in_array($comptype,['boolean','exists'],1);
+  } 
+
   /**
    * 
    * @param string $type - the criteria type - like, 'group', 'numeric', 'string'

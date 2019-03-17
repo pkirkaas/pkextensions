@@ -303,7 +303,6 @@ class PkHtmlRenderer extends PartialSet {
    * @return PkHtmlRenderer - with data inserted in the template
    */
   public function inject($arr,$tpl=null,$rawkeys=[]) {
-    //pkdebug("ARR:",$arr,"TPL", $tpl);
     if (!is_array($arr) && is_stringish($arr)) {
       $arr = ['content' => $arr];
     }
@@ -439,7 +438,6 @@ class PkHtmlRenderer extends PartialSet {
   ######!!!! TODO!!! See PkRendEx.php for testing of nested children
   public function tagged($tag, $content = null, $attributes=null, $raw = false) {
     $ctype = typeOf($content);
-    //if (! is_simple($content)) pkdebug("Type of Content: [$ctype]");
     $attributes = $this->cleanAttributes($attributes);
     $raw = $raw?$raw:keyVal('raw',$attributes);
     if (($content === true) || ($content === $this)) { #That's RENDEROPEN === TRUE
@@ -506,8 +504,6 @@ class PkHtmlRenderer extends PartialSet {
   /** This called for no-content element tags, like img, br, hr, input, etc */
   public function nocontent($tag, $attributes=null) {
     $attributes = $this->cleanAttributes($attributes);
-    //pkdebug("TAG: [$tag], atts:",$attributes);
-    //$this[] = "<$tag ". PkHtml::attributes($attributes).">\n";
     return $this->rawcontent("<$tag ". PkHtml::attributes($attributes).">\n");
   }
 
@@ -1385,9 +1381,9 @@ class PkHtmlRenderer extends PartialSet {
   }
 
   ## Build Query controls
-  public static function buildQuerySet($params = []) {
+  public static function buildQuerySet($params = [],$inits = []) {
     $out=new static();
-    $out->querySet($params);
+    $out->querySet($params,$inits);
     return $out;
   }
 
@@ -1429,7 +1425,7 @@ class PkHtmlRenderer extends PartialSet {
    * 
    * @return \PkExtensions\PkHtmlRenderer - Representing the HTML for the Query Control
    */
-  public function querySet($params = []) {
+  public function querySet($params = [], $inits=[]) {
     $defaults = [
     'wrapTag' => 'fieldset', 
     'wrapClass' => ' form-group block search-crit-val-pair ',
@@ -1448,7 +1444,6 @@ class PkHtmlRenderer extends PartialSet {
 
     ];
 
-pkdebug("Params:",$params);
     $appendableOpts = ['wrapClass', 'labelClass', 'critClass', 'valClass'];
     $tmpOpts = [];
     foreach ($appendableOpts as $apOpt) {
@@ -1462,7 +1457,15 @@ pkdebug("Params:",$params);
     $comptype = $params['comptype'];
     $noval = ($comptype === 'exists') || ($comptype === 'boolean');
     $basename = keyVal('basename', $params);
+    $critname = keyVal('critname', $params, $basename.'_crit');
+    if (!$params['critVal']) {
+      $params['critVal'] = $inits[$critname] ?? null;
+    }
     $params['critname'] = keyVal('critname', $params, $basename.'_crit');
+    $valname = keyVal('valname', $params, $basename.'_val');
+    if (!$params['valVal']) {
+      $params['valVal'] = $inits[$valname] ?? null;
+    }
     $params['valname'] = keyVal('valname', $params, $basename.'_val');
     $params['critAtts']['class'] = $params['critClass'];
     unset( $params['critClass']);
