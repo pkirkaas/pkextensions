@@ -19,8 +19,8 @@ Trait CriteriaSetsTrait {
       'string' => [
           '0' => "Don't Care",
           'LIKE' => 'Is',
-          '%LIKE' => 'Starts With',
-          'LIKE%' => 'Ends With',
+          'LIKE%' => 'Starts With',
+          '%LIKE' => 'Ends With',
           '%LIKE%' => 'Contains',
       ],
       'group' => [
