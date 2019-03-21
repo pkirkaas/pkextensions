@@ -58,6 +58,13 @@ Trait CriteriaSetsTrait {
           'EXISTS' => 'Required',
           'NOT EXISTS' => "Doesn't have",
       ],
+      'date' => [
+          '0' => "Don't Care",
+          '<' => 'Before',
+          '>' => 'After',
+          '=' => 'At',
+          '!=' => 'Not At',
+      ],
   ];
 
 /** Existential queries that don't require values */

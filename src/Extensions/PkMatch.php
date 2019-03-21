@@ -242,6 +242,8 @@ class PkMatch {
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
     if ($this->comptype === 'numeric') return $this->numericComp($arg);
+    //if ($this->comptype === 'date') return $this->dateComp($arg);
+    if ($this->comptype === 'date') return $this->numericComp($arg,'strtotime');
     if ($this->comptype === 'group') return $this->groupComp($arg);
     if ($this->comptype === 'within') return $this->withinComp($arg);
     if ($this->comptype === 'between') return $this->betweenComp($arg);
@@ -333,56 +335,60 @@ class PkMatch {
     return ($this->crit === 'EXISTS') && $arg;
   }
 
-  public function numericComp($arg = null) {
+/*
+  public function dateComp($arg = null) {
+    pkdebug("DateComp; : arg: ", $arg, "thisval:,", $this->val); 
+    if ($arg === null) return false;
+    $arg = strtotime($arg);
+    $this->val = strtotime($this->val);
+    pkdebug("DateComp;after strto time : arg: ", $arg, "thisval:,", $this->val); 
+    return $this->numericComp($arg = null);
+  }
+  */
+  public function numericComp($arg = null,$conv=null) {
     if ($arg === null) return false;
       //if ($this->compfield == 'assetdebtratio')  pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg,$this);
     //pkdebug("ArG",$arg,'this', $this);
-    if (!is_numeric($this->val) || !is_numeric($arg)) {
+    if ($conv) {
+      $val = $conv($this->val);
+      $arg = $conv($arg);
+    } else {
+      $val = $this->val;
+    }
+    if (!is_numeric($val) || !is_numeric($arg)) {
       //throw new Exception ("[{$this->val}] or [$arg] is not numeric");
       return pkwarn("A PROBLEM: For thisMatch;", $this, 'this->val', $this->val, " or [arg] ", $arg, " is not numeric");
     }
-    /** Restore to this clean state when debugged...
-      if ($this->crit === '<' ) return $arg <  $this->val;
-
-      if ($this->crit === '<=') return $arg <=  $this->val;
-
-      if ($this->crit === '>=') return $arg >=  $this->val;
-
-      if ($this->crit === '>')   return $arg >  $this->val;
-      if ($this->crit === '=' ) return $arg == $this->val;
-      if ($this->crit === '!=' ) return $arg != $this->val;
-     * 
-     */
     if ($this->crit === '<') {
-      $res = ($arg < $this->val);
+      $res = ($arg < $val);
       //if ($this->compfield == 'assetdebtratio')  pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '<=') {
-      $res = ( $arg <= $this->val);
+      $res = ( $arg <= $val);
       //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '>=') {
-      $res = ($arg >= $this->val);
+      $res = ($arg >= $val);
       //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
 
     if ($this->crit === '>') {
-      $res = ($arg > $this->val);
+      $res = ($arg > $val);
       //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
     if ($this->crit === '=') {
-      $res = ( $arg == $this->val);
+      $res = ( $arg == $val);
       //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }
     if ($this->crit === '!=') {
-      $res = ($arg != $this->val);
+      $res = ($arg != $val);
       //if ($this->compfield == 'assetdebtratio') pkdebug("adet: THIS:", $this, 'ARG', $arg, 'res', $res);
       return $res;
     }

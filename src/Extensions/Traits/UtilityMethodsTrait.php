@@ -3,6 +3,8 @@ namespace PkExtensions\Traits;
 use Undefined;
 use Failure;
 use PkExtensions\Models\PkModel;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Carbon\Carbon;
 use ReflectionClass;
@@ -115,6 +117,16 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     $traits = getDirectTraits($target);
     $traits = array_diff($traits, $trimtraits);
     return traitMethods($traits);
+  }
+
+  /** Returns true if $el is a Builder or a Relation - quite similar
+   * Esp. when we add "getModel() via Macro in PkServiceProvider()
+   */
+  public static function Builderish($el) {
+    if (($el instanceOf Builder) || ($el instanceOf Relation)) {
+      return true;
+    }
+    return false;
   }
 
   /** Returns all trait methods starting with start. This is a great way to use

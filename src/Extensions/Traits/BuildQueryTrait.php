@@ -2,6 +2,7 @@
 
 namespace PkExtensions\Traits;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Models\PkSearchModel;
 use PkExtensions\PkController;
@@ -96,9 +97,49 @@ trait BuildQueryTrait {
       return $model->getTable();
     }
   }
-  public static function getTargetModel() {
+
+  /** Returns the target model, if any
+   * @param Builder|ModelClassName|null - 
+   *    If builder, get Model class from it & return
+   *    If class name, Return
+   *    If null, figure out from class properties (from app query trait)
+   *@return string|null - Model name if any, else null
+   */
+  public static function getTargetModel($targetEloquent = null) {
+    if ($targetEloquent) {
+      //if ($targetEloquent instanceOf Builder) {
+      if (static::Builderish($targetEloquent)) {
+        return get_class($targetEloquent->getModel());
+      } else {
+        return $targetEloquent;
+      }
+    }
     if (property_exists(static::class,'targetModel')) return static::$targetModel;
+    if (method_exists(static::class,'getTargetBuilder')) {
+      return get_class(static::getTargetBuilder()->getModel());
+    }
+    return null;
   }
+
+  /** Gets the builder from $targetEloquent or local properties */
+  public function getQBTargetBuilder($targetEloquent = null) {
+    if ($targetEloquent) {
+      if (static::Builderish($targetEloquent)) {
+        return $targetEloquent;
+      } else { #Must be a model name?
+        return $targetEloquent::query();
+      }
+    } else { #Get from class properties - app query trait
+      if (method_exists(static::class,'getTargetBuilder')) {
+        return $this->getTargetBuilder();
+      } else if (property_exists(static::class,'targetModel')) {
+        return $this->targetModel::query();
+      }
+    }
+    return null;
+  }
+
+
 
   /** From CriteriaSetsTrait:
   public static function isValidCriterion($crit, $type = null) {
@@ -339,6 +380,30 @@ trait BuildQueryTrait {
     $parms = keyVal('parms', $def);
     if ($parms && is_scalar($parms)) $parms = [$parms];
     if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
+
+  }
+
+/////// Questionable? 
+  public static function buildQueryFieldsDate($baseName, $def = null) {
+    //if ($baseName == 'netprofitmargin') {
+     // pkdebug("BASENAME: [ $baseName ] ; def: ", $def);
+    //}
+    $valType = keyVal('fieldtype', $def, 'date');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
+    $fields = [];
+    //$criteria = keyVal('criteria',$def,[]);
+    //$omit = keyVal('omit',$criteria);
+    //$fields['criteriaSet'] = PkMatch::getCriteriaSets('numeric', $omit);
+    //$def['criteria']['criteriaSet'] = $fields['criteriaSet'];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      //$fields[$baseName.'_parm'.$i] = $parm;
       $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
@@ -624,12 +689,14 @@ trait BuildQueryTrait {
    * ....]
    * </pre>
    *
-   * @param $targetModel - A PkModel CLASS, NOT instance.
+   * @param $targetEloquent - A PkModel CLASS OR Builder, NOT instance.
    * @return Eloquent Builder
    * */
-  public function buildQueryOnModel($targetModel = null, $querySets=null) {
-    if (!$targetModel) $targetModel = static::getTargetModel();
-    if (empty($targetModel)) throw new \Exception("No model to build query on");
+  public function buildQueryOnModel($targetEloquent = null, $querySets=null) {
+//    if (!$targetEloquent) $targetEloquent = static::getTargetEloquent();
+ //   if (empty($targetEloquent)) throw new \Exception("No model or builder to build query on");
+    $targetModel = static::getTargetModel($targetEloquent);
+    $targetBuilder = $this->getQBTargetBuilder($targetEloquent);
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     //pkdebug("TargetFieldNames:", $targetFieldNames);
     if ($querySets === null) {
@@ -650,7 +717,8 @@ trait BuildQueryTrait {
     #In fact, it's totally appropriate for a persistent query to consist entirely
     #of methods and NO model/table fields.
     //pkdebug("Query Sets:", $sets);
-    $query = $targetModel::query();
+    //$query = $targetModel::query();
+    $query = $targetBuilder;
     if (empty($querySets)) return $query;
     //pkdebug("NOT empty SETS!");
     //pkdebug("QuerySets:", $querySets);
@@ -974,7 +1042,7 @@ trait BuildQueryTrait {
     //foreach ($this->matchObjs as $ma) {
       //if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma);
     //}
-    //pkdebug("querySets should contain both property & method queries: SETS:", $sets);
+    pkdebug("querySets should contain both property & method queries: SETS:", $sets);
     return $sets;
   }
 

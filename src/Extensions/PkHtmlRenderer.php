@@ -1426,6 +1426,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return \PkExtensions\PkHtmlRenderer - Representing the HTML for the Query Control
    */
   public function querySet($params = [], $inits=[]) {
+    //pkdebug("Params:", $params, "inits:", $inits);
     $defaults = [
     'wrapTag' => 'fieldset', 
     'wrapClass' => ' form-group block search-crit-val-pair ',
@@ -1469,12 +1470,15 @@ class PkHtmlRenderer extends PartialSet {
     $params['valname'] = keyVal('valname', $params, $basename.'_val');
     $params['critAtts']['class'] = $params['critClass'];
     unset( $params['critClass']);
+    $valType = $params['valType'];
+    if ($comptype === 'date') {
+      $params['valClass'] .= " datepicker auto-attach ";
+    }
     $params['valAtts']['class'] = $params['valClass'];
     unset( $params['valClass']);
 
     $wrapTag = $params['wrapTag'];
     $critType = $params['critType'];
-    $valType = $params['valType'];
 
     #Start building!
     $this->$wrapTag(RENDEROPEN, $params['wrapClass']);
