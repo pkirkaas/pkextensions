@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * To include the Extension Vue components
  * in webpack.mix.js, include this

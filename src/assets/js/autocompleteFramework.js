@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /**
  * This file generalizes a common jQuery/jQuery UI autocomplete use case, so specific
  * arguments are used to customize the behavoir.

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
 class PkPainter {
 /** Initializes/resets any member attributes that have a key in $args,

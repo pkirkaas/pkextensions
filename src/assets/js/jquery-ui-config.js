@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * Generic jQuery UI Initialization - uses standardized class names to attach
  * datepicker, etc.

@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!-- Drop & immediately upload, in place -->
 <!-- Since I clearly forgot -- I seem to have made this specifically for 
  separate uploaded/file/media objects, NOT to be included as part of just a 

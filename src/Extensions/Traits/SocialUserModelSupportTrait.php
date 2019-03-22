@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * This add data field & processing to user implementations you want to support
  * with social media interacton. Start with FB, but then might want to add Linked

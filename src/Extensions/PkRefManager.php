@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
 use PkRenderer;
 ### Danger Will Robinson! static::getRefArr() only works if static::$refArr is set!

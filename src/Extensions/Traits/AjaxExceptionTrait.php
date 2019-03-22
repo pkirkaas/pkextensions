@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Use in App\Exceptions\Handler to return default Ajax exception if unhandled
  * ex:

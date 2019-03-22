@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Extends Laravel "File" to inlcude features of UploadedFile, like, "isValid"
  * Also, 

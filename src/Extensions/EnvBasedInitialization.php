@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Add to Http/Kernel.php */
 namespace PkExtensions;
 /** Use this middlware to do any environment specific setup */

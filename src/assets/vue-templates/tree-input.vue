@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 
 <!--  #############   Tree Selection Control #################################  -->
 <!--

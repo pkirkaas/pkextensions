@@ -1,4 +1,5 @@
 <?php namespace PkExtensions;
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 use Illuminate\Validation\Factory;
 
 /** The purpose of this ValidatorFactory extension is to bind custom validation rule closures to the

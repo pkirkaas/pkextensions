@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Until I do a better implementation - including this trait provideds an
  * array property "structuredArr", which can be used as a persistent array.

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** For some reason, 5.8 puts the original View path name at the END of the compiled template on my HostGator machine, so override to remove it.
 
 MUST ALSO OVERRIDE ViewServiceProvider as follows:

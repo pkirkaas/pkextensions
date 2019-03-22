@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * This adds a field to an object, $instancetype,
  * and an array of names=>closures - which can be set based on the instancetype

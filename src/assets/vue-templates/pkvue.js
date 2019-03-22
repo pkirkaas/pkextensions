@@ -1,4 +1,5 @@
 'use strict';
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 // Mostly junk, maybe something interesting
 var Vue = require( 'vue');
 class PkVue extends Vue {

@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  Support for _pk-bs4-mods.sccs - like if fixed menu, push down content
  */

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Mis-named 'upload' - also includes managing files from other external sources
  * like images from external URLs - manages media 
  * Knows NOTHING of Models, just processes uploads/copies, validates, stores,

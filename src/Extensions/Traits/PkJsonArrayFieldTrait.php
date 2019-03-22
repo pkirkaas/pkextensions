@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Try a simpler implementation of PkJsonFiedTrait, using what Laravel supports
  * Idea is to support a basic repeatable named object structure - 

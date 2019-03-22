@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Experimenting with a couple thoughts here. If the received content in the
  * method is ME, I don't return it - I create a new instance, put it in the next slot, & return it. 
  */

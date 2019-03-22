@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!-- A generic modal container. Takes props: "modalparams" & "contentparams".
    "modalparams" are title, formatting, etc. 
    "contentparams" could be another comonent, or just raw HTML content to

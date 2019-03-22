@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /**
 *  @param simple object dataitem  containing the constant label, and the data for the cell
 * (either for input/update, or for display). 

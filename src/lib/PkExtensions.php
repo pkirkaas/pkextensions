@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* This file is INCLUDED in all installs, so we don't have to use different
  * files for every little class. This has a collection of classes, in the
  * PkExtensions namespace

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * DB operations with deep arrays of scalar values representing the searches,
  * operations & results

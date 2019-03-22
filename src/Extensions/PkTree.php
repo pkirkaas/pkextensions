@@ -2,7 +2,6 @@
 
 /**
  * Copyright (c) <Paul Kirkaas> - 2016 - Builds a DOM tree for rendering 
- * The MIT License (MIT)
  * Much of the custom input code is taken from the Laravel Collective
  * Html & Form Builders
  * Copyright (c) <Adam Engebretson>

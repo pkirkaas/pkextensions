@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * Responsinve Vue data (label/value) components - both for input & display
  * Compose to make forms

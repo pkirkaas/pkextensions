@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Base trait to make it easier to structure to & from JSON responses,
  * possibly update objects, respond with the modified data, etc. 

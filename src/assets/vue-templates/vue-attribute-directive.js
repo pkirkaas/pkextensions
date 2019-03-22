@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * This creates a directive that allows you to specify
  * arbitrary attributes (including data-xxx & values in elements.

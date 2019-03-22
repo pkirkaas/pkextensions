@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Mate to PkTypedModelTrait - model which have Typed Models should use this
  */

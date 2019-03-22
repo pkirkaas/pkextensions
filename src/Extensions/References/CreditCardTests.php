@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 return $testcards = [
 ["type"=>"30569309025904","pass"=>true,"processorspecific"=>false],
 ["type"=>"Diners Club", "number"=>"38520000023237","pass"=>true,"processorspecific"=>false],

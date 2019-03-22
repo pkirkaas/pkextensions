@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* * JS Specific to Laravel */
 $(function () {
   /*

@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /**
  * MODIFIED BY Paul Kirkaas, 9 Feb 19 to remove assert string failures
   * vee-validate v2.1.7

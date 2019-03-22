@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
 /**
  * Re-implementation of PkHtmlPainter, based on PkTree, rather than PkHtmlRenderer 

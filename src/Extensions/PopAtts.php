@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** This class supports getting the pop-up attributes named correctly and consistently
  * throughout the applicaton, including in the JavaScript
  *

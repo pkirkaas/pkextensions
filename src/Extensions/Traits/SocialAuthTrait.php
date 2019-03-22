@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions\Traits;
 use App\Models\User;
 use Laravel\Socialite\Two\User as Auth2User;

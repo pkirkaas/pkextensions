@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!-- Component for visually building JSON/JS Objects -->
 <template>
     <div class="jbld-el" :class="mytype">

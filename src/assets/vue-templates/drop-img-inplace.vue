@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!-- Drop & immediately upload, in place -->
 <!-- Default is images, but support PDF -->
 

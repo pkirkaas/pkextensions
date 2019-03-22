@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!--  A Basic form composable of components - based on Vue 2.6 Slots
     with custom v-atts directive
 Usage:

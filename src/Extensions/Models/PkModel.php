@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Adds functionality to base Eloquent\Model
  * Highlights:
  * If your model defines the static variable $table_field_defs, ex:

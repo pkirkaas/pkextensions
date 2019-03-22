@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Reusable Generic functions to help Vue/Axios
  * Attached to window - global functions
 */

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * To combine TypedModel trait with UploadTrait. Unfortunately, models using
  * this will have to explicitly use PkTypedModelTrait, because otherwise there

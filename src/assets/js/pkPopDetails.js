@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * This library manages if you have encoded model/instance details encoded as 
  * data-attributes in JS and you want to pop them into a dialog when the user

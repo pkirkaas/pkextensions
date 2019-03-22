@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 $titles = [
 "Able Seamen",
 "Account Manager",

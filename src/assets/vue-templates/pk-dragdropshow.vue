@@ -1,3 +1,4 @@
+<!-- Copyright (C) 2018 by Paul Kirkaas - All Rights Reserved -->
 <!-- For single images - saves instantly, dropping another replaces, & little red delete x -->
 <!-- Start over again on the one I know works rename to 
 <template>

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Actually, maybe better called "OwnedModelTrait" - it is "owned" by another
  * model (which could use the "PkHasTypedModelTrait" to manage this.)
  * This can be one to many or one to one - like ProfileUploads, could be several

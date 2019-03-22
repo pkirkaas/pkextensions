@@ -1,4 +1,5 @@
 <?php namespace PkExtensions;
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 use Illuminate\Validation\Validator;
 use Symfony\Component\Translation\TranslatorInterface;
 use Illuminate\Contracts\Translation\Translator;

@@ -1,4 +1,5 @@
 'use strict';
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Smaller Vue components that don't require an entire *.vue page template */
 
 /** CVue instances will be created new for each use.

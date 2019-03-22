@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
 /** Class to work with Blade::declare() to automate the inclusion of mulit-subforms in forms
  * 

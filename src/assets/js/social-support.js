@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* JS for Social Functionality Support - ratings, messaging, blocking, etc.  */
 
 /* Makes the "Send Message" dialog box / form */

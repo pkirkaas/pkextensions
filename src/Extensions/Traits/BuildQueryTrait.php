@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 
 namespace PkExtensions\Traits;
 use Illuminate\Database\Eloquent\Collection;
@@ -133,7 +134,7 @@ trait BuildQueryTrait {
       if (method_exists(static::class,'getTargetBuilder')) {
         return $this->getTargetBuilder();
       } else if (property_exists(static::class,'targetModel')) {
-        return $this->targetModel::query();
+        return static::$targetModel::query();
       }
     }
     return null;

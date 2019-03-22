@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Extends PkHtmlRenderer, for explicit repeating subform (Items in Cart) 
  * rendering, with template, dependent upon pklib.js definitions
  * 

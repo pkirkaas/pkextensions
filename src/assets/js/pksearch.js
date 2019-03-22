@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * Start of supporting Search Forms. Depends on jQuery & pklib.js (included first)
  * Expected Structure:

@@ -1,4 +1,5 @@
 var repository = {};
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Library of convenient JS/jQuery functions. Not PKMVCFramework Specific
  * @author    Paul Kirkaas
  * @email     p.kirkaas@gmail.com

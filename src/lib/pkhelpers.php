@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Helper functions for use with Laravel/PkExtensions
  * Depends on function file pklib.php
  * 26 Feb 2016

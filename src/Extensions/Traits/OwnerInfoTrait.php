@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** This is to use in PkModels that "own" other items, & might want to provide
  * info on that.
  */

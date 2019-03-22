@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions\Console\Commands;
 use Illuminate\Console\Command;
 class GenerateMigrations extends Command {

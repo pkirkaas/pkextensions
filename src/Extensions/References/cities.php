@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 $cities = [[35004,"AL","Acmar",33.584132,-86.51557],
 [35005,"AL","Adamsville",33.588437,-86.959727],
 [35006,"AL","Adger",33.434277,-87.167455],

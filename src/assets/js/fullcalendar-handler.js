@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * Experimental handler for the fullcalendar jQuery UI Plugin
  */

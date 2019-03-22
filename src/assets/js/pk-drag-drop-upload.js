@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** 
  * A jQuery/pklib based Drag and Drop upload -
  * Different because you can have as many as you like on a page, different 

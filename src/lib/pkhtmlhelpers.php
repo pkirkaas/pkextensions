@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 use Collective\Html\HtmlBuilder;
 use Collective\Html\FormBuilder;
 use PkExtensions\PartialSet;

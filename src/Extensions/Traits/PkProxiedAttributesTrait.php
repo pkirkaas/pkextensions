@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * To allow 2 related one-to-one models appear & behave as a single instance -
  * That is, where attibutes of object B appear to be part of object A, can be

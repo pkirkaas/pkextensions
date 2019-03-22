@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Provides some base, common admin functionality, in conjunction with routes
  * & views in PkExtensions/resources
  */

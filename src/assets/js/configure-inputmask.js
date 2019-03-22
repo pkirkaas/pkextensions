@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  * Sets up input mask to convert to/from formatted input
  * https://github.com/RobinHerbots/Inputmask 

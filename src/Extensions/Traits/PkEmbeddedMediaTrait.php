@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Manages media files/urls that are embedded as a field in the model/table -
  * simple - the model definition 

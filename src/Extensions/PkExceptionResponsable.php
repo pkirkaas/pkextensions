@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** A user exception that displays the exception message to the user in the
     context of the app template. Use MsgBag
     */

@@ -1,3 +1,4 @@
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /* 
  *Will take JSON arrays & build complex structures, suited to 
  *noSQL/JSON storage in DB

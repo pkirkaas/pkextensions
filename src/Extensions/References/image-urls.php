@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 return $imgurls = [
 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/D%C3%BClmen%2C_Wildpark_--_2017_--_6075-81.jpg/500px-D%C3%BClmen%2C_Wildpark_--_2017_--_6075-81.jpg',
 

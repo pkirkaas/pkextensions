@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Renders HTML - can be included in Blade templates, but also implements a
  * custom templating/HTML rendering system.
  * Accessable as the PkRenderer facade

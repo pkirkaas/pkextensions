@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 $ca_cities = [
 [90001,"CA","Los Angeles",33.973093,-118.247896],
 [90002,"CA","Los Angeles",33.94969,-118.246213],

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** The 2 PolymorphicTraits - PolymorphicBaseTrait & PolymorphicMorphTrait:
  * This (PolymorphicBaseTrait) is implemented/used by Models that will be the
  * common basis for the extended "Morph" Models. 

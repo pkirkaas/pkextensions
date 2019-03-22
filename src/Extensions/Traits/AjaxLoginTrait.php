@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /*
  * Implement this in your Ajax controller to login w. Ajax.
  * Two keys are required - ['ident'=>$name, 'password'=>$password]

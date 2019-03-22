@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 /** Just helps build BS4 menus, along with the partials, to keep up with the 
  * changes in one place
  */

@@ -1,4 +1,5 @@
 <?php
+/**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 
 use PkExtensions\Universal;
 use PkExtensions\PartialSet;
