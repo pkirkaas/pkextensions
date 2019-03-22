@@ -26,6 +26,10 @@ abstract class PkSearchModel extends PkModel {
     return $this->querySets;
   }
 
+  public function searchCtls() {
+    return static::buildSearchControlArray($this);
+  }
+
   
 
 

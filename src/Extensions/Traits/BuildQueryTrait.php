@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Models\PkSearchModel;
 use PkExtensions\PkController;
+use PkExtensions\PkRefManager;
 use PkExtensions\PkException;
 use PkExtensions\PkMatch;
 use PkExtensions\PkHtmlRenderer;
@@ -197,16 +198,21 @@ trait BuildQueryTrait {
    * @return array of assoc arrays of min: [$basename => ['fieldtype' => $fieldtype]
    */
 
-  public static function getSearchFieldDefs() {
+  public static function getNormedSearchFieldDefs() {
     $configStruct = ['fieldtype',
         'fieldtype' => 'integer',
         'comptype' => 'numeric',
     ];
-    return normalizeConfigArray(static::$search_field_defs, $configStruct);
+    return normalizeConfigArray(static::getSearchFieldDefs(), $configStruct);
+  }
+
+  public static function getSearchFieldDefs() {
+    pkdebug("Static sfd:",static::$search_field_defs);
+    return static::$search_field_defs;
   }
 
   public static function getSearchFields() {
-    return array_keys(static::getSearchFieldDefs());
+    return array_keys(static::getNormedSearchFieldDefs());
   }
 
   /** Builds a set of HTML inputs for a particular search item/term, based on the
@@ -241,8 +247,8 @@ trait BuildQueryTrait {
    * 
    */
   public static function filterToCritArr($dirtyArr = null) {
-    if (!$dirtyArr && isPost()) { #Check if we are in a POST, if so, clean & return it
-      $dirtyArr = request()->all();
+    if (!$dirtyArr && isPost()) { 
+       $dirtyArr = request()->all();
     }
     if (!is_array($dirtyArr)) return [];
     return array_intersect_key($dirtyArr,static::getTableFieldDefsExtraBuildQuery());
@@ -265,7 +271,8 @@ trait BuildQueryTrait {
      *
      */
     //$searchDefs = []; //Made of both the table field defs AND other params/settings
-    $searchFields = static::getSearchFieldDefs();
+    $searchFields = static::getNormedSearchFieldDefs();
+    pkdebug("SearchFields:", $searchFields);
     //$fieldDefsCollection = [];
     foreach ($searchFields as $baseName => &$def) {
       /** Initially defaulted to the Query Model if the field type was method - but
@@ -288,14 +295,21 @@ trait BuildQueryTrait {
       /** This allows implementing classes to add additional comparison types
        * and methods, and still get called from here.
        */
-      if (!is_arrayish($def)) $def = [];
-      $criteria = keyVal('criteria', $def);
+      $custom = keyVal('custom', $def);
+      #$custom can be an array of the form ['omit'=>['>=','!='],'='=>'Same As']
+      #Where 'omit' removes elements, and the remainder substitutes the descriptive phrases
+      $def['criteria'] = static::getCriteriaSets($comptype,$custom);
+      #If criteriea exists, either an indexed array of comparison keys to remove from
+      #standard, or an assoc array to substitute (esp labels)
+      /*
       $criteriaSet = keyVal('criteriaSet', $criteria);
       if (!$criteriaSet) {
         $omit = keyVal('omit', $criteria);
         $criteriaSet = static::getCriteriaSets($comptype, $omit);
       }
       $def['criteria']['criteriaSet'] = $criteriaSet;
+       * 
+       */
       $fieldDefs = static::$fieldBuildMethod($baseName, $def);
       /*
       if ($extra) {
@@ -970,7 +984,7 @@ trait BuildQueryTrait {
       if ($this instanceOf PkModel) {
         #To use Accessors/Mutators
         //$arr = $this->getAttributes();
-        $arr = $this->getAccessorAttributes();
+        $arr = static::filterToCritArr($this->getAccessorAttributes());
       } else if (isPost()) {
         $arr = static::filterToCritArr(request()->all());
       }
@@ -1148,12 +1162,18 @@ trait BuildQueryTrait {
  * complete array of ALL the html search components defined in $search_field_defs,
  * which can just be called in the controller & inserted into the search form view
  @return assoc array keyed by search fields, with the value of the html control for it
-# $refresh means to restore the data from a post if we have it.
+# $refresh means to restore the data from a post OR SearchModel if we have it.
  */
 public static function buildSearchControlArray($refresh = null) {
   $data = null;
-  if ($refresh) { #Clean the POST
-    $data = static::filterToCritArr();
+  if ($refresh) { #Clean the POST/Saved Atts
+    if ($refresh instanceOf PkSearchModel) {
+      $data = static::filterToCritArr($refresh->getAccessorAttributes());
+    } else if (is_array($refresh)) { # From a saved search model?
+      $data = static::filterToCritArr($refresh);
+    } else { #Maybe a post?
+      $data = static::filterToCritArr();
+    }
   }
   $fields =  static::getSearchFields();
   $ctls = [];
@@ -1201,30 +1221,37 @@ public static function buildSearchControlArray($refresh = null) {
         }
       }
     }
-    $queryDef = static::getFullQueryDef($basename);
-    $comptype = $queryDef['comptype'] ?? 'numeric';
-    $label = $queryDef['label'] ?? $queryDef['desc'] ?? ucfirst($basename);
+    $qd = static::getFullQueryDef($basename);
+    pkdebug("Querydef:", $qd);
+    $refarr = $qd['refarr'] ?? null;
+    if (is_subclass_of($refarr,PkRefManager::class)) {
+      $refarr = $refarr::notEmpty();
+    }
+    $qd['refarr'] = $refarr;
+    $comptype = $qd['comptype'] ?? 'numeric';
+    $label = $qd['label'] ?? $qd['desc'] ?? ucfirst($basename);
     if (!array_key_exists('label', $params)) {
       $params['label'] =  $label;
     }
     $criteriaSet = keyVal('criteriaSet', $params);
     if (!$criteriaSet) {
-      $criteriaSet = keyVal('criteriaSet', $queryDef);
+      $criteriaSet = keyVal('criteriaSet', $qd);
       if (!$criteriaSet) {
-        $criteria = keyVal('criteria', $queryDef);
+        $criteria = keyVal('criteria', $qd);
         if (ne_arrayish($criteria)) {
           $criteriaSet = keyVal('criteriaSet',$criteria);
         }
       }
       if (!$criteriaSet) { #No custom criteriaSet, so default
-        //$comptype = keyVal('comptype', $queryDef, 'numeric');
+        //$comptype = keyVal('comptype', $qd, 'numeric');
         $criteriaSet = static::getCriteriaSets($comptype);
       }
     }
     $params['criteriaSet'] = $criteriaSet;
     $params['comptype'] = $comptype;
+    $params=array_merge($params,$qd);
     /*
-    $fieldDefArr = keyVal('field_defs', $queryDef);
+    $fieldDefArr = keyVal('field_defs', $qd);
     if (ne_array($fieldDefArr)) {
       $fieldNames = array_keys($fieldDefArr);
     } else {

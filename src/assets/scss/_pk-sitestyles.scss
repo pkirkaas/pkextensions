@@ -254,6 +254,8 @@ div input[type=checkbox].pk-inp {
 div input[type=checkbox].pk-inp.z1 { zoom: 1.5; }
 div input[type=checkbox].pk-inp.z2 { zoom: 2; }
 
+div input[type=checkbox].search-val.form-control { width: auto; display: inline-flex;}
+
 $input-font-size: 14px !default;
 select.pk-inp,
 textarea.pk-inp,
@@ -681,6 +683,10 @@ $pkp-data-mg: .05em .05em !default;
   .pk-pair-set.lw#{$i} .pkp-lbl {width: $i * 1em;}
   .pk-pair.sw#{$i}  {width: $i * 1em;}
   .pk-pair.lw#{$i} .pkp-lbl {width: $i * 1em;}
+  .w#{$i}em  {width: $i * 1em;}
+  .w#{$i}rem  {width: $i * 1rem;}
+  .mw#{$i}em  {min-width: $i * 1em;}
+  .mw#{$i}rem  {min-width: $i * 1rem;}
 }
 //Example: 
 //      <data-label-pair

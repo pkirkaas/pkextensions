@@ -74,16 +74,22 @@ var formatMixin = {
       fmt = fmt || "MMMM D, YYYY";
       var m = window.moment(dt);
       if (!m.isValid()) {
+        /*
         console.error("Invalid date: ",dt);
+        console.trace();
+        */
         return '';
       }
       return m.format(fmt);
       //return m.isValid() ? m.format(fmt) : '';
     },
     formatCurrency: function(amt) { //Returns a wrapped value for negative
-      num = Number(amt);
+      var num = Number(amt);
       if (isNaN(num)) {
+        /*
         console.error("Invalid number: ",amt);
+        console.trace();
+        */
         return ' ';
       }
       if (!num || (num == 0)) {

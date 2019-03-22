@@ -752,16 +752,22 @@ class PkHtmlRenderer extends PartialSet {
    * @param $deftype - string - default 'class': if $attributes is a string, what is it?
    * Default is 'class', but could be 'data-tootik', for example
    */
-  public function cleanAttributes($attributes, $defaults=null, $required=null, $defatt='class') {
+  public function cleanAttributes($attributes=null, $defaults=null, $required=null, $defatt='class') {
     return static::scleanAttributes($attributes, $defaults, $required, $defatt);
   }
-  public static function scleanAttributes($attributes, $defaults=null, $required=null, $defatt='class') {
+  public static function scleanAttributes($attributes=null, $defaults=null, $required=null, $defatt='class') {
+    if (!$attributes) {
+      $attributes = [];
+    }
     if (is_array_indexed($attributes)) {
       $attributes = implode (' ', $attributes);
     }
     if (is_string($attributes)) $attributes = [$defatt => $attributes];
-    if (is_string($required)) $required = [$defatt => $required];
     if (!is_array_assoc($attributes)) $attributes = [];
+    if (is_array_indexed($required)) {
+      $required = implode (' ', $required);
+    }
+    if (is_string($required)) $required = [$defatt => $required];
     if (!is_array_assoc($required)) $required = [];
     $atts = merge_attributes($attributes, $required);
     if (!$defaults) {
@@ -1403,100 +1409,104 @@ class PkHtmlRenderer extends PartialSet {
    *   @paramParam string 'label' - The label for the set
    *   @paramParam string 'wrapTag' - The wrapper type: default: 'fieldset'
    *   @paramParam string 'critVal' - Criteria value - default null
-   *   @paramParam string 'valVal' - (comparison) Value value - default null
+   *   @paramParam string 'inpVal' - (comparison) Value value - default null
    *   @paramParam string|array 'wrapClass' - The css class for the set wrapper
    *   @paramParam string|array 'labelClass'  - The css class for the set label
    *   @paramParam string|array 'critClass'  - The css class for the critBox
-   *   @paramParam string|array 'valClass'  - The css class for the valBox
+   *   @paramParam string|array 'inpClass'  - The css class for the valBox
    *   @paramParam assoc array 'critAtts'  - optional criteria control atts
-   *   @paramParam assoc array 'valAtts'  - optional value control atts
+   *   @paramParam assoc array 'inpAtts'  - optional value control atts
    *   @paramParam string 'critType'  - Default: 'select'
-   *   @paramParam string 'valType'  - Default: 'text'
+   *   @paramParam string 'inpType' - inp type; Default: 'text'
+   *      but can be any made by PkForm ('multiselect, select, boolean, etc)
+   *   @paramParam array 'refArr' - opt - used by select, multiselect, etc. 
    *   @paramParam string 'enabled'  - 'enabled', 'disabled', null : Default: null
    * 
-   * #Field Names: - EITHER 'basename' is set, or 'critname' & 'valname' are set.
+   * #Field Names: - EITHER 'basename' is set, or 'critname' & 'inpname' are set.
    *   @paramParam string 'basename': If set, creates
    *      the criteria field "$basename_crit'  
    *      the value field "$basename_val'  
    * OTHERWISE:
    *   @paramParam string 'critname': The name of the crit field
-   *   @paramParam string 'valname': The name of the crit field
+   *   @paramParam string 'inpname': The name of the input/val field
    * 
    *   @paramParam assoc array 'criteriaSet' : crit values => labels
    * 
    * @return \PkExtensions\PkHtmlRenderer - Representing the HTML for the Query Control
    */
   public function querySet($params = [], $inits=[]) {
-    //pkdebug("Params:", $params, "inits:", $inits);
+    pkdebug("Params:", $params, "inits:", $inits);
     $defaults = [
     'wrapTag' => 'fieldset', 
-    'wrapClass' => ' form-group block search-crit-val-pair ',
-    'labelClass' => '',
-    'critClass' => ' form-control search-crit ',
-    'valClass' => ' form-control search-val ',
-    'valAtts' => [],
-    'critAtts' => [],
-    'valType' => 'text',
+    'wrapclass' => ' form-group inline-flex mw10em search-crit-val-pair ',
+    'labelclass' => '',
+    'critclass' => ' form-control search-crit ',
+    'inpclass' => ' form-control search-val ',
+    'inpctts' => [],
+    'cricctts' => [],
     'comptype' => 'numeric',
-    'critType' => 'select',
     'label' => '',
-    'valVal' => null,
-    'critVal' => null,
+    'inpval' => null,
+    'critval' => null,
     'enabled' => null,
 
     ];
 
-    $appendableOpts = ['wrapClass', 'labelClass', 'critClass', 'valClass'];
-    $tmpOpts = [];
-    foreach ($appendableOpts as $apOpt) {
-      $tmpOpts[$apOpt] = keyVal($apOpt, $params);
-      if (ne_array($tmpOpts[$apOpt])) {
-        $params[$apOpt] = $defaults[$apOpt] . ' '. explode(' ', $tmpOpts[$apOpt]);
-      }
-    }
+    $inpclass = $defaults['inpclass'] . ' '.($params['inpclass'] ?? ' ');
+    $wrapclass = $defaults['wrapclass'] . ' '.($params['wrapclass'] ?? ' ');
+    $labelclass = $defaults['labelclass'] . ' '.($params['labelclass'] ?? ' ');
+    $critclass = $defaults['critclass'] . ' '.($params['critclass'] ?? ' ');
 
-    $params = array_merge($defaults, $params);
-    $comptype = $params['comptype'];
+    //$params = array_merge($defaults, $params);
+    $comptype = $params['comptype'] ?? 'numeric';
     $noval = ($comptype === 'exists') || ($comptype === 'boolean');
     $basename = keyVal('basename', $params);
-    $critname = keyVal('critname', $params, $basename.'_crit');
-    if (!$params['critVal']) {
-      $params['critVal'] = $inits[$critname] ?? null;
-    }
-    $params['critname'] = keyVal('critname', $params, $basename.'_crit');
-    $valname = keyVal('valname', $params, $basename.'_val');
-    if (!$params['valVal']) {
-      $params['valVal'] = $inits[$valname] ?? null;
-    }
-    $params['valname'] = keyVal('valname', $params, $basename.'_val');
-    $params['critAtts']['class'] = $params['critClass'];
-    unset( $params['critClass']);
-    $valType = $params['valType'];
-    if ($comptype === 'date') {
-      $params['valClass'] .= " datepicker auto-attach ";
-    }
-    $params['valAtts']['class'] = $params['valClass'];
-    unset( $params['valClass']);
+    $refarr = $params['refarr'] ?? [];
+    $critname = $params['critname'] ?? $basename.'_crit';
+    $inpname = $params['inpname'] ??  $basename.'_val';
+    $critval = $params['critval'] ?? $inits[$critname] ?? null;
+    $inpval = $params['inpval'] ?? $inits[$inpname] ?? null;
+    $inptype = $params['inptype'] ?? 'text';
 
-    $wrapTag = $params['wrapTag'];
-    $critType = $params['critType'];
+    if ($comptype === 'date') {
+      $inpclass .= " datepicker auto-attach ";
+    }
+    $critatts = static::scleanAttributes(keyVal('critAtts',$params),null,$critclass);
+    $inpatts = static::scleanAttributes(keyVal('inpAtts',$params),null,$inpclass);
+
+    $wraptag = "fieldset";
+    $crittype = $params['crittype'] ?? 'select';
 
     #Start building!
-    $this->$wrapTag(RENDEROPEN, $params['wrapClass']);
-      $this->label(RENDEROPEN, $params['labelClass']);
+    $this->$wraptag(RENDEROPEN, $wrapclass);
+      $this->label(RENDEROPEN, $labelclass);
         //$this->div($params['label'], $params['labelClass']);
         $this->rawcontent($params['label']);
-        $this->rawcontent(PkForm::select($params['critname'],$params['criteriaSet'], $params['critVal'], $params['critAtts']));
+        $this->rawcontent(PkForm::$crittype($critname,$params['criteria'], $critval, $critatts));
 
 if (!$noval) {
-        $this->rawcontent(PkForm::text($params['valname'], $params['valVal'], $params['valAtts']));
+        //$this->rawcontent(PkForm::text($params['inpname'], $params['inpVal'], $params['inpAtts']));
+        if ($inptype === 'text') {
+          $inp =PkForm::text($inpname, $inpval, $inpatts); 
+        } else if (in_array($inptype,['select', 'multiselect'], 1)) {
+          $inp = PkForm::$inptype($inpname, $refarr, $inpval, $inpatts);
+        }
+        //$this->rawcontent(PkForm::text($params['inpname'], $params['inpVal'], $params['inpAtts']));
+        $this->rawcontent($inp);
 }
       $this->RENDERCLOSE();
     $this->RENDERCLOSE();
 
     return $this;
-
   }
+
+
+
+
+
+
+
+
   /** Makes an un-named datepicker text input (so it doesn't POST), and pairs it
    * with a hidden named input, 
    * Deeply depends on support from JS

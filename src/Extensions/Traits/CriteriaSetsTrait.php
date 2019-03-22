@@ -81,14 +81,23 @@ Trait CriteriaSetsTrait {
    * @return type
    */
 
-  public static function getCriteriaSets($type = null, $omit = null) {
+  public static function getCriteriaSets($type = null, $custom = null) {
     if (!$type) return static::$criteriaSets;
     $rawCritSet = keyVal($type, static::$criteriaSets, []);
-    if (is_arrayish($omit) && count($omit)) {
+    if (!$custom || !is_array($custom)) {
+      return $rawCritSet;
+    }
+    $omit = keyVal('omit',$custom);
+    if (is_array_idx($omit) && count($omit)) {
       foreach ($omit as $oc) {
         unset($rawCritSet[$oc]);
       }
-      //pkdebug("GETSETS: For type: [ $type ]; OMIT: ", $omit, 'rawCritSet:', $rawCritSet);
+      unset($custom['omit']);
+    }
+    if (count($custom)) {
+      foreach ($custom as $key=>$label) {
+        $rawCritSet[$key]=$label;
+      }
     }
     return $rawCritSet;
   }
