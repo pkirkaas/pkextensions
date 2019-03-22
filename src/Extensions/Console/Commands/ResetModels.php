@@ -20,7 +20,7 @@ class ResetModels extends Command {
 
     public function handle() {
       $this->call('destroy:tables');
-      $this->call('make:migration');
+      $this->call('make:PkModel-migration');
       $this->call('migrate');
       $this->call('db:seed');
     }

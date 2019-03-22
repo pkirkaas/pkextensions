@@ -760,16 +760,18 @@ public static function createOrUpdate(array $attributes = []) {
       $create = 0;
       $createorupdate = 'update';
       #We will only change and add fields here.
-      $currenttablefields = static::getStaticAttributeNames();
-      $is_timestamped = in_array('updated_at', $currenttablefields);
+      $currentSQLTableDefs = static::getStaticAttributeDefs();
+      $tablefields = array_keys($currentSQLTableDefs);
       $currentmodelfields = static::getFieldNames();
       if (!$currentmodelfields)
           die("No table field names defined for Model [$basename]\n");
-      $newfields = array_diff($currentmodelfields, $currenttablefields);
+      //$newfields = array_diff($currentmodelfields, $currenttablefields);
+      $newfields = array_diff($currentmodelfields, $tablefields);
       $newfielddefs = array_subset($newfields, $allFieldDefs);
       $newfieldstr = static::buildMigrationFieldDefs($newfielddefs);
-      $changedfields = array_intersect($currenttablefields, $currentmodelfields);
-      $droppedfields = array_diff($currenttablefields, $currentmodelfields);
+      //pkecho("We think the NEW fields are:",$newfields,"New Field Defs are:", $newfielddefs,"And string to build them:",$newfieldstr,"and current table fields are:", $tablefields);
+      $changedfields = array_intersect($tablefields, $currentmodelfields);
+      $droppedfields = array_diff($tablefields, $currentmodelfields);
       $droppedfieldstr = '';
       foreach ($droppedfields as $droppedfield) {
         if (!in_array($droppedfield, ['created_at', 'updated_at', 'deleted_at','remember_token']))
@@ -802,10 +804,18 @@ class $createclassname extends Migration {
     Schema::{$tableaction[$create]}('$tablename', function (Blueprint \$table) {
 ";
     $migrationFunctions = '';
-    foreach (static::getOnetimeMigrationFunctions() as $key => $func) {
-      if (!in_array($key, $currenttablefields))
-          $migrationFunctions .= "$spaces\$table->$func;\n";
-    }
+
+
+      if($createorupdate === 'create') {
+
+        foreach (static::getOnetimeMigrationFunctions() as $key => $func) {
+          if (!in_array($key, $currenttablefields))
+            $migrationFunctions .= "$spaces\$table->$func;\n";
+          }
+      }
+
+
+
     $close = "
     });
   }";
@@ -996,11 +1006,11 @@ class $createclassname extends Migration {
    * @return Array
    */
     #Fix this for both inheritance & NOT instantiating an empty instance
-  public static function getStaticAttributeDefs() {
-    pkdebug("Don't want to call this EVER!");
-    if (array_key_exists(static::class, static::$attributeDefinitionArr)) {
-      return static::$attributeDefinitionArr[static::class];
+  public static function getStaticAttributeDefs($modelorinstance = null) {
+    if (is_object($modelorinstance) && ($modelorinstance instanceOf PkModel)){
+      return $modelorinstance->getAttributeDefs();
     }
+    pkdebug("Don't want to call this EVER!");
     $instance = new Static();
     return $instance->getAttributeDefs();
   }
@@ -1514,6 +1524,11 @@ class $createclassname extends Migration {
    */
   public  $attstocalcs = [];
   /**
+   * March 2019 --- NO - MUCH IMPROVED! ELEMENTS OF THE STATIC $attstofuncs
+   * array can just be elements in a list, in which case they are just methods
+   * called on their instances, with no arguments. Or, they can be keys as below
+   * to runnables that are run instead. OR they can be keys to arrays that have
+   * Labels, maybe arguments, maybe 
    * If no key, returns the mapped array of keys to funcs/methods
    * If $key, returns the matched callable (or $key if null)
    * @param null|string $key

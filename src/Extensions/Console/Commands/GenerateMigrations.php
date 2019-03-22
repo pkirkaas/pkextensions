@@ -3,9 +3,9 @@
 namespace PkExtensions\Console\Commands;
 use Illuminate\Console\Command;
 class GenerateMigrations extends Command {
-    protected $signature = 'make:migration {class?} {modelRoot=\\App\\Models}';
+    protected $signature = 'make:PkModel-migration {class?} {modelRoot=\\App\\Models}';
 
-    protected $description = 'Allows Models implementing PkModel to specify their own DB attributes in their code, then generate Create and Update Migration tables for the DB';
+    protected $description = "Allows Models implementing PkModel to specify their own DB attributes in their code, then generate Create and Update Migration tables for the DB. Can specify a single PkModel name as an option, or will run on all of them. Default model root is App/Models, that's a second option";
 
     /**
      * Create a new command instance.

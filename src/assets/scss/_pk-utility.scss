@@ -192,6 +192,11 @@ containing block needs to be positioned relatively*/
   justify-content: flex-start;
 }
 
+.justify-evenly {
+  display: flex; 
+  justify-content: space-evenly;
+}
+
 .justify-around {
   display: flex;
   justify-content: space-around;

@@ -1438,7 +1438,7 @@ class PkHtmlRenderer extends PartialSet {
     pkdebug("Params:", $params, "inits:", $inits);
     $defaults = [
     'wrapTag' => 'fieldset', 
-    'wrapclass' => ' form-group inline-flex mw10em search-crit-val-pair ',
+    'wrapclass' => ' form-group inline-flex mnh4em mnw10em search-crit-val-pair m-3',
     'labelclass' => '',
     'critclass' => ' form-control search-crit ',
     'inpclass' => ' form-control search-val ',
