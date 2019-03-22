@@ -37,20 +37,25 @@ function disableDontCares() {
 
 /** If target is a 'search-crit' control, and equal to 'Don't Care', disable
  * its paired 'search-val' control. Else, enable
+ * ALSO: Style crit sel box depending on care/don't care
+ * CSS Classes: do-care dont-care
  * @param search criteria control target
  */
 function disableDontCare(target) {
   var paired_val_ctl = getCousins('.search-crit-val-pair','.search-val',target);
-  if (!paired_val_ctl.length) {
-   // console.log("No matching paired_val_ctl for target:",target);
-    return;
-  }
+
   /*
   */
   var search_crit_val = $(target).val();
   // if (!search_crit_val) Doesn't work???
   if (search_crit_val == 0) {
+    $(target).addClass('dont-care');
+    $(target).removeClass('do-care');
 
+    if (!paired_val_ctl.length) {
+     // console.log("No matching paired_val_ctl for target:",target);
+      return;
+    }
     if ($(paired_val_ctl).is('input[type="checkbox"]')) {
       $(paired_val_ctl).prop('checked',false);
     } else {
@@ -66,6 +71,12 @@ function disableDontCare(target) {
     $(paired_val_ctl).removeClass('enabled');
     $(paired_val_ctl).inputmask('remove');
   } else {
+    $(target).addClass('do-care');
+    $(target).removeClass('dont-care');
+    if (!paired_val_ctl.length) {
+     // console.log("No matching paired_val_ctl for target:",target);
+      return;
+    }
     $(paired_val_ctl).attr('title','');
     $(paired_val_ctl).attr('disabled',false);
     $(paired_val_ctl).removeClass('disabled');

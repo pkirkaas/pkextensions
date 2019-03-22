@@ -100,6 +100,16 @@ $checkbox-width: 2rem !default;
   width: $checkbox-width;
 }
 
+// Search/criteria styles
+$dont-care-back: #ccc !default;
+$do-care-back: #fff !default;
+
+select.search-crit.dont-care {
+  background-color: $dont-care-back;
+}
+select.search-crit.do-care {
+  background-color: $do-care-back;
+}
 
 
 

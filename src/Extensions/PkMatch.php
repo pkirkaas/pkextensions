@@ -248,6 +248,7 @@ class PkMatch {
     if ($this->comptype === 'within') return $this->withinComp($arg);
     if ($this->comptype === 'between') return $this->betweenComp($arg);
     if ($this->comptype === 'exists') return $this->existsComp($arg);
+    if ($this->comptype === 'boolean') return $this->booleanComp($arg);
     if ($this->comptype === 'intersects') return $this->intersectsComp($arg);
     throw new \Exception("Unknown comparison type: " . $this->comptype);
   }
@@ -331,20 +332,30 @@ class PkMatch {
     throw new Exception("Unknown [{$this->crit}] for comptype: {$this->comptype}");
   }
 
+/**
+#Uh, check $this->val, not arg!
   public function existsComp($arg = null) {
     return ($this->crit === 'EXISTS') && $arg;
   }
+**/
+  public function existsComp($arg = null) {
+    return ((($this->crit === 'EXISTS') && $arg)) ||
+       (($this->crit === 'NOT EXISTS') && !$arg);
+  }
 
+  public function booleanComp($arg = null) {
+  //  pkdebug("BC -  CRIT: ", $this->crit,'val: ', $this->val,"arg", $arg);
+    return ( (($this->crit === 'IS') && $arg))
+      || (($this->crit === 'IS NOT') && !$arg);
+  }
 /*
-  public function dateComp($arg = null) {
-    pkdebug("DateComp; : arg: ", $arg, "thisval:,", $this->val); 
-    if ($arg === null) return false;
-    $arg = strtotime($arg);
-    $this->val = strtotime($this->val);
-    pkdebug("DateComp;after strto time : arg: ", $arg, "thisval:,", $this->val); 
-    return $this->numericComp($arg = null);
+  public function booleanComp($arg = null) {
+    pkdebug("BC -  CRIT: ", $this->crit,'val: ', $this->val);
+    return ( (($this->crit === 'IS') && $this->val))
+      || (($this->crit === 'IS NOT') && !$this->val);
   }
   */
+
   public function numericComp($arg = null,$conv=null) {
     if ($arg === null) return false;
       //if ($this->compfield == 'assetdebtratio')  pkdebug("YES: SUCCESSFULLY GOT TO NUMERIC, ARG:", $arg,$this);
