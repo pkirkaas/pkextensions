@@ -96,9 +96,18 @@ Class Undefined {
  * this.
  */
 Class Failure {
+  public static $failure;
+  public static function get($msg=null) {
+    if (!static::$failure) {
+      static::$failure = new Failure($msg);
+    } else {
+      static::$failure->msg = $msg;
+    }
+    return static::$failure;
+  }
   public $msg='Failure';
   public function getMsg() {
-    return displayData($msg);
+    return displayData($this->msg);
   }
   public function __construct($msg = null) {
     if ($msg !== null) {

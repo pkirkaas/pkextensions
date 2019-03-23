@@ -242,6 +242,7 @@ class PkMatch {
     //pkdebug("Trying to satisfy this...", $this, 'with arg', $arg);
     if (!$this->crit || ($this->crit === '0')) return true;
     if ($this->comptype === 'string') return $this->stringComp($arg);
+    if ($this->comptype === 'exact') return $this->numericComp($arg);
     if ($this->comptype === 'numeric') return $this->numericComp($arg);
     //if ($this->comptype === 'date') return $this->dateComp($arg);
     if ($this->comptype === 'date') return $this->numericComp($arg,'strtotime');

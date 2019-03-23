@@ -113,6 +113,92 @@ select.search-crit.do-care {
 }
 
 
+div.row.search {
+  margin-top: 1.5em;
+  fieldset.search-crit-val-pair {
+    border: solid blue 1px;
+    border-radius: .5em;
+    text-align: center;
+
+  > label {
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    color: #006;
+  }
+  }
+}
+
+div.row.search fieldset label {
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    color: #006;
+    margin-bottom: 0;
+
+}
+div.pk-checkbox input[type='checkbox'] {
+  margin-right: 1rem;
+}
+
+div.row.search div.multiselect.form-control label {
+  font-size: 1rem;
+  color: #400;
+  margin-left: .5rem;
+  text-align: left;
+}
+
+select.form-control.search-crit {
+  text-align-last: center;
+  display: inline-block;
+  font-size: 1rem;
+  color: #000;
+}
+
+
+div.row.search {
+  margin-top: 1.5em;
+  fieldset.search-crit-val-pair {
+    border: solid blue 1px;
+    border-radius: .5em;
+    text-align: center;
+
+  > label {
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    color: #006;
+  }
+  }
+}
+
+div.row.search fieldset label {
+    font-size: 1.2rem;
+    text-align: center;
+    font-weight: 600;
+    color: #006;
+    margin-bottom: 0;
+
+}
+div.pk-checkbox input[type='checkbox'] {
+  margin-right: 1rem;
+}
+
+div.row.search div.multiselect.form-control label {
+  font-size: 1rem;
+  color: #400;
+  margin-left: .5rem;
+  text-align: left;
+}
+
+select.form-control.search-crit {
+  text-align-last: center;
+  display: inline-block;
+  font-size: 1rem;
+  color: #000;
+}
+
+
 
 
 $body-font-size: 14px !default;

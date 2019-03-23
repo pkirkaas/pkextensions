@@ -66,6 +66,21 @@ Trait CriteriaSetsTrait {
           '=' => 'At',
           '!=' => 'Not At',
       ],
+
+      'exact' => [
+         '0' => "Don't Care",
+         "=" => "Required",
+         "!=" => "Excluded",
+         ], #Seems like boolean, except it's for a specific value,
+            #probably in a select dropdown from a reference array
+
+         #Matching a property of a 'many' side - like clients missed appts.
+          'oneofmany' => [
+             '0' => "Don't Care",
+             "IN" => "With",
+             "NOT IN" => "Without",
+             ],
+              
   ];
 
 /** Existential queries that don't require values */

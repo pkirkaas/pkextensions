@@ -1633,7 +1633,9 @@ class $createclassname extends Migration {
      * *
      */
 
-    return parent::__get($key);
+    //Sometimes I'm SURE I'm nuts
+    return $this->tryTraitFGets($key);
+    //return parent::__get($key);
      /** 7 Nov 18 - NO idea what I wanted to do with "conversion"? */ 
     /*
     $res = parent::__get($key);

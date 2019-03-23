@@ -111,6 +111,12 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
     return getAllTraits($target);
   }
 
+  public static function fail($msg=null) {
+    return Failure::get($msg);
+  }
+  public static function failed($res) {
+    return $res instanceOf Failure;
+  }
   public static function getTraitMethods($trimtraits=[],$target = null) {
     if (!$target) {
       $target = static::class;
@@ -143,6 +149,45 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   }
    * *
    */
+
+  /** Returns all methods of this class beginning with the string
+   * 'pre'. If $longer is true, (default), the method names have to be 
+   * 1 character longer than $pre
+   * @param string $pre
+   * @param boolean $longer
+   * @return array of matching method names
+   */
+  public function methodsStartingWith($pre,$longer=true) {
+    $mtds = get_class_methods($this);
+    if (!$mtds || !is_array($mtds)) return [];
+    $res = [];
+    foreach ($mtds as $mtd) {
+       if (startsWith($mtd, $pre,  true, $longer)) {
+         $res[] = $mtd;
+       }
+    }
+    return $res;
+  }
+
+
+  /** Methods starting with '__getF' (the F) are a promise
+   * to return an instance of \Failure if they can't fulfill it
+   * @param string $key - what to get
+   * @param boolean $parent - if true, call parent __get, else
+   * return failure;
+   */
+  public function tryTraitFGets($key, $parent = true) {
+    $gets = $this->methodsStartingWith('__getF');
+    foreach ($gets as $get) {
+      if (!$this->failed($res=$this->$get($key))) {
+        return $res;
+      }
+    }
+    if ($parent) {
+      return parent::__get($key);
+    }
+    return $this->failure();
+  }
     
 
 /** Does THIS SPECIFIC CLASS or used TRAIT define the method?

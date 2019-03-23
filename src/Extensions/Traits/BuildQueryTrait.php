@@ -203,10 +203,13 @@ trait BuildQueryTrait {
         'fieldtype' => 'integer',
         'comptype' => 'numeric',
     ];
-    return normalizeConfigArray(static::getSearchFieldDefs(), $configStruct);
+    return normalizeConfigArray(static::getSearchQDFieldDefs(), $configStruct);
   }
 
-  public static function getSearchFieldDefs() {
+  public static function getSearchQDFieldDefs() {
+    if (method_exists(static::class,'getSearchFieldDefs')) {
+      return static::getSearchFieldDefs();
+    }
     pkdebug("Static sfd:",static::$search_field_defs);
     return static::$search_field_defs;
   }
@@ -388,6 +391,22 @@ trait BuildQueryTrait {
   }
 
 
+  public static function buildQueryFieldsExact($baseName, $def = null) {
+    $valType = keyVal('fieldtype', $def, 'integer');
+    $fieldtype_args = keyVal('fieldtype_args', $def);
+    $fields = [];
+    $parms = keyVal('parms', $def);
+    if ($parms && is_scalar($parms)) $parms = [$parms];
+    if($parms && is_array($parms)) foreach ($parms as $i => $parm) {
+      $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
+    }
+    $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
+    $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
+    return $fields;
+  }
+
+
+
   public static function buildQueryFieldsBoolean($baseName, $def = null) {
     $valType = keyVal('fieldtype', $def, 'boolean');
     $fieldtype_args = keyVal('fieldtype_args', $def);
@@ -400,8 +419,9 @@ trait BuildQueryTrait {
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
     return $fields;
-
   }
+
+
 
 /////// Questionable? 
   public static function buildQueryFieldsDate($baseName, $def = null) {
@@ -1281,7 +1301,7 @@ public static function buildSearchControlArray($refresh = null) {
     if (! $this instanceOf PkController) return;
     if (isPost()) {
       $data = request()->all();
-      $sedefs = static::getSearchFieldDefs();
+      $sedefs = static::getSearchQDFieldDefs();
       $fqd = static::getFullQueryDef();
       pkdebug("In Trait PS, data:", $data, 'SDs',$sedefs, "FullQD", $fqd);
     }
