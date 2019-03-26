@@ -38,5 +38,14 @@ class PkKernal extends ConsoleKernel {
         $this->bootstrap();
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
+    /**
+     * Get the bootstrap classes for the application.
+     *
+     * @return array
+     */
+    protected function bootstrappers() {
+      echo "In PkKernal bootstrappers\n";
+        return $this->bootstrappers;
+    }
 
 }
