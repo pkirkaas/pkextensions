@@ -5,14 +5,7 @@ use Illuminate\Console\Command;
 class ClearAll extends Command {
     protected $signature = 'wipe';
     protected $description = 'Runs all possible clears and cache dumps';
-    public function __construct() {
-        parent::__construct();
-        $this->addArgument("setenv");
-    }
     public function handle() {
-      echo "Arguments are:\n";
-
-      print_r($this->arguments());
       $this->call('config:cache');
       $this->call('cache:clear');
       $this->call('view:clear');
