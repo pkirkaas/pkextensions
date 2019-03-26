@@ -45,6 +45,46 @@ function pkinst($var) {
   return get_class($var);
 }
 
+/** Assumes config('app.type') exists, checks it's value against $type arg
+ * For customizing behavior  of same code base based on VHOST SetEnv,
+ * forexample: SetEnv APP_TYPE val. Base function to be called by more
+ * specific functions like "apptype($test)"
+ * 
+ * @param string $configsetting: like 'app.type', to fetch & compair to $type
+ * @param string|array $test - single test or test array
+ * @return string|false - Value of config($configsetting) in $test (arr),
+ *   else false
+ */
+function configsetting($configsetting,$test) {
+  if (!$test) return false;
+  if (is_string($test)) {
+    $test = [$test];
+  }
+  if (!is_array($test)) {
+    pkerror("Wrong arg for [test]:", $test, "ConfigSetting: [$configsetting]");
+    return false;
+  }
+  if (in_array(config($configsetting),$test,1)) {
+    return config($configsetting);
+  }
+  return false;
+}
+
+/** Assumes config('app.type') exists, checks it's value against $type arg
+ * For customizing behavior  of same code base based on VHOST SetEnv APP_TYPE val
+ * See PkServiceProvider to add additinal configs
+ * @param string|array $type - single type or type array
+ * @return boolean - true if config('app.type') in $type (arr)
+ */
+function apptype($type) {
+  return configsetting('app.type', $type);
+}
+
+function appgroup($type) {
+  return configsetting('app.group', $type);
+}
+
+
 /** Escape for SQL - but ->quote() quotes everything, so have to work around
  * for numerics & dates
  * Problem is, for string table columns that accept empty strings but not null..
