@@ -2,6 +2,7 @@
 /** (C) Copyright 2018 by Paul Kirkaas. All Rights Reserved */
 namespace PkExtensions\Traits;
 use PkExtensions\PkException;
+use PkExtensions\VHandler;
 /** Modfies the app config dynamically, during execution, to use the Apache 
  * SetEnv VARIANT environment variable (or, if from Artisan, the passed value
  * The variant file can execute code, & return an array to cusomize config.
@@ -14,7 +15,8 @@ use PkExtensions\PkException;
 trait VariantConfigTrait {
   public function variantConfig($variant = null)  {
     variant($variant);
-    if (!$variant) {
+    VHandler::set($variant);
+    if (!$variant || !file_exists(base_path("env.$variant.php"))) {
       return;
     }
     $map = require(base_path("env.$variant.php"));
@@ -32,16 +34,4 @@ trait VariantConfigTrait {
       config(["database.connections.$def.database"=>$db]);
     }
   }
-
-
-  /*
-$db = config('database.default');
-$con = config("database.connections.$db");
-$con['database'] = 'lsbb_vendor';
-config(["database.variant" => $con]);
-config(["database.connections.variant" => $con]);
-   * 
-   */
-
-
 }

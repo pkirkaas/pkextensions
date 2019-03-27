@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use PkExtensions\Traits\VariantConfigTrait;
 
 class PkServiceProvider extends ServiceProvider {
+  use VariantConfigTrait;
     public function register() {
       config(['app.url'=>request()->root()]);
       if($var = getenv("VARIANT")) {
@@ -14,8 +15,6 @@ class PkServiceProvider extends ServiceProvider {
         $this->variantConfig($var);
       }
 
-
-      pkdebug("VAR: [$var]");
       //pkdebug("ReqRoot:",request()->root(),"baseURL:",getBaseUrl() , "app",config('app'));
       // Over-rides generated configs with custom settings from VHOST, like:
       // SetEnv APP_NAME "My VHOST App Name"
