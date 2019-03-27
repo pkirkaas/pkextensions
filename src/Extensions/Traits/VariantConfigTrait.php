@@ -5,23 +5,43 @@ use PkExtensions\PkException;
 /** Modfies the app config dynamically, during execution, to use the Apache 
  * SetEnv VARIANT environment variable (or, if from Artisan, the passed value
  * The variant file can execute code, & return an array to cusomize config.
+ * env.VARIANT.php can do whatever it wants, but some conventions:
+ *   It uses the config key "variant" to set custom values; like:
+ *   config(['variant.db'=>"vendor_db"]); -- and the config trait will
+ *   create a custom Schema/DB connection to the new DB
  *
  */
 trait VariantConfigTrait {
   public function variantConfig($variant = null)  {
+    variant($variant);
     if (!$variant) {
       return;
     }
-    if (!is_string($variant)) {
-      throw new PkException(["Illegal Type for Variant:", $variant]);
+    $map = require(base_path("env.$variant.php"));
+    if ($map && is_array($map)) {
+      foreach ($map as $ckey =>$val) {
+        config([$ckey=>$val]);
+      }
     }
-    $vcnfnm = base_path("env.$variant.php");
-    //echo "The path: [$vcnfnm]\n";
- #a PHP array of config keys to values ['app.name'=>"Custom Name", ...
-    $map = require($vcnfnm);
-    foreach ($map as $ckey =>$val) {
-      config([$ckey=>$val]);
-    }
-//pkecho("The New Con? ",config("database.variant"));
+    $this->setDb();
   }
+
+  public function setDb() {
+    if ($db = config('variant.db')) {
+      $def = config('database.default');
+      config(["database.connections.$def.database"=>$db]);
+    }
+  }
+
+
+  /*
+$db = config('database.default');
+$con = config("database.connections.$db");
+$con['database'] = 'lsbb_vendor';
+config(["database.variant" => $con]);
+config(["database.connections.variant" => $con]);
+   * 
+   */
+
+
 }

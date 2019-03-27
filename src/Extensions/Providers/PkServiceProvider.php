@@ -4,10 +4,19 @@
 namespace PkExtensions\Providers;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
+use PkExtensions\Traits\VariantConfigTrait;
 
 class PkServiceProvider extends ServiceProvider {
     public function register() {
       config(['app.url'=>request()->root()]);
+      if($var = getenv("VARIANT")) {
+        config(['variant.variant'=>$var]);
+        $this->variantConfig($var);
+      }
+
+
+      pkdebug("VAR: [$var]");
+      //pkdebug("ReqRoot:",request()->root(),"baseURL:",getBaseUrl() , "app",config('app'));
       // Over-rides generated configs with custom settings from VHOST, like:
       // SetEnv APP_NAME "My VHOST App Name"
       // See lib/pkhelpers for convenience functions like 

@@ -33,6 +33,23 @@ function eloquentToArray($var) {
   return getAsArray($var);
 }
 
+
+/** To support different behavior in the same code, depending
+ * on environment variable or URL or whatever. Used to set
+ * and retrieve the variant value - which is a string used
+ * to load "env.VARIANT.php" 
+ * @staticvar int $varval
+ * @param type $variant
+ * @return string|0
+ */
+function variant($variant=null) {
+  static $varval = 0;
+  if ($variant) {
+    $varval = $variant;
+  }
+  return $varval;
+}
+
 /** Checks $var is an instantiated/persisted (w. ID) instance of PkModel; 
  * false if not, else the class name.
  * @param mixed $var - the value to test

@@ -2,9 +2,10 @@
 /** (C) Copyright 2018 by Paul Kirkaas. All Rights Reserved */
 /** * Description of MigrateVariant * */
 Namespace PkExtensions\Console\Commands;
-use PkExtensions\Console\Commands\Support\MigratorVariant;
-use Illuminate\Database\Console\Migrations\MigrateCommand;
+//use PkExtensions\Console\Commands\Support\MigratorVariant;
+
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\Console\Migrations\MigrateCommand;
 use PkExtensions\Traits\VariantConfigTrait;
 
 class MigrateVariant extends MigrateCommand{
@@ -28,38 +29,19 @@ class MigrateVariant extends MigrateCommand{
 
     public function __construct() {
         $repository = app()['migration.repository'];
-      //  pkecho(app()['files']);
-       // $this->variantConfig(trim($this->input->getArgument('variant')));
-        $mv = new MigratorVariant($repository, app()['db'], app()['files']);
+        //$mv = new MigratorVariant($repository, app()['db'], app()['files']);
+        $mv = new Migrator($repository, app()['db'], app()['files']);
         parent::__construct($mv);
     }
 
     public function handle() {
        $this->variantConfig(trim($this->input->getArgument('variant')));
        parent::handle();
-      
     }
 
     protected function getMigrationPath() {
       $mpath = parent::getMigrationPath();
       $var =  trim($this->input->getArgument('variant'));
       return $mpath.'/'.$var;
-      /*
-      return $this->laravel->databasePath().'/'.
-       * 
-       */
     }
-    protected function prepareDatabase() {
-      $this->migrator->setConnection('variant');
-      
-        if (! $this->migrator->repositoryExists()) {
-            $this->call('migrate:install', ['variant']);
-        }
-    }
-
-    /*
-    protected function getMigrationPaths() {
-    }
-     * 
-     */
 }
