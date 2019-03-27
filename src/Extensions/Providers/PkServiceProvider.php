@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Command;
 
-class PkServiceProvider extends ServiceProvider
-{
+class PkServiceProvider extends ServiceProvider {
     /**
      * Register services.
      *
@@ -58,4 +57,7 @@ class PkServiceProvider extends ServiceProvider
 
 
     }
+
+
+
 }
