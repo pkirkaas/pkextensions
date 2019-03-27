@@ -24,6 +24,10 @@ Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
   w10em, w20rem - {width: 10em/10rem;}, etc.
 
 
+Better Dimensions:
+w1em-w60em, and rem & mxw (max-width) mnw, h same
+
+
 min-line-height - empty div minimum 1 line height
 
 (x = t (top), b (bottom), l (left), r (right), v (vertical), h (horizontal)

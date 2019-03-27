@@ -284,7 +284,7 @@ var utilityMixin = {
      return this.postSetData(object, fields, params, instance);
     },
     report(stuff) {
-      console.log("Component Name:",this.componentname, "this.$data", this.$data,"stuff:",stuff);
+      //console.log("Component Name:",this.componentname, "this.$data", this.$data,"stuff:",stuff);
     },
     /** Takes an array of refs names, checks they exist, then calls the method
      * on each of them.
@@ -396,13 +396,13 @@ var vValidatorMixin = {
       if ((!this.errors || typeof this.errors !== 'object') || !this.errors.items.length) {
         return false;
       }
-      console.log("getMyError:  After no obj no arr before Iteration");
+      //console.log("getMyError:  After no obj no arr before Iteration");
       var result = false;
       this.errors.items.forEach(function(item){
-        console.log("In iteration, item:",item,"item.vmId",item.vmId,"typeof item.vmId",
-        typeof item.vmId, "vmId",vmId, "typeof vmid", typeof vmId);
+        //console.log("In iteration, item:",item,"item.vmId",item.vmId,"typeof item.vmId",
+       // typeof item.vmId, "vmId",vmId, "typeof vmid", typeof vmId);
         if (item.vmId === vmId) {
-          console.log("Match & return item:", item);
+        //  console.log("Match & return item:", item);
           result = item;
           return item;
         }
@@ -534,7 +534,7 @@ var pinputMixin = {
       //console.log("After mounted, this$data:",this.$data);
       if (this.params.vrule  || (this.name === 'facebook_url') || (this.name === 'linkedin_url') 
               || (this.params.name==='facebook_url')) {
-        console.log("this params:", this.params,"this.vrule:",this.vrule,"this 4data:",this.$data);
+       // console.log("this params:", this.params,"this.vrule:",this.vrule,"this 4data:",this.$data);
       }
   },
   methods: {
@@ -576,7 +576,7 @@ var pinputMixin = {
     },
     initData() {
       if (this.overrideInitData() === true) {
-        console.log ("Overrode - not initting");
+        //console.log ("Overrode - not initting");
         return;
       }
      if (this.stopProcessing()) return;
@@ -590,7 +590,7 @@ var pinputMixin = {
        //console.log("Succeeded in fetch, resp:", response);
        var value = response.data[this.name];
        if (this.name === 'tskills_m') {
-         console.log("The value response:", value);
+         //console.log("The value response:", value);
        }
        if (this.formatin) {
          value = this[this.formatin](value);
@@ -605,7 +605,7 @@ var pinputMixin = {
      }).  catch(defaxerr);
     },
     savesubmit(event,arg) {
-      console.log("This errors:",this.errors,"this vrule:",this.vrule, "this._uid:", this._uid);
+      //console.log("This errors:",this.errors,"this vrule:",this.vrule, "this._uid:", this._uid);
       var errobj = this.getMyFormattedError(this._uid);
       if (errobj) {
         console.log("In savesubmit, errorobj:",errobj,"this.error_class:",this.error_class,"thiserror_msg",this.error_msg);
@@ -641,7 +641,7 @@ var pinputMixin = {
        if (this.params.formatin) {
          value = this[formatin](value);
        }
-       console.log("After save, returned value:",value);
+       //console.log("After save, returned value:",value);
        this.value = value;
      }).catch(defaxerr);
     },
@@ -1832,7 +1832,7 @@ window.Vue.component('data-label-pair', {
  * value/input is flex-grow: 1
  */
 window.Vue.component('value-label-set', {
-  name: 'data-label-set',
+  name: 'val-label-set',
   template: `
   <div class="dls-wrap-cls" :class="wrap_cls" v-atts="wrap_atts" :style="wrap_style">
     <div class="dls-lbl-cls" :class="lbl_cls" v-atts="lbl_atts" :style="lbl_style" v-html="label"></div>
@@ -1844,7 +1844,7 @@ window.Vue.component('value-label-set', {
   */
   props: {
     lparams:{type:Object, default: {},},
-    dparams:{type:Object, default: {},},
+    vparams:{type:Object, default: {},},
     wparams:{type:Object, default: {},},
   },
   data: function() {
@@ -2073,7 +2073,7 @@ Vue.component('new-btn', {
       };
       axios.post(url,params).then(response=> {
         //Apparent success - if 
-        console.log("Created new instance - refresh");
+        //console.log("Created new instance - refresh");
         if (notify) notify();
       }).catch(defaxerr);
     }
