@@ -4,15 +4,24 @@
 namespace PkExtensions\Providers;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
+use PkExtensions\Console\Commands\MigrateMakeVariant;
+use PkExtensions\Console\Commands\MigrateVariant;
 use Illuminate\Console\Command;
 
 class PkServiceProvider extends ServiceProvider {
+  protected $commands = [
+      'MigrateVariant' =>'command.migratevariant',
+      'MigrateVariantMake'=>'command.migratevariant.make'
+      ];
     /**
      * Register services.
      *
      * @return void
      */
     public function register() {
+      $this->registerMigrateVariantCommand();
+      $this->registerMigrateMakeVariantCommand();
+      $this->commands(array_values($this->commands));
       //Command::macro(""
       // Over-rides generated configs with custom settings from VHOST, like:
       // SetEnv APP_NAME "My VHOST App Name"
@@ -22,6 +31,7 @@ class PkServiceProvider extends ServiceProvider {
       //    which return True or False
       // Sometimes the env def (DB_DATABASE) doesn't match the config param
       // 'database.database' - so then cat is an array as below
+      /*
       $apacheConfigArgs = [
           ['cat'=>'app','param'=>'name'],
           ['cat'=>'app','param'=>'type'],
@@ -42,7 +52,20 @@ class PkServiceProvider extends ServiceProvider {
           config(["$confcat.$param"=>$envVal]);
         }
       }
+       * 
+       */
         //
+    }
+  public function registerMigrateVariantCommand() {
+        $this->app->singleton('command.migratevariant', function ($app) {
+            return new MigrateVariant($app['migratorvariant']);
+        });
+  }
+    public function registerMigrateMakeVariantCommand() {
+        $this->app->singleton('command.migratevariant.make', function ($app) {
+          $creator=$app['migration.creatorvariant'];
+          return new MigrateMakeVariant($creator,$app['composer']);
+    });
     }
 
     /**
@@ -56,6 +79,9 @@ class PkServiceProvider extends ServiceProvider {
       });
 
 
+    }
+    public function provides() {
+      return ['command.migratevariant.make', 'command.migratevariant'];
     }
 
 
