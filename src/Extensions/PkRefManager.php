@@ -145,7 +145,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
 
   /**Defaults to getRefArr, but if $merged, combines the
    * key & value in the select display, with $merged as the separator
-   * @param boolean $null - include null value?
+   * @param boolean|string $null - include null value?
+   *   If boolean TRUE, show "None", if string, show that for null value
    * @param boolean|string $merged - if 'true', combine w. ':' , if
    * string, use that.
    * 
@@ -159,8 +160,22 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       $refArr[$key] = $key." $merged ".$val;
     }
     if (!$null) return $refArr;
-    return [null=>'None'] + $refArr;
+    if (!is_string($null)) {
+      $null = "None";
+    }
+    return [null=>$null] + $refArr;
+  }
 
+  public static function mergeKeyVal($key,$mergestr=null) {
+    $keyvalarr = static::getKeyValArr();
+    if (!array_key_exists($key,$keyvalarr)) {
+      return '';
+    }
+    $val = $keyvalarr[$key];
+    if (!is_string($mergestr)) {
+      $mergestr = ":";
+    }
+    return $key." $mergestr ".$val;
   }
 
 
@@ -174,14 +189,22 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * [['key'=>$key,'value'=>$value,'other'=>$other,],]
    * but THIS will return
    * in the normalized form of ['key'=>$value] 
+   * @param boolean|string $null - default: false
+   *   If false, do not give empty option
+   *   If true, give empty option labelled "None"
+   *   If string, give empty option labelled w. string
    * @return array of arrays of key=>value
    */
+
   public static function getKeyValArr($null = false) {
+    if (($null === true) || ($null === 1)) {
+      $null = "None";
+    }
     if (is_array(static::$refArr)) return static::getRefArr($null);
 
     #TODO: Restore the caching later...
     if (is_array(static::$idxRefArr)) {
-      if ($null) $refArr = [null=>'None'];
+      if ($null) $refArr = [null=>$null];
       else $refArr = [];
       foreach (static::$idxRefArr as $refRow) {
         $refArr[keyVal('key', $refRow)] = keyVal('value', $refRow);
@@ -189,7 +212,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       return $refArr;
     }
     if (is_array(static::$keyRefArr)) {
-      if ($null) $refArr = [null=>'None'];
+      if ($null) $refArr = [null=>$null];
       else $refArr = [];
       foreach (static::$keyRefArr as $key => $refRow) {
         $refArr[$key] = keyVal('value', $refRow);
@@ -211,7 +234,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       static::$cache[$class][$kvk][$refRow['key']] = $refRow['value'];
     }
     $retArr =  static::$cache[$class][$kvk];
-    if ($null) $retArr = [null=>'None'] + $retArr;
+    if ($null) $retArr = [null=>$null] + $retArr;
     return $retArr;
     //return static::$cache[$class][$kvk];
   }

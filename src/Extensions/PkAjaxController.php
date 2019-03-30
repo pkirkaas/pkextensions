@@ -193,6 +193,7 @@ abstract class PkAjaxController extends PkController {
     return $this->jsonresponse($data,$status,$headers,$options);
   }
 
+
   /**
    * Returns an error but also pops up a message to the user
    * @param string|array $data - the message to the user. If an array, can contain

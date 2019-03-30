@@ -25,7 +25,7 @@ Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
 
 
 Better Dimensions:
-w1em-w60em, and rem & mxw (max-width) mnw, h same
+w1em -> w60em, and rem & mxw (max-width) mnw, h same
 
 
 min-line-height - empty div minimum 1 line height
@@ -35,7 +35,7 @@ Padding:
   (rem) p-rN, pad-rN, p-lN p-rN p-tN p-bN p-vN, p-hN, pvN, pxN
   (em) pe-xN
 
-Margins:
+Margins: (x=v vertical, h horizontal)
   (rem) mN, mxN - positive; mx-N - negative
   (em) mexN (positive);   mex-N (negative)
   mxa : auto
