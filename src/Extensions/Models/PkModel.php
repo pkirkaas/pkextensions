@@ -410,20 +410,32 @@ public static function createOrUpdate(array $attributes = []) {
   /** Returns an array of attributes matching the keys, for AJAX
    * Indexed keys are this objects attributes/properties - entries
    * keyed by a string with value of array are relationship attributes
+   * 
    * If $keys is empty or $extra is true, return the default keys
-   * (as defined in attributeNames). Else, defaults PLUS extras
+   * (as defined in attributeNames PLUS ->getExtraAttributeNames).
+   * AND if method exists ->getLocalAttributeNames()
+   * 
+   * Else, all defaults PLUS extras
+   * 
    * @param array $keys - the key/attribute pairs to be returned.
    *    if empty, return all the default ones. Can be index for direct
    *    attributes, or associative, where key is a relationship & value
    *    is an array of attributes to be returned from the relationships
+   *    (If only  want subset of atts from relationship)
+   * 
+   * 
    * @param $extra mixed boolean|array - if false, only return the keys
    * specified by the $keys argument (if $keys empty, all default)
+   * 
    * If true, return all default key/values PLUS those specified in $keys
-   * (for example, relationships). If array, merge with $keys, if string,
+   * (for example, relationships, or $attstofuncs (virtual/calculated attributes))
+   * If array, merge with $keys, if string,
    * convert to array
    * 
    * (This way you can add extra keys to the defaults without having to 
    * specify all the defaults in the $keys arguments. 
+   * 
+   * So fetchAttributes([],['rel1','rel2']) ==  fetchAttributes(['rel1','rel2'],true);
    *
    */
 

@@ -1,6 +1,7 @@
 <?php
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
+use PkExtensions\Traits\TraitDataToRefs;
 use PkRenderer;
 ### Danger Will Robinson! static::getRefArr() only works if static::$refArr is set!
 ### Have to fix that....
@@ -11,6 +12,7 @@ use PkRenderer;
  * @author Paul Kirkaas
  */
 abstract class PkRefManager  implements PkDisplayValueInterface{
+  use TraitDataToRefs;
 
   public static $multival = false; #Default is simple key/value pairs
   #But if true, ref array of form: [['key'=>$key,'value'=>$value, 'details'=>$details], ['key'=>....
@@ -42,8 +44,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @param boolean $null - if false or 0,  no "empty" options,
    * if boolean "True"  adds key null=>'None' to start of array -
    * if $null=string(also '' empty string - so null w. no label
-   * if $null is ne_string string, puts the string as
-   * the label for the null option.
+   * if $null is ne_string string, value is the label for the null option.
+   * 
    * @return array of key=>value
    */
   public static function getRefArr($null=false) {

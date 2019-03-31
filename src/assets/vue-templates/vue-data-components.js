@@ -361,9 +361,57 @@ var utilityMixin = {
     chunkArr: function(anarr,sz) {
       sz = sz || 2;
       return _.chunk(anarr,sz);
+    },
+    /** Merges o2 into 01 - so modifies it, but doesn't over-write 
+     * existing values, unless spefied in options
+     * options: object,
+     *   overwrite:keys - if keys empty, overwrite all
+     *   if keys is array, only overwrite those keys. If
+     *   overwritekeys:keys  not set, don't overwrite
+     *   overwritevals:values to overwrite. If key exists but value
+     *   empty, overwrite only target null values
+     *   
+     *   Worry about options later
+     * 
+    */
+   /*
+    gentleMerge: function(o1,o2,options) {
+      //options = this.toObject(options);
+      o1 = this.toObject(o1);
+      o2 = this.toObject(o2);
+      //var optkeys = Object.keys(options);
+      var o1keys = Object.keys(o1);
+      var o2keys = Object.keys(o2);
+      for (var akey in o2) {
+        if (Array.indexOf(
+
+
+      }
+      
+
     }
+    */
+   /* Existing settings override default, required override existing */
+   mergeDefaultSetRequired: function (defaults, params, required) {
+     defaults = this.toObject(defaults);
+     required = this.toObject(required);
+     params = this.toObject(params);
+     var res = _.merge({},defaults,params,required);
+     return res;
+   },
+  },
+};
+
+/** Used to build out a dataset to build a select control tied to 
+  makeMergedSelSet: function(defaults, selset, required) {
+    selset.params = this.mergeDefaultSetRequired(defaults,selset.params,required);
+    return selset;
+  }
+
+
   }
 };
+*/
 window.utilityMixin = utilityMixin;
 
 /** To add common characteristics to build ajax inputs to be more
@@ -1831,7 +1879,7 @@ window.Vue.component('data-label-pair', {
  * Default formatting - wrapper is flex (inline-flex?) - label is flex-grow: 0,
  * value/input is flex-grow: 1
  */
-window.Vue.component('value-label-set', {
+window.Vue.component('val-label-set', {
   name: 'val-label-set',
   template: `
   <div class="dls-wrap-cls" :class="wrap_cls" v-atts="wrap_atts" :style="wrap_style">
@@ -2434,6 +2482,46 @@ window.Vue.component('ajax-textarea-input', {
   </div>`,
 });
 
+/*******    Ordinary inputs - no AJAX *****/
+// We prefix them the 'std-'
+Vue.component('std-select', {
+  name: 'std-select',
+  props: ['name','value','params','options'],
+  template: `
+    <select v-if="canOpen" :name="name" v-model='value'>
+      <option v-for="(option, idx) in options"
+         :value="option.value" v-html="option.label">
+      </option>
+    </select>
+ ` ,
+    data: function() {
+      return {
+        options2:    [
+          { value: "", label: null },
+          { value: 10, label: "Accountants" },
+          { value: 20, label: "Advertising/PR" },
+          { value: 30, label: "Aerospace, Defense" },
+          { value: 40, label: "Agriculture" },
+          { value: 50, label: "Alcoholic Beverages" },
+        ],
+      };
+    },
+    mounted: function() {
+      console.log("Anoter note from mountes");
+      //this.$nextTick(() => {
+        console.log('Super Mounted:::name', this.name, "value", this.value, "params:", this.params, "options",this.options);
+     // });
+    },
+    computed: {
+      canOpen: function () {
+        if(!this.name ) {
+          return false;
+        }
+        return true;
+      },
+    },
+
+});
 
 
 /**AJAX Load & Save Select */
