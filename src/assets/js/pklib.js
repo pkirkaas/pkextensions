@@ -2151,3 +2151,47 @@ function arrayFormData(fd, log) {
   }
   return retarr;
 }
+
+
+
+
+/** These enable related inputs when this input is empty/null, 
+ * and disable/reset them when not empty. The triggering input has
+ * ['data-pk-input-enable-none'=>':input[name="insuranceco_name"]',
+ * Have to call all on load, and just individual when changed - which
+ * is all done below.
+ */
+ /** Individual 
+ * @param jQuery-node triggerinput
+ */
+function enableRelatedInputWhenEmpty(triggerinput) {
+  triggerinput = jQuerify(triggerinput);
+  var data_sel = 'data-pk-input-enable-none';
+  var cousinSelector = triggerinput.attr(data_sel);
+  var targetinput = triggerinput.cousin(cousinSelector);
+  if (!triggerinput.val()) {
+    targetinput.prop('disabled',false);
+  } else {
+    targetinput.val(null);
+    targetinput.prop('disabled',true);
+  }
+}
+
+/** Called on page load - loops through all */
+function enableRelatedInputsWhenEmpty() {
+  var data_sel = 'data-pk-input-enable-none';
+  var sel = ':input['+data_sel+']';
+  var toginp = $(sel);
+  if (!toginp.length) {
+    return;
+  }
+  toginp.each(function() {
+    enableRelatedInputWhenEmpty(this);
+  });
+}
+$(function () {
+  enableRelatedInputsWhenEmpty();
+  $('body').on('change', ':input[data-pk-input-enable-none]', function (event) {
+    enableRelatedInputWhenEmpty(event.target);
+  });
+});

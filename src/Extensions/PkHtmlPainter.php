@@ -446,14 +446,21 @@ class PkHtmlPainter extends PkHtmlRenderer {
   public static function mkErrorPopUp() {
     //$errorMsgBag = session('errorBag');
     //$errorMsgBag = session('errors');
+    $allMsgs = [];
     $errorSet = session('errors');
     if (!$errorSet) return null;
+    if (is_string($errorSet)) {
+      $errorSet = [$errorSet];
+    }
+    if (is_array($errorSet)) {
+      $errorSet = new MessageBag($errorSet);
+    }
+
     if ($errorSet instanceOf ViewErrorBag) {
       $errorBags = $errorSet->getBags();
     } else if ($errorSet instanceOf MessageBag) {
       $errorBags = [$errorSet];
     }
-    $allMsgs = [];
     foreach ($errorBags as $errorBag) {
       foreach ($errorBag->all() as $msg) {
         $allMsgs[] = $msg;

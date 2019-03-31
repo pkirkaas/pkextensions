@@ -664,6 +664,9 @@ public static function createOrUpdate(array $attributes = []) {
     $spaces = "    ";
     //foreach (static::$table_field_defs as $fieldName => $def) {
     foreach ($fielddefs as $fieldName => $def) {
+      if ($change && ($fieldName === 'id')) {
+        continue;
+      }
       $type = null;
       //pkdebug("Defs for '$fieldName',", $def);
       $methodChain = '';
@@ -730,6 +733,9 @@ public static function createOrUpdate(array $attributes = []) {
         $standaloneModifiers = ['primary','index','unique','nullable','unsigned','useCurrent',];
         //pkdebug("DefVals for $fieldName:",$defvals);
         foreach($standaloneModifiers as $sam) {
+          if ($change && in_array($sam,$indices,1)) {
+            continue;
+          }
           if (in_array($sam,$defvals,true) && !in_array($sam,$usedMethods,1)) {
             $methodChain.=  "->$sam()";
           }
@@ -3156,6 +3162,8 @@ class $createclassname extends Migration {
   /** Default: Guesses parent / "owner" models by looking for all fields in 
    * this model ending in "XXX_id", and looking for parent tables called XXXs
    * returns false if none, or else parent struct array of ['model', 'table', 'key']
+   * 
+   * **   THIS IS VERY DANGEROUS !!!!!  
    */
   public static function parentStructure() {
     $pkModelTables = static::getAllPkModelsTables();

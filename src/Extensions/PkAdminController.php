@@ -13,6 +13,35 @@ Abstract class PkAdminController extends PkController {
   public function orphans() {
     return view('admin.orphans');
   }
+  /**
+   * @param string $model - fully qualified model name subclass of PkModel
+   * @param integer $id - the ID of the instance
+   * @return 
+   */
+  public function deletemodel() { 
+    $data = request()->all();
+    $model = $data['model'];
+    if (!is_subclass_of($model,PkModel::class)) {
+      $err = "Model not subclass of PkModel? Model: [$model]";
+      pkdebug($err);
+      return redirect()->back()->with('errors',$err);
+    }
+    $id = to_int ($data['id']);
+    $instance = $model::find($id);
+    if (!$instance) {
+      $err = "Didn't find instance of Model: [$model] with ID: [$id]";
+      pkdebug($err);
+      return redirect()->back()->with('errors',$err);
+    }
+    $instance->delete(true);
+    return redirect()->back();
+  }
+
+  public function tools() {
+    return view('admin.tools');
+  }
+
+
 
   /** This returns a whole complete page of treeEditPanes,
    * called & returned by

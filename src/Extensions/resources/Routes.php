@@ -13,7 +13,20 @@ protected function mapWebRoutes() {
  */
 Auth::routes();
 Route::group(['middleware' => ['web']], function () {
-//Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
+  Route::group(['prefix'=>'admin','middleware'=> ['auth', 'admin']],function() {
+    Route::any('/deletemodel',  ['as' => 'admin_deletemodel', 
+        'uses'=>'AdminController@deletemodel']);
+
+    Route::any('/orphans', ['as' => 'admin_orphans',
+      'uses' => 'AdminController@orphans', 'desc'=>'Manage Orphans']);
+      //'type'=>'admin', 'desc'=>'Manage Orphans']);
+
+    Route::any('/tools', ['as' => 'admin_tools',
+      'uses' => 'AdminController@tools', 'desc'=>'Admin Tools']);
+      //'type'=>'admin', 'desc'=>'Admin Tools']);
+
+
+});
   /*
 Route::group(['prefix'=>'admin','middleware'=> ['auth','admin']],function() {
   Route::get('/btest',function () {return "<h1> Proxied Hi, kid</h1><h1> Proxied ";});

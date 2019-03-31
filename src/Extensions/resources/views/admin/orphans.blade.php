@@ -7,6 +7,7 @@ $allorphans = PkModel::getAllOrphans(true);
 @section('content')
 <div class='template type'>
   <h1>Orphans</h1>
+  <h1>STOP!! THIS IS VERY DANGEROUS !! ASSUMES EVERY TABLE CALLS 'blocks' OWNS every table that has a field "block_id" and proposes to delete them all if empty!</h1>
   <table class='pk-tbl fullwidth'>
     <tr><th>Model</th><th>ID</th><th>Delete?</th><th>Parent Key</th><th>Parent Model</th><th>Parent ID</th></tr>
   @foreach ($allorphans as $model => $orphans)
