@@ -52,6 +52,7 @@
 namespace PkExtensions\Models;
 
 use PkExtensions\Traits\UtilityMethodsTrait;
+use PkExtensions\Traits\ArrayFetchAttributesTrait;
 use PkExtensions\PkCollection;
 use PkExtensions\PkJsonArrayObject;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,7 +77,7 @@ use Cache;
 
 abstract class PkModel extends Model {
 
-  use UtilityMethodsTrait, PkSelfBuildingTrait;
+  use UtilityMethodsTrait, ArrayFetchAttributesTrait, PkSelfBuildingTrait;
 
   public static $timestamp = true;
   /** Until I can get regular Laravel caching to work, I can
@@ -473,8 +474,10 @@ public static function createOrUpdate(array $attributes = []) {
         //TODO!! Have to see if this works for relations & JSONable
         $value = $this->$key;
         //if (($value instanceOf PkModel) || ($value instanceOf PkCollection)) {
-        if (is_object($value) && method_exists($value,'fetchattributes')) {
+        if (is_object($value) && method_exists($value,'fetchAttributes')) {
           $value = $value->fetchattributes();
+        } else if (is_arrayish($value)) {
+          $value = $this->arrayFetchAttributes($value);
         }
         /*
         if (is_arrayish($value)) {

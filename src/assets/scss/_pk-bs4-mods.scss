@@ -203,9 +203,9 @@ nav.navbar {
 
 //    height: $pk-top-menu-height;
     flex-direction: row;
-    background: #a00;
+    background: $pk-nav-sub-nav-background;
     .nav-link {
-      color: #ccf;
+      color:  $pk-nav-sub-nav-color;
       //font-size: 1rem;
       &:hover {
         color: white;
@@ -217,6 +217,28 @@ nav.navbar {
 
     }
   } 
+
+
+ body nav.navbar.pk-nav.sub-nav {
+    padding-top: 0;
+  }
+
+  nav.pk-nav.sub-nav ul.nav.navbar-nav {
+    padding-top: 0;
+  }
+
+  nav.pk-nav.sub-nav ul.nav.navbar-nav {
+    padding-top: 0;
+  }
+
+  div.dropdown-menu a.nav.navbar.pk-nav.sub-nav .dropdown-menu {
+    background: $pk-nav-sub-nav-background;
+    color:  $pk-nav-sub-nav-color;
+      &:hover {
+        color:   $pk-nav-sub-nav-background;
+      }
+  }
+
 
   div.container-fluid.theme-showcase.app-tpl {
     //If we need this, use JS

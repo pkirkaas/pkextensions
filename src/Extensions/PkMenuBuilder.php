@@ -35,7 +35,13 @@ class PkMenuBuilder {
     'atoggle' => ['tag'=>'a', 'class'=>
       'nav-link dropdown-toggle site-brand', 'data-toggle'=>'dropdown', 'href'=>'#',
       'role'=>'button','aria-haspopup'=>'true', 'aria-expanded'=>'false'],
+      #For dropdowns in submenu
+    'satoggle' => ['tag'=>'a', 'class'=>
+      'nav-link dropdown-toggle submenu', 'data-toggle'=>'dropdown', 'href'=>'#',
+      'role'=>'button','aria-haspopup'=>'true', 'aria-expanded'=>'false'],
     'lidrop' => ['tag'=>'li', 'class'=>"navbar-brand nav-item dropdown site-brand-li"],
+      #For dropdowns in submenu
+    'slidrop' => ['tag'=>'li', 'class'=>" nav-item dropdown submenu"],
     'liflat' => ['tag' => 'li', 'class'=>"navbar-brand nav-item site-brand-li"],
     'aflat' => ['tag'=>'a', 'class'=>"nav-link site-brand tpm-menu-link "],
   ];
@@ -75,6 +81,15 @@ class PkMenuBuilder {
 
     $mb = new static();
     $ps = new PartialSet();
+    $submenu = $optatts['submenu'] ?? null;
+    if ($submenu) {
+      $toggle = 'satoggle';
+      $lidrop = 'slidrop';
+    } else {
+      $toggle = 'atoggle';
+      $lidrop = 'lidrop';
+    }
+    pkdebug("Toggle: [$toggle], optatts:", $optatts);
     if (is_arrayish($lnkarr)) {
       foreach ($lnkarr as $arr) {
         if ($arr instanceOf Route) { 
@@ -95,8 +110,9 @@ class PkMenuBuilder {
       }
     }
     $optatts = PkRenderer::cleanAttributes($optatts,[],[],'data-tootik');
-    return $mb->lidrop([
-      $mb->atoggle($label),
+    return $mb->$lidrop([
+
+      $mb->$toggle($label),
       $mb->divdrop($ps)], $optatts);
   }
 

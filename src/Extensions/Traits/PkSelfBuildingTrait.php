@@ -14,7 +14,7 @@ use PKExtensions\PkCollection;
 trait PkSelfBuildingTrait {
 /** Takes the params generated getRestore (PkModel & ID or ID's) & rebuilds the 
  * instance or collection
- * @param[PkModel model: Fully namespaced
+ * @param[PkModel modelname: Fully namespaced
  * @param[int | array of ints] - keys to rebuild the model(s)
  * @return PkModel or PkCollection. For a single model instance, you don't
  * need the model name - conversely, you can use any PkModel if you do have the

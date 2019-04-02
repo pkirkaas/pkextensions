@@ -457,6 +457,24 @@ $('body').on('click', '.hide-toggler', function (event) {
   toggled.prop('disabled', !disabled);
 });
 
+/** Toggle visility of an element - 'data-element-hide' is both the button this
+ * action is attached to, as well as containing the cousin selector for the 
+ * element to be hidden/shown
+ * @returns {undefined}
+ */
+$(function () {
+  $('body').on('click','[data-toggle-hide]', function(event) {
+    var toggler = $(event.target);
+    var togglee =toggler.cousin(toggler.attr('data-toggle-hide'));
+    console.log("Togglee:", togglee);
+    if (togglee.is(':hidden')) {
+      togglee.show();
+    } else {
+      togglee.hide();
+    }
+  
+  });
+});
 
 /** Set subform select inputs after templating */
 
@@ -1560,8 +1578,9 @@ function mkLoginDlg(selector,opts) {
  */
 $(function () {
   var $dlgwrap = $('.jqui-dlg-pop-load-wrapper');
-  if (!$dlgwrap.length)
+  if (!$dlgwrap.length) {
     return;
+  }
   $dlgwrap.hide();
   //console.log("Wrapper found & hidden - looking for first child...");
   var $dbx = $dlgwrap.find('div').first();
@@ -1574,6 +1593,7 @@ $(function () {
   var defaultWidth = Math.min(600,$(window).width());
   var dialogDefaults = {
     modal: true,
+    top: 150,
     autoOpen: true,
     minWidth: defaultWidth,
     resizable: true,
@@ -1589,11 +1609,19 @@ $(function () {
     ]
   };
 
-  var dialogOpts = JSON.parse(htmlDecode($dbx.attr('data-dialog-opts')));
+  var dialogOpts = {};
+  if ($dbx.attr('data-dialog-opts')) {
+    dialogOpts = JSON.parse(htmlDecode($dbx.attr('data-dialog-opts')));
+  }
   if (isObject (dialogOpts) && !isEmpty(dialogOpts)) {
     dialogDefaults = Object.assign(dialogDefaults, dialogOpts);
   }
-  //console.log("In 'new' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
+  var top = (dialogDefaults.top || 160).toString();
+  var left = dialogDefaults.left || 'center';
+  if (!dialogDefaults.position) {
+    dialogDefaults.position = {my:"center top",at:"center "+ "top+"+top, of:'body'};
+  }
+  console.log("In 'new' pop, merged opts:", dialogDefaults, 'dialogOpts:', dialogOpts);
   $dbx.dialog(dialogDefaults);
 });
 

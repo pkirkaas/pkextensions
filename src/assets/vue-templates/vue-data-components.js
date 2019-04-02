@@ -2486,7 +2486,8 @@ window.Vue.component('ajax-textarea-input', {
 // We prefix them the 'std-'
 Vue.component('std-select', {
   name: 'std-select',
-  props: ['name','value','params','options'],
+  //props: ['name','value','params','options'],
+  props: ['selectdata'],
   template: `
     <select v-if="canOpen" :name="name" v-model='value'>
       <option v-for="(option, idx) in options"
@@ -2496,23 +2497,18 @@ Vue.component('std-select', {
  ` ,
     data: function() {
       return {
-        options2:    [
-          { value: "", label: null },
-          { value: 10, label: "Accountants" },
-          { value: 20, label: "Advertising/PR" },
-          { value: 30, label: "Aerospace, Defense" },
-          { value: 40, label: "Agriculture" },
-          { value: 50, label: "Alcoholic Beverages" },
-        ],
+        name:selectdata.name,
+        value: selectdata.value,
+        options: selectdata.options,
+        params:selectdata.params,
       };
     },
     mounted: function() {
-      console.log("Anoter note from mountes");
-      //this.$nextTick(() => {
-        console.log('Super Mounted:::name', this.name, "value", this.value, "params:", this.params, "options",this.options);
-     // });
     },
     computed: {
+      val: function() {
+        return this.value;
+      },
       canOpen: function () {
         if(!this.name ) {
           return false;

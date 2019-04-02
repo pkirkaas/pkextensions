@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use PkExtensions\Models\PkModel;
 use PkExtensions\Traits\PkSelfBuildingTrait;
+use PkExtensions\Traits\ArrayFetchAttributesTrait;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -16,7 +17,7 @@ use Illuminate\Support\Str;
  * @author pkirk
  */
 class PkCollection extends Collection {
-   use PkSelfBuildingTrait;
+   use PkSelfBuildingTrait, ArrayFetchAttributesTrait;
   /**
    * Just iterates over the instances & returns an array
    * of the of the individuale instance 'fetchAttributes()
@@ -26,11 +27,14 @@ class PkCollection extends Collection {
    */
    public function fetchAttributes($keys=[],$extra=[]) {
      $retarr=[];
-     foreach ($this as $instance) {
-       if (!$instance instanceOf PkModel) {
-         continue;
+     foreach ($this as $akey => $instance) {
+       if (is_object($instance) && method_exists($instance,'fetchAttributes')) {
+          $retarr[$akey]=$instance->fetchAttributes($keys, $extra);
+       } else if (is_arrayish($instance)) {
+         $retarr[$akey] = $this->arrayFetchAttributes($instance);
+       } else if (is_scalarish($instance)) {
+         $retarr[$akey] = $instance;
        }
-       $retarr[]=$instance->fetchAttributes($keys,$extra);
      }
      return $retarr;
    }

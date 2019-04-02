@@ -460,14 +460,14 @@ a.undecorated {
     display: none;
   }
 }
-.js-dialog-content {
-  display: none;
-}
 
 .row.col-inner-border [class*="col"] {
    @extend .inner-border;
 }
 /** A jQuery UI Dialog Box that should pop-up on page load if it exists*/
+
+.js-dialog-content,
+.jqui-dlg-pop-load-wrapper,
 .jqui-dlg-pop-load {
   display: none;
 }

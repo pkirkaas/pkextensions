@@ -5,6 +5,7 @@ namespace PkExtensions;
 
 use PkExtensions\Models\PkModel;
 use PkExtensions\PkController;
+use PkExtensions\PkMenuBuilder;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use PkForm;
@@ -385,6 +386,13 @@ class PkHtmlPainter extends PkHtmlRenderer {
     return $links;
   }
 
+  /** Allow drop menus in links - if link key is string, make drop
+   * 
+   * @param mixed array  $links - if key is int, direct link. If key is string,
+   *   make a drop menu, with the other links
+   * @param type $opts
+   * @return string
+   */
   public function mkBsMenu($links = [], $opts = []) {
     $nav_class = keyVal('nav_class', $opts, 'pk-nav sub-nav pk-fixed-menu');
     $nav_ul_class = keyVal('nav_ul_class', $opts, 'flex-row');
@@ -392,11 +400,16 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $menu[] = "
       <nav class='$nav_class navbar navbar-inverse no-print zup'>";
     $menu[] = " <ul class='nav navbar-nav $nav_ul_class'>\n";
-    foreach ($links as $link) {
+    foreach ($links as  $drop => $link) {
+      if (is_string($drop)) {
+        pkdebug("Opts:", $opts);
+        $menu[]=PkMenuBuilder::Drop($drop,$link,$opts);
+      } else {
       $menu[] = "
-    <li class='nav-item'>
-      $link
-    </li>\n";
+        <li class='nav-item'>
+          $link
+        </li>\n";
+      }
     }
     $menu[] = " </ul>";
     $menu[] = " </nav>\n";

@@ -210,7 +210,7 @@ trait BuildQueryTrait {
     if (method_exists(static::class,'getSearchFieldDefs')) {
       return static::getSearchFieldDefs();
     }
-    pkdebug("Static sfd:",static::$search_field_defs);
+    //pkdebug("Static sfd:",static::$search_field_defs);
     return static::$search_field_defs;
   }
 
@@ -275,7 +275,7 @@ trait BuildQueryTrait {
      */
     //$searchDefs = []; //Made of both the table field defs AND other params/settings
     $searchFields = static::getNormedSearchFieldDefs();
-    pkdebug("SearchFields:", $searchFields);
+    //pkdebug("SearchFields:", $searchFields);
     //$fieldDefsCollection = [];
     foreach ($searchFields as $baseName => &$def) {
       /** Initially defaulted to the Query Model if the field type was method - but
@@ -1077,7 +1077,7 @@ trait BuildQueryTrait {
     //foreach ($this->matchObjs as $ma) {
       //if ($ma->compfield == 'assetdebtratio') pkdebug("After buildQS, The MA is: ", $ma);
     //}
-    pkdebug("querySets should contain both property & method queries: SETS:", $sets);
+    //pkdebug("querySets should contain both property & method queries: SETS:", $sets);
     return $sets;
   }
 
@@ -1242,7 +1242,7 @@ public static function buildSearchControlArray($refresh = null) {
       }
     }
     $qd = static::getFullQueryDef($basename);
-    pkdebug("Querydef:", $qd);
+    //pkdebug("Querydef:", $qd);
     $refarr = $qd['refarr'] ?? null;
     if (is_subclass_of($refarr,PkRefManager::class)) {
       $refarr = $refarr::notEmpty();

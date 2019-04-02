@@ -1435,7 +1435,7 @@ class PkHtmlRenderer extends PartialSet {
    * @return \PkExtensions\PkHtmlRenderer - Representing the HTML for the Query Control
    */
   public function querySet($params = [], $inits=[]) {
-    pkdebug("Params:", $params, "inits:", $inits);
+    //pkdebug("Params:", $params, "inits:", $inits);
     $defaults = [
     'wrapTag' => 'fieldset', 
     'wrapclass' => ' form-group inline-flex mnh4em mnw10em search-crit-val-pair m-3',
