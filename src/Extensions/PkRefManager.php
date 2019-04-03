@@ -2,7 +2,12 @@
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
 use PkExtensions\Traits\TraitDataToRefs;
-use PkRenderer;
+use PkExtensions\Traits\UtilityMethodsTrait;
+ #So models can implement as well so models can implement as well
+#Provides some common methods, and abstract methods as well, that
+#Any implementer will  have to profive
+use PkExtensions\Traits\RefDisplayTrait;
+use PkRenderer, RefDisplayTrait;
 ### Danger Will Robinson! static::getRefArr() only works if static::$refArr is set!
 ### Have to fix that....
 /**
@@ -137,8 +142,15 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
  *   ['value'=>$value2, 'label'=>$label2],
 
  *  */
-  public static function mkVueSelectArray($null=true) {
-      return static::mkIdxRefArr($null);
+  public static function mkVueSelectArray($null=true,$json=false) {
+      $options = static::mkIdxRefArr($null);
+      if ($json) {
+        $options = json_encode($options,UtilityMethodsTrait::$jsonopts);
+      }
+      return $options;
+  }
+  public static function vueSelectOpts($null=true) {
+    return static::mkVueSelectArray($null, true);
   }
 
 

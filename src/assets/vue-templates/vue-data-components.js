@@ -2535,6 +2535,20 @@ Vue.component('std-select', {
 
 });
 
+/////  Testing a wrapper with a slot???
+Vue.component('slot-wrapper',{
+  name: 'slot-wrapper',
+  props:['label'],
+  template: `
+  <div class="sw-wrapper">
+      <div class="lbl" v-html="label"></div>
+        <div class="inp-wrap">
+          <slot>Inserted Slot Content Belongs Here</slot>
+        </div>
+  </div>
+ `,
+});
+
 
 /**AJAX Load & Save Select */
 //options is an array of objects: {value:value,label:label, rendered by:'

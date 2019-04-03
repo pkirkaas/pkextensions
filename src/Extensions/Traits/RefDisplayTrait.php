@@ -7,6 +7,10 @@ use PkForm;
  *public static $refArrays = 
  *  ['reason_id'=>[1=>"Didn't like it", 2=>"Didn't Fit"], 'brand_id'=>[1=>"Levi's".....
  * Of course uses public static function getRefArrays() 
+ * 
+ * But it should be changed to be implementable for reference tables
+ * as well. Can support abstract methods, so like an interface with some
+ * implemented methods
  */
 trait RefDisplayTrait {
   public static function getRefArrays($el = null) {
