@@ -2489,7 +2489,7 @@ Vue.component('std-select', {
   //props: ['name','value','params','options'],
   props: ['selectdata'],
   template: `
-    <select v-if="canOpen" :name="name" v-model='value'>
+    <select :name="name" v-model='value'>
       <option v-for="(option, idx) in options"
          :value="option.value" v-html="option.label">
       </option>
@@ -2497,20 +2497,36 @@ Vue.component('std-select', {
  ` ,
     data: function() {
       return {
-        name:selectdata.name,
-        value: selectdata.value,
-        options: selectdata.options,
-        params:selectdata.params,
+        name:this.selectdata.name,
+        value: this.selectdata.value,
+        options: this.selectdata.options,
+        params:this.selectdata.params,
+        /*
+        */
       };
     },
     mounted: function() {
     },
     computed: {
       val: function() {
-        return this.value;
+        return this.selectdata.value;
       },
+      /*
+      value: function() {
+        return this.selectdata.value;
+      },
+      name: function() {
+        return this.selectdata.name;
+      },
+      options: function() {
+        return this.selectdata.options;
+      },
+      params: function() {
+        return this.selectdata.params;
+      },
+      */
       canOpen: function () {
-        if(!this.name ) {
+        if(!this.selectdata.name ) {
           return false;
         }
         return true;
