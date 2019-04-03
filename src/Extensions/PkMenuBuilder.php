@@ -89,7 +89,6 @@ class PkMenuBuilder {
       $toggle = 'atoggle';
       $lidrop = 'lidrop';
     }
-    pkdebug("Toggle: [$toggle], optatts:", $optatts);
     if (is_arrayish($lnkarr)) {
       foreach ($lnkarr as $arr) {
         if ($arr instanceOf Route) { 
@@ -136,7 +135,6 @@ class PkMenuBuilder {
       $this->ps = new PartialSet();
     }
     $method = strtolower($method);
-    //pkdebug("\nCalling [$method], Depth: ".$this->depth);
     if (in_array($method, array_keys($this->menudefaults) , 1)) {
       array_unshift($args, $this->menudefaults[$method]);
       $res = call_user_func_array([$this,'_base'], $args);

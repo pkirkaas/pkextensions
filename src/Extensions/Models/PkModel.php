@@ -1459,7 +1459,7 @@ class $createclassname extends Migration {
     $this->casts = $this->getInstanceArraysMerged('casts');
     $this->fillable($this->attributeNames);
     //$this->fillable($this->getFieldNames());
-    unset ($attributes['id']);
+    unset ($attributes['id']); #HOW THE FUCK DOES THIS WORK???
     $attributes = $this->RunExtraConstructors($attributes);
     parent::__construct($attributes);
   }
