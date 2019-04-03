@@ -75,8 +75,8 @@ Boxes:
 .bbfcborder { @extend .bb-fc; @extend .border-rad;
 .flex-row { flex-wrap: wrap; }
 Tables: 
-  No Borders: tableno-borders
-  Collapsed: tablepk-tbl
+  No Borders: table.no-borders
+  Collapsed: table.pk-tbl
 
 Zooms: z1, z2, etc increase zoom by 11, 12, etc
    z-1, z-2 to 9, 8

@@ -45,7 +45,9 @@ $(function () {
  *  AND for Laravel Validation errors 
  */
 $(function () {
-  $("[class^='jq-format-']").htmlFormatted();
+  $("[class^='jq-format-']").each(function() {
+    $(this).htmlFormatted();
+  });
   /*
   $(document).ajaxError(function (event, jqxhr, settings, error) {
     var j = jqxhr;
@@ -846,7 +848,9 @@ jQuery.fn.extend({
       return false;
     },
     currency: function (jqobj, content, force) {
-      if (jqobj.hasClass('jq-format-currency') || force) {
+      if (jqobj.hasClass('jq-format-currency') 
+        || jqobj.hasClass('jq-format-dollar') 
+              || force) {
         //console.log("In currency formatter, content:",content);
         var num = toNumber(content);
         if (isNaN(num)) {
@@ -858,6 +862,7 @@ jQuery.fn.extend({
         if (wrap_class) {
           jqobj.addClass(wrap_class);
         } else {
+          jqobj.addClass('tar');
           //jqobj.addClass('pk-dollar-value');
           //jqobj.addClass('dollar-format');
         }
