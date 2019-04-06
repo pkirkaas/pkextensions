@@ -1,13 +1,15 @@
 <?php
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 namespace PkExtensions;
-use PkExtensions\Traits\TraitDataToRefs;
+//use PkExtensions\Traits\TraitDataToRefs;
 use PkExtensions\Traits\UtilityMethodsTrait;
+use PkExtensions\Traits\addNullOptTrait;
+use PkExtensions\Interfaces\KeyValInterface;
  #So models can implement as well so models can implement as well
 #Provides some common methods, and abstract methods as well, that
 #Any implementer will  have to profive
 use PkExtensions\Traits\RefDisplayTrait;
-use PkRenderer, RefDisplayTrait;
+use PkRenderer;
 ### Danger Will Robinson! static::getRefArr() only works if static::$refArr is set!
 ### Have to fix that....
 /**
@@ -16,8 +18,9 @@ use PkRenderer, RefDisplayTrait;
  * Adding support for indexed key/value/details
  * @author Paul Kirkaas
  */
-abstract class PkRefManager  implements PkDisplayValueInterface{
-  use TraitDataToRefs;
+abstract class PkRefManager  implements PkDisplayValueInterface, KeyValInterface {
+  //use  RefDisplayTrait, addNullOptTrait;
+  use  UtilityMethodsTrait, addNullOptTrait;
 
   public static $multival = false; #Default is simple key/value pairs
   #But if true, ref array of form: [['key'=>$key,'value'=>$value, 'details'=>$details], ['key'=>....
@@ -26,10 +29,12 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @var array key=>value; key to store in DB, value to display
    */
   public static $cache = [];
-  #ONE of these should be set, 
+  #ONE of these 3 static variables should be set, 
+
   public static $refArr;# Simplest: [$key1=>$val1,$key2=>$val2,...
   public static $idxRefArr;# indexed array of arrays: [['key'=>$key1,'value'=>$val1,],['key'=>$key2,'value'=>$val2,...
   public static $keyRefArr; #keyed array of arrays: [$key1=>['value'=>$val1],$key2=>['value'=>$val2,]...
+
   public static $labels = ['', '', ''];
 
   /** Obviously, so implementing classes can get / generate their refArray other
@@ -54,11 +59,20 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
    * @return array of key=>value
    */
   public static function getRefArr($null=false) {
-    if (($null===false) || ($null===0)) return static::$refArr;
-    if ($null===true) {
-      $null = "None";
+    if (property_exists(static::class,'refArr')) {
+      $refArr = static::$refArr;
+    } else if (property_exists(static::class,'idxRefArr')) {
+      $refArr = [];
+      foreach (static::$idxRefArr as $row) {
+        $refArr[$row['key']] = $row['value'];
+      }
+    } else if (property_exists(static::class,'keyRefArr')) {
+      $refArr = [];
+      foreach (static::$idxRefArr as $key =>$row) {
+        $refArr[$key] = $row['value'];
+      }
     }
-    return [null=>$null] + static::$refArr;
+    return static::_null($null,$refArr);
   }
 
 /** See function getOptionList below for more option definition
@@ -107,7 +121,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
       }
       $ret[]="<option $selected>$null</option>\n";
     }
-    foreach (static::$refArr as $key => $target) {
+    foreach (static::getRefArr() as $key => $target) {
       if (is_array_indexed($target)) {
         $display=$target[0];
         $tip = " title='$target[1]' ";
@@ -136,24 +150,6 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return $ret;
   }
 
-/*Just like above, except returns just idx array of assoc arrays, for Vue select
- * @return array like: [
- *   ['value'=>$value1, 'label'=>$label1],
- *   ['value'=>$value2, 'label'=>$label2],
-
- *  */
-  public static function mkVueSelectArray($null=true,$json=false) {
-      $options = static::mkIdxRefArr($null);
-      if ($json) {
-        $options = json_encode($options,UtilityMethodsTrait::$jsonopts);
-      }
-      return $options;
-  }
-  public static function vueSelectOpts($null=true) {
-    return static::mkVueSelectArray($null, true);
-  }
-
-
 
 
 
@@ -173,11 +169,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     foreach ( static::getKeyValArr($null) as $key => $val) {
       $refArr[$key] = $key." $merged ".$val;
     }
-    if (!$null) return $refArr;
-    if (!is_string($null)) {
-      $null = "None";
-    }
-    return [null=>$null] + $refArr;
+    return static::_null($null, $refArr);
   }
 
   public static function mergeKeyVal($key,$mergestr=null) {
@@ -192,6 +184,23 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     return $key." $mergestr ".$val;
   }
 
+
+/*Returns just idx array of assoc arrays, for Vue select
+ * @return array like: [
+ *   ['value'=>$value1, 'label'=>$label1],
+ *   ['value'=>$value2, 'label'=>$label2],
+
+ *  */
+  public static function mkVueSelectArray($null=true,$json=false) {
+      $options = static::mkIdxRefArr($null);
+      if ($json) {
+        $options = json_encode($options,UtilityMethodsTrait::$jsonopts);
+      }
+      return $options;
+  }
+  public static function vueSelectOpts($null=true) {
+    return static::mkVueSelectArray($null, true);
+  }
 
 
 
@@ -279,7 +288,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
   public static function notEmpty() {
-    $refArr = static::getRefArr();
+    $refArr = static::getKeyValArr();
     if (!key($refArr)) unset($refArr[key($refArr)]);
     //reset($refArr);
     return $refArr;
@@ -402,7 +411,7 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
     $class = static::class;
     if (!array_key_exists($class, static::$refcache)) {
       $refs = [];
-      $refArr = static::getRefArr();
+      $refArr = static::getKeyValArr();
       foreach ($refArr as $refKey => $refValue) {
         $refs[$refKey] = new static([$refKey => $refValue]);
       }
@@ -476,8 +485,8 @@ abstract class PkRefManager  implements PkDisplayValueInterface{
   }
 
   /** Only works if there is a refArr. */
-  public static function mkIdxRefArr($null=true, $keylabel='value', $valuelabel='label') {
-    $refarr = static::getRefArr($null);
+  public static function mkIdxRefArr($null=false, $keylabel='value', $valuelabel='label') {
+    $refarr = static::getKeyValArr($null);
     $ret = [];
     foreach ($refarr as $key=>$value) {
       $ret[] = [$keylabel=>$key, $valuelabel=>$value];

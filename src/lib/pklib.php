@@ -4104,3 +4104,17 @@ function is_exactly_a($var1, $var2) {
 function &arref(&$arr, $key) {
    return $arr[$key];
 }
+
+/** PHP "class_implements($mixed) returns an array of all interfaces implemented
+ * by $mixed (which can be a class name or object) - does implement checks if
+ * $mixed implements (the fully namespaced) interface
+ * @param object|string classname : $mixed
+ * @param string $interface - interface name
+ */
+function does_implement($mixed, $interface) {
+  $interfaces = class_implements($mixed);
+  if (!is_array($interfaces)) return false;
+  if (in_array($interface, $interfaces, 1)) {
+    return true;
+  }
+}

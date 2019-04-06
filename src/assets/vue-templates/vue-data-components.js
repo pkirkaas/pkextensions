@@ -438,6 +438,21 @@ var controlMixin = {
 window.controlMixin = controlMixin;
 
 
+/** Wrappers can have multiple classes & styles for label, wrapper, & content
+ * They will be values of a param object, & may be null, string, class or array
+ * @type {type}
+ */
+var wrapperMixin = {
+  methods: {
+    mkClass(cssclass) {
+      if (window.isEmpty(cssclass)) return {};
+      if (typeof cssclass==='string') return {[cssclass]:true};
+      return cssclass;
+    },
+  }
+};
+window.wrapperMixin = wrapperMixin;
+
 var vValidatorMixin = {
   methods: {
     getMyError: function(vmId) { //Checks errors & only reports for THIS input
@@ -2489,7 +2504,7 @@ Vue.component('std-select', {
   //props: ['name','value','params','options'],
   props: ['selectdata'],
   template: `
-    <select :name="name" v-model='value'>
+    <select :class="selectdata.selectclass" :name="name" v-model='value'>
       <option v-for="(option, idx) in options"
          :value="option.value" v-html="option.label">
       </option>
@@ -2538,16 +2553,74 @@ Vue.component('std-select', {
 /////  Testing a wrapper with a slot???
 Vue.component('slot-wrapper',{
   name: 'slot-wrapper',
-  props:['label'],
+  mixins:[window.wrapperMixin],
+  props:{
+    slotwrap: {type:Object, default:function(){ return {};}}
+    },
+    /*
+    label
+    wrapclass
+    wrapstyle
+    wrapatts
+    lblstyle
+    lblclass
+    lblatts
+    cntstyle
+    cntclass
+    cntatts
+
+          */
   template: `
-  <div class="sw-wrapper">
-      <div class="lbl" v-html="label"></div>
-        <div class="inp-wrap">
+  <div class="sw-wrapper" :class="wrapclass" :style="wrapstyle" v-atts="wrapatts">
+      <div class="lbl" :class="lblclass" :style="lblstyle" v-html="label" v-atts="lblatts">
+      </div>
+        <div class="cnt-wrap" :class="cntclass" :style="cntstyle" v-atts="cntatts">
           <slot>Inserted Slot Content Belongs Here</slot>
         </div>
   </div>
  `,
+  computed: {
+    label() { return typeof slotwrap.label === 'string' ? slotwrap.label : '';},
+    wrapcls() { return this.mkClass(this.slotwrap.wrapcls);},
+    lblcls() { return this.mkClass(this.slotwrap.lblcls);},
+    cntcls() { return this.mkClass(this.slotwrap.cntcls);},
+    wrapstyle() { return this.mkStyle(this.slotwrap.wrapstyle);},
+    lblstyle() { return this.mkStyle(this.slotwrap.lblstyle);},
+    cntstyle() { return this.mkStyle(this.slotwrap.cntstyle);},
+    wrapatts() {return this.slotwrap.wrapatts;},
+    lblatts() {return this.slotwrap.lblatts;},
+    cntatts() {return this.slotwrap.cntatts;},
+  }
+
 });
+
+Vue.component('slot-pkmodel-form',{
+  name: 'slot-pkmodel-form',
+  props: {
+    submitlabel:{type:String, default:'Submit'},
+    submitname:{type:String, default:'submit'},
+    submitvalue:{type:String, default:'submit'},
+    submitclass:{type:Object, default: function() {return {};}},
+    formclass:{type:Object, default: function() {return {};}},
+    formstyle:{type:Object, default: function() {return {};}},
+    submitstyle:{type:Object, default: function() {return {};}},
+    instance: {type:Object, default: function() {return {};}},
+    },
+  template: `
+  <form method="post" class="pkmodel-slot-form-cls form-frame" :class="formclass">
+  <input type='hidden' name='pkmodel' :value='instance.model'/>
+  <input type='hidden' name='id' :value='instance.id'/>
+
+  <slot>Form Data Goes Here</slot>
+
+  <button type='submit' :name='submitname' :value='submitvalue'
+     class="pkmodel-slot-form-submit-cls" :class="submitclass"
+    :style="submitstyle" v-html="submitlabel">
+  </button>
+  </form>
+  `
+});
+
 
 
 /**AJAX Load & Save Select */
@@ -2602,7 +2675,7 @@ Vue.component('ajax-checkbox-input',{
   },
 });
 
-export { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin,vValidatorMixin  } ;
+export { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin,vValidatorMixin, wrapperMixin  } ;
 //// END Ajax Input Components (Use mixins below)
 
 /// Start JSON bulder components

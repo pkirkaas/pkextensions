@@ -46,6 +46,11 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
   }
 
 
+  /** Does this class/object implement the full qualified interface name? */
+  public static function implements($interface) {
+    //$interface = $interface::class;
+    return does_implement(static::class, $interface);
+  }
 
   // God, really thought I did this. Take a associative array of names -> closures,
      //assing the closures to this, key them by name & put them the array, then

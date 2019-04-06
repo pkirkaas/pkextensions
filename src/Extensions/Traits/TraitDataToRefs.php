@@ -10,6 +10,8 @@ namespace PkExtensions\Traits;
  *
  * @author pkirkaas
  */
+
+////////////   DEPRECATED !!! DO NOT USE !!!!!!!!!!!!!!
 trait TraitDataToRefs {
   /**Largely for Vue select structure trivially
    * Creates an array for attributes that are ref_id keys
@@ -47,6 +49,7 @@ trait TraitDataToRefs {
   * @param type $null
   * @return type
   */ 
+  /*
   public static function dataRefSelectArr($data=[], $defaults=false){
     $null=0;
     $name=$data['name'] ?? null;
@@ -67,6 +70,8 @@ trait TraitDataToRefs {
         'options'=>$options,
         ];
   }
+   * 
+   */
   
   //put your code here
 }
