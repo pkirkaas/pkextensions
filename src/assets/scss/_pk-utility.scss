@@ -228,6 +228,10 @@ containing block needs to be positioned relatively*/
 }
 
 .fg,.fg1 { flex-grow: 1; }
+.fg2 { flex-grow: 2; }
+.fg3 { flex-grow: 3; }
+.fg4 { flex-grow: 4; }
+.fg5 { flex-grow: 5; }
 .fs, .fs1 { flex-shrink: 1; }
 
 .nfg,.fg0 { flex-grow: 0; }

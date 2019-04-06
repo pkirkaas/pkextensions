@@ -449,6 +449,11 @@ var wrapperMixin = {
       if (typeof cssclass==='string') return {[cssclass]:true};
       return cssclass;
     },
+    mkStyle(style) { //Just prefent null/undefined
+      if (window.isEmpty(style)) return {};
+      if (typeof style !== 'object') return {};
+      return style;
+    }
   }
 };
 window.wrapperMixin = wrapperMixin;
@@ -2502,31 +2507,34 @@ window.Vue.component('ajax-textarea-input', {
 Vue.component('std-select', {
   name: 'std-select',
   //props: ['name','value','params','options'],
-  props: ['selectdata'],
+  props: {params:{type:Object,default:function(){return {};}}},
   template: `
-    <select :class="selectdata.selectclass" :name="name" v-model='value'>
-      <option v-for="(option, idx) in options"
+    <select :class="params.class"
+        :style="params.style" 
+        :name="params.name" v-model='params.value'>
+      <option v-for="(option, idx) in params.options"
          :value="option.value" v-html="option.label">
       </option>
     </select>
  ` ,
+
+/*
     data: function() {
       return {
         name:this.selectdata.name,
         value: this.selectdata.value,
         options: this.selectdata.options,
         params:this.selectdata.params,
-        /*
-        */
       };
     },
     mounted: function() {
     },
+          */
     computed: {
+          /*
       val: function() {
         return this.selectdata.value;
       },
-      /*
       value: function() {
         return this.selectdata.value;
       },
@@ -2559,31 +2567,31 @@ Vue.component('slot-wrapper',{
     },
     /*
     label
-    wrapclass
+    wrapcls
     wrapstyle
     wrapatts
     lblstyle
-    lblclass
+    lblcls
     lblatts
     cntstyle
-    cntclass
+    cntcls
     cntatts
 
           */
   template: `
-  <div class="sw-wrapper" :class="wrapclass" :style="wrapstyle" v-atts="wrapatts">
-      <div class="lbl" :class="lblclass" :style="lblstyle" v-html="label" v-atts="lblatts">
+  <div class="sw-wrapper" :class="wrapcls" :style="wrapstyle" v-atts="wrapatts">
+      <div class="lbl" :class="lblcls" :style="lblstyle" v-html="label" v-atts="lblatts">
       </div>
-        <div class="cnt-wrap" :class="cntclass" :style="cntstyle" v-atts="cntatts">
-          <slot>Inserted Slot Content Belongs Here</slot>
+        <div class="cnt-wrap" :class="cntcls" :style="cntstyle" v-atts="cntatts">
+          <slot >Inserted Slot Content Belongs Here</slot>
         </div>
   </div>
  `,
   computed: {
-    label() { return typeof slotwrap.label === 'string' ? slotwrap.label : '';},
-    wrapcls() { return this.mkClass(this.slotwrap.wrapcls);},
-    lblcls() { return this.mkClass(this.slotwrap.lblcls);},
-    cntcls() { return this.mkClass(this.slotwrap.cntcls);},
+    label() { return typeof this.slotwrap.label === 'string' ? this.slotwrap.label : '';},
+    wrapcls() { return mkCss(this.slotwrap.wrapcls);},
+    lblcls() { return mkCss(this.slotwrap.lblcls);},
+    cntcls() { return mkCss(this.slotwrap.cntcls);},
     wrapstyle() { return this.mkStyle(this.slotwrap.wrapstyle);},
     lblstyle() { return this.mkStyle(this.slotwrap.lblstyle);},
     cntstyle() { return this.mkStyle(this.slotwrap.cntstyle);},

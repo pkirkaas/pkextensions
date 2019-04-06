@@ -27,6 +27,21 @@ Dimensions: (Where N is 1/3rem; max 90N/30rem) (For some reason I forced -N)
 Better Dimensions:
 w1em -> w60em, and rem & mxw (max-width) mnw, h same
 
+=========
+Combining classes for wrappers,label,content:
+content can grow - unpredicable
+content classes - pk-val, pk-inp
+#Label Above Content:
+wrapcls: v-flex  - set width
+lblcls: block fg0 full-width
+cntcls: block fg1 full-width and grow vertically
+
+
+#Label Before Content:
+wrapcls: inline-flex - set width
+lblcls: inline-flex fg0 set width 
+cntcls: inline-flex fg1 grow to width
+
 
 min-line-height - empty div minimum 1 line height
 
@@ -118,8 +133,10 @@ flex-between: Evenly spaces content
 fi-XXX are flex-item classes
 fi-fixed: grow, shrink 0. Set a width as well.
 fi-resize: grow, shrink 1
-fg - flex-grow:1
-fs - flex-shrink: 1
+fg,fg1,fgN - flex-grow:1 (N)
+fg0 - flex-grow:0
+fs,fs1 - flex-shrink: 1
+fs0 - flex-shrink:0
 fw - flex-wrap: wrap
 
 
