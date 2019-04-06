@@ -246,7 +246,7 @@ $default-pkmvc-button: 1 !default;
   body .pkmvc-button:focus,
   body .pkmvc-button:visited,
   body .pkmvc-button {
-    font: bold 1rem/1 "helvetica neue", helvetica, arial, sans-serif;
+    font: bold 1em/1 "helvetica neue", helvetica, arial, sans-serif;
     white-space: nowrap;
     text-align: center;
     text-decoration: none;
@@ -291,7 +291,7 @@ $default-pkmvc-button: 1 !default;
 body .light-button:focus,
 body .light-button:visited,
 body .light-button {
-    font:  1rem/1 "helvetica neue", helvetica, arial, sans-serif;
+    font:  1em/1 "helvetica neue", helvetica, arial, sans-serif;
     display: inline-block;
     height: 1.5em;
     white-space: nowrap;
@@ -350,7 +350,7 @@ $inline-login-hover-color: #aaf !default;
 form.inline-login input.form-control.checkbox-inline {
   display: inline-block;
   width: auto;
-  margin-left: .25rem;
+  margin-left: .25em;
   vertical-align: middle;
 }
 
@@ -380,7 +380,7 @@ form.inline-login.form-inline button.btn-primary {
   }
 }
 
-$inline-form-font-size: .8rem !default; 
+$inline-form-font-size: .8em !default; 
 form.inline-login.form-inline {
   font-size: $pk-top-menu-font-size;
   .form-control{

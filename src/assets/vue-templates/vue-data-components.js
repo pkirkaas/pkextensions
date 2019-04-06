@@ -2509,7 +2509,7 @@ Vue.component('std-select', {
   //props: ['name','value','params','options'],
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
-    <select :class="params.class"
+    <select :class="params.inpclass"
         :style="params.style" 
         :name="params.name" v-model='params.value'>
       <option v-for="(option, idx) in params.options"
@@ -2517,46 +2517,19 @@ Vue.component('std-select', {
       </option>
     </select>
  ` ,
-
-/*
-    data: function() {
-      return {
-        name:this.selectdata.name,
-        value: this.selectdata.value,
-        options: this.selectdata.options,
-        params:this.selectdata.params,
-      };
-    },
-    mounted: function() {
-    },
-          */
-    computed: {
-          /*
-      val: function() {
-        return this.selectdata.value;
-      },
-      value: function() {
-        return this.selectdata.value;
-      },
-      name: function() {
-        return this.selectdata.name;
-      },
-      options: function() {
-        return this.selectdata.options;
-      },
-      params: function() {
-        return this.selectdata.params;
-      },
-      */
-      canOpen: function () {
-        if(!this.selectdata.name ) {
-          return false;
-        }
-        return true;
-      },
-    },
-
 });
+Vue.component('std-input', {
+  name: 'std-input',
+  //props: ['name','value','params','options'],
+  props: {params:{type:Object,default:function(){return {};}}},
+  template: `
+    <input :type="params.type||'text'" :class="params.inpclass"
+        :style="params.style" 
+        :name="params.name" v-model='params.value'/>
+    
+ ` ,
+});
+
 
 /////  Testing a wrapper with a slot???
 Vue.component('slot-wrapper',{
@@ -2580,7 +2553,7 @@ Vue.component('slot-wrapper',{
           */
   template: `
   <div class="sw-wrapper" :class="wrapcls" :style="wrapstyle" v-atts="wrapatts">
-      <div class="lbl" :class="lblcls" :style="lblstyle" v-html="label" v-atts="lblatts">
+      <div class="pk-lbl" :class="lblcls" :style="lblstyle" v-html="label" v-atts="lblatts">
       </div>
         <div class="cnt-wrap" :class="cntcls" :style="cntstyle" v-atts="cntatts">
           <slot >Inserted Slot Content Belongs Here</slot>

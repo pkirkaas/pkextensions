@@ -288,7 +288,6 @@ $site-val-color: #422 !default;
 $site-negative-value-color: #a22 !default;
 
 .pk-lbl {
-  //font-weight: bold;
   color: $site-lbl-color;
 }
 
@@ -309,21 +308,27 @@ div input[type=checkbox].pk-inp.z2 { zoom: 2; }
 
 div input[type=checkbox].search-val.form-control { width: auto; display: inline-flex;}
 
-$input-font-size: 14px !default;
+$input-font-size: 16px !important !default;
+$input-font-color: #200 !default;
+$input-font-weight: 500 !important !default;
+$input-background-color: #eee !default;
+$input-hover-background-color: #fff !default;
 select.pk-inp,
 textarea.pk-inp,
 input.pk-inp {
-  @extend .form-control; 
+ // @extend .form-control; 
   padding: 2px;
   //font-weight: bold;
   //font-family: 'Times New Roman', serif;
   font-family: 'Montserrat', arial;
   font-size: $input-font-size;
+  font-weight: $input-font-weight;
   //font-family: 'Roboto', verdana;
-  color: #300;
-  background-color: white;
+  color: $input-font-color;
+  background-color: $input-background-color;
   &:hover, &:focus {
-    box-shadow: 0px 0px 15px 5px rgba(255, 255, 190, .75); 
+    background-color: $input-hover-background-color; 
+    box-shadow: 0px 0px 5px 5px rgba(255, 255, 220, .75); 
   }
 }
 select.pk-inp,
