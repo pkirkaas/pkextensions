@@ -283,12 +283,14 @@ $page-template-subtitle-radius: $page-template-title-radius !default;
    color: $page-template-subtitle-bg;
 }
 
-$site-lbl-color: #228 !default;
+$site-lbl-color: #fff !default;
+$site-lbl-background-color: #008 !default;
 $site-val-color: #422 !default;
 $site-negative-value-color: #a22 !default;
 
 .pk-lbl {
   color: $site-lbl-color;
+  background: $site-lbl-background-color;
 }
 
 .pk-val {
@@ -322,6 +324,7 @@ input.pk-inp {
   //font-family: 'Times New Roman', serif;
   font-family: 'Montserrat', arial;
   font-size: $input-font-size;
+  //font-size: 16px;
   font-weight: $input-font-weight;
   //font-family: 'Roboto', verdana;
   color: $input-font-color;
