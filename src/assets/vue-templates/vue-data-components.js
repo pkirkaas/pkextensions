@@ -2535,13 +2535,17 @@ Vue.component('std-checkbox', {
   //props: ['name','value','params','options'],
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
+  <div>
+    <input type="hidden" :name="params.name" value="0" />
     <input class="pk-inp tac" type="checkbox"
         :class="params.inpclass"
+        v-atts="params.inpatts"
         :style="params.style" 
         :name="params.name" 
         value="1"
         :checked="checked"
     />
+              </div>
  ` ,
         //v-model="checked" :value="value" />
         //v-model='params.value'/>

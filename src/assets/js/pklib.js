@@ -2202,6 +2202,7 @@ function enableRelatedInputWhenEmpty(triggerinput) {
   var data_sel = 'data-pk-input-enable-none';
   var cousinSelector = triggerinput.attr(data_sel);
   var targetinput = triggerinput.cousin(cousinSelector);
+  console.log("Trigger Inp Val:",triggerinput.val());
   if (!triggerinput.val()) {
     targetinput.prop('disabled',false);
   } else {

@@ -310,11 +310,11 @@ div input[type=checkbox].pk-inp.z2 { zoom: 2; }
 
 div input[type=checkbox].search-val.form-control { width: auto; display: inline-flex;}
 
-$input-font-size: 16px !important !default;
-$input-font-color: #200 !default;
-$input-font-weight: 500 !important !default;
-$input-background-color: #eee !default;
-$input-hover-background-color: #fff !default;
+$pk-inp-font-size: 16px !default;
+$pk-inp-font-color: #200 !default;
+$pk-inp-font-weight: 500 !default;
+$pk-inp-background-color: #eee !default;
+$pk-inp-hover-background-color: #fff !default;
 select.pk-inp,
 textarea.pk-inp,
 input.pk-inp {
@@ -323,14 +323,14 @@ input.pk-inp {
   //font-weight: bold;
   //font-family: 'Times New Roman', serif;
   font-family: 'Montserrat', arial;
-  font-size: $input-font-size;
+  font-size: $pk-inp-font-size;
   //font-size: 16px;
-  font-weight: $input-font-weight;
+  font-weight: $pk-inp-font-weight;
   //font-family: 'Roboto', verdana;
-  color: $input-font-color;
-  background-color: $input-background-color;
+  color: $pk-inp-font-color;
+  background-color: $pk-inp-background-color;
   &:hover, &:focus {
-    background-color: $input-hover-background-color; 
+    background-color: $pk-inp-hover-background-color; 
     box-shadow: 0px 0px 5px 5px rgba(255, 255, 220, .75); 
   }
 }
@@ -348,7 +348,7 @@ div.pk-pair div.checkbox-wrap.pkp-data {
 }
 body div div form div select.pk-inp {
    &:not([size]):not([multiple]) {
-    height: 1.7 * $input-font-size;
+    height: 1.7 * $pk-inp-font-size;
    }
 }
 
@@ -538,6 +538,11 @@ $avatar-desc-bg: #eee !default;
   text-align: center;
   color: #33a;
   margin-bottom: .5em;
+}
+
+$template-background-color: #eef !default;
+.template {
+  background-color: $template-background-color;
 }
 
 div.msg.row.from.first-view  {
