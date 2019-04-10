@@ -319,7 +319,7 @@ select.pk-inp,
 textarea.pk-inp,
 input.pk-inp {
  // @extend .form-control; 
-  padding: 2px;
+  padding: 2px 3px;
   //font-weight: bold;
   //font-family: 'Times New Roman', serif;
   font-family: 'Montserrat', arial;
@@ -784,6 +784,10 @@ $pkp-data-mg: .05em .05em !default;
       flex-grow: 1;
     }
   }
+
+.v-set .pk-inp {
+  width: 100%;
+}
 
 .pk-pair.stacked { //Label over data
 

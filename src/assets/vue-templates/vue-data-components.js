@@ -2509,7 +2509,7 @@ Vue.component('std-select', {
   //props: ['name','value','params','options'],
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
-    <select :class="params.inpclass"
+    <select class="pk-inp" :class="params.inpclass"
         :style="params.style" 
         :name="params.name" v-model='params.value'>
       <option v-for="(option, idx) in params.options"
@@ -2523,12 +2523,57 @@ Vue.component('std-input', {
   //props: ['name','value','params','options'],
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
-    <input :type="params.type||'text'" :class="params.inpclass"
+    <input class="pk-inp" :type="params.type||'text'"
+        :class="params.inpclass"
         :style="params.style" 
         :name="params.name" v-model='params.value'/>
     
  ` ,
 });
+Vue.component('std-checkbox', {
+  name: 'std-checkbox',
+  //props: ['name','value','params','options'],
+  props: {params:{type:Object,default:function(){return {};}}},
+  template: `
+    <input class="pk-inp tac" type="checkbox"
+        :class="params.inpclass"
+        :style="params.style" 
+        :name="params.name" 
+        value="1"
+        :checked="checked"
+    />
+ ` ,
+        //v-model="checked" :value="value" />
+        //v-model='params.value'/>
+  data: function() {
+    var val = this.params.checkedvalue || '1';
+    var checked = !!this.params.value;
+    return {
+      checked: checked,
+    };
+
+  },
+  /*
+  computed: {
+    value: function() {
+      var val = params.checkedvalue || '1';
+      return val;
+    },
+    checked: function() {
+      return 
+    }
+  },
+              */
+});
+/** Testing std-checkbox templates
+ * 
+    <input type="hidden" :name="params.name" :value=""
+    <input class="pk-inp" type="checkbox"
+        :class="params.inpclass"
+        :style="params.style" 
+        :name="params.name" v-model='params.value'/>
+ ` ,
+ */
 
 
 /////  Testing a wrapper with a slot???
