@@ -620,11 +620,14 @@ var pinputMixin = {
     //so not false. This will both toggle the appearance of the checkbox, AND send
     //the unchecked value, so can clear
     setCheckedState() {
+      this.checked = this.value == this.checkedvalue;
+      /*
       if(this.value == this.checkedvalue) {
         this.checked = true;
       } else {
         this.checked = false;
       }
+      */
     },
     toggleCheckState(event,arg) {
       //console.log("Got change event?",event,arg,"this.val",this.value,"Checkedval:", this.checkedvalue,"Unchecked:", this.uncheckedvalue);
@@ -2532,17 +2535,17 @@ Vue.component('std-input', {
 });
 Vue.component('std-checkbox', {
   name: 'std-checkbox',
-  //Allows params.checkedvalue, if not "1"
+  //Allows params.checkedvalue, uncheckedvalue if not "1"/"0"
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
   <div>
-    <input type="hidden" :name="params.name"/>
+    <input type="hidden" :name="params.name" :value="uncheckedvalue"/>
     <input class="pk-inp tac" type="checkbox"
         :class="params.inpclass"
         v-atts="params.inpatts"
         :style="params.style" 
         :name="params.name" 
-        :value="val"
+        :value="checkedvalue"
         :checked="checked"
     />
               </div>
@@ -2550,14 +2553,25 @@ Vue.component('std-checkbox', {
         //v-model="checked" :value="value" />
         //v-model='params.value'/>
   data: function() {
-    let val = this.params.checkedvalue || '1';
-    // DELIBERATE "!=" NOT "!==" - In case value="0" instead of 0
-    let checked = (this.params.value != 0) && (this.params.value != null ) ;
-    console.log("Params.Value:",this.params.value,"Checked:",checked);
+    let checkedvalue = this.params.checkedvalue || '1';
     return {
-      val,
+      checkedvalue,
+      uncheckedvalue : this.params.uncheckedvalue || null,
+      checked : this.params.value == checkedvalue,
+    };
+    /*
+    let checkedvalue = this.params.checkedvalue || '1';
+    let uncheckedvalue = this.params.uncheckedvalue || null;
+    // DELIBERATE "!=" NOT "!==" - In case value="0" instead of 0
+    //let checked = (this.params.value != 0) && (this.params.value != null ) ;
+    let checked = (this.params.value == checkedvalue);
+    //console.log("Params.Value:",this.params.value,"Checked:",checked);
+    return {
+      checkedvalue,
+      uncheckedvalue,
       checked,
     };
+    */
 
   },
   /*

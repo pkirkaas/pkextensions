@@ -310,11 +310,13 @@ div input[type=checkbox].pk-inp.z2 { zoom: 2; }
 
 div input[type=checkbox].search-val.form-control { width: auto; display: inline-flex;}
 
-$pk-inp-font-size: 16px !default;
+$pk-inp-font-size: 1em !default;
 $pk-inp-color: #200 !default;
 $pk-inp-font-weight: 500 !default;
 $pk-inp-background: #eee !default;
 $pk-inp-hover-background-color: #fff !default;
+$pk-inp-disabled-color: #888 !default;
+$pk-inp-disabled-background: #bbb !default;
 select.pk-inp,
 textarea.pk-inp,
 input.pk-inp {
@@ -333,10 +335,31 @@ input.pk-inp {
     background-color: $pk-inp-hover-background-color; 
     box-shadow: 0px 0px 5px 5px rgba(255, 255, 220, .75); 
   }
+  &:disabled:hover, &:disabled {
+  color: $pk-inp-disabled-color;
+  background: $pk-inp-disabled-background;
 }
+}
+
 select.pk-inp,
 input.pk-inp {
   display: inline-flex;
+}
+
+
+.v-set .pk-inp { //Vertical set/pair - 
+  width: 100%;
+}
+.pk-pair.stacked { //Label over data - replaced by above
+
+}
+.pk-pair.inline { //Label preceeds data
+
+  .pkp-lbl {
+         }
+  .pkp-data {
+
+  }
 }
 
 div.pk-pair div.checkbox-wrap.pkp-data {
@@ -789,30 +812,6 @@ $pkp-data-mg: .05em .05em !default;
       flex-grow: 1;
     }
   }
-
-$pk-inp-disabled-color: #888 !default;
-$pk-inp-disabled-background: #bbb !default;
-.pk-inp:disabled:hover, 
-.pk-inp:disabled {
-  color: $pk-inp-disabled-color;
-  background: $pk-inp-disabled-background;
-}
-
-.v-set .pk-inp {
-  width: 100%;
-}
-
-.pk-pair.stacked { //Label over data
-
-}
-.pk-pair.inline { //Label preceeds data
-
-  .pkp-lbl {
-         }
-  .pkp-data {
-
-  }
-}
 
 
 
