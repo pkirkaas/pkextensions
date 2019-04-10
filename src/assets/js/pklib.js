@@ -954,6 +954,31 @@ jQuery.fn.extend({
     };
   }( jQuery ));
 
+
+/** An experimental version of a jQuery extension that returns the 
+ * value of an input - unless it's an unchecked checkbox, in which 
+ * case - null? 0?
+ * @returns thevalue of the input
+ */
+(function(jQuery) {
+  jQuery.fn.cval = function() {
+    if (this.is("input[type='checkbox']")) {
+       if (this.is(":checked")) {
+         console.log("Checkbox Checked");
+         return this.val();
+       } else {
+         console.log("CB NOT Checked");
+         return null;
+       }
+    } else {
+       console.log("cval - NOT checkbox");
+       return this.val();
+    }
+  }
+}(jQuery));
+
+
+
 /** If have a 'position: fixed' top menu row, (id='top-menu-fixed'), change the 
  * body padding-top to adjust to the height of the menu on window resize and init  */
 $(function () {
@@ -2202,8 +2227,8 @@ function enableRelatedInputWhenEmpty(triggerinput) {
   var data_sel = 'data-pk-input-enable-none';
   var cousinSelector = triggerinput.attr(data_sel);
   var targetinput = triggerinput.cousin(cousinSelector);
-  console.log("Trigger Inp Val:",triggerinput.val());
-  if (!triggerinput.val()) {
+  console.log("Trigger Inp CVal:",triggerinput.cval());
+  if (!triggerinput.cval()) {
     targetinput.prop('disabled',false);
   } else {
     targetinput.val(null);

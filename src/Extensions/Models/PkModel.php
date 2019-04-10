@@ -2055,6 +2055,7 @@ class $createclassname extends Migration {
       if (!sizeof($keys)) $this->$relationName()->delete();
       else $this->$relationName()->whereNotIn($keyName, $keys)->delete();
     }
+    $this->refresh(); #TO KEEP 0 === 0 NOT "0"
     return true;
   }
 

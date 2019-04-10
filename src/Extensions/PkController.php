@@ -248,6 +248,9 @@ abstract class PkController extends Controller {
           $data[$key] = $val;
         }
       $result = $pkmodel->saveRelations($data);
+      //$pkmodel->refresh(); #9 April 19 - TO RETURN INTS INSTEAD OF STRINGS
+      #BUT MAYBE BREAKS SOMETHING ELSE?
+      #MOVED TO PkModel->saveRelations()
       return $result;
       #TODO: Future Enhancement if multiple models
 

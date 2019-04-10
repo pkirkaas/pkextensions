@@ -2532,17 +2532,17 @@ Vue.component('std-input', {
 });
 Vue.component('std-checkbox', {
   name: 'std-checkbox',
-  //props: ['name','value','params','options'],
+  //Allows params.checkedvalue, if not "1"
   props: {params:{type:Object,default:function(){return {};}}},
   template: `
   <div>
-    <input type="hidden" :name="params.name" value="0" />
+    <input type="hidden" :name="params.name"/>
     <input class="pk-inp tac" type="checkbox"
         :class="params.inpclass"
         v-atts="params.inpatts"
         :style="params.style" 
         :name="params.name" 
-        value="1"
+        :value="val"
         :checked="checked"
     />
               </div>
@@ -2550,10 +2550,13 @@ Vue.component('std-checkbox', {
         //v-model="checked" :value="value" />
         //v-model='params.value'/>
   data: function() {
-    var val = this.params.checkedvalue || '1';
-    var checked = !!this.params.value;
+    let val = this.params.checkedvalue || '1';
+    // DELIBERATE "!=" NOT "!==" - In case value="0" instead of 0
+    let checked = (this.params.value != 0) && (this.params.value != null ) ;
+    console.log("Params.Value:",this.params.value,"Checked:",checked);
     return {
-      checked: checked,
+      val,
+      checked,
     };
 
   },
