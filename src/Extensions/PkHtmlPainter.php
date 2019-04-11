@@ -402,7 +402,7 @@ class PkHtmlPainter extends PkHtmlRenderer {
     $menu[] = " <ul class='nav navbar-nav $nav_ul_class'>\n";
     foreach ($links as  $drop => $link) {
       if (is_string($drop)) {
-        pkdebug("Opts:", $opts);
+        //pkdebug("Opts:", $opts);
         $menu[]=PkMenuBuilder::Drop($drop,$link,$opts);
       } else {
       $menu[] = "
