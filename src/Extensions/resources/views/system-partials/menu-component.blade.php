@@ -14,6 +14,7 @@
       <!-- Nav Content -->
       <div class="navbar-collapse collapse main-menu" id="nav-content">
       <ul class="nav navbar-nav">
+        @if ( 0)
         <li class="navbar-brand nav-item site-brand-li">
             <a class="nav-link" data-tootik="Home" data-tootik-conf='bottom'
                title='Home' href="{{route('home')}}">
@@ -21,6 +22,7 @@
                    src="{{asset(Config::get('app.menu_icon'))}}">
             </a>
         </li>
+        @endif
 
 {{ $slot }}
 
