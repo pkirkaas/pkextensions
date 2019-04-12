@@ -2506,6 +2506,7 @@ window.Vue.component('ajax-textarea-input', {
 });
 
 /*******    For setting/inserting components into slot-wrappers *  *****/
+/*
 var bldStdInpsMixin = {
     methods: {
     getCtlData(name,label, opts) { //Might as well use for textarea
@@ -2564,6 +2565,7 @@ var bldStdInpsMixin = {
 };
 window.bldStdInpsMixin = bldStdInpsMixin;
 
+*/
 
 
 
