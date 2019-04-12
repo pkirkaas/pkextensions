@@ -438,6 +438,7 @@ public static function createOrUpdate(array $attributes = []) {
    * 
    * So fetchAttributes([],['rel1','rel2']) ==  fetchAttributes(['rel1','rel2'],true);
    *
+   * Q? Do we need to handle JSON atts specially?
    */
 
   //public function 

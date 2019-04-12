@@ -2505,6 +2505,69 @@ window.Vue.component('ajax-textarea-input', {
   </div>`,
 });
 
+/*******    For setting/inserting components into slot-wrappers *  *****/
+var bldStdInpsMixin = {
+    methods: {
+    getCtlData(name,label, opts) { //Might as well use for textarea
+      opts = opts || {};
+      return {
+        name: name,
+        label: label,
+        value: instance[name],
+        inpatts:opts.inpatts,
+      };
+    },
+    getInpData(name,label,opts) {
+      opts = opts || {};
+      let ctlData = this.getCtlData(name,label,opts);
+      ctlData.type = opts.type || "text";
+      return ctlData;
+    },
+    getDollarData(name,label,opts) {
+      opts = opts || {};
+      let ctlData = this.getCtlData(name,label,opts);
+      ctlData.inpclass=mkCss(ctlData.inpclass,'inputmask-dollars', 'tar');
+      return ctlData;
+    },
+    getDateData(name,label,opts) {
+      opts = opts || {};
+      let ctlData = this.getCtlData(name,label,opts);
+      ctlData.inpclass=mkCss(ctlData.inpclass,
+      'datepicker auto-attach', 'tar');
+
+      return ctlData;
+    },
+
+    getSelectData(name,label, opts) {
+      opts = opts || {};
+      let ctlData = this.getCtlData(name,label,opts);
+      ctlData.options = refarrs[name];
+      return ctlData;
+    },
+    getCheckboxData(name,label,opts) {
+      opts = opts || {};
+      let ctlData = this.getCtlData(name,label,opts);
+      console.log("Returning checkboxdata for "+name+"\n",ctlData);
+      return ctlData;
+    },
+    getFormData(event) {
+      let data = {};
+      $('div.form-frame :input').each(function() {
+        var $this = $(this);
+        data[$this.attr('name')]=$this.val();
+      });
+      console.log("Data:", data);
+    }
+  },
+      
+
+};
+window.bldStdInpsMixin = bldStdInpsMixin;
+
+
+
+
+
 /*******    Ordinary inputs - no AJAX *****/
 // We prefix them the 'std-'
 Vue.component('std-select', {
@@ -2533,6 +2596,19 @@ Vue.component('std-input', {
     
  ` ,
 });
+
+Vue.component('std-textarea', {
+  name:"std-textarea",
+  props: {params:{type:Object,default:function(){return {};}}},
+  template: `
+  <textarea  class="pk-inp" :class="params.inpcls" :style="params.inpstyle"
+    :name="params.name" v-model="params.value" v-atts="params.inpatts"></textarea>
+  `,
+
+});
+
+
+
 Vue.component('std-checkbox', {
   name: 'std-checkbox',
   //Allows params.checkedvalue, uncheckedvalue if not "1"/"0"
