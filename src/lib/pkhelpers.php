@@ -151,6 +151,9 @@ function throwerr($msg) {
  *   true: Return "Never"
  *   string: return the string
  */
+function fcdte($date = null, $format =  'M j, Y',$shownever = false) {
+  return  friendlyCarbonDate($date, $format ,$shownever); 
+  }
 function friendlyCarbonDate($date = null, $format =  'M j, Y',$shownever = false) {
   // American style m/d/y:   'n/j/y'
   if (!$date) {
