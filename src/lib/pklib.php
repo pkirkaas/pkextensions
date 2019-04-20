@@ -35,13 +35,17 @@ function console() {
         ]
      * 
      */
-    pkdebug("What! ChromePhp doesn't exist?");
-    return;
+    $args = func_get_args();
+    array_unshift($args,"\nWhat! ChromePhp doesn't exist? Would have said:\n");
+    $out = call_user_func_array("pkdebug_base", $args);
+    pkdebugOut($out);
+    return false;
   }
   pkdebug("CALLING CONSOLE ChromePhp!");
   $args = func_get_args();
   $out = call_user_func_array("pkdebug_base", $args);
-  ChromePhp::log($out);
+  $cout = "\nCONSOLE OUT from PHP:\n$out\n";
+  ChromePhp::log($cout);
 }
 
 class PkLibConfig {

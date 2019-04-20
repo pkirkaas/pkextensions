@@ -44,7 +44,7 @@ $(function () {
 /** An AJAX error handler - just for my custom error status 499
  *  AND for Laravel Validation errors 
  */
-$(function () {
+$(function () { //NOTE!!! Can have multiple classes, BUT jq-format- MUST BE FIRST
   $("[class^='jq-format-']").each(function() {
     $(this).htmlFormatted();
   });
@@ -754,11 +754,11 @@ $(function () {
  * js: $('.jq-format').htmlFormatted();
  * or:
    $target.htmlFormatted(result,format);
- * <div class='jq-format jq-format-currency'>300</div>
+ * <div class='jq-format-currency other-classes only-after'>300</div>
  */
 jQuery.fn.extend({
   htmlFormatted: function (argcontent,argformat, argparams) {
-    //console.log("Matched this -",this);
+    console.log("Matched this -",this);
     if (!this.length) {
       //console.log("No length for this:",this);
       return;
