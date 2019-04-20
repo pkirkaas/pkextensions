@@ -2719,6 +2719,50 @@ Vue.component('slot-wrapper',{
 
 });
 
+/////  Testing a wrapper with a slot???
+Vue.component('slot-form',{
+  name: 'slot-form',
+  mixins:[window.wrapperMixin],
+  props:{
+    formparams: {type:Object, default:function(){ return {};}}
+    },
+  template: `
+  <form :method="method" :action="action" class="lot-form-cls form-frame" :class="formcls"
+      :style="formstyle">
+  <input v-if="model" type='hidden' name='pkmodel' :value='model'/>
+  <input type='hidden' name='id' :value='id'/>
+  <input type='hidden' name='_token' :value='xsrftoken'/>
+
+  <slot>Form Data Goes Here</slot>
+
+  <button type='submit' :name='submitname' :value='submitvalue'
+     class="slot-form-submit-btn-cls pkmvc-button" :class="submitcls"
+    :style="submitstyle" v-atts="submitatts" v-html="submitlabel">
+  </button>
+  </form>
+`,
+ data: function() {
+   var instance = this.formparams.instance || {};
+   return {
+     model: this.formparams.model || false,
+     method: this.formparams.method || 'post',
+     action: this.formparams.action || '',
+     formatts : this.formparams.formatts,
+     formcls : this.formparams.formcls || null,
+     formstyle : this.formparams.formstyle || null,
+     pkmodel: this.formparams.pkmodel || false,
+     id: this.formparams.id || null,
+     submitatts: this.formparams.submitatts || null,
+     submitname: this.formparams.submitname || "submit",
+     submitvalue: this.formparams.submitvalue || "submit",
+     submitlabel: this.formparams.submitlabel || "Submit",
+     submitstyle: this.formparams.submitstyle || null,
+     submitcls: this.formparams.submitstyle || null,
+     xsrftoken: $('meta[name="_token"]').attr('content'),
+   };
+ },
+});
+
 Vue.component('slot-pkmodel-form',{
   name: 'slot-pkmodel-form',
   props: {
