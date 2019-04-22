@@ -758,7 +758,6 @@ $(function () {
  */
 jQuery.fn.extend({
   htmlFormatted: function (argcontent,argformat, argparams) {
-    console.log("Matched this -",this);
     if (!this.length) {
       //console.log("No length for this:",this);
       return;

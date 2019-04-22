@@ -457,6 +457,12 @@ a.undecorated {
     color: black ! important;
     text-decoration: none ! important;
     }
+    .break-after {
+      page-break-after: always;
+    }
+    .break-before {
+      page-break-before: always;
+    }
 }
 
 @media screen {
