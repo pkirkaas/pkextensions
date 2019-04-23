@@ -76,6 +76,7 @@ trait RefDisplayTrait {
       return json_encode($ret,UtilityMethodsTrait::$jsonopts);
   }
 
+  /** Just above, but already JSON's it */
   public static function vueSelectOptsArr($keys=false,$null=false) {
     return static::mkVueSelectArrays($keys, $null, true);
   }

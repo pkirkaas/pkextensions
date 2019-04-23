@@ -445,12 +445,20 @@ a.undecorated {
 
 
 @media print {
+  * {
+    background-color: white;
+  }
   .print-button {
     display: none ! important;
   }
 
   .no-print {
     display: none ! important;
+  }
+  div.template {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    background-color: white !important;
   }
 
   .print-black {

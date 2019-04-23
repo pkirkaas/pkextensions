@@ -157,4 +157,33 @@ Input sets (with or without Vue) - ALL pairs in the set 50 em & all labels 20:
   </div>
 </div>
 
+============   @media print
+
+
+@media print {
+  .print-button {
+    display: none ! important;
+  }
+
+  .no-print {
+    display: none ! important;
+  }
+
+  .print-black {
+    color: black ! important;
+    text-decoration: none ! important;
+    }
+    .break-after {
+      page-break-after: always;
+    }
+    .break-before {
+      page-break-before: always;
+    }
+}
+
+@media screen {
+  .print-only, .no-screen {
+    display: none;
+  }
+}
 
