@@ -474,7 +474,7 @@ a.undecorated {
 }
 
 @media screen {
-  .print-only, .no-screen {
+  body div .print-only, body div .no-screen {
     display: none;
   }
 }
