@@ -107,6 +107,8 @@ $do-care-back: #fff !default;
 
 select.search-crit.dont-care {
   background-color: $dont-care-back;
+  //background-color: fuchsia;
+ // background-color: green;
 }
 select.search-crit.do-care {
   background-color: $do-care-back;
