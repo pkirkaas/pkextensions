@@ -12,8 +12,8 @@ use PkExtensions\PopAtts;
     <!--
     <script language="javascript" src="{{asset('/mixed/js/app.js')}}"></script>
     -->
-    <script language="javascript" src="{{asset('/mixed/js/es6.js')}}"></script>
-    <script language="javascript" src="{{asset('/mixed/js/scripts.js')}}"></script>
+    <script language="javascript" src="{{mix('/mixed/js/es6.js')}}"></script>
+    <script language="javascript" src="{{mix('/mixed/js/scripts.js')}}"></script>
     <!--
     Oddly, the below causes errors in the above...
     <script language="javascript" src="{{asset('/mixed/js/vscripts.js')}}"></script>
@@ -23,5 +23,5 @@ use PkExtensions\PopAtts;
           rel="stylesheet">
      */?>
     <title>{{Config::get("app.name")}}</title>
-    <link href="{{ asset('/mixed/css/stylesheets.css') }}" rel="stylesheet">
+    <link href="{{ mix('/mixed/css/stylesheets.css') }}" rel="stylesheet">
     {!!PopAtts::jsInit()!!}
