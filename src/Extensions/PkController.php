@@ -38,6 +38,10 @@ use PkExtensions\Traits\PkHasTypedModelTrait;
 use PkExtensions\Traits\PkAjaxQueryTrait;
 use PkExtensions\Traits\PkTypedUploadTrait;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Request;
 use Route as RouteFacade;
 use \Exception;
@@ -46,7 +50,8 @@ use \Auth;
 use PkHtml;
 
 abstract class PkController extends Controller {
-  use UtilityMethodsTrait, PkAjaxQueryTrait;
+  use UtilityMethodsTrait, PkAjaxQueryTrait, 
+    AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
   public function __construct($args = null) {
     $this->middleware(function ($request, $next) {
