@@ -14,6 +14,31 @@
   <title>CustomizingDefaultLaravelInstall</title>
 </head>
 <body>
+<div class='title'>Modify default Laravel Install for PkExtensions</div>
+<h1>Composer</h1>
+<p>Add...</p>
+<pre>
+    "repositories": [{
+      "type": "git",
+      "url": "https://github.com/pkirkaas/PkExtensions.git"
+    }
+    ...
+    "require": {
+        "pkirkaas/pkextensions": "dev-master"
+    }
+</pre>
+
+<h1>.env</h1>
+<pre>
+APP_NAME=Jokadotes
+APP_ENV=local
+DB_DATABASE=*_jokadotes
+DB_USERNAME=root
+DB_PASSWORD=
+</pre>
+
+<h1>Databse (Migrations)</h1>
+
 
 </body>
 </html>

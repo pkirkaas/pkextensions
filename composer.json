@@ -14,10 +14,7 @@
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
     "eventviva/php-image-resize": "*",
-    "ccampbell/chromephp": "^4.1"
-  },
-  "require-dev": {
-    "ccampbell/chromephp": "^4.1"
+    "ccampbell/chromephp": "*"
   },
   "autoload": {
     "psr-4": {

@@ -24,7 +24,7 @@
 
 namespace PkExtensions;
 use Illuminate\Routing\Route;
-use App\Http\Controllers\Controller;
+#use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag; #A collection of MessageBags
 use Illuminate\Validation\ValidationException;
@@ -49,7 +49,7 @@ use \Closure;
 use \Auth;
 use PkHtml;
 
-abstract class PkController extends Controller {
+abstract class PkController extends BaseController {
   use UtilityMethodsTrait, PkAjaxQueryTrait, 
     AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
