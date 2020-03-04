@@ -10,9 +10,11 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">7",
-    "laravelcollective/html": "*",
+    "laravelcollective/html": ">5",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
+  },
+  "require-dev": {
     "ccampbell/chromephp": "*"
   },
   "autoload": {
