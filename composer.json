@@ -12,7 +12,7 @@
     "php": ">7",
     "laravelcollective/html": ">5",
     "jenssegers/agent": "*",
-    "ezyang/htmlpurifier": "*",
+    "ezyang/htmlpurifier": "*"
   },
   "require-dev": {
     "ccampbell/chromephp": "*"
