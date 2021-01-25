@@ -56,7 +56,7 @@ class PkMenuBuilder {
    * @param array $defaults - the default atts & tag for the type of menu element
    * @param array $props(additional atts , reqs, & content, which might b a further array
    */
-  public function _base($defaults= [], $content, $atts=[], $reqs= []) {
+  public function _base($defaults= [], $content = null, $atts=[], $reqs= []) {
     $ps = new PartialSet();
     $ps->arrayseparator ="  ";
     $atts = PkRenderer::cleanAttributes($atts,$defaults,$reqs);

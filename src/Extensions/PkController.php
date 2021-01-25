@@ -1,4 +1,5 @@
 <?php
+
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 
 /**
@@ -23,6 +24,7 @@
  */
 
 namespace PkExtensions;
+
 use Illuminate\Routing\Route;
 #use App\Http\Controllers\Controller;
 use Illuminate\Support\MessageBag;
@@ -46,17 +48,22 @@ use Request;
 use Route as RouteFacade;
 use \Exception;
 use \Closure;
-use \Auth;
+use Auth;
 use PkHtml;
 
-abstract class PkController extends BaseController {
-  use UtilityMethodsTrait, PkAjaxQueryTrait, 
-    AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+abstract class PkController extends BaseController
+{
+  use UtilityMethodsTrait,
+    PkAjaxQueryTrait,
+    AuthorizesRequests,
+    DispatchesJobs,
+    ValidatesRequests;
 
-  public function __construct($args = null) {
+  public function __construct($args = null)
+  {
     $this->middleware(function ($request, $next) {
-        $this->me = Auth::user();
-        return $next($request);
+      $this->me = Auth::user();
+      return $next($request);
     });
     //$this->mkSubMenu();
     /*
@@ -70,17 +77,19 @@ abstract class PkController extends BaseController {
 
 
   #Generic submenu generation:
-  public function allSubmenuRouteArrs() {
-    return $this->getInstanceAncestorArraysMerged('submenu_routearr',true);
+  public function allSubmenuRouteArrs()
+  {
+    return $this->getInstanceAncestorArraysMerged('submenu_routearr', true);
   }
   public $submenu_literal; #If exists, just use it, as pure HTML
   public $submenu_routearr; #If exists, build submenu from routes, using descs
   public $submenu_itemarr; #If exists, build submenu from routes, using descs
   public $submenu_opts; #If exists, use for PkHtmlPainter::mkBsMenu
-  public $submenu_link_class='nav-link';
+  public $submenu_link_class = 'nav-link';
   public $submenu_class;
 
-  public function mkSubMenu($args = null) { #Override as desired
+  public function mkSubMenu($args = null)
+  { #Override as desired
     /** Links look like this:
      *     <li class='nav-item'>
       <a href="http://local.mentalhealthman/client/viewprofile/260" class="nav-link small-nav m-l-1 m-r-1" style="color:#88f;" data-tootik="View Client Profile &amp; Print New Intake Form">Emily M May : </a>
@@ -92,7 +101,7 @@ abstract class PkController extends BaseController {
       $submenu = $this->submenu_literal;
     } else {
       $ptr = new PkHtmlPainter();
-      $links = keyVal('links',$args,[]);
+      $links = keyVal('links', $args, []);
       if (!$links) {
         $routeArrs = $this->allSubmenuRouteArrs();
         if ($routeArrs) { #Assumes array of findable routes, with params
@@ -105,9 +114,9 @@ abstract class PkController extends BaseController {
           }
         }
       }
-      $submenu = $ptr->mkBsMenu($links,$this->submenu_opts).' ';
+      $submenu = $ptr->mkBsMenu($links, $this->submenu_opts) . ' ';
     }
-    view()->share('sub_menu',$submenu);
+    view()->share('sub_menu', $submenu);
   }
 
   public static $errorMsgBag; #The error messages, if any. Try static first
@@ -122,13 +131,14 @@ abstract class PkController extends BaseController {
 
   public $me;
 
-  public static function addErrorMsg($msg) {
-    if (!static::$errorMsgBag instanceOf MessageBag) {
+  public static function addErrorMsg($msg)
+  {
+    if (!static::$errorMsgBag instanceof MessageBag) {
       static::$errorMsgBag = new MessageBag();
     }
     static::$errorMsgBag->add('error', $msg);
     $viewErrorBag = session('errors');
-    if (!($viewErrorBag instanceOf ViewErrorBag)) {
+    if (!($viewErrorBag instanceof ViewErrorBag)) {
       $viewErrorBag = new ViewErrorBag();
       session()->flash('errors', static::$viewErrorBag);
     }
@@ -151,8 +161,8 @@ abstract class PkController extends BaseController {
         'zip'=>'nullable|integer',
         ];
    */
-  public $validationmessages=[]; #Allows methods to set their own validators
-  public $validationcustomattributes=[]; #Allows methods to set their own validators
+  public $validationmessages = []; #Allows methods to set their own validators
+  public $validationcustomattributes = []; #Allows methods to set their own validators
   #Alternatively, the method creates its own custom validator, and sets it:
   public $validator;
 
@@ -163,16 +173,21 @@ abstract class PkController extends BaseController {
    * Else no validation.
    * @param Validator $validator
    */
-  public function validateRequest($validator = null, $request = null) {
+  public function validateRequest($validator = null, $request = null)
+  {
     if (!$validator) {
       $validator = $this->validator;
     }
     if ($validator) {
-      return $this->validateWith($validator,$request);
+      return $this->validateWith($validator, $request);
     }
     if ($this->validationrules) {
-      return $this->validate(request(), $this->validationrules,
-          $this->validationmessages, $this->validationcustomattributes);
+      return $this->validate(
+        request(),
+        $this->validationrules,
+        $this->validationmessages,
+        $this->validationcustomattributes
+      );
     }
     return true;
   }
@@ -184,13 +199,14 @@ abstract class PkController extends BaseController {
    * @param string $submitvalue - default NULL - If you don't want to check on the submittd key/value, leave value out
    * @return boolean - true if we should process the post, else false if it fails a test
    */
-  public function shouldProcessSubmit($opts = null) {
+  public function shouldProcessSubmit($opts = null)
+  {
     if (Request::method() !== 'POST') return false;
     if (!$opts) return true;
-    if ($opts instanceOf PkModel) return $opts->shouldProcessPost();
+    if ($opts instanceof PkModel) return $opts->shouldProcessPost();
     if (is_array($opts)) $closurecheck = keyVal('closurecheck', $opts);
-    if ($opts instanceOf Closure) $closurecheck = $opts;
-    if ($closurecheck instanceOf Closure) {
+    if ($opts instanceof Closure) $closurecheck = $opts;
+    if ($closurecheck instanceof Closure) {
       $data = Request::all();
       if (!$closurecheck($data, $opts)) return false;
     }
@@ -220,14 +236,15 @@ abstract class PkController extends BaseController {
    * @param type $modelkey
    * @return boolean|null - null if shouldn't processSubmit, true if succeds, else false
    */
-  public function processSubmit($opts = null, $inits = null) {
+  public function processSubmit($opts = null, $inits = null)
+  {
     if (!$this->ShouldProcessSubmit($opts)) return null;
     $validator = keyVal('validator', $opts);
     $valres = $this->validateRequest($validator);
     //pkdebug("Validation Result:", $valres);
- 
+
     #In a POST && met 'shouldProcessSubmit' requirements
-    if ($opts instanceOf PkModel) {
+    if ($opts instanceof PkModel) {
       $pkmodel = $opts;
     } else if (is_arrayish($opts)) {
       #We are processing a form submission
@@ -247,9 +264,9 @@ abstract class PkController extends BaseController {
      */
     $data = Request::all();
     //pkdebug("processSubmit POST data:", $data, "pkmodel:", $pkmodel);
-    if ($pkmodel instanceOf PkModel) {
+    if ($pkmodel instanceof PkModel) {
       if (is_array($inits))
-          foreach ($inits as $key => $val) {
+        foreach ($inits as $key => $val) {
           $data[$key] = $val;
         }
       $result = $pkmodel->saveRelations($data);
@@ -300,15 +317,16 @@ abstract class PkController extends BaseController {
    * @param string $validationStr - The validation string to use for validation
    * @return type
    */
-  public function processFileUploads($pkmodel ,$ctlName,$attName,$validationStr='image') {
+  public function processFileUploads($pkmodel, $ctlName, $attName, $validationStr = 'image')
+  {
     if (!$this->shouldProcessSubmit()) return;
     $request = request();
     $uploadedFile  = $request->file($ctlName);
     if ($validationStr) {
-      $this->validate($request,[$ctlName=>$validationStr]);
+      $this->validate($request, [$ctlName => $validationStr]);
     }
     //if (static::usesTrait('PkUploadTrait', $uploadedFile)) {
-    if ($uploadedFile instanceOf UploadedFile) {
+    if ($uploadedFile instanceof UploadedFile) {
       $path = $uploadedFile->store('public');
       $baseName = basename($path);
       $pkmodel->$attName = $baseName;
@@ -348,10 +366,11 @@ abstract class PkController extends BaseController {
    *  #$ctlName,$attName,$validationStr='image') {
    * @return either new instance of PkUploadModelTrait, or updated
    */
-  public function _processFileUpload( $params=[]) { #$ctlName,$attName,$validationStr='image') {
+  public function _processFileUpload($params = [])
+  { #$ctlName,$attName,$validationStr='image') {
     if (!$this->shouldProcessSubmit()) return;
     $uploadinstance = keyVal('pkinstance', $params);
-    $uploadmodel = keyVal('model',$params); #The type/instance to create
+    $uploadmodel = keyVal('model', $params); #The type/instance to create
     $id = keyVal('id', $params);
     if (!$uploadinstance) { //Find or make one
       if (!$uploadmodel::usesTrait(PkUploadTrait::class)) {
@@ -379,18 +398,20 @@ abstract class PkController extends BaseController {
      * or if none, all array of above array keyed by att names
      */
 
-    
+
     $owner = keyVal('owner', $params); #PkModel instance to own upload, if any
-    if ($owner)  {
-      if ( !$owner instanceOf PkModel) {
+    if ($owner) {
+      if (!$owner instanceof PkModel) {
         return false;
       } #We have an owner & info
       $ownerModel = get_class($owner);
       if ($ownerModel::usesTrait(PkHasTypedModelTrait::class)) {
         $att_name = keyVal('att_name', $params);
         $def = $ownerModel::getTypedMemberDefs($att_name);
-        $typedMember = $owner->makeTypedMember($att_name,
-            array_merge($params,$def));
+        $typedMember = $owner->makeTypedMember(
+          $att_name,
+          array_merge($params, $def)
+        );
         $typedMember->save();
         return $typedMember;
       }
@@ -401,7 +422,7 @@ abstract class PkController extends BaseController {
 
 
 
-    
+
   /*
 
     //if (static::usesTrait('PkUploadTrait', $uploadedFile)) {
@@ -425,7 +446,8 @@ abstract class PkController extends BaseController {
    * fully qualified 'App\Models\Item' model name or whatever.
    * @return false | ModelName
    */
-  public function isModelSetSubmit() {
+  public function isModelSetSubmit()
+  {
     if (Request::method() !== 'POST') return false;
     $data = Request::all();
     return keyValOrDefault('modelset', $data, false);
@@ -439,7 +461,8 @@ abstract class PkController extends BaseController {
    * @param string $msg - the error to report
    * @return Redirect Response
    */
-  public function error($msg = null) {
+  public function error($msg = null)
+  {
     if (!$msg) {
       $msg = "There was an error";
     }
@@ -453,24 +476,27 @@ abstract class PkController extends BaseController {
    * @param type $error
    * @return Redirected to the error page with appropriate error msg.
    */
-  public function showerror($error = null) {
+  public function showerror($error = null)
+  {
     if ($error === null) $error = \Session::get('error');
-    if (!$error instanceOf MessageBag) {
+    if (!$error instanceof MessageBag) {
       if (is_string($error)) $error = new MessageBag(['error' => $error]);
       else $error = new MessageBag(['error' => print_r($error, 1)]);
     }
     return view('showerror', ['error' => $error]);
   }
 
-  public function message($msg) {
+  public function message($msg)
+  {
     return redirect()->route('showmessage')->withMessage(new MessageBag(['message' => $msg]));
   }
 
-  public function showmessage($message = null) {
+  public function showmessage($message = null)
+  {
     if ($message === null) $message = \Session::get('message');
-    if (!$message instanceOf MessageBag) {
+    if (!$message instanceof MessageBag) {
       if (is_string($message))
-          $message = new MessageBag(['message' => $message]);
+        $message = new MessageBag(['message' => $message]);
       else $message = new MessageBag(['message' => print_r($message, 1)]);
     }
     return view('showmessage', ['message' => $message]);
@@ -480,7 +506,8 @@ abstract class PkController extends BaseController {
    * @param boolean - $lc - Return the name in lower case? Default true
    * @return string - the base controller name
    */
-  public static function getControllerName($lc = true) {
+  public static function getControllerName($lc = true)
+  {
     $shortname = (new \ReflectionClass($this))->getShortName();
     $controllerName = removeEndStr($shortname, 'Controller');
     if ($lc) return to_lower($controllerName);
@@ -492,7 +519,8 @@ abstract class PkController extends BaseController {
    * @param str $view
    * @param array $data
    */
-  public function render($view, $data = []) {
+  public function render($view, $data = [])
+  {
     if (!$view || !is_string($view)) return '';
     $relview = str_replace('.', '/', $view);
     $viewroots = \Config::get('view.paths');
@@ -514,13 +542,14 @@ abstract class PkController extends BaseController {
       extract($data);
     }
     ob_start();
-    include ($viewfile);
+    include($viewfile);
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
     return $___PKMVC_RENDERER_OUT;
   }
 
-  public static function staticRender($view, $data = []) {
+  public static function staticRender($view, $data = [])
+  {
     if (!$view || !is_string($view)) return '';
     $relview = str_replace('.', '/', $view);
     $viewroots = \Config::get('view.paths');
@@ -542,7 +571,7 @@ abstract class PkController extends BaseController {
       extract($data);
     }
     ob_start();
-    include ($viewfile);
+    include($viewfile);
     $___PKMVC_RENDERER_OUT = ob_get_contents();
     ob_end_clean();
     return $___PKMVC_RENDERER_OUT;
@@ -559,7 +588,8 @@ abstract class PkController extends BaseController {
    * PkExtensions package
    * @return file - with appropriate header
    */
-  public function pkasset($assetpath) {
+  public function pkasset($assetpath)
+  {
     if (!$assetpath || !is_string($assetpath)) {
       header("HTTP/1.0 404 Not Found");
       die();
@@ -588,15 +618,16 @@ abstract class PkController extends BaseController {
    * @param string $fileName - The file to try and import
    * @return array of arrays (rows) - or else an error
    */
-  function importCsv($fileName) {
+  function importCsv($fileName)
+  {
     if (!$fileName || !is_string($fileName)) return false;
     $csvMimeTypes = [
-        'text/plain',
-        'text/csv',
-        'text/x-csv',
-        'application/csv',
-        'text/comma-separated-values',
-        'application/x-csv',
+      'text/plain',
+      'text/csv',
+      'text/x-csv',
+      'application/csv',
+      'text/comma-separated-values',
+      'application/x-csv',
     ];
     $fmt = getFileMimeType($fileName);
     if (!$fmt || !in_array($fmt, $csvMimeTypes, 1)) {
@@ -606,7 +637,7 @@ abstract class PkController extends BaseController {
     if ($handle === false) return false;
     $retarr = [];
     while (($data = fgetcsv($handle)) !== FALSE) {
-      if (!is_array($data) || ((sizeOf($data) === 1 ) && ($data[0] === null))) {
+      if (!is_array($data) || ((sizeOf($data) === 1) && ($data[0] === null))) {
         continue;
       }
       $retarr[] = $data;
@@ -622,7 +653,8 @@ abstract class PkController extends BaseController {
    *   will output them first as column headers for the CSV file.
    * @return - 
    */
-  public function exportCsv($fileName, Array $output_arr = [], $columnHeaders = null) {
+  public function exportCsv($fileName, array $output_arr = [], $columnHeaders = null)
+  {
     $this->setExportHeaders($fileName);
     $output = fopen("php://output", "w");
     if ($columnHeaders && is_array($columnHeaders) && sizeOf($columnHeaders)) {
@@ -635,25 +667,78 @@ abstract class PkController extends BaseController {
     die();
   }
 
+  /** Imports a CSV file as an array. Tries to recover from errors and return
+   * as much as possible.
+   * @param string $filePath - The file to try and import
+   * @param boolean $firstRowHeaders: Use the first row as array keys
+   * @param boolean $slugify: Convert first row headers strings to variable names
+   * @return array of arrays (rows) - or else an error
+   */
+  /* Improved version 
+    public static function importCsv($filePath, $firstRowHeaders = false, $slugify=false) {
+    if (!$filePath || !is_string($filePath)) return false;
+    $csvMimeTypes = [
+        'text/plain',
+        'text/csv',
+        'text/x-csv',
+        'application/csv',
+        'text/comma-separated-values',
+        'application/x-csv',
+    ];
+    $fmt = static::getFileMimeType($filePath);
+    if (!$fmt || !in_array($fmt, $csvMimeTypes, 1)) {
+      throw new \Exception("Importinc CSV file: [$filePath], reported MimeType: [$fmt]");
+    }
+    $handle = fopen($filePath, "r");
+    if ($handle === false) return false;
+    $retarr = [];
+    $keys = null;
+    if ($firstRowHeaders) {
+      $keys = fgetcsv($handle);
+      if ($slugify) {
+        foreach ($keys as &$key) {
+          $key = StringUtil::slugify($key,'_');
+        }
+      }
+    }
+
+    $i=0;
+    while (($data = fgetcsv($handle)) !== FALSE) {
+      if (!is_array($data) || ((sizeOf($data) === 1 ) && ($data[0] === null))) {
+        continue;
+      }
+      if ($keys) {
+        if (!(count($keys) === count($data))) {
+          throw new \Exception("Key count different from row count");
+        }
+        $data = array_combine($keys, $data);
+      }
+      $retarr[] = $data;
+    }
+    return $retarr;
+  }
+*/
+
   /** Sets headers for file export/save
    * Should be followed by "echo" of data, then die();
    * @param string $filename - suggested filename
    */
-  public static function setExportHeaders($filename = '') {
+  public static function setExportHeaders($filename = '')
+  {
     header("Pragma: public");
     header("Expires: 0"); // set expiration time
     header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-// browser must download file from server instead of cache
-// force download dialog
+    // browser must download file from server instead of cache
+    // force download dialog
     header("Content-Type: application/force-download");
     header("Content-Type: application/octet-stream");
     header("Content-Type: application/download");
 
-// use the Content-Disposition header to supply a recommended filename and
-// force the browser to display the save dialog.
+    // use the Content-Disposition header to supply a recommended filename and
+    // force the browser to display the save dialog.
     header("Content-Disposition: attachment; filename=$filename;");
 
-//Make sure the browser gets a 200 header
+    //Make sure the browser gets a 200 header
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT', true, 200);
   }
 
@@ -664,7 +749,8 @@ abstract class PkController extends BaseController {
    */
   public static $type = null;
   public static $title = null;
-  public static function menuFromRoutes($type=null,$title=null) {
+  public static function menuFromRoutes($type = null, $title = null)
+  {
     if (!$type) {
       $type = static::$type;
     }
@@ -688,6 +774,6 @@ abstract class PkController extends BaseController {
     if (!$routes) {
       return null;
     }
-    return PkMenuBuilder::Drop($title,$routes);
+    return PkMenuBuilder::Drop($title, $routes);
   }
 }

@@ -11,6 +11,11 @@ class ClearAll extends Command {
       $this->call('view:clear');
       $this->call('route:clear');
       $this->call('clear-compiled');
-      $this->info("Now run 'composer dump-autoload");
+      /*
+      $output = "Pending...";
+      $this->exec("composer dump-autoload", $output);
+      $this->comment("Dumping Autoload:\n".implode("\n", $output));
+      */
+      $this->info("Now run 'composer dump-autoload'");
     }
 }
