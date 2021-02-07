@@ -15,7 +15,8 @@
     "ezyang/htmlpurifier": "*"
   },
   "require-dev": {
-    "ccampbell/chromephp": "*"
+    "ccampbell/chromephp": "*",
+    "kint-php/kint": "dev-master"
   },
   "autoload": {
     "psr-4": {
