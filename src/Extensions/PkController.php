@@ -197,18 +197,22 @@ abstract class PkController extends BaseController
    * $opts are an array of params:
    * @param string $submitname - default 'submit' - The name of the POST key to check
    * @param string $submitvalue - default NULL - If you don't want to check on the submittd key/value, leave value out
-   * @return boolean - true if we should process the post, else false if it fails a test
+   * @return boolean - true if we should process the post, EXCEPTION if not - only called by this->processSubmit
    */
   public function shouldProcessSubmit($opts = null)
   {
-    if (Request::method() !== 'POST') return false;
+    if (Request::method() !== 'POST') { //return false;
+      throw new PkException("Not a post");
+    }
     if (!$opts) return true;
     if ($opts instanceof PkModel) return $opts->shouldProcessPost();
     if (is_array($opts)) $closurecheck = keyVal('closurecheck', $opts);
     if ($opts instanceof Closure) $closurecheck = $opts;
     if ($closurecheck instanceof Closure) {
       $data = Request::all();
-      if (!$closurecheck($data, $opts)) return false;
+      if (!$closurecheck($data, $opts)) { //return false;
+        throw new PkException("Failed closureCheck");
+      }
     }
     $submitname = keyVal('submitname', $opts, 'submit');
     $submitvalue = keyVal('submitvalue', $opts);
@@ -238,7 +242,15 @@ abstract class PkController extends BaseController
    */
   public function processSubmit($opts = null, $inits = null)
   {
-    if (!$this->ShouldProcessSubmit($opts)) return null;
+    try {
+      if ($this->ShouldProcessSubmit($opts) !== true) { //return null;
+        pkdebug("Failed ShouldProcessSubmit");
+        return null;
+      }
+    } catch (\Throwable $e) {
+        pkdebug("Excepted from ShouldProcessSubmit");
+      return null;
+    }
     $validator = keyVal('validator', $opts);
     $valres = $this->validateRequest($validator);
     //pkdebug("Validation Result:", $valres);

@@ -82,7 +82,6 @@ class PkHtmlBuilder extends HtmlBuilder
     unset($attributes['img']);
     unset($attributes['escape']);
     unset($attributes['image']);
-    pkdebug("In linkRoute - Name: [$name]; params:", $parameters, "URL Type:", typeOf($this->url));
     return $this->link($this->url->route($name, $parameters), $title, $attributes, $secure, $escape);
     //return parent::linkRoute($name,$title,$parameters, $attributes);
   }
