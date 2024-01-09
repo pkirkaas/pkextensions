@@ -14,5 +14,5 @@ logs/
 .env
 /storage/*
 /vendor/*
-/composer.lock
+composer.lock
 nbproject/*
