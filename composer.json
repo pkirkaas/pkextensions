@@ -9,8 +9,8 @@
   ],
   "minimum-stability": "dev",
   "require": {
-    "php": ">7",
-    "laravelcollective/html": ">5",
+    "php": ">8",
+    "spatie/laravel-html": "*",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*"
   },
