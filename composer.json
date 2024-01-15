@@ -12,7 +12,8 @@
     "php": ">8",
     "spatie/laravel-html": "*",
     "jenssegers/agent": "*",
-    "ezyang/htmlpurifier": "*"
+    "ezyang/htmlpurifier": "*",
+    "laravelcollective/html": "6.x-dev"
   },
   "require-dev": {
     "ccampbell/chromephp": "*",
