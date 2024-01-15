@@ -24,8 +24,9 @@ use PkExtensions\PopAtts;
      */?>
     <title>{{Config::get("app.name")}}</title>
     <link href="{{ mix('/mixed/css/stylesheets.css') }}" rel="stylesheet">
-    <link href="{{ mix('/mixed/css/sassed.css') }}" rel="stylesheet">
     <?php /*
+    // ?? 2024 - think this is included in stylesheets?
+    <link href="{{ mix('/mixed/css/sassed.css') }}" rel="stylesheet">
     <link href="{{ mix('/mixed/css/sassed.css') }}" rel="stylesheet">
     */ ?>
     {!!PopAtts::jsInit()!!}
