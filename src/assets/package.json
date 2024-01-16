@@ -1,0 +1,7 @@
+{
+  "name": "Dummy Package for Webpack",
+  "description": "?? Requires a package.json JUST TO EXIST",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {}
+}
