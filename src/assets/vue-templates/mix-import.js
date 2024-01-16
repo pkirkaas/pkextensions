@@ -21,6 +21,9 @@ window.Popper = Popper;
  * arg contain 'appendTemplate' as a string of a vue template. 
  * If arg.placement ==  'after', vue is placed AFTER the element, else within
  */
+
+/**
+ *  Vue 3 doesn't like this. Will removing it break anything? 2024
 class pkVue extends Vue {constructor(arg){
     if (arg.appendtemplate) {
       var uid ='uid-'+elid(); // Make random unique ID
@@ -70,6 +73,9 @@ class pkVue extends Vue {constructor(arg){
   }
 }} ;
 
+window.pkVue = pkVue;
+
+
 /** Use like: to initialize from AJAX
     var vg = new pkVue({
       el: '#vue-home',
@@ -77,9 +83,6 @@ class pkVue extends Vue {constructor(arg){
       ajax: {url: '/ajax', params: {action: 'test'}},
 });
 */
-
-
-window.pkVue = pkVue;
 
 //window.Vue.component('pk-dragndrop', require('./pk-dragndrop.vue'));
 
