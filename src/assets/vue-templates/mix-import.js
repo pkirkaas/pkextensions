@@ -24,6 +24,7 @@ window.Popper = Popper;
 
 /**
  *  Vue 3 doesn't like this. Will removing it break anything? 2024
+ */
 class pkVue extends Vue {constructor(arg){
     if (arg.appendtemplate) {
       var uid ='uid-'+elid(); // Make random unique ID
