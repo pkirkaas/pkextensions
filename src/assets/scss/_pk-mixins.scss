@@ -10,6 +10,8 @@ font-family: 'Oswald', verdana;
 font-family: 'Lato', verdana;
 */
 
+@use 'sass:math';
+
 @import 'variables';
 // If they weren't previously defined, use defaults
 $grid-breakpoints: (xs: 0, sm: 544px, md: 768px, lg: 992px, xl: 1200px) !default;
@@ -302,7 +304,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
 
 @mixin mk-zooms {
   @for $i from 0 through 50 {
-    $inc: $i/10;
+    $inc: calc($i/10);
     .z#{$i} { zoom: 1+$inc; }
     .z-#{$i} { zoom: 1-$inc; }
   }
@@ -334,10 +336,10 @@ $grid-gutter-width:          1.875rem !default; // 30px
 @mixin mk-spacing {
   @for $i from 0 through 90 {
     $sz: if($i!=0, -$i, 0);
-    $offset: $i/3 * 1rem;
-    $eoffset: $i/3 * 1em;
-    $foffset: $offset/5;
-    $feoffset: $eoffset/5;
+    $offset: calc($i/3) * 1rem;
+    $eoffset: calc($i/3) * 1em;
+    $foffset: calc($offset/5);
+    $feoffset: calc($eoffset/5);
     @if $i < 50 {
       //$foffset: $offset + 1em;
       //Font Size: REM, up and down - fs-0: 1rem;, fs-1: fs--1
