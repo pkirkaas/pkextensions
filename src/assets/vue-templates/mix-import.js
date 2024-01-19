@@ -11,7 +11,9 @@
 //Vue.component('pk-dragndrop',PkDragndrop);
 
 window.axios = require('axios');
-window.Vue = require('vue');
+//window.Vue = require('vue');
+import Vue from 'vue';
+window.Vue = Vue;
 import Popper from 'popper.js';
 window.Popper = Popper;
 /**

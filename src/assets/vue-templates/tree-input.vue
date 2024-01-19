@@ -67,7 +67,9 @@ Each "treenode" node has up to 6 properties:
 
 
 <script>
-window.Vue = require('vue');
+//window.Vue = require('vue');
+import Vue from 'vue';
+window.Vue = Vue;
 require('./vue-data-components.js');
 //import { pinputMixin, formatMixin, utilityMixin, refreshRefsMixin, controlMixin }
   // from '/vue-data-components' ;
