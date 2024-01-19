@@ -158,7 +158,7 @@ trait RefDisplayTrait {
    * @return type
    */
   public static function getRefValArr($el, $null=false) {
-    $merged = getAllRefsMerged();
+    $merged = static::getAllRefsMerged();
     $optarr = $merged[$el] ?? null;
     if (!$optarr || !is_array($optarr)) return null;
     return static::_null($null, $optarr);
