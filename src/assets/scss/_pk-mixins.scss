@@ -208,7 +208,7 @@ $grid-gutter-width:          1.875rem !default; // 30px
     $sz: if($i!=0, $i, null);
     // For a while was:
     //$sz: if($i!=0, -$i, null);
-    $szmap: (font-size:($i/5)+$size);
+    $szmap: (font-size:calc($i/5)+$size);
     @each $bga in map-keys($bgmap) {
       $bmap: map-get($bgmap,$bga);
       @each $ca in map-keys($clmap) {

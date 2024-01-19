@@ -467,10 +467,10 @@ img.avatar {
 }
 
 img.avatar.small {
-  max-height: $img-avatar-max-height/2;
+  max-height: calc($img-avatar-max-height/2);
 }
 img.avatar.xsmall {
-  max-height: $img-avatar-max-height/3;
+  max-height: calc($img-avatar-max-height/3);
 }
 img.avatar.tiny {
   max-height: $img-avatar-tiny-max-height;

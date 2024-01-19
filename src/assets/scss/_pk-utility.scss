@@ -549,7 +549,7 @@ div.error-popup-box.ui-dialog-content {
 @mixin mk-offsets() {
   @for $i from 0 through 100 {
     $ex: if($i!=0, -$i, null);
-    $sz: $i/10 *1rem;
+    $sz: calc($i/10) *1rem;
     .top#{$ex} {
       top: $sz;
     }
