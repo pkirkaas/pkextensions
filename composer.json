@@ -7,13 +7,16 @@
       "email": "paul.kirkaas@gmail.com"
     }
   ],
+  "comments": {
+    "spatie/laravel-html": "*",
+    "laravelcollective/html": "6.x-dev"
+  },
   "minimum-stability": "dev",
   "require": {
     "php": ">8",
-    "spatie/laravel-html": "*",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
-    "laravelcollective/html": "6.x-dev"
+    "laravelcollective/html": "^6"
   },
   "require-dev": {
     "ccampbell/chromephp": "*",
