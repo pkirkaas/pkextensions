@@ -840,8 +840,8 @@ function getAppLogDir() {
  * @return boolean
  */
 function appLogReset($reset = null) {
-  return false;
-  static $staticReset = true;
+  //return false;
+  //static $staticReset = true;
   if ($reset === true) {
     $staticReset = true;
   } else if ($reset === false) {
