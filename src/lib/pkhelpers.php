@@ -14,6 +14,8 @@ use Illuminate\Support\Collection as BaseCollection;
 //use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Str;
+
 
 use Jenssegers\Agent\Agent as MobileDetectAgent;
 use Carbon\Carbon;
@@ -198,12 +200,15 @@ function friendlyCarbonDate($date = null, $format =  'M j, Y',$shownever = false
  * @return string - count of items, with 'No" for 0, singular for 1, else plural
  */
 function numberItems($items,$word) {
-  $wordform = str_plural($word);
+  //$wordform = str_plural($word);
+
+  $wordform = Str::plural($word);
   if (!$items || !count($items)) {
     $num = "No";
   } else {
     $num = count($items);
-    if ($num === 1) $wordform = str_singular($word);
+    //if ($num === 1) $wordform = str_singular($word);
+    if ($num === 1) $wordform = Str::singular($word);
   }
   return "<div class='num-items'>$num </div> <div class='item-desc'>$wordform</div>";
 }
