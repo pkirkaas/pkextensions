@@ -1161,7 +1161,7 @@ trait BuildQueryTrait {
    * @return Collection - trimmed/filtered collection
    */
   public function filterOnMatch(Collection $collection) {
-    $pkmarr = $this->getMatchObj();
+    $pkmarr = $this->getMatchObj($collection);
     pkdebug("FOM: MatchArr:",$pkmarr, "Passed Collection:",$collection);
     if(!$pkmarr) {
       return $collection;
