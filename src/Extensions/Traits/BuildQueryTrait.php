@@ -1162,7 +1162,7 @@ trait BuildQueryTrait {
    */
   public function filterOnMatch(Collection $collection) {
     $pkmarr = $this->getMatchObj();
-    //pkdebug("MatchArr:",$pkmarr);
+    pkdebug("FOM: MatchArr:",$pkmarr);
     if(!$pkmarr) {
       return $collection;
     }
