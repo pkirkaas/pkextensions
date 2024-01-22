@@ -642,8 +642,9 @@ trait BuildQueryTrait {
     $newcol = $this->filterOnMatch($collection);
     $nnewcol = $this->filterOnClosures($newcol);
     $nnnewcol = $this->filterCustomMethods($nnewcol);
-    //$sza = count($newcol);
-    //pkdebug("SXA:  $sza");
+    $sza = count($newcol);
+    $sznnn = count($nnnewcol);
+    pkdebug("In ExecuteSearch: SZA:  $sza", $newcol, "SZNNN: $sznnn", $nnnewcol);
     return $nnnewcol;
   }
 
