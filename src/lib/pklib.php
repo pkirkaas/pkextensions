@@ -832,7 +832,8 @@ function getAppLogDir() {
   return dirname($appLogPath);
 }
 
-/** Sets whether the first call to the pkdebug function in a given request
+/** CURRENTLY NO OP - FIX - 2024
+ *  Sets whether the first call to the pkdebug function in a given request
  * should reset the log file a the start of the request, or append to it.
  * @staticvar boolean $staticReset
  * @param boolean|null $reset If given, changes the reset value and returns it.
@@ -840,14 +841,16 @@ function getAppLogDir() {
  * @return boolean
  */
 function appLogReset($reset = null) {
-  //return false;
+  return false;
   //static $staticReset = true;
+  /*
   if ($reset === true) {
     $staticReset = true;
   } else if ($reset === false) {
     $staticReset = false;
   }
   return $staticReset;
+  */
 }
 
 /** Request Info - URL, Type, params, etc.
