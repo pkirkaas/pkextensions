@@ -888,10 +888,8 @@ trait BuildQueryTrait {
             $critset['crit'], $critset['val'], $critset['param']);
       }
     }
-    /*
     pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
         "Query to SQL:", $query->toSql());
-    */
     return $query;
   }
 
@@ -904,6 +902,8 @@ trait BuildQueryTrait {
     $matchObj->compfield = $baseName;
     $this->matchObjArr[$baseName]=$matchObj;
   }
+  
+
   public function getMatchObj($base = null) {
     if ($base) return keyVal($base,$this->matchObjArr);
     return $this->matchObjArr;
@@ -1161,7 +1161,8 @@ trait BuildQueryTrait {
    * @return Collection - trimmed/filtered collection
    */
   public function filterOnMatch(Collection $collection) {
-    $pkmarr = $this->getMatchObj($collection);
+    // Not the fix....: $pkmarr = $this->getMatchObj($collection);
+    $pkmarr = $this->getMatchObj();
     pkdebug("FOM: MatchArr:",$pkmarr, "Passed Collection:",$collection);
     if(!$pkmarr) {
       return $collection;
