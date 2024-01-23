@@ -739,7 +739,7 @@ trait BuildQueryTrait {
       if (!empty($this->querySets)) $querySets = $this->querySets;
       else $querySets = $this->buildQuerySets();
     }
-    //pkdebug("QuerySets:", $querySets);
+    pkdebug("buildQueryOnModel: QuerySets:", $querySets);
     #Sets are keyed by 'root' or 'baseName', with a definition array. If the
     #root key matches an attribute name on the model, that's what we search
     #against. If not, try to figure out what the query is on/for/to.
