@@ -777,7 +777,8 @@ function pkvardump($arg, $disableXdebug = true, $useVarDump=false) {
   static $JENCODEFLAGS = JSON_INVALID_UTF8_IGNORE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
   ini_set('html_errors', 0);
   ini_set('xdebug.overload_var_dump', 0);
-  if ($useVarDump || (is_object($arg) && method_exists($arg, '__debuginfo' ))) {
+  //if ($useVarDump || (is_object($arg) && method_exists($arg, '__debuginfo' ))) {
+  if ($useVarDump) {
     ob_start();
     Var_Dump($arg);
     $vardump = ob_get_contents();
