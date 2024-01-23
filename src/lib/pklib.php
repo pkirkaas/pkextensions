@@ -781,14 +781,14 @@ function pkvardump($arg, $disableXdebug = true, $useVarDump=false) {
   if ($useVarDump) {
     ob_start();
     Var_Dump($arg);
-    $vardump = ob_get_contents();
+    $vardump = ob_get_contents() . " - VAR_DUMP ENCODED ";
     //Experimenting 6/16 - replacing with ob_end_flush...
     //NOPE! Flush also outputs to browser!
     ob_end_clean();
     //ob_end_flush();
   } else {
     //$vardump = print_r($arg, true);
-    $vardump = json_encode($arg, $JENCODEFLAGS);
+    $vardump = json_encode($arg, $JENCODEFLAGS) . " - JSON ENCODED ";
   }
   ini_set('xdebug.overload_var_dump', 1);
   ini_set('html_errors', 1);
