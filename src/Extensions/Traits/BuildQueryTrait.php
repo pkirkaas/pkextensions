@@ -736,7 +736,8 @@ trait BuildQueryTrait {
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     // Too much memory...: pkdebug("TargetFieldNames:", $targetFieldNames, "targetBuilder:", $targetBuilder, "targetModel:", $targetModel, "QuerySets:", $querySets);
     pkdebug("TargetFieldNames:", $targetFieldNames,  "QuerySets:", $querySets, "this.querySets:", $this->querySets);
-    if ($querySets === null) {
+    //if ($querySets === null) {
+    if (empty($querySets)) {
       if (!empty($this->querySets)) $querySets = $this->querySets;
       else $querySets = $this->buildQuerySets();
     }
@@ -996,6 +997,7 @@ trait BuildQueryTrait {
   ## Filters. AND - Don't build filter if "don't care"
 ###!!!!  BUT DO BUILD FILTER WITHOUT VALUES FOR EXISTENTIAL QUERIES
   public function buildQuerySets(Array $arr = []) { #Should also work from controller
+    pkdebug("Enter buildQuerySets; arg arr:", $arr);
     $arr = static::filterToCritArr($arr);
     //if ($this->matchObjs === null) {
       //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
