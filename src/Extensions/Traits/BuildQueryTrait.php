@@ -735,7 +735,7 @@ trait BuildQueryTrait {
     $targetBuilder = $this->getQBTargetBuilder($targetEloquent);
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     // Too much memory...: pkdebug("TargetFieldNames:", $targetFieldNames, "targetBuilder:", $targetBuilder, "targetModel:", $targetModel, "QuerySets:", $querySets);
-    pkdebug("TargetFieldNames:", $targetFieldNames, "targetBuilder:", $targetBuilder,  "QuerySets:", $querySets);
+    pkdebug("TargetFieldNames:", $targetFieldNames,  "QuerySets:", $querySets);
     if ($querySets === null) {
       if (!empty($this->querySets)) $querySets = $this->querySets;
       else $querySets = $this->buildQuerySets();
