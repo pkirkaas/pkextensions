@@ -763,8 +763,6 @@ function pkcatchecho($runnable) {
 }
 
 
-// some default json_encode flags
-$JENCODEFLAGS = JSON_INVALID_UTF8_IGNORE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
 /**
  * Returns a string of the arg content, in the form var_dump or print_r would output.
  * Explore alternatives like: json_encode, print_r, serialize, var_export
@@ -775,6 +773,8 @@ $JENCODEFLAGS = JSON_INVALID_UTF8_IGNORE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_P
 //function pkvardump($arg, $disableXdebug = true, $useVarDump=true) {
 // 2024 - try using json_encode as default 
 function pkvardump($arg, $disableXdebug = true, $useVarDump=false) {
+  // some default json_encode flags
+  static $JENCODEFLAGS = JSON_INVALID_UTF8_IGNORE | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
   ini_set('html_errors', 0);
   ini_set('xdebug.overload_var_dump', 0);
   if ($useVarDump || (is_object($arg) && method_exists($arg, '__debuginfo' ))) {
