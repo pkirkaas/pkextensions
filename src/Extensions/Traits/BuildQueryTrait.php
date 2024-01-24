@@ -644,7 +644,8 @@ trait BuildQueryTrait {
     $nnnewcol = $this->filterCustomMethods($nnewcol);
     $sza = count($newcol);
     $sznnn = count($nnnewcol);
-    pkdebug("In ExecuteSearch: SZA:  $sza", $newcol, "SZNNN: $sznnn", $nnnewcol);
+    //pkdebug("In ExecuteSearch: SZA:  $sza", $newcol, "SZNNN: $sznnn", $nnnewcol);
+    pkdebug("In ExecuteSearch: SZNNN: $sznnn", $nnnewcol);
     return $nnnewcol;
   }
 
@@ -735,7 +736,8 @@ trait BuildQueryTrait {
     $targetBuilder = $this->getQBTargetBuilder($targetEloquent);
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     // Too much memory...: pkdebug("TargetFieldNames:", $targetFieldNames, "targetBuilder:", $targetBuilder, "targetModel:", $targetModel, "QuerySets:", $querySets);
-    pkdebug("TargetFieldNames:", $targetFieldNames,  "QuerySets:", $querySets, "this.querySets:", $this->querySets);
+    //pkdebug("TargetFieldNames:", $targetFieldNames,  "QuerySets:", $querySets, "this.querySets:", $this->querySets);
+    pkdebug( "QuerySets:", $querySets, "this.querySets:", $this->querySets);
     //if ($querySets === null) {
     if (empty($querySets)) {
       if (!empty($this->querySets)) $querySets = $this->querySets;
@@ -890,8 +892,8 @@ trait BuildQueryTrait {
             $critset['crit'], $critset['val'], $critset['param']);
       }
     }
-    pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr,
-        "Query to SQL:", $query->toSql());
+    //pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr, "Query to SQL:", $query->toSql());
+    pkdebug("End of BuildQuerySets - Query to SQL:", $query->toSql());
     return $query;
   }
 
@@ -1016,7 +1018,7 @@ trait BuildQueryTrait {
         pkdebug("Arr was empty but this was a Post request, new arr:", $arr, "reqData:", $reqData);
       } else {
         $thisType = typeOf($this);
-        pkdebug("Arr was empty but this is NEITHER a Post OR a PkModel - it's:??", $thisType);
+        pkdebug("Arr was empty but this is NEITHER a Post OR a PkModel??");
       }
     }
     if (empty($arr)) {
@@ -1172,7 +1174,7 @@ trait BuildQueryTrait {
   public function filterOnMatch(Collection $collection) {
     // Not the fix....: $pkmarr = $this->getMatchObj($collection);
     $pkmarr = $this->getMatchObj();
-    pkdebug("FOM: MatchArr:",$pkmarr, "Passed Collection:",$collection);
+    //pkdebug("FOM: MatchArr:",$pkmarr, "Passed Collection:",$collection);
     if(!$pkmarr) {
       return $collection;
     }
