@@ -125,6 +125,7 @@ Trait CriteriaSetsTrait {
    */
   public static function isValidCriterion($crit, $type = null) {
     $cs = static::getCriteriaSets();
+    pkdebug("Res of getCriteriaSets:", $cs);
     foreach ($cs as $ctype => $criteria) {
       if ((!$type || ($type === $ctype)) && in_array($crit, array_keys($criteria))) {
         return true;
