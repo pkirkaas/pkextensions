@@ -645,7 +645,7 @@ trait BuildQueryTrait {
     $sza = count($newcol);
     $sznnn = count($nnnewcol);
     //pkdebug("In ExecuteSearch: SZA:  $sza", $newcol, "SZNNN: $sznnn", $nnnewcol);
-    pkdebug("In ExecuteSearch: SZNNN: $sznnn", $nnnewcol);
+    pkdebug("In ExecuteSearch: SZNNN: $sznnn");
     return $nnnewcol;
   }
 
