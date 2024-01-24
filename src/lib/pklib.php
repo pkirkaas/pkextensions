@@ -866,7 +866,10 @@ function appLogReset($reset = null) {
  */
 function appLogClear() {
   $appLog = appLogPath();
-  unlink ($appLog);
+  try {
+    unlink ($appLog);
+  } catch (\Exception $e) {
+  }
 }
 
 /** Request Info - URL, Type, params, etc.
