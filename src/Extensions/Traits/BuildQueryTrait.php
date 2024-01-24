@@ -109,7 +109,6 @@ trait BuildQueryTrait {
    */
   public static function getTargetModel($targetEloquent = null) {
     if ($targetEloquent) {
-      //if ($targetEloquent instanceOf Builder) {
       if (static::Builderish($targetEloquent)) {
         return get_class($targetEloquent->getModel());
       } else {
@@ -325,12 +324,8 @@ trait BuildQueryTrait {
       $def['field_defs'] = $fieldDefs;
       //$fieldDefsCollection[$baseName] = $fieldDefs;
     }
-    //pkdebug("FIELDDEFS:", $fieldDefs);
     if ($fieldName) return $searchFields[$fieldName];
     return $searchFields;
-    //$r = static::setCached(static::$queryFieldDefCacheKey, $fieldDefsCollection);
-    //if ($baseName) return keyVal($baseName, $r);
-    //return $r;
   }
 
   /** The query definitions can comprise several different Tables, Models,
