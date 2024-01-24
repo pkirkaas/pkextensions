@@ -1009,8 +1009,11 @@ trait BuildQueryTrait {
         #To use Accessors/Mutators
         //$arr = $this->getAttributes();
         $arr = static::filterToCritArr($this->getAccessorAttributes());
+        pkdebug("Arr was empty but this is a PkModel, new arr:", $arr);
       } else if (isPost()) {
+        $reqData = request()->all();
         $arr = static::filterToCritArr(request()->all());
+        pkdebug("Arr was empty but this was a Post request, new arr:", $arr, "reqData:", $reqData);
       }
     }
     if (empty($arr)) {
