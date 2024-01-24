@@ -640,7 +640,7 @@ trait BuildQueryTrait {
     $sza = count($newcol);
     $sznnn = count($nnnewcol);
     //pkdebug("In ExecuteSearch: SZA:  $sza", $newcol, "SZNNN: $sznnn", $nnnewcol);
-    pkdebug("In ExecuteSearch: SZNNN: $sznnn");
+    //pkdebug("In ExecuteSearch: SZNNN: $sznnn");
     return $nnnewcol;
   }
 
@@ -738,7 +738,7 @@ trait BuildQueryTrait {
       if (!empty($this->querySets)) $querySets = $this->querySets;
       else $querySets = $this->buildQuerySets();
     }
-    pkdebug("buildQueryOnModel: QuerySets:", $querySets);
+    //pkdebug("buildQueryOnModel: QuerySets:", $querySets);
     #Sets are keyed by 'root' or 'baseName', with a definition array. If the
     #root key matches an attribute name on the model, that's what we search
     #against. If not, try to figure out what the query is on/for/to.
@@ -994,7 +994,7 @@ trait BuildQueryTrait {
   ## Filters. AND - Don't build filter if "don't care"
 ###!!!!  BUT DO BUILD FILTER WITHOUT VALUES FOR EXISTENTIAL QUERIES
   public function buildQuerySets(Array $arr = []) { #Should also work from controller
-    pkdebug("Enter buildQuerySets; arg arr:", $arr);
+    //pkdebug("Enter buildQuerySets; arg arr:", $arr);
     $arr = static::filterToCritArr($arr);
     //if ($this->matchObjs === null) {
       //$this->matchObjs=PkMatch::matchFactory(static::getFullQueryDef());
@@ -1006,14 +1006,14 @@ trait BuildQueryTrait {
         #To use Accessors/Mutators
         //$arr = $this->getAttributes();
         $arr = static::filterToCritArr($this->getAccessorAttributes());
-        pkdebug("Arr was empty but this is a PkModel, new arr:", $arr);
+        //pkdebug("Arr was empty but this is a PkModel, new arr:", $arr);
       } else if (isPost()) {
         $reqData = request()->all();
         $arr = static::filterToCritArr(request()->all());
-        pkdebug("Arr was empty but this was a Post request, new arr:", $arr, "reqData:", $reqData);
+        //pkdebug("Arr was empty but this was a Post request, new arr:", $arr, "reqData:", $reqData);
       } else {
         $thisType = typeOf($this);
-        pkdebug("Arr was empty but this is NEITHER a Post OR a PkModel??");
+        //pkdebug("Arr was empty but this is NEITHER a Post OR a PkModel??");
       }
     }
     if (empty($arr)) {
