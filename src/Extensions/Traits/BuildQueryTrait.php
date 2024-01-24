@@ -1014,6 +1014,9 @@ trait BuildQueryTrait {
         $reqData = request()->all();
         $arr = static::filterToCritArr(request()->all());
         pkdebug("Arr was empty but this was a Post request, new arr:", $arr, "reqData:", $reqData);
+      } else {
+        $thisType = typeOf($this);
+        pkdebug("Arr was empty but this is NEITHER a Post OR a PkModel - it's:??", $thisType);
       }
     }
     if (empty($arr)) {
