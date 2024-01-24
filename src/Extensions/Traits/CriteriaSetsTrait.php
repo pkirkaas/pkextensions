@@ -125,10 +125,11 @@ Trait CriteriaSetsTrait {
    */
   public static function isValidCriterion($crit, $type = null) {
     $cs = static::getCriteriaSets();
-    // OK, so this works to get CS: pkdebug("Res of getCriteriaSets:", $cs);
+    // OK, so this works to get CS: 
+    pkdebug("Res of getCriteriaSets:", $cs);
     foreach ($cs as $ctype => $criteria) {
       if ((!$type || ($type === $ctype)) && in_array($crit, array_keys($criteria))) {
-        pkdebug("crit [$crit] IS valid, with criteria:", $criteria);
+        pkdebug("crit [$crit], of ctype: [$ctype] IS valid, with criteria:", $criteria);
         return true;
       }
     }

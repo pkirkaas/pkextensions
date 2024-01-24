@@ -1034,7 +1034,8 @@ trait BuildQueryTrait {
       $root = removeEndStr($key, '_crit');
       if ($root === false) continue;#Not a crit
       if ($val === null) continue;
-      if (!$this->isValidCriterion($key)) continue;
+      if (!$this->isValidCriterion($val)) continue;
+      //if (!$this->isValidCriterion($key)) continue;
       #We COULD get static::getBasenameQueryDef($root) now, and see if we have supplimental info
       $comptype = static::comptype($root);
       $noval = static::noval($comptype);
