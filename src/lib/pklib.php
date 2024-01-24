@@ -861,6 +861,14 @@ function appLogReset($reset = null) {
   */
 }
 
+/**
+ * Deletes the app log file
+ */
+function appLogClear() {
+  $appLog = appLogPath();
+  unlink ($appLog);
+}
+
 /** Request Info - URL, Type, params, etc.
 * @return string - w. the req info
 */
