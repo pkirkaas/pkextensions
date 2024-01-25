@@ -69,6 +69,8 @@ var formatMixin = {
         fmt = "MMM D YYYY";
       } else if (fmt === "Tm") {
         fmt = "h:mm A";
+      } else if (fmt === "CmpDt") {
+        fmt = "D MMM YY";
       }
       //"MMM D YYYY  h:mm A" - Nov 2 2018 3:05 PM
       fmt = fmt || "MMMM D, YYYY";
