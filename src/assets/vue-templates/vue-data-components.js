@@ -1446,7 +1446,7 @@ window.Vue.component('del-icon',{
  *      name
  *    & paramaters necessary
  * */
-/*
+// 2024 - Why is this commented out? Does it still work? Try restoring...
 window.Vue.component('data-item',{
   template: `
     <div :class="itmcls" :style="style" v-html="content"></div>
@@ -1510,7 +1510,8 @@ window.Vue.component('data-item',{
   },
 });
 
-*/
+// END Restored data-item component
+
 /** Looks like it wraps a label with associated data value OR input ctl
  * 
  */
