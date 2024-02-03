@@ -1,6 +1,7 @@
 'use strict';
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 // Mostly junk, maybe something interesting
+// 2024 - I THINK DEPRECATED - but has buildInput - try moving
 //var Vue = require( 'vue');
 import Vue from 'vue';
 class PkVue extends Vue {
