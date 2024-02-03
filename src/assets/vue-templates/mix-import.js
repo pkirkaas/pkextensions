@@ -101,7 +101,7 @@ window.Vue.component('pk-showimage',PkShowimage);
 
 
 
-Vue.buildInput = function(params) {
+window.Vue.buildInput = function(params) {
   //console.log("Paramas", params);
   var reginptypes = ['text','password','color','date','datetime-local', 'email',
     'month', 'number', 'range', 'search', 'tel', 'time', 'url', 'week'];
