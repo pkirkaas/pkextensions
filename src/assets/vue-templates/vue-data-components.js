@@ -1428,6 +1428,65 @@ window.Vue.component('del-icon',{
 });
 
 
+// 2024 - try somehow to restore data-input, which uses buildInput
+function buildInput(params) {
+  //console.log("Paramas", params);
+  var reginptypes = ['text','password','color','date','datetime-local', 'email',
+    'month', 'number', 'range', 'search', 'tel', 'time', 'url', 'week'];
+  var defcls = " rt-inp ";
+  var name = params.name;
+  var val = params.val;
+  var placeholder = params.placeholder || '';
+  var inpcls = params.inpcls + defcls ;
+  var cmnatts = ' name="'+name+'" class="'+inpcls+'" placeholder="'+
+          placeholder+'" '+ params.inpatts + ' ';
+  var type = params.type || 'text';
+  //console.log("Build Input: params:",params,"cmnatts:",cmnatts);
+  if (reginptypes.indexOf(type) !== -1){ //It's a regular textish input type
+    return '<input type="'+type+'" value="'+htmlEncode(val)+'" '+cmnatts+'/>';
+  } else if (type === 'select') { // Need inpparams for select:
+    //console.log("IN Bld Inp; Params:",params,'val',val);
+    //allownull: default: true - if string, the string display for empty
+    var allownull = params.allownull; //Trueish, falseish, or a string placeholder
+    if (allownull === undefined) {
+      allownull = true;
+    }
+    var options = params.options;
+    //options: object keyed by value=>display
+    var inp = '\n<select '+cmnatts + '>\n';
+    var selected = "";
+    if (allownull) {
+      if (typeof allownull !== 'string') {
+        allownull='';
+      }
+      if (!val) {
+        selected = " selected ";
+      }
+      inp += '  <option value="" '+selected+'>'+allownull+'</options>\n';
+      selected = '';
+    }
+    for (var key in options) {
+      if (key === val) {
+        selected = " selected ";
+      }
+      inp += '  <option value="'+key+'" '+selected+'>'+options[key]+'</options>\n';
+      selected = '';
+    }
+    inp += "</select>\n";
+    return inp;
+  } else if (type === 'checkbox') { //Add hidden empty in case cleared
+    var checkedval = params.inpparams.checkedval || "1";
+    var inp = '<input type="hidden" name="'+name+'"/>\n';
+    var checked = val===checkedval ? " checked " : "";
+    inp += '<input type="checkbox" value="'+htmlEncode(checkedval)+'" '+checked+'/>\n';
+    return inp;
+  } else if (type === 'textarea') { 
+    var inp = '\n<textarea '+cmnatts +'>'+val+'</textarea>\n';
+  } else {
+    throw "Unhandled input type ["+type+"]";
+  }
+};
+
 
 
 
@@ -1504,7 +1563,7 @@ window.Vue.component('data-item',{
         } else {
           throw "Input invalid type";
         }
-        return Vue.buildInput(Object.assign({},this.params,input));
+        return buildInput(Object.assign({},this.params,input));
       }
     }
   },

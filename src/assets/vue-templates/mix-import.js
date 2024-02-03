@@ -101,6 +101,7 @@ window.Vue.component('pk-showimage',PkShowimage);
 
 
 
+/*
 window.Vue.buildInput = function(params) {
   //console.log("Paramas", params);
   var reginptypes = ['text','password','color','date','datetime-local', 'email',
@@ -158,4 +159,6 @@ window.Vue.buildInput = function(params) {
     throw "Unhandled input type ["+type+"]";
   }
 };
+
+*/
 
