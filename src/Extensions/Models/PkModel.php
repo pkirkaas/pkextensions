@@ -668,6 +668,11 @@ abstract class PkModel extends Model
      * 
      */
   }
+  
+  /**
+   * 2024 - What did I do 7 years ago? Something about automatically creating JSON fields as strings in the DB if the att name ends in _j?
+   * Or has to be listed in the static $jsonfields array?
+   */
   public static $jsonfields = [];
   public static function getJsonFields($tst = null)
   {

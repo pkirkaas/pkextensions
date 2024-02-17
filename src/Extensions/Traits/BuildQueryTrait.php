@@ -1324,9 +1324,13 @@ public static function buildSearchControlArray($refresh = null) {
 
   public static function staticCritset($root) {
     $fqd = static::getFullQueryDef($root);
-    pkdebug($fqd,$root, "Stack:");
-    pkstack();
-    return $fqd['criteria']['criteriaSet'];
+    try {
+      return $fqd['criteria']['criteriaSet'];
+    } catch (\Exception $e) {
+      pkdebug("Exception!",$e,$fqd,$root, "Stack:");
+      pkstack();
+      return [];
+    }
   }
 
 
