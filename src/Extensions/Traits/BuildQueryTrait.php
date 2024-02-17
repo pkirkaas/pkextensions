@@ -1343,6 +1343,7 @@ public static function buildSearchControlArray($refresh = null) {
 
   public static function critset($root) {
     $fqd = static::getFullQueryDef($root);
+    pkdebug($fqd,$root);
     return $fqd['criteria']['criteriaSet'];
   }
 
