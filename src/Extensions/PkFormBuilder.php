@@ -310,7 +310,7 @@ class PkFormBuilder extends FormBuilder {
     if (ne_string($options)) {
       $options = ['class'=>$options];
     }
-    return $this->select($basename.'_crit', $querymodel::critset($basename),null,$options);
+    return $this->select($basename.'_crit', $querymodel::staticCritset($basename),null,$options);
   }
 
   /**

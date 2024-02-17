@@ -780,15 +780,6 @@ trait BuildQueryTrait {
       //$toq = typeOf($query);
       //pkdebug("ROOT: [$root] SET:", $critSetSet, "queryT: $toq");
       if ($root == '0') continue;
-      //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
-
-      /*
-      if (($root==='assetdebtratio') || ($root === "loanamt") || ($root === 'yrsest'))  {
-        pkdebug("ROOT: [$root] SET:", $critSetSet, "queryT: $toq");
-        //pkdebug("ADR: QT: ".typeOf($query)."..");
-      }
-       *
-       */
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
       //if (!$critSetSet['crit'] || ($critSetSet['crit'] == '0') || static::emptyVal($critSetSet['val'])) continue;
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
@@ -802,14 +793,6 @@ trait BuildQueryTrait {
           $query->where($root,'like',$val);
           continue;
         }
-
-
-
-
-
-
-
-
 
         if (method_exists($this, 'customCompare' . $comptype)) {
 
@@ -850,8 +833,6 @@ trait BuildQueryTrait {
             continue;
 
           } else if ($critSetSet['crit'] === 'BETWEEN') {
-            //  $max = is_int(keyVal('max',$critSetSet['val'])) ? keyVal('max',$critSetSet['val']) : PHP_INT_MAX;
-            //  $min = is_int(keyVal('min',$critSetSet['val'])) ? keyVal('min',$critSetSet['val']) : -PHP_INT_MAX;
             $min = to_int(keyVal('minval', $critSetSet['val']), -PHP_INT_MAX);
             $max = to_int(keyVal('maxval', $critSetSet['val']), PHP_INT_MAX);
             //pkdebug('Orig Val Arr:', $critSetSet['val'], "MIN:", $min, "MAX", $max);
@@ -884,7 +865,7 @@ trait BuildQueryTrait {
       } else if (method_exists($this, 'customQuery' . $root)) {
         $customQueryMethod = 'customQuery' . $root;
         $query = $this->$customQueryMethod($query,
-            $critSetSet['crit'], $critSetSet['val'], $critset['param']);
+            $critSetSet['crit'], $critSetSet['val'], $critSetSet['param']);
       }
     }
     //pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr, "Query to SQL:", $query->toSql());
@@ -1341,7 +1322,7 @@ public static function buildSearchControlArray($refresh = null) {
    *
    */
 
-  public static function critset($root) {
+  public static function staticCritset($root) {
     $fqd = static::getFullQueryDef($root);
     pkdebug($fqd,$root);
     return $fqd['criteria']['criteriaSet'];
