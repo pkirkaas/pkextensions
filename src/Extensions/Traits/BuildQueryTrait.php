@@ -761,43 +761,43 @@ trait BuildQueryTrait {
     //pkdebug("My PkMatchObjs:", $this->matchObjs);
     #$querySets includes both attribute=>'property' types, which are eloquent/SQL suitable,
     #as well as attribute=>'method', which should go to PkMatch filters
-    foreach ($querySets as $root => $critset) {
-      $crit = $critset['crit'];
-      $val = $critset['val'];
-      $comptype = $critset['comptype'];
-      if (static::emptyCrit($critset['crit']) || (static::emptyVal($critset['val']) && !static::noval($comptype))) {
+    foreach ($querySets as $root => $critSetSet) {
+      $crit = $critSetSet['crit'];
+      $val = $critSetSet['val'];
+      $comptype = $critSetSet['comptype'];
+      if (static::emptyCrit($critSetSet['crit']) || (static::emptyVal($critSetSet['val']) && !static::noval($comptype))) {
         continue;
       }
-      if ($critset['def']['attribute'] === 'method') {
+      if ($critSetSet['def']['attribute'] === 'method') {
         #add to PkMatch set & continue
         $matchObj = PkMatch::mkMatchObj(
-              static::getFullQueryDef($root)+['field_set'=>$critset],$root);
+              static::getFullQueryDef($root)+['field_set'=>$critSetSet],$root);
         if ($matchObj) {
           $this->addMatchObj($root,$matchObj);
         }
         continue;
       }
       //$toq = typeOf($query);
-      //pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
+      //pkdebug("ROOT: [$root] SET:", $critSetSet, "queryT: $toq");
       if ($root == '0') continue;
       //if ($root==='assetdebtratio') pkdebug("ADR: QT: ".typeOf($query)."..");
 
       /*
       if (($root==='assetdebtratio') || ($root === "loanamt") || ($root === 'yrsest'))  {
-        pkdebug("ROOT: [$root] SET:", $critset, "queryT: $toq");
+        pkdebug("ROOT: [$root] SET:", $critSetSet, "queryT: $toq");
         //pkdebug("ADR: QT: ".typeOf($query)."..");
       }
        *
        */
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
-      //if (!$critset['crit'] || ($critset['crit'] == '0') || static::emptyVal($critset['val'])) continue;
+      //if (!$critSetSet['crit'] || ($critSetSet['crit'] == '0') || static::emptyVal($critSetSet['val'])) continue;
       //pkdebug("ROOT: [ $root ] ADR: QT: ".typeOf($query)."..");
-      //pkdebug("root is:", $root, "critset:", $critset);
+      //pkdebug("root is:", $root, "critSetSet:", $critSetSet);
       if (in_array($root, $targetFieldNames)) {
         $comptype = static::comptype($root);
         if ($comptype === 'string') {
-          $val = $critset['val'];
-          $crit = $critset['crit'];
+          $val = $critSetSet['val'];
+          $crit = $critSetSet['crit'];
           $val = static::likify($val,$crit);
           $query->where($root,'like',$val);
           continue;
@@ -813,7 +813,7 @@ trait BuildQueryTrait {
 
         if (method_exists($this, 'customCompare' . $comptype)) {
 
-            #The $critset is roughly:
+            #The $critSetSet is roughly:
             /*
               ['crit'] = $arr[$key];
               ['val'] = $valval;
@@ -822,12 +822,12 @@ trait BuildQueryTrait {
               ['root'] = $root;
               ['def'] = static::getFullQueryDef($root);
              .... and here lets add the callable - to make it generic for any kind of function,
-             closure, method, etc. That runable should accept two arguments - this critset,
+             closure, method, etc. That runable should accept two arguments - this critSetSet,
              and the collection that passed through the SQL part
              */
-            //pkdebug("About to add critset to custom methods: critset:",$critset);
-            $critset['callable'] = [$this, "customCompare$comptype"];
-            $this->customMethods[] = $critset;
+            //pkdebug("About to add critSetSet to custom methods: critSetSet:",$critSetSet);
+            $critSetSet['callable'] = [$this, "customCompare$comptype"];
+            $this->customMethods[] = $critSetSet;
 
 
             #We have to pack everything in a structure with field names,
@@ -838,53 +838,53 @@ trait BuildQueryTrait {
             #This is for methods/comparisons that unlike the above are not built for a
             #single field and might be reusable, or just not suitible for SQL and
             #not worth the trouble of match filters or custom closures. Like "intersects"
-            //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critset['val']);
+            //pkdebug("ROOT: [$root], CT: [$comptype], CRITVAL:", $critSetSet['val']);
           continue;
         }
-        if (is_array($critset['val'])) {
-          if (($comptype === 'group') && ($critset['crit'] === 'IN')) {
-            $query = $query->whereIn($root, array_values($critset['val']));
+        if (is_array($critSetSet['val'])) {
+          if (($comptype === 'group') && ($critSetSet['crit'] === 'IN')) {
+            $query = $query->whereIn($root, array_values($critSetSet['val']));
             continue;
-          } else if (($comptype === 'group') && ($critset['crit'] === 'NOTIN')) {
-            $query = $query->whereNotIn($root, array_values($critset['val']));
+          } else if (($comptype === 'group') && ($critSetSet['crit'] === 'NOTIN')) {
+            $query = $query->whereNotIn($root, array_values($critSetSet['val']));
             continue;
 
-          } else if ($critset['crit'] === 'BETWEEN') {
-            //  $max = is_int(keyVal('max',$critset['val'])) ? keyVal('max',$critset['val']) : PHP_INT_MAX;
-            //  $min = is_int(keyVal('min',$critset['val'])) ? keyVal('min',$critset['val']) : -PHP_INT_MAX;
-            $min = to_int(keyVal('minval', $critset['val']), -PHP_INT_MAX);
-            $max = to_int(keyVal('maxval', $critset['val']), PHP_INT_MAX);
-            //pkdebug('Orig Val Arr:', $critset['val'], "MIN:", $min, "MAX", $max);
+          } else if ($critSetSet['crit'] === 'BETWEEN') {
+            //  $max = is_int(keyVal('max',$critSetSet['val'])) ? keyVal('max',$critSetSet['val']) : PHP_INT_MAX;
+            //  $min = is_int(keyVal('min',$critSetSet['val'])) ? keyVal('min',$critSetSet['val']) : -PHP_INT_MAX;
+            $min = to_int(keyVal('minval', $critSetSet['val']), -PHP_INT_MAX);
+            $max = to_int(keyVal('maxval', $critSetSet['val']), PHP_INT_MAX);
+            //pkdebug('Orig Val Arr:', $critSetSet['val'], "MIN:", $min, "MAX", $max);
             $query = $query->whereBetween($root, [$min, $max]);
             continue;
           /*
           } else if($matchObj = PkMatch::mkMatchObj(
-              static::getFullQueryDef($root)+['field_set'=>$critset],$root)){
-            pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critset);
+              static::getFullQueryDef($root)+['field_set'=>$critSetSet],$root)){
+            pkdebug("FQD for [$root]",static::getFullQueryDef($root),'critst',$critSetSet);
             $this->addMatchObj($root,$matchObj);
             continue;
            */
           } else {
             throw new PkException(["Unhandled for root[$root], comptype [$comptype] w. val:",
-                $critset['val']]);
+                $critSetSet['val']]);
           }
         }
         //pkdebug("QT: ".typeOf($query)."..");
-        if ($critset['crit'] === 'EXISTS') {
+        if ($critSetSet['crit'] === 'EXISTS') {
           $query = $query->whereNotNull($root)->where($root,'!=','');
-        } else if ($critset['crit'] === 'NOT EXISTS') {
+        } else if ($critSetSet['crit'] === 'NOT EXISTS') {
           $query = $query->whereNull($root);
-        } else if ($critset['crit'] === 'IS') {
+        } else if ($critSetSet['crit'] === 'IS') {
           $query = $query->where($root, true);
-        } else if ($critset['crit'] === 'IS NOT') {
+        } else if ($critSetSet['crit'] === 'IS NOT') {
           $query = $query->where($root, false);
         } else {
-          $query = $query->where($root, $critset['crit'], $critset['val']);
+          $query = $query->where($root, $critSetSet['crit'], $critSetSet['val']);
         }
       } else if (method_exists($this, 'customQuery' . $root)) {
         $customQueryMethod = 'customQuery' . $root;
         $query = $this->$customQueryMethod($query,
-            $critset['crit'], $critset['val'], $critset['param']);
+            $critSetSet['crit'], $critSetSet['val'], $critset['param']);
       }
     }
     //pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr, "Query to SQL:", $query->toSql());
@@ -910,7 +910,7 @@ trait BuildQueryTrait {
 
   /** Compares if 2 arrays have any values in common -
    *
-   * @param array $critset
+   * @param array $critSetSet
               ['crit'] = $arr[$key];
               ['val'] = $valval;
               ['param'] = $arr[$paramfield];
@@ -925,11 +925,11 @@ trait BuildQueryTrait {
    * @param collection $collection
    * @return Collection
    */
-  public function customCompareintersects($critset, $collection) {
-      $crit = $critset['crit'];
-      $root = $critset['root'];
+  public function customCompareintersects($critSetSet, $collection) {
+      $crit = $critSetSet['crit'];
+      $root = $critSetSet['root'];
       $in = ($crit === 'IN');
-      $val = $critset['val'];
+      $val = $critSetSet['val'];
       //pkdebug("In the customCopare: crit: [$crit], root: [$root], in:",$in,"val:", $val);
       if (!$crit) return $collection;
       $toArr = function($tst) { #Try to make the arg arrayable - & only the values
