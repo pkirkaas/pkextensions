@@ -275,6 +275,12 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * 
    */
 
+  /**
+   * Ascends the ancestor tree to merge static array definitions. Since re-declaring a static variable 
+   * causes problems, each parent/trait needs to have a different variable name - with a common prefix -
+   * like `cprefix` - each variant would be `cprefix_foo``
+   * 
+   */
   public static function getArraysMerged($prefix, $idx=false,$default=null) {
     //pkdebug("Entering garmr for class: ".static::class."; prefix: [$prefix]");
   //public static function combineAncestorAndSiblings($prefix, $idx=false) {
@@ -384,6 +390,8 @@ JSON_ERROR_UTF16 => "Malformed UTF-16 characters, possibly incorrectly encoded",
    * @var boolean
    */
   public static $stopAccensionFlag = false;
+  
+  
   /**
    * Recurse up through inheritance hierarchy and merge static arrays of
    * the given arrayName name.
