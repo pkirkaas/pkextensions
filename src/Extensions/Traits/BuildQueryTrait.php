@@ -152,7 +152,10 @@ trait BuildQueryTrait {
 
   /** Must be intish */
   public static function isValidWithinCriterion($crit) {
-    if (to_int($crit) === false) return false;
+    if (to_int($crit) === false) {
+      pkdebug("Crit [$crit] NOT VALID withing Criterion");
+        return false;
+    }
     return true;
   }
 
