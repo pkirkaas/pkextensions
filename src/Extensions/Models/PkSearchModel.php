@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * of 'height_crit', 'height_val', 'weight_crit', 'weight_val', 'age_crit', 'age_val',
  * etc. Where the contents of the *_crit fields are SQL comparison operators as
  * below, and the content of the *_val fields are compared against.
+ *
+ * Uses BuilQueryTrait - SO CAN BUILD HTML CONTROLS/Inputs for SEARCH FORMS!!
  * <p>
  * Implementations build an array keyed by field names, containing the crit and
  * val contents - for example, ['height']=>['crit'=>'>', 'val'=>190]

@@ -18,7 +18,9 @@ use \Request;
 /**
  * Builds a query from criteria and value params. Should be available to both
  * query models and query controllers.
- * <p>
+ * 
+ * ALSO AUTOMATICALLY BUILDS QUERY FORM CONTROLS FOR SEARCH FORMS
+ * 
  * There are two potential kinds of Models here - a "target" model to be
  * searched, and a "Query" model which contains the query/search criteria for the
  * target model to be searched.
@@ -27,15 +29,15 @@ use \Request;
  * create a model/table field 'typeoffinancing_id_val' as a string, and get/set
  * the set of values as JSON, using accessors/mutators like:
  * <pre>
-  public function setTypeoffinancingIdValAttribute($value) { #$value is an array of possible values
-  if (!is_array($value)) $value = [$value];
-  $this->attributes['typeoffinancing_id_val'] = json_encode(array_values($value));
-  }
+ * public function setTypeoffinancingIdValAttribute($value) { #$value is an array of possible values
+ *   if (!is_array($value)) $value = [$value];
+ *   $this->attributes['typeoffinancing_id_val'] = json_encode(array_values($value));
+ * }
 
-  public function getTypeoffinancingIdValAttribute($value) {
-  if (!$value) return [];
-  return json_decode($value,true);
-  }
+ * public function getTypeoffinancingIdValAttribute($value) {
+ *  if (!$value) return [];
+ *  return json_decode($value,true);
+ * }
  * </pre>
  * This trait supports "out of the box" direct field queries.
  * @author Paul Kirkaas
