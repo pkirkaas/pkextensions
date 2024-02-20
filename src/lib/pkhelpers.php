@@ -136,6 +136,11 @@ function isLocal($tst = null) {
   return config('app.env') === 'local';
 }
 
+
+function isDbg() {
+  return config('app.debug');
+}
+
 function throwerr($msg) {
   throw new PkExceptionResponsable($msg);
 }

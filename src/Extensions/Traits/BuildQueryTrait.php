@@ -519,6 +519,7 @@ trait BuildQueryTrait {
       //$fields[$baseName.'_parm'.$i] = $parm;
       $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
+    pkdebug($baseName,$def,$parms);
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
     return $fields;

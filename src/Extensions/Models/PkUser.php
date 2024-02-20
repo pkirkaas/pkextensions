@@ -1,6 +1,9 @@
 <?php
+
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
-Namespace PkExtensions\Models;
+
+namespace PkExtensions\Models;
+
 use Auth;
 use Exception;
 use Illuminate\Auth\Authenticatable;
@@ -24,51 +27,54 @@ use \Hash;
  */
 
 use Request;
-class PkUser extends PkModel  
-    implements AuthenticatableContract, AuthorizableContract,
-        CanResetPasswordContract {
-    use Authenticatable, Authorizable, CanResetPassword, Notifiable;
-    public static $onetimeMigrationFuncs = [
-      'remember_token' => 'rememberToken()',
-      ];
-    protected $fillable = [
-        'name', 'email', 'password',
-    ];
-    public $isResetPassword = false;
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
+class PkUser extends PkModel
+implements
+  AuthenticatableContract,
+  AuthorizableContract,
+  CanResetPasswordContract {
+  use Authenticatable, Authorizable, CanResetPassword, Notifiable;
+  public static $onetimeMigrationFuncs = [
+    'remember_token' => 'rememberToken()',
+  ];
+  protected $fillable = [
+    'name', 'email', 'password',
+  ];
+  public $isResetPassword = false;
+
+  /**
+   * The attributes excluded from the model's JSON form.
+   *
+   * @var array
+   */
+  protected $hidden = [
+    'password', 'remember_token',
+  ];
 
   /**
    * Fields that if empty ('' or 0) should be converted to NULL before saving.
    * Mainly for unique indices, which accept multiple nulls but not multiple ''
    * @var array of field names
    */
-  public static $emptyToNull=['name','email'];
+  public static $emptyToNull = ['name', 'email'];
   public static $table_field_defs = [
-      'name' => ['type'=>'string', 'methods'=>['nullable','unique']],
-      'email' => ['type' => 'string', 'methods' => 'unique'],
-      'password' =>  ['type'=>'string', 'methods'=>'nullable'],
-      'active' =>   ['type'=>'integer', 'methods'=>'nullable'],
-       'admin'=>['type'=>'boolean', 'methods'=>['default'=>'false']],
-      'socialreg' =>  ['type'=>'string', 'methods'=>'nullable'],
-      'logins' =>  ['type'=>'integer', 'methods'=>'nullable'],
-      'lastlogin' =>  ['type'=>'datetime', 'methods'=>'nullable'],
-      'provider' =>  ['type'=>'string', 'methods'=>'nullable'],
-      'provider_id' =>  ['type'=>'string', 'methods'=>'nullable'],
-      'access_token' =>  ['type'=>'string', 'methods'=>'nullable'],
+    'name' => ['type' => 'string', 'methods' => ['nullable', 'unique']],
+    'email' => ['type' => 'string', 'methods' => 'unique'],
+    'password' =>  ['type' => 'string', 'methods' => 'nullable'],
+    'active' =>   ['type' => 'integer', 'methods' => 'nullable'],
+    'admin' => ['type' => 'boolean', 'methods' => ['default' => 'false']],
+    'socialreg' =>  ['type' => 'string', 'methods' => 'nullable'],
+    'logins' =>  ['type' => 'integer', 'methods' => 'nullable'],
+    'lastlogin' =>  ['type' => 'datetime', 'methods' => 'nullable'],
+    'provider' =>  ['type' => 'string', 'methods' => 'nullable'],
+    'provider_id' =>  ['type' => 'string', 'methods' => 'nullable'],
+    'access_token' =>  ['type' => 'string', 'methods' => 'nullable'],
 
-    ];
+  ];
 
-  public static $attstofuncs=[
-      'full_name',
-      ];
+  public static $attstofuncs = [
+    'full_name',
+  ];
   public static $allowUpdate = 0; #To allow user registration/update 
 
   /*
@@ -121,13 +127,13 @@ class PkUser extends PkModel
    * @param type $password
    * @param type $password2
    */
-  public function resetPassword($password, $password2=false) {
+  public function resetPassword($password, $password2 = false) {
     $password = trim($password);
     if (!$password || !ne_string($password)) {
       return false;
     }
     if ($password2 !== false) {
-      $password2 = trim ($password2);
+      $password2 = trim($password2);
       if ($password2 !== $password) {
         return false;
       }
@@ -168,7 +174,7 @@ class PkUser extends PkModel
     return parent::save($args);
   }
 
-    
+
   public function isLoggedIn() {
     return $this->is(Auth::user());
   }
@@ -183,7 +189,7 @@ class PkUser extends PkModel
     }
     return $res;
   }
-             //Auth::logout();
+  //Auth::logout();
 
   public function authDelete() {
     return $this->authUpdate();
@@ -192,9 +198,9 @@ class PkUser extends PkModel
     if (isCli() || static::$allowUpdate) return true;
     if (!static::instantiated($this)) return true;
     $me = Auth::user();
-    if (!$me instanceOf static) return false;
+    if (!$me instanceof static) return false;
     if ($this->is($me) || $me->isAdmin()) return true;
-    
+
     return false;
   }
 
@@ -202,18 +208,18 @@ class PkUser extends PkModel
   public function authRead() {
     return $this->authUpdate();
   }
-    /** 
-     * Subclasses should implement this
-     * @return boolean
-     */
+  /** 
+   * Subclasses should implement this
+   * @return boolean
+   */
 
   public function isAdmin() {
     if ($this->admin) return true;
     return false;
   }
 
-    /** Special handling to reset passwords in a form, then calls parent method
-     */
+  /** Special handling to reset passwords in a form, then calls parent method
+   */
   /*
     public function saveRelations(Array $arr = []) {
       if (!$this->authUpdate()) throw new Exception("Not authorized to update this object");
@@ -232,124 +238,136 @@ class PkUser extends PkModel
    * 
    */
 
-    /** Makes sure only the logged in user OR Admin can use the $user object
-     * 
-     * @param \PkExtensions\Models\PkUser $user
-     * @return boolean
-     */
-    public static function auth(PkUser $user = null) {
-      //pkdebug("User Type:".typeOf($user).'; ID: '. $user->id);
-      if (!static::instantiated($user)) {
-        $user = Auth::user();
-        pkdebug("Not Instantiated? Get Auth: User Type:".typeOf($user).'; ID: '. $user->id);
-      }
-      $me = Auth::user();
-      //pkdebug("Me Type:".typeOf($me).'; ID: '. $me->id);
-      if ($me != $user && !$me->isAdmin()) return  false;
-      //pkdebug("About to return User");
-      return $user;
+  /** Makes sure only the logged in user OR Admin can use the $user object
+   * 
+   * @param \PkExtensions\Models\PkUser $user
+   * @return boolean
+   */
+  public static function auth(PkUser $user = null) {
+    //pkdebug("User Type:".typeOf($user).'; ID: '. $user->id);
+    if (!static::instantiated($user)) {
+      $user = Auth::user();
+      pkdebug("Not Instantiated? Get Auth: User Type:" . typeOf($user) . '; ID: ' . $user->id);
     }
+    $me = Auth::user();
+    //pkdebug("Me Type:".typeOf($me).'; ID: '. $me->id);
+    if ($me != $user && !$me->isAdmin()) return  false;
+    //pkdebug("About to return User");
+    return $user;
+  }
 
-    /** Allow a user to log in, with either name or email, & 
-     * $password
-     * @param string|array $ident - if string, look for users with
-     * either that name or that email. If array, assoc,
-     * ['ident'=>$ident,'password'=>$password]
-     * @param string|null $password
-     * @return - either logged in user, or false
-     * TODO: Disallow emails as user names, require emails
-     * to be valid - so we don't risk dups
-     */
+  /** Allow a user to log in, with either name or email, & 
+   * $password
+   * @param string|array $ident - if string, look for users with
+   * either that name or that email. If array, assoc,
+   * ['ident'=>$ident,'password'=>$password]
+   * @param string|null $password
+   * @return - either logged in user, or false
+   * TODO: Disallow emails as user names, require emails
+   * to be valid - so we don't risk dups
+   */
 
-    /** Default identifying fields, subclasses can change -
-     *  like phone number
-     * @var array 
-     */
-    public static $idents = ['name','email'];
-    public static function tryLogin($ident=null, $password=null, $remember=null) {
-      if (!$ident) {
-        $ident = Request::all();
+  /** Default identifying fields, subclasses can change -
+   *  like phone number
+   * @var array 
+   */
+  public static $idents = ['name', 'email'];
+  public static function tryLogin($ident = null, $password = null, $remember = null) {
+    if (!$ident) {
+      $ident = Request::all();
+    }
+    //pkdebug("Ident:", $ident);
+    if (is_array($ident)) {
+      $password = keyVal('password', $ident);
+      $remember = keyVal('remember', $ident);
+      $ident = keyVal('ident', $ident);
+    }
+    if (!(ne_string($ident) && ne_string($password))) {
+      return false;
+    }
+    foreach (static::$idents as $field) {
+      $try = static::where($field, $ident)->first();
+      if (!$try instanceof static) {
+        continue;
       }
-      //pkdebug("Ident:", $ident);
-      if (is_array($ident)) {
-        $password = keyVal('password',$ident);
-        $remember = keyVal('remember',$ident);
-        $ident = keyVal('ident',$ident);
-      }
-      if (! (ne_string($ident) && ne_string($password))) {
+      if ($try->pwdMatch($password)) {
+        return $try->login($remember);
+      } else {
         return false;
       }
-      foreach (static::$idents as $field) {
-        $try = static::where($field,$ident)->first();
-        if (!$try instanceOf static) {
-          continue;
-        }
-        if ($try->pwdMatch($password)) {
-          return $try->login($remember); 
-        } else {
-          return false;
-        }
-      }
-      return false;
     }
+    return false;
+  }
 
-    /** Log in the user - remember if remember - true */
-    public function login($remember = false) {
-      //pkdebug("Logging in...");
-      Auth::login($this,$remember);
-      $me = Auth::user();
-      if (!$me->logins) {
-        $me->logins = 1;
-      } else {
-        $me->logins++;
-      }
-      $me->lastlogin = unixtimeToSql();
-      $me->save();
-      return $this;
+  /** Log in the user - remember if remember - true */
+  public function login($remember = false) {
+    //pkdebug("Logging in...");
+    Auth::login($this, $remember);
+    $me = Auth::user();
+    if (!$me->logins) {
+      $me->logins = 1;
+    } else {
+      $me->logins++;
     }
+    $me->lastlogin = unixtimeToSql();
+    $me->save();
+    return $this;
+  }
 
-    /** Verifies $user exists, or gets the logged in user, or throws
-     * exception
-     * @param User $user
-     */
-    public static function getUser($user) {
-      if (!static::instantiated($user)) {
-        $user = Auth::user();
-      }
-      if (!static::instantiated($user)) {
-        throwerr("No valid user");
-      }
+  /** Verifies $user is instatiated, or instantiates from id or email, or returns logged in user instance
+   * exception
+   * 2024 - 
+   * @param null|User|Int|String $user
+   * @return User
+   */
+  public static function getUser($user) {
+    if (static::instantiated($user)) {
       return $user;
     }
-
-    /** Returns the ID of the authenticated user, else false */
-    public static function uid() {
-      $user = Auth::user();
-      if ($user instanceof static) {
-        return $user->id;
-      }
-      return false;
-    }
-
-    /** Gets the logged in user, if none, returns
-     *  false or throws exception
-     * @param boolean $throw - Throw if not logged in? Default true
-     * @return User|boolean
-     * @throws PkException
-     */
-    public static function me($throw = true) {
-      $me = Auth::user();
-      if (!static::instantiated($me)) {
-        if ($throw) {
-          throw new PkException("Not Logged In");
-        } else {
-          return false;
+    if (is_scalar($user)) { //Email or id?
+      $id = to_int($user);
+      if ($id) { // integer ID
+        $user = static::find($id);
+      } else {
+        $email = filter_var($user, FILTER_VALIDATE_EMAIL);
+        if ($email) {
+          $user = static::where(['email' => $email])->first();
         }
       }
-      return $me;
+    } else {
+      $user = Auth::user();
     }
+    if (!static::instantiated($user)) {
+      pkdebug("User was not instantiated!!", $user);
+      throwerr("No valid user");
+    }
+    return $user;
+  }
 
+  /** Returns the ID of the authenticated user, else false */
+  public static function uid() {
+    $user = Auth::user();
+    if ($user instanceof static) {
+      return $user->id;
+    }
+    return false;
+  }
 
-
-
+  /** Gets the logged in user, if none, returns
+   *  false or throws exception
+   * @param boolean $throw - Throw if not logged in? Default true
+   * @return User|boolean
+   * @throws PkException
+   */
+  public static function me($throw = true) {
+    $me = Auth::user();
+    if (!static::instantiated($me)) {
+      if ($throw) {
+        throw new PkException("Not Logged In");
+      } else {
+        return false;
+      }
+    }
+    return $me;
+  }
 }

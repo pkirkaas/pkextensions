@@ -795,6 +795,10 @@ function pkvardump($arg, $disableXdebug = true, $useVarDump=false) {
   return $vardump;
 }
 
+function getCallingScript() {
+  return get_included_files()[0];
+}
+
 /** Sets the path and name for the debug log IF
  * PkLibConfig::getSuppressPkDebug() is FALSE
  * @staticvar type $logpath
@@ -807,7 +811,12 @@ function appLogPath($path = null) {
     return getNullPath();
   }
   if (isCli()) {
-    $base = __DIR__;
+    //$scwd = getcwd();
+    //$included = get_included_files();
+    //$included = getCallingScript();
+    //pkecho ("In CLI Log: - getcwd & included_files:", $scwd, $included); 
+    //$base = __DIR__;
+    $base = dirname(getCallingScript());
   } else {
     $base = $_SERVER['DOCUMENT_ROOT'] . '/..';
   }
