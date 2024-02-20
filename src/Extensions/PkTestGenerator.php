@@ -567,7 +567,14 @@ class PkTestGenerator {
    * @throws \Exception
    */
   public static function copyAllFiles($fromDir, $toDir=null) {
-    if (!$toDir) $toDir = storage_path("app/public");
+    //if (!$toDir) $toDir = storage_path("app/public");
+    # 2024 - changed storage_path to public_path
+    if (!$toDir) $toDir = public_path("storage");
+    if (!is_dir($toDir)) {
+      pkwarn("ToDir [$toDir] doesn't exist - creating");
+      mkdir($toDir, 0755,  true);
+    }
+    pkdebug("Copying all files from [$fromDir] to [$toDir]");
     if (!is_dir($fromDir)) throw new \Exception("FromDir [$fromDir] not found");
     if (!is_dir($toDir)) throw new \Exception("ToDir [$toDir] not found");
     $entries = scandir($fromDir);
@@ -587,7 +594,9 @@ class PkTestGenerator {
    * @param string $dirName - directory name - defaults to storage dir
    */
   public static function getFilenamesInDir($dirName=null) {
-    if (!$dirName) $dirName = storage_path("app/public");
+    //if (!$dirName) $dirName = storage_path("app/public");
+    # 2024 - changed storage_path to public_path
+    if (!$dirName) $dirName = public_path("app/public");
     if (!is_dir($dirName)) throw new \Exception("Src dir [$dirName] not found");
     pkdebug("DirName: [$dirName]");
     $entries = scandir($dirName);
