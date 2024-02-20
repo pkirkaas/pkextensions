@@ -318,9 +318,10 @@ implements
    * exception
    * 2024 - 
    * @param null|User|Int|String $user
+   * @param doThrow - if no user, throw exception? Defaults to false
    * @return User
    */
-  public static function getUser($user) {
+  public static function getUser($user, $doThrow=false) {
     if (static::instantiated($user)) {
       return $user;
     }
@@ -338,8 +339,11 @@ implements
       $user = Auth::user();
     }
     if (!static::instantiated($user)) {
-      pkdebug("User was not instantiated!!", $user);
-      throwerr("No valid user");
+      pkdebug("User was not instantiated!!", $user, $doThrow);
+      if ($doThrow) {
+        throwerr("No valid user");
+      }
+      return false;
     }
     return $user;
   }
