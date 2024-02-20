@@ -70,7 +70,7 @@ class PartialSet extends \ArrayObject {
     }
     return $i;
   }
-  public function getArrayCopy() {
+  public function getArrayCopy():Array {
     $ret = [];
     foreach ($this as $key=>$val) {
       if ($val instanceOf \ArrayObject) {
