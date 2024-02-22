@@ -288,7 +288,7 @@ class PkMatch {
   }
 
   /** $arg has to be an array or string to be json_decoded 
-   * 
+   * 2024 TODO: Should add more criteria - like EQUALS? Exactly the same? 
    * @param type $arg
    */
   function intersectsComp($arg = null) {

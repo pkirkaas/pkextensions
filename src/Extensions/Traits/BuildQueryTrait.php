@@ -617,7 +617,8 @@ trait BuildQueryTrait {
     }
   }
 
-  /** Just combines the 'buildQueryOnModel' method, executes it, then
+  /** Just combines the 'buildQueryOnModel' SQL method for simple SQL queries & executes it
+   * Then does the cheat & runs the PHP filters
    * runs the filters on the collection.  If there is no query set, but in
    * a POST, use it to buildl query
    *

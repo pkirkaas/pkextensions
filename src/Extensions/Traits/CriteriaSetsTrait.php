@@ -3,6 +3,8 @@
 namespace PkExtensions\Traits;
 /**
  * Share CriteriaSets between PkMatch Model, & BuildQueryTrait
+ * 
+ * Key name of criteria set is type of criteria - NOT ALL SQL - cheat & use php to filter the tough ones after easy SQL
  *
  * @author pkirk
  */
@@ -24,7 +26,7 @@ Trait CriteriaSetsTrait {
           '%LIKE' => 'Ends With',
           '%LIKE%' => 'Contains',
       ],
-      'group' => [
+      'group' => [ # Is a scalar value in an array?
           '0' => "Don't Care",
           'IN' => 'In',
           'NOTIN' => 'Not In',
@@ -36,7 +38,7 @@ Trait CriteriaSetsTrait {
           'IN' => 'In',
           'NOTIN' => 'Not In',
       ],
-      'within' => [
+      'within' => [ # Miles of zipcode
           '0' => "Don't Care",
           '1' => 'Within 1 mile',
           '5' => 'Within 5 miles',
