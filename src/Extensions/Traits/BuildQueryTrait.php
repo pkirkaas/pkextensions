@@ -519,7 +519,7 @@ trait BuildQueryTrait {
       //$fields[$baseName.'_parm'.$i] = $parm;
       $fields[$baseName.'_parm'.$i] = ['type'=> $parm, 'methods' => 'nullable'] ;
     }
-    pkdebug($baseName,$def,$parms);
+    //pkdebug($baseName,$def,$parms);
     $fields[$baseName . '_val'] = ['type' => $valType, 'methods' => 'nullable', 'type_args' => $fieldtype_args];
     $fields[$baseName . '_crit'] = ['type' => 'string', 'methods' => 'nullable'];
     return $fields;
@@ -738,7 +738,7 @@ trait BuildQueryTrait {
     $targetFieldNames = $targetModel::getStaticAttributeNames();
     // Too much memory...: pkdebug("TargetFieldNames:", $targetFieldNames, "targetBuilder:", $targetBuilder, "targetModel:", $targetModel, "QuerySets:", $querySets);
     //pkdebug("TargetFieldNames:", $targetFieldNames,  "QuerySets:", $querySets, "this.querySets:", $this->querySets);
-    pkdebug( "QuerySets:", $querySets, "this.querySets:", $this->querySets);
+    //pkdebug( "QuerySets:", $querySets, "this.querySets:", $this->querySets);
     //if ($querySets === null) {
     if (empty($querySets)) {
       if (!empty($this->querySets)) $querySets = $this->querySets;

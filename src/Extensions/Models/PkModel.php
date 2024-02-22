@@ -76,8 +76,7 @@ use PkExtensions\PkException;
 use PkHtml;
 use Cache;
 
-abstract class PkModel extends Model
-{
+abstract class PkModel extends Model {
 
   use UtilityMethodsTrait, ArrayFetchAttributesTrait, PkSelfBuildingTrait;
 
@@ -111,8 +110,7 @@ abstract class PkModel extends Model
 
 
   //Restore "create" to models..
-  public static function create(array $attributes = [])
-  {
+  public static function create(array $attributes = []) {
     $model = static::query()->create($attributes);
     //if ( removeEndStr(static::class, "Bouncer")) {
     //pkdebug("Att shift_j:", keyVal('shift_j',$attributes), "b->sj",$model->shift_j);
@@ -125,8 +123,7 @@ abstract class PkModel extends Model
    * @param array $attributes
    * @return type
    */
-  public static function createOrUpdate(array $attributes = [])
-  {
+  public static function createOrUpdate(array $attributes = []) {
     $id = to_int(keyVal('id', $attributes));
     pkdebug("attributes:", $attributes);
     if ($id) {
@@ -154,15 +151,13 @@ abstract class PkModel extends Model
   public static $escape_fields = [];
 
   //Each instance can cache local calculated values
-  public function mkInstanceKey($key = null)
-  {
+  public function mkInstanceKey($key = null) {
     return 'MDL:' . static::class . ":ID:" . $this->id . ":k:$key";
   }
 
 
   /** Returns the model name, appropriate for JS */
-  public static function jsclass()
-  {
+  public static function jsclass() {
     return addslashes('\\' . static::class);
   }
 
@@ -171,8 +166,7 @@ abstract class PkModel extends Model
    * @param boolean $jsonencode
    * @return array|json_encoded array
    */
-  public function instance($jsonencode = true)
-  {
+  public function instance($jsonencode = true) {
     $instance = [
       //'model'=>static::jsclass(),
       'model' => static::class,
@@ -183,8 +177,7 @@ abstract class PkModel extends Model
   }
 
   public $instanceCache = [];
-  public function getICache($key, $cache = false)
-  {
+  public function getICache($key, $cache = false) {
     $cache = false;
     $ret = keyVal($key, $this->instanceCache, false);
     $found = ($ret === false) ? "Didn't FIND [$key]" : "FOUND [$key]!";
@@ -208,8 +201,7 @@ abstract class PkModel extends Model
      * *
      */
   }
-  public function setICache($key, $value, $cache = false, $min = 10)
-  {
+  public function setICache($key, $value, $cache = false, $min = 10) {
     $cache = false;
     if (is_callable($value)) {
       $value = user_func_array($value);
@@ -254,8 +246,7 @@ abstract class PkModel extends Model
    * as array keys mapped to PkRef classes - or actually, classes that implement
    * the PkDisplayValueInterface
    */
-  public static function cgetDisplayValueFields($onlyrefs = false)
-  {
+  public static function cgetDisplayValueFields($onlyrefs = false) {
     $display_value_fields = static::getArraysMerged('display_value_fields');
     //pkdebug("Display value fields:", $display_value_fields);
     if ($onlyrefs) {
@@ -278,8 +269,7 @@ abstract class PkModel extends Model
     if (is_array($normalized)) return array_keys($normalized);
     return [];
   }
-  public static function getDisplayValueFields($onlyrefs = false)
-  {
+  public static function getDisplayValueFields($onlyrefs = false) {
     $prefix = 'display_value_fields';
     if ($onlyrefs) $skey = $prefix . "_onlyrefs";
     else $skey = $prefix . "_norefs";
@@ -331,12 +321,10 @@ abstract class PkModel extends Model
 
   public static $requiredArgs = [];
 
-  public static function getRequiredArgs()
-  {
+  public static function getRequiredArgs() {
     return static::getArraysMerged("requiredArgs");
   }
-  public static function getLoadRelations($relation = null, $justmodel = false)
-  {
+  public static function getLoadRelations($relation = null, $justmodel = false) {
     $loadrels = static::getArraysMerged("load_relations");
     if (!$relation) return $loadrels;
     if ($model = keyVal($relation, $loadrels)) {
@@ -346,8 +334,7 @@ abstract class PkModel extends Model
     return [];
   }
 
-  public static function getHasOneRelations($relation = null)
-  {
+  public static function getHasOneRelations($relation = null) {
     $onerelations = static::getArraysMerged("has_one_relation");
     if ($relation) {
       return keyVal($relation, $onerelations);
@@ -355,8 +342,7 @@ abstract class PkModel extends Model
     return $onerelations;
   }
 
-  public function deleteHasOne($relation)
-  {
+  public function deleteHasOne($relation) {
     if (static::getHasOneRelations($relation) && $this->$relation) {
       $this->$relation->delete();
     }
@@ -366,13 +352,11 @@ abstract class PkModel extends Model
   ######## And the reverse to create the object from the string ######
   ### God, might as well do it for PkCollections too...
 
-  public function totag()
-  {
+  public function totag() {
     return static::class . '#' . $this->id;
   }
 
-  public static function fromtag($idtag)
-  {
+  public static function fromtag($idtag) {
     $comps = explode('#', $idtag);
     if (count($comps) !== 2 || !(class_exists($comps[0]))) return false;
     return $comps[0]::find($comps[1]);
@@ -385,8 +369,7 @@ abstract class PkModel extends Model
    * @param null|string|array $fields
    * @return array
    */
-  public static function getFieldNames($fields = null)
-  {
+  public static function getFieldNames($fields = null) {
     $closure = function () {
       return array_keys(static::getTableFieldDefs());
     };
@@ -409,8 +392,7 @@ abstract class PkModel extends Model
    */
 
 
-  public static function getMethodsAsAttributeNames()
-  {
+  public static function getMethodsAsAttributeNames() {
     $merged = static::getArraysMerged("methodsAsAttributeNames", true);
     if (!$merged) $merged = [];
     return $merged;
@@ -427,8 +409,7 @@ abstract class PkModel extends Model
    * 
    * @return array
    */
-  public static function getEmptyToNull()
-  {
+  public static function getEmptyToNull() {
     $merged = static::getArraysMerged("emptyToNull", true);
     if (!$merged) $merged = [];
     return $merged;
@@ -467,8 +448,7 @@ abstract class PkModel extends Model
    */
 
   //public function 
-  public function fetchAttributes($keys = [], $extra = [])
-  {
+  public function fetchAttributes($keys = [], $extra = []) {
     if (!$keys) {
       $keys = array_merge($this->attributeNames, $this->getExtraAttributeNames);
       if (method_exists($this, 'getLocalAttributeNames')) {
@@ -533,8 +513,7 @@ abstract class PkModel extends Model
   /** Executes the methods listed in static::getMethodsAsAttributesNames() and
    * returns the results in an array of arrays
    */
-  public function getMethodAttributes($arg = null)
-  {
+  public function getMethodAttributes($arg = null) {
     $methodAttributes = static::getMethodsAsAttributeNames();
     if (!$methodAttributes || !is_arrayish($methodAttributes) || !count($methodAttributes)) {
       return [];
@@ -570,8 +549,7 @@ abstract class PkModel extends Model
    * @staticvar array $modelFieldDefs
    * @return array
    */
-  public static function _getTableFieldDefs()
-  {
+  public static function _getTableFieldDefs() {
     $cacheKey = 'tableFieldDefs';
     if (static::$onlyLocal) return static::$table_field_defs;
     return static::getCached(
@@ -582,24 +560,21 @@ abstract class PkModel extends Model
   }
 
   /** Only if a particular subclass wants to remove inherited fields */
-  public static function _unsetTableFieldDefs($defs = [])
-  {
+  public static function _unsetTableFieldDefs($defs = []) {
     foreach (static::$unset_table_field_keys as $unset_key) {
       unset($defs[$unset_key]);
     }
     return $defs;
   }
 
-  public static function cgetTableFieldDefs()
-  {
+  public static function cgetTableFieldDefs() {
     $_gtbd = static::_getTableFieldDefs();
     $extrad = static::getExtraTableFieldDefs();
     $ttbd =   static::getTableFieldDefsTrait();
     $defs = array_merge($_gtbd, $extrad, $ttbd);
     return $defs;
   }
-  public static function getTableFieldDefs()
-  {
+  public static function getTableFieldDefs() {
     return static::getCached(
       'tableFieldDefs',
       [static::class, 'cgetTableFieldDefs']
@@ -620,8 +595,7 @@ abstract class PkModel extends Model
    * Else, if there is a 'comment' property for the attribute, return it
    * Else, return ucfirst $attname
    */
-  public static function attdesc($attname)
-  {
+  public static function attdesc($attname) {
     $defs = static::getTableFieldDefs();
     if (!in_array($attname, array_keys($defs), 1)) {
       return false; //ucfirst($attname);
@@ -631,8 +605,7 @@ abstract class PkModel extends Model
     return $desc;
   }
 
-  public static function get_field_type($fieldname)
-  {
+  public static function get_field_type($fieldname) {
     $fielddef = KeyVal($fieldname, static::getTableFieldDefs());
     if (!$fielddef) return false;
     if (is_string($fielddef)) return $fielddef;
@@ -647,8 +620,7 @@ abstract class PkModel extends Model
    * @param string|null $model_name - if false, table for this model, else that one
    * @return string
    */
-  public static function getTableName($model_name = null)
-  {
+  public static function getTableName($model_name = null) {
     if (!$model_name) {
       $model_name = static::class;
     }
@@ -668,14 +640,13 @@ abstract class PkModel extends Model
      * 
      */
   }
-  
+
   /**
    * 2024 - What did I do 7 years ago? Something about automatically creating JSON fields as strings in the DB if the att name ends in _j?
    * Or has to be listed in the static $jsonfields array?
    */
   public static $jsonfields = [];
-  public static function getJsonFields($tst = null)
-  {
+  public static function getJsonFields($tst = null) {
     $closure = function () {
       return normalizeConfigArray(static::getArraysMerged('jsonfields'));
     };
@@ -703,8 +674,7 @@ abstract class PkModel extends Model
    * @param type $change
    * @return string
    */
-  public static function buildMigrationFieldDefs($fielddefs = [], $change = false)
-  {
+  public static function buildMigrationFieldDefs($fielddefs = [], $change = false) {
     $eloquentMigrationColumnDefs = [
       'bigIncrements', 'bigInteger', 'binary', 'boolean', 'char', 'date', 'dateTime',
       'dateTimeTz', 'decimal', 'double', 'enum', 'float', 'increments', 'integer',
@@ -813,14 +783,12 @@ abstract class PkModel extends Model
     return $out;
   }
 
-  public static function getOnetimeMigrationFunctions()
-  {
+  public static function getOnetimeMigrationFunctions() {
     return static::getAncestorArraysMerged('onetimeMigrationFuncs');
   }
 
   /** Either create new, or update if table already exists */
-  public static function buildMigrationDefinition()
-  {
+  public static function buildMigrationDefinition() {
     $tablename = static::getTableName();
     $basename = getBaseName(static::class);
     $pbasename = Str::plural($basename);
@@ -916,8 +884,7 @@ class $createclassname extends Migration {
    * the table for this model
    * @param string|null $tablename
    */
-  public static function dropTable($tablename = null)
-  {
+  public static function dropTable($tablename = null) {
     if (!$tablename) $tablename = static::getTableName();
     if (Schema::hasTable($tablename)) {
       Schema::drop($tablename);
@@ -925,8 +892,7 @@ class $createclassname extends Migration {
   }
 
   /** Delete the migration files auto generated by this Model */
-  public static function deleteMigrationFiles()
-  {
+  public static function deleteMigrationFiles() {
     $tablename = static::getTableName();
     $migrationpattern = database_path() . "/migrations/*_Pk*_{$tablename}_table.php";
     foreach (glob($migrationpattern) as $file) {
@@ -980,8 +946,7 @@ class $createclassname extends Migration {
    * @throws Exception
    */
   //public static function createIn(PkModel $parent = null, Array $attributes = [], $foreignKey = null, Model $user = null) {
-  public static function createIn(PkModel $parent = null, array $attributes = [], $foreignKey = null)
-  {
+  public static function createIn(PkModel $parent = null, array $attributes = [], $foreignKey = null) {
     //if (!static::authCreate($parent, $user)) return false;
     if (!static::authCreate($parent)) return false;
     if ($parent) {
@@ -1007,8 +972,7 @@ class $createclassname extends Migration {
    * @param array $attributes
    * @param type $sync
    */
-  public function setRawAttributes(array $attributes, $sync = false)
-  {
+  public function setRawAttributes(array $attributes, $sync = false) {
     parent::setRawAttributes($attributes, $sync);
     $this->buildFillableOptions();
   }
@@ -1019,8 +983,7 @@ class $createclassname extends Migration {
    * @return scalar|null|array - if $key given, the value (or null) - if 
    * no $key, an array of the table field names => values. 
    */
-  public function getTableFieldAttributes($key = null)
-  {
+  public function getTableFieldAttributes($key = null) {
     $attributeNames = $this->attributeNames;
     if (!$key) {
       $key = $attributeNames;
@@ -1040,8 +1003,7 @@ class $createclassname extends Migration {
     }
   }
 
-  public function hasTableField($fieldName)
-  {
+  public function hasTableField($fieldName) {
     return $this->getTableFieldAttributes($fieldName);
   }
 
@@ -1052,8 +1014,7 @@ class $createclassname extends Migration {
    * @param assoc_array $arr - initializing attributes
    * @param indexed array of atts to  $exclude
    */
-  public function initializeFromArr($arr, $exclude = [])
-  {
+  public function initializeFromArr($arr, $exclude = []) {
     $myattnames = static::getStaticAttributeNames();
     $arrkeys = array_keys($arr);
     foreach ($myattnames as $myattname) {
@@ -1073,8 +1034,7 @@ class $createclassname extends Migration {
    * @return indexed array of table field names.
    */
 
-  public static function getStaticAttributeNames()
-  {
+  public static function getStaticAttributeNames() {
     return static::getFieldNames();
     //return array_keys(static::getStaticAttributeDefs());
     # If problem w. getting attribute defs ...
@@ -1092,8 +1052,7 @@ class $createclassname extends Migration {
    * @return Array
    */
   #Fix this for both inheritance & NOT instantiating an empty instance
-  public static function getStaticAttributeDefs($modelorinstance = null)
-  {
+  public static function getStaticAttributeDefs($modelorinstance = null) {
     if (is_object($modelorinstance) && ($modelorinstance instanceof PkModel)) {
       return $modelorinstance->getAttributeDefs();
     }
@@ -1114,8 +1073,7 @@ class $createclassname extends Migration {
    * not a specific instance of this class (& not subclass)
    * @return static|null
    */
-  public static function instantiated($var = null, $exact = false)
-  {
+  public static function instantiated($var = null, $exact = false) {
     if (!($var instanceof static) || !$var->exists || !$var->getKey()) return null;
     //Debugging
     $varcl = get_class($var);
@@ -1127,8 +1085,7 @@ class $createclassname extends Migration {
     return $var;
   }
 
-  public function real()
-  {
+  public function real() {
     return static::instantiated($this);
   }
 
@@ -1140,8 +1097,7 @@ class $createclassname extends Migration {
    * @param any $var
    * $return boolean|static - false if not instantiated or not the same object, else the object
    */
-  public function is($var)
-  {
+  public function is($var) {
     if (!$var || !($var instanceof Model)) return false;
     if (method_exists(get_parent_class(), 'is')) {
       if (!parent::is($var)) return false;
@@ -1153,13 +1109,11 @@ class $createclassname extends Migration {
     return $this;
   }
 
-  public function __debuginfo()
-  {
+  public function __debuginfo() {
     return $this->attributes + ['MODEL CLASS' => static::class];
   }
 
-  public function jsonDebug($args = [])
-  {
+  public function jsonDebug($args = []) {
     return json_encode($this->__debuginfo(), static::$jsonopts);
   }
 
@@ -1169,16 +1123,14 @@ class $createclassname extends Migration {
    * @return boolean
    */
   //public function authDelete(Model $user = null) {
-  public function authDelete()
-  {
+  public function authDelete() {
     if (static::allowall()) return true;
     //return $this->authUpdate($user);
     return $this->authUpdate();
   }
 
   //public function authRead(Model $user = null) {
-  public function authRead()
-  {
+  public function authRead() {
     if (static::allowall()) return true;
     //return $this->authUpdate($user);
     return $this->authUpdate();
@@ -1186,8 +1138,7 @@ class $createclassname extends Migration {
 
   /** The extended model should over-ride this */
   //public function authUpdate(Model $user = null) {
-  public function authUpdate()
-  {
+  public function authUpdate() {
     if (static::allowall()) return true;
     return true;
   }
@@ -1206,8 +1157,7 @@ class $createclassname extends Migration {
    * <p>
    * AGAIN, not all implementations will require / desire 
    */
-  public function buildFillableOptions($opts = null)
-  {
+  public function buildFillableOptions($opts = null) {
     if (!$this->useBuildFillableOptions) return true;
     #authUpdate here can cause page failure
     #Can put it in some subclasses
@@ -1253,8 +1203,7 @@ class $createclassname extends Migration {
    * should override this method without requiring a "owner" or "parent"
    */
   //public static function authCreate(PkModel $parent = null, Model $user = null) {
-  public static function authCreate(PkModel $parent = null)
-  {
+  public static function authCreate(PkModel $parent = null) {
     if (static::allowall()) return true;
     if ($parent && ($parent instanceof PkModel)) {
       //return $parent->authUpdate($user);
@@ -1270,8 +1219,7 @@ class $createclassname extends Migration {
    * @param mixed $idx - key for the ref array
    * @return string - the name/label, or "Not Set"
    */
-  public function showRefItemName(array $refVar, $idx = null)
-  {
+  public function showRefItemName(array $refVar, $idx = null) {
     if (!is_array($refVar) || !$idx) return "Not Set";
     return keyValOrDefault($idx, $refVar, "Not Set");
   }
@@ -1291,8 +1239,7 @@ class $createclassname extends Migration {
    * @return EloquentCollection - already existing objects that have the same
    * values as this one for the given fields. Excludes '$this' if already exists
    */
-  public function matchingRecords($fieldArr = null, $andthis = false)
-  {
+  public function matchingRecords($fieldArr = null, $andthis = false) {
     if (!$fieldArr) $fieldArr = $this->distinctFields;
     if (!is_array($fieldArr) || !$fieldArr)
       throw new Exception("No fields for matchingRecords");
@@ -1316,8 +1263,7 @@ class $createclassname extends Migration {
    *   defined on this class, NOT part of persisted / DB Model attributes
    * @param type $Model
    */
-  public function getAttributeNames($andPropertyNames = false)
-  {
+  public function getAttributeNames($andPropertyNames = false) {
     $attNames = array_keys($this->getAttributeDefs());
     if ($andPropertyNames) {
       $attNames = array_merge($attNames, array_keys(get_class_vars(static::class)));
@@ -1333,14 +1279,12 @@ class $createclassname extends Migration {
   /** For 'fetchAttributes' - extra atts - usually from 'attstofuncs'
    * @return array - extra attribute names to return w. fetchattributes 
    */
-  public static function getExtraAttributeNames()
-  {
+  public static function getExtraAttributeNames() {
     return static::getArraysMerged("extraAttributeNames");
   }
 
   /** For generating backup SQL files for the model */
-  public static function sqlToBuildRelationTables($self = true)
-  {
+  public static function sqlToBuildRelationTables($self = true) {
     $relClasses = static::getRelationClasses();
     if ($self) {
       $relClasses[] = static::class;
@@ -1353,8 +1297,7 @@ class $createclassname extends Migration {
     return $sqlStr;
   }
 
-  public static function getRelationClasses($relClasses = [])
-  {
+  public static function getRelationClasses($relClasses = []) {
     //static $relationClasses = [];
     foreach (static::getLoadRelations() as $load_relation) {
       if (!in_array($load_relation, $relClasses)) {
@@ -1366,8 +1309,7 @@ class $createclassname extends Migration {
   }
 
   //public static function getAttributeCollectionNames() {
-  public static function getRelationNames($relation = null)
-  {
+  public static function getRelationNames($relation = null) {
     $relations = array_keys(static::getLoadRelations());
     if (!$relation) {
       return $relations;
@@ -1380,8 +1322,7 @@ class $createclassname extends Migration {
    * 
    */
 
-  public static function getRelationClass($relation)
-  {
+  public static function getRelationClass($relation) {
     return static::getRelationClasses()[$relation] ?? null;
     /*
     if (in_array($relclass, static::getRelationalClasses(),1)) {
@@ -1395,8 +1336,7 @@ class $createclassname extends Migration {
    *  Gets the inserts for the current instance, then recursively for all its
    * one-to-many relationship inserts. Have to be clever to avoid cycles
    */
-  public function getSqlInserts()
-  {
+  public function getSqlInserts() {
     static $tablesAndKeys = []; // #['table1'=>[$key1,$key2,$key3],'table2'=>[...]
     $tableName = $this->getTable();
     $keys = keyVal($tableName, $tablesAndKeys, []);
@@ -1417,8 +1357,7 @@ class $createclassname extends Migration {
     return $sqlInsStr;
   }
 
-  public function newCollection(array $models = [])
-  {
+  public function newCollection(array $models = []) {
     return new PkCollection($models);
   }
 
@@ -1427,8 +1366,7 @@ class $createclassname extends Migration {
    * @staticvar array $tablesAndKeys
    * @return array: ['table'=>['key_name'=>'id','keys'=>[3,4,6,12]],...
    */
-  public function getTablesAndKeys($tablesAndKeys = [])
-  {
+  public function getTablesAndKeys($tablesAndKeys = []) {
     //static $tablesAndKeys = []; #['table1'=>[$key1,$key2,$key3],'table2'=>[...]
     $tableName = $this->getTable();
     $keydata = keyVal($tableName, $tablesAndKeys, []);
@@ -1455,16 +1393,14 @@ class $createclassname extends Migration {
   /** Generates SQL string to back up object data & its relations. Reasonable
    * general method, but to be accurate subclasses have to customize it.
    */
-  public function sqlObjectData()
-  {
+  public function sqlObjectData() {
     $sqlCreateTbls = $this->sqlToBuildRelationTables();
     $sqlInsAtts = $this->getSqlInserts();
     return "$sqlCreateTbls\n\n$sqlInsAtts";
   }
 
   /** For generating backup SQL files */
-  public function sqlInsertAttributes()
-  {
+  public function sqlInsertAttributes() {
     $tableName = $this->getTable();
     $myAttributes = $this->getAttributes();
     $setArr = [];
@@ -1481,8 +1417,7 @@ class $createclassname extends Migration {
   /** Minimal, to build backup SQL files
    * 
    */
-  public static function sqlToBuildTable()
-  {
+  public static function sqlToBuildTable() {
     $tableName = static::getTableName();
     $rawcols = DB::select(DB::raw("SHOW COLUMNS FROM `$tableName`"));
     $colDefArr = [];
@@ -1505,8 +1440,7 @@ class $createclassname extends Migration {
    *   ->Extra: null/autoincrement/
    *   
    */
-  public static function sqlToBuildCol($colDef)
-  {
+  public static function sqlToBuildCol($colDef) {
     if ($colDef->Null === 'NO') $nullable = ' NOT NULL ';
     else $nullable = ' NULL ';
     //return "      `{$colDef->Field}` {$colDef->Type} $nullable {$colDef->Extra} "; 
@@ -1517,8 +1451,7 @@ class $createclassname extends Migration {
    * column type as value. Caches the result in a static array.
    * @return array - table column names to DB Column type
    */
-  public function getAttributeDefs()
-  {
+  public function getAttributeDefs() {
     if (array_key_exists(static::class, static::$attributeDefinitionArr)) {
       return static::$attributeDefinitionArr[static::class];
     }
@@ -1542,8 +1475,7 @@ class $createclassname extends Migration {
    * @param array $attributes
    */
   public $relCacheClosure;
-  public function __construct(array $attributes = [])
-  {
+  public function __construct(array $attributes = []) {
 
 
     $this->casts = $this->getInstanceArraysMerged('casts');
@@ -1579,8 +1511,7 @@ class $createclassname extends Migration {
    * ExtraConstructor[TraitName]
    * @param type $attributes
    */
-  public static function cgetExtraConstructors()
-  {
+  public static function cgetExtraConstructors() {
     // pkdebug("Building constructors for : ".static::class);
     // echo "\nIn The extra constructors closure...\n";
     #Assume only from Traits
@@ -1594,8 +1525,7 @@ class $createclassname extends Migration {
     }
     return $constructors;
   }
-  public static function getExtraConstructors()
-  {
+  public static function getExtraConstructors() {
     return static::getCached('ExtraConstructors', [static::class, 'cgetExtraConstructors']);
   }
 
@@ -1606,8 +1536,7 @@ class $createclassname extends Migration {
    * @var type 
    */
   public static $allowall = false;
-  public static function allowall($allow = null)
-  {
+  public static function allowall($allow = null) {
     if ($allow || ($allow === false)) {
       static::$allowall = $allow;
     }
@@ -1616,8 +1545,7 @@ class $createclassname extends Migration {
 
 
 
-  public function RunExtraConstructors($attributes)
-  {
+  public function RunExtraConstructors($attributes) {
     $constructors = static::getExtraConstructors();
     if ($constructors) {
       foreach ($constructors as $constructor) {
@@ -1648,8 +1576,7 @@ class $createclassname extends Migration {
    * @param null|string $key
    * @return array|callable
    */
-  public static function getAttsToFuncs($key = null)
-  {
+  public static function getAttsToFuncs($key = null) {
     $class = static::class;
     $attstofuncs = static::getCached(
       'attstofuncs_key',
@@ -1677,8 +1604,7 @@ class $createclassname extends Migration {
   public $attGetters = []; #Any class that wants to catch "gets" registerts the att with the method here.
 
 
-  public function __get($key)
-  {
+  public function __get($key) {
     //echo "In PK Get, KEY $key\n";
     # This seems pretty obvious - why doesn't Eloquent do it?
     if (!$key) return null;
@@ -1776,8 +1702,7 @@ class $createclassname extends Migration {
    * @param string|null $name - if null, all at names, else true if it's one them
    * @return array of attribute names
    */
-  public static function getAllAttributesNames($name = null)
-  {
+  public static function getAllAttributesNames($name = null) {
     $key = "allPkModelAttributeNames";
     $allAttNames = static::getCached($key);
     if (!$allAttNames) {
@@ -1807,13 +1732,11 @@ class $createclassname extends Migration {
    * 
    */
 
-  public function getAttribute($key)
-  {
+  public function getAttribute($key) {
     if (!$key) return null;
     return parent::getAttribute($key);
   }
-  public function getAttributeValue($key)
-  {
+  public function getAttributeValue($key) {
     if (!$key) return null;
     if ($jsoncls = static::getJsonFields($key)) {
       $value = $this->attributes[$key];
@@ -1835,8 +1758,7 @@ class $createclassname extends Migration {
     }
     return parent::getAttributeValue($key);
   }
-  public function __set($key, $value)
-  {
+  public function __set($key, $value) {
     $res = $this->__sets($key, $value);
     if (didFail($res)) {
       parent::__set($key, $value);
@@ -1866,8 +1788,7 @@ class $createclassname extends Migration {
      */
 
 
-  public function __call($method, $args = [])
-  {
+  public function __call($method, $args = []) {
     #First see if it's a dynamic method in this class...
     $res = $this->__calls($method, $args);
     if (!didFail($res)) {
@@ -1896,8 +1817,7 @@ class $createclassname extends Migration {
    * a relationship
    * @return Builder|string error message
    */
-  public static function multiWhere($keyvals, $builder = null)
-  {
+  public static function multiWhere($keyvals, $builder = null) {
     if (!$builder) {
       $builder = static::query();
     }
@@ -1920,8 +1840,7 @@ class $createclassname extends Migration {
     return $builder;
   }
 
-  public static function multiOrderby($keyvals, $builder = null)
-  {
+  public static function multiOrderby($keyvals, $builder = null) {
     if (!$builder) {
       $builder = static::query();
     }
@@ -1940,8 +1859,7 @@ class $createclassname extends Migration {
    * @param scalar $foreign_key - the ID of the owning instance
    * @return EloquentBuilder
    */
-  public static function allOwnedBy($foreign_model, $foreign_key)
-  {
+  public static function allOwnedBy($foreign_model, $foreign_key) {
     $owner = $foreign_model::find($foreign_key);
     $default_rel = static::getTableName();
     pkdebug("The return from AllOwned - should be a builder", $owner->$default_rel());
@@ -1988,8 +1906,7 @@ class $createclassname extends Migration {
   ## RE-ENABLE WHEN EVERYTHING ELSE WORKING - 
   ## Need to think through deleting both from here, AND from the "Save Relations"
   ## method below
-  public function delete($cascade = true)
-  {
+  public function delete($cascade = true) {
     if (!$this->authDelete()) {
       pkdebug("Can't delete:", $this);
       throw new Exception("Not authorized to delete this object");
@@ -2050,8 +1967,7 @@ class $createclassname extends Migration {
    * @param $modelCollection - EloquentCollection of PkModels
    * @param $modelDataArray array of new model data, probably from a POST
    */
-  public static function updateModels($modelCollection, $modelDataArray)
-  {
+  public static function updateModels($modelCollection, $modelDataArray) {
     $tstInstance = new static();
     $keyName = $tstInstance->getKeyName();
     $arrayKeys = [];
@@ -2072,8 +1988,7 @@ class $createclassname extends Migration {
     }
   }
 
-  public function getForeignKey()
-  {
+  public function getForeignKey() {
     return Str::snake(class_basename($this)) . '_' . $this->getKeyName();
   }
 
@@ -2106,8 +2021,7 @@ class $createclassname extends Migration {
    * @return true|string|Validator - if successful, boolean true, anything not
    * boolean true is an error - error message or Validator containing errors, etc.
    */
-  public function saveRelations(array $arr = [])
-  {
+  public function saveRelations(array $arr = []) {
     $relations = $this->getLoadRelations();
     $foreignKey = $this->getForeignKey();
     $this->fillFillables($arr);
@@ -2167,14 +2081,12 @@ class $createclassname extends Migration {
     return true;
   }
 
-  public function owns($item)
-  {
+  public function owns($item) {
     return false;
   }
 
   /** Very approximate - extended models should override this */
-  public function abstractowns($item)
-  {
+  public function abstractowns($item) {
     if (!$item instanceof PkModel) return false;
     if (!$this->id || !$item->id) return false;
     $ownerID = Str::snake(static::basename()) . '_id';
@@ -2192,8 +2104,7 @@ class $createclassname extends Migration {
    * also defined in the static::$load_many_to_many variable, with the key
    * names of $load_many_to_many the same as the relationship names
    */
-  public function saveM2MRelations($data = [])
-  {
+  public function saveM2MRelations($data = []) {
     //pkdebug("Saving Here Data:", $data);
     if (
       empty(static::$load_many_to_many) ||
@@ -2302,8 +2213,7 @@ class $createclassname extends Migration {
    * with. Eventually expand to ArrayAccess, etc
    * @return \App\Models\PkModel $this
    */
-  public function fillFillables(array $data = [])
-  {
+  public function fillFillables(array $data = []) {
     $relFillables = $this->getFillable();
     foreach ($relFillables as $relFillable) {
       if (array_key_exists($relFillable, $data)) {
@@ -2320,8 +2230,7 @@ class $createclassname extends Migration {
    * attributes that are not table fields. If false, only attributes that are field names
    * @return array - attributeNames=>values
    */
-  public function getAccessorAttributes($withAttributes = true)
-  {
+  public function getAccessorAttributes($withAttributes = true) {
     $attributeNames = $this->attributeNames;
     $extraKeys = [];
     if ($withAttributes) $extraKeys = array_keys($this->getAttributes());
@@ -2340,8 +2249,7 @@ class $createclassname extends Migration {
    * @return mixed - boolean false (can't set this field), true (set field to any value),
    * or array
    */
-  public function canEditThisField($fieldName)
-  {
+  public function canEditThisField($fieldName) {
     if (!$this->useBuildFillableOptions) return $this->isFillable($fieldName);
     $fillableOptions = $this->fillableOptions;
     if (!array_key_exists($fieldName, $fillableOptions)) return false;
@@ -2360,8 +2268,7 @@ class $createclassname extends Migration {
    * @param string $fieldName - the name of the DB field to examine
    * @return string - the user-friendly text to display
    */
-  public function displayValue($fieldName)
-  {
+  public function displayValue($fieldName) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
     //pkdebug ("refmaps", $refmaps, "cache:", static::$_cache);
@@ -2392,8 +2299,7 @@ class $createclassname extends Migration {
   }
 
   /*** Delete if the above works */
-  public function displayValue_old($fieldName, $value = null)
-  {
+  public function displayValue_old($fieldName, $value = null) {
     if (!ne_string($fieldName)) return null;
     $refmaps = static::getDisplayValueFields(true);
     #Example: 'claim_submitted' => ['\\PkExtensions\\DisplayValue\\DateFormat', 'M j, Y', 'No'],
@@ -2447,8 +2353,7 @@ class $createclassname extends Migration {
    * to send the arg to the DV function.... - so $possessionName could be an attriubute
    * name that passes it's value & optional arguments to a callable....
    */
-  public function displayValueMethod($possessionName, $args = [])
-  {
+  public function displayValueMethod($possessionName, $args = []) {
     if (!ne_string($possessionName)) return null;
     //$class=get_class($this);
     if (in_array($possessionName, $this->getAttributeNames(1), 1)) {
@@ -2480,8 +2385,7 @@ class $createclassname extends Migration {
 
 
   /*** Delete if the above works */
-  public function displayValueMethod_old($methodName, $args = [])
-  {
+  public function displayValueMethod_old($methodName, $args = []) {
     if (!ne_string($methodName)) return null;
     //$class=get_class($this);
     $attNms = $this->getAttributeNames(1); #Could call w. True to allow object properties as well?
@@ -2514,8 +2418,7 @@ class $createclassname extends Migration {
    * @return type
    * @throws Exception
    */
-  public function save(array $opts = [])
-  {
+  public function save(array $opts = []) {
     $this->RunExtraMethods("_save", $opts);
     $this->saves($opts);
     foreach ($this->getAttributes() as $key => &$value) {
@@ -2565,8 +2468,7 @@ class $createclassname extends Migration {
    * @param array $options
    * @return type
    */
-  protected function performInsert(Builder $query, array $options = [])
-  {
+  protected function performInsert(Builder $query, array $options = []) {
     $result = parent::performInsert($query, $options);
     if ($result === true) $this->postCreate($options);
     return $result;
@@ -2576,8 +2478,7 @@ class $createclassname extends Migration {
    * Like postCreate() - SO TWO CLASSES shouldn't implement both postSave & postCreate
    * @param array $opts - whatever opts were sent to save
    */
-  public function postSave(array $opts = [])
-  {
+  public function postSave(array $opts = []) {
   }
 
   /** Accepts a closure, binds to it, executes & returns it with the (optional) args
@@ -2586,16 +2487,14 @@ class $createclassname extends Migration {
    * @param mixed $args
    * @return mixed
    */
-  public function callClosure(Closure $closure, $args = [])
-  {
+  public function callClosure(Closure $closure, $args = []) {
     return $closure->call($this, $args);
   }
 
   /**
    * @param array $options - comes from "save" options, in case we want to add any
    */
-  public function postCreate(array $options = [])
-  {
+  public function postCreate(array $options = []) {
   }
 
   /*
@@ -2616,8 +2515,7 @@ class $createclassname extends Migration {
    * No good for int & date types, even if they allow NULL, so convert to NULL
    * @param boolean $anddates: true - and dates?
    */
-  public function convertEmptyStringToNullForNumerics($anddates = true)
-  {
+  public function convertEmptyStringToNullForNumerics($anddates = true) {
     $attributeDefs = $this->getAttributeDefs();
     foreach ($attributeDefs as $name => $type) {
       if (($this->$name === '') &&
@@ -2636,8 +2534,7 @@ class $createclassname extends Migration {
    * atts, etc. 
    * @return array of model attributes
    */
-  public function getCustomAttributes($arg = null, $extra = [])
-  {
+  public function getCustomAttributes($arg = null, $extra = []) {
     return $this->fetchAttributes($arg, $extra);
     /*
     if (is_string($arg)) {
@@ -2664,8 +2561,7 @@ class $createclassname extends Migration {
    * a real user name from a user_id
    * @return array
    */
-  public function getExtraAtts()
-  {
+  public function getExtraAtts() {
     return [];
   }
 
@@ -2674,8 +2570,7 @@ class $createclassname extends Migration {
    * @param array $params - typically an array of id's or instances
    * @param array $arg - to be passed to instance getCustomAttributes($arg)
    */
-  public static function getCustomAttributesIn($params = [], $arg = null)
-  {
+  public static function getCustomAttributesIn($params = [], $arg = null) {
     if (!$params || (is_arrayish($params) && !count($params))) {
       return [];
     }
@@ -2708,8 +2603,7 @@ class $createclassname extends Migration {
 
 
   /** Gets the Display Value attributes of Methods & IDs */
-  public function getDisplayValueAttributes($arg = null)
-  {
+  public function getDisplayValueAttributes($arg = null) {
     $dva = [];
     //pkdebug("The Fields:", static::getDisplayValueFields());
     foreach (static::getDisplayValueFields() as $dvf) {
@@ -2735,8 +2629,7 @@ class $createclassname extends Migration {
    * (optionally keyed by name with ModelClass as value), or empty to get
    * all the relations this model knows about.
    */
-  public function getRelationshipAttributes($relations = null)
-  {
+  public function getRelationshipAttributes($relations = null) {
     $resarr = [];
     $loadRelations = $this->getLoadRelations();
     if (is_string($relations)) {
@@ -2784,8 +2677,7 @@ class $createclassname extends Migration {
    * @param type $args
    * @return type
    */
-  public function getEncodedCustomAttributes($args = null)
-  {
+  public function getEncodedCustomAttributes($args = null) {
     $ca = $this->getCustomAttributes($args);
     $jsenc = json_encode($ca, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     $htenc = html_encode($jsenc);
@@ -2793,8 +2685,7 @@ class $createclassname extends Migration {
     return $htenc;
   }
 
-  public function encodeFetchAttributes($keys = [], $extra = [])
-  {
+  public function encodeFetchAttributes($keys = [], $extra = []) {
     $fa = $this->fetchAttributes($keys, $extra);
     $jsenc = json_encode($fa, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
     $htenc = html_encode($jsenc);
@@ -2804,14 +2695,12 @@ class $createclassname extends Migration {
 
   /** Probably useless method, but a subclass might want to do something with it.
    * More useful in the controllers */
-  public function shouldProcessPost($opts = null)
-  {
+  public function shouldProcessPost($opts = null) {
     if (Request::method() === 'POST') return true;
     return false;
   }
 
-  public function processPost($opts = null)
-  {
+  public function processPost($opts = null) {
     return false;
   }
 
@@ -2826,8 +2715,7 @@ class $createclassname extends Migration {
    * 
    * BAD -= See below for alternative
    */
-  public static function bgetExtraTableFieldDefs()
-  {
+  public static function bgetExtraTableFieldDefs() {
     $fnpre = 'getTableFieldDefsExtra';
     $methods = get_class_methods(static::class);
     $tfmethods = [];
@@ -2848,8 +2736,7 @@ class $createclassname extends Migration {
     if (count($tfdefsets) === 1) return $tfdefsets[0];
     return call_user_func_array('array_merge', $tfdefsets) ?: [];
   }
-  public static function getExtraTableFieldDefs()
-  {
+  public static function getExtraTableFieldDefs() {
     return static::getCached(
       "ExtraTableFieldDefMethods_methods",
       [static::class, 'bgetExtraTableFieldDefs']
@@ -2889,8 +2776,7 @@ class $createclassname extends Migration {
    * Get table field defs from trait properties, starting with
    *  public static $table_field_defs_XXXX_trait =  [
    */
-  public static function getTableFieldDefsTrait()
-  {
+  public static function getTableFieldDefsTrait() {
     $pre = "table_field_defs";
     $props = static::getSiblingArraysMerged($pre) ?: [];
     return $props;
@@ -2906,8 +2792,7 @@ class $createclassname extends Migration {
    * @param array $params - Can be used by subclasses to filter
    * @return instance|array instances - 
    */
-  public static function getRandomInstances($num = -1, $params = [])
-  {
+  public static function getRandomInstances($num = -1, $params = []) {
     if ($num === 0) return [];
     $instances = static::all()->all();
     $numinst = count($instances);
@@ -2923,8 +2808,7 @@ class $createclassname extends Migration {
     return \PkExtensions\PkTestGenerator::randData($instances, $num);
   }
 
-  public function clearRelCached($rel)
-  {
+  public function clearRelCached($rel) {
     clearDbCached([$this, 'relationship', $rel]);
   }
 
@@ -2944,16 +2828,14 @@ class $createclassname extends Migration {
    * @param string $rel - relationship name
    * @return PkCollection
    */
-  public function relCached($rel)
-  {
+  public function relCached($rel) {
     $callable = [$this, $rel];
     //public function relCached($rel, $val=false) {
     //$key = cacheKey([$this,'relationship',$rel]);
     return getRelDbCached([$this, 'relationship', $rel], $callable);
   }
 
-  public function dataCached($comps = [], $callable = null)
-  {
+  public function dataCached($comps = [], $callable = null) {
     if (static::$useMemoryCache) {
       return $this->localDataCached($comps, $callable);
     }
@@ -2974,8 +2856,7 @@ class $createclassname extends Migration {
    * For in-memory caching of calculated attributes, can
    * just be the method name.
    */
-  public function simpleKey($comps = [])
-  {
+  public function simpleKey($comps = []) {
     //pkdbgtm("Starting simpleKey Calc");
     if (!is_array($comps)) {
       $comps = [$comps];
@@ -3000,8 +2881,7 @@ class $createclassname extends Migration {
     return $key;
   }
 
-  public function localDataCached($comps, $callable = null)
-  {
+  public function localDataCached($comps, $callable = null) {
     //pkdbgtm("Starting localDataCached");
     $compsToCallable = false;
     if (is_array($comps) && !$callable && is_callable($comps)) {
@@ -3050,8 +2930,7 @@ class $createclassname extends Migration {
    * @param array $filters - optional like ['att_name'=>$attname,....
    * @return builder
    */
-  public function hasManyTyped($typedClass, $params = [])
-  {
+  public function hasManyTyped($typedClass, $params = []) {
     $builder =  $this->hasMany($typedClass);
     foreach ($params as $propname =>  $propval) {
       $builder->where($propname, $propval);
@@ -3065,8 +2944,7 @@ class $createclassname extends Migration {
    * @param array $typeFilters
    * @return $builder
    */
-  public function hasOneTyped($typedClass, $typeFilters = [])
-  {
+  public function hasOneTyped($typedClass, $typeFilters = []) {
     $builder = $this->hasMany($typedClass);
     foreach ($params as $propname =>  $propval) {
       $builder->where($propname, $propval);
@@ -3083,8 +2961,7 @@ class $createclassname extends Migration {
    * @param boolean $hasone - if true, delete existing instances
    * @param string $typedClass - the class to build
    */
-  public function addTyped($typedClass, array $typeFilters = [], array $filedata = [],  $hasone = false)
-  {
+  public function addTyped($typedClass, array $typeFilters = [], array $filedata = [],  $hasone = false) {
     $typeFilters[$this->getForeignKey()] = $this->getKey();
     if ($hasone) { #Delete all existing matches
       $builder = $typedClass::query();
@@ -3122,8 +2999,7 @@ class $createclassname extends Migration {
      */
   }
 
-  public function setTyped($typedClass, array $typeFilters = [], array $filedata = [])
-  {
+  public function setTyped($typedClass, array $typeFilters = [], array $filedata = []) {
     return $this->addTyped($typedClass, $typeFilters, $filedata,  1);
   }
   /*
@@ -3177,8 +3053,7 @@ class $createclassname extends Migration {
    */
 
   /** Allow models to determine who can delete them */
-  function deletableBy($deleter)
-  {
+  function deletableBy($deleter) {
     if (($deleter instanceof PkUser) && $deleter->isAdmin()) {
       return true;
     }
@@ -3197,8 +3072,7 @@ class $createclassname extends Migration {
    *    additional: passed to linkroute as attributes
    * else just the URL to delete
    */
-  public function deleteRoute($args = [])
-  { // = 'admin_deletemodel', $link='Delete',$attributes=[]) {
+  public function deleteRoute($args = []) { // = 'admin_deletemodel', $link='Delete',$attributes=[]) {
     $defaultargs = [
       'deleteroute' => 'admin_deletemodel',
       'label' => 'Delete',
@@ -3225,8 +3099,7 @@ class $createclassname extends Migration {
    * an AJAX delete - with supporting code in laravel-support.js
    * @param boolean $cascade - should the delete cascade to the many possesions
    */
-  public function ajaxDeleteProps($cascade = true, $delroute = "ajax_delete")
-  {
+  public function ajaxDeleteProps($cascade = true, $delroute = "ajax_delete") {
     $model = static::class;
     $id = $this->id;
     $url = route($delroute);
@@ -3240,8 +3113,7 @@ class $createclassname extends Migration {
    * @param \PkExtensions\Models\PkModel $var
    * @return type
    */
-  public static function asid($var)
-  {
+  public static function asid($var) {
     if (!$var) return false;
     if ($var instanceof PkModel) {
       return $var->id;
@@ -3250,8 +3122,7 @@ class $createclassname extends Migration {
   }
 
   /** The reverse of the above - takes an instance OR id, & returns the instance */
-  public static function asmodel($var)
-  {
+  public static function asmodel($var) {
     if (!$var) return false;
     if ($var instanceof static) return $var;
     return static::find($var);
@@ -3264,8 +3135,7 @@ class $createclassname extends Migration {
    * @param array $fields - optional array of additional fields,
    * merged with class whichfields
    */
-  public function which($fields = [])
-  {
+  public function which($fields = []) {
     $myf = array_merge(static::getAncestorArraysMerged('whichfields', true), $fields);
     $out = "Class: " . get_class($this);
     //$out .= "; ID: ". $this->id;
@@ -3275,8 +3145,7 @@ class $createclassname extends Migration {
     return $out;
   }
 
-  public static function getAllPkModelsTables()
-  {
+  public static function getAllPkModelsTables() {
     $modeltotable = [];
     foreach (config('app.buildmodels') as $model) {
       $modeltotable[$model] = $model::getTableName();
@@ -3284,8 +3153,7 @@ class $createclassname extends Migration {
     return $modeltotable;
   }
 
-  public static function getAllChildModels()
-  {
+  public static function getAllChildModels() {
     $childModels = [];
     foreach (config('app.buildmodels') as $model) {
       if ($model::isChildModel()) {
@@ -3301,8 +3169,7 @@ class $createclassname extends Migration {
    * otherwise just the model types & IDs
    * @return array - orphaned objects
    */
-  public static function getAllOrphans($instances = false)
-  {
+  public static function getAllOrphans($instances = false) {
     $orphans = [];
     foreach (static::getAllChildModels() as $model) {
       if ($morphans = $model::getOrphans($instances)) {
@@ -3313,8 +3180,7 @@ class $createclassname extends Migration {
   }
 
   /** The generic 'getOrphans' - but override in special PkModels */
-  public static function getOrphans($instances = false)
-  {
+  public static function getOrphans($instances = false) {
     $parentStruct = static::parentStructure();
     //$pkModelTables = static::getAllPkModelsTables();
     $morphans = [];
@@ -3342,8 +3208,7 @@ class $createclassname extends Migration {
 
 
   /** The generic 'isChildModel' - but override in special PkModels */
-  public static function isChildModel()
-  {
+  public static function isChildModel() {
     return static::parentStructure();
   }
 
@@ -3353,8 +3218,7 @@ class $createclassname extends Migration {
    * 
    * **   THIS IS VERY DANGEROUS !!!!!  
    */
-  public static function parentStructure()
-  {
+  public static function parentStructure() {
     $pkModelTables = static::getAllPkModelsTables();
     $fields = static::getFieldNames();
     $parentStruct = [];
@@ -3372,8 +3236,7 @@ class $createclassname extends Migration {
 
 
   /** Gets instance (if ID), & checks if user is authed, & returns */
-  public static function authInstance($instance)
-  {
+  public static function authInstance($instance) {
     if (is_scalar($instance)) {
       $instance = static::find($instance);
     }
@@ -3388,8 +3251,7 @@ class $createclassname extends Migration {
 
   //Represent this object as Javascript, for inclusion in templates!
 
-  public function attsAsJson()
-  {
+  public function attsAsJson() {
     return json_encode(
       $this->attributesToArray(),
       JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
@@ -3403,8 +3265,7 @@ class $createclassname extends Migration {
    * that now?
    * @param array $atts
    */
-  public function getSetAtts($atts = [], $save = false)
-  {
+  public function getSetAtts($atts = [], $save = false) {
     $ouratts = static::getFieldNames();
     $emptykeys = [];
     $setatts = [];
