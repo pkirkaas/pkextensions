@@ -1736,7 +1736,14 @@ class $createclassname extends Migration {
     if (!$key) return null;
     return parent::getAttribute($key);
   }
-  public function getAttributeValue($key) {
+
+
+  /**
+   * 2024 - 
+   * Now Eloquent Model supports (sort of) json [Remember to add to protected $casts
+   * SO Rethink/test 
+   */
+  public function DEPRECATEDgetAttributeValue($key) {
     if (!$key) return null;
     if ($jsoncls = static::getJsonFields($key)) {
       $value = $this->attributes[$key];
@@ -1758,6 +1765,8 @@ class $createclassname extends Migration {
     }
     return parent::getAttributeValue($key);
   }
+
+
   public function __set($key, $value) {
     $res = $this->__sets($key, $value);
     if (didFail($res)) {
@@ -2422,9 +2431,11 @@ class $createclassname extends Migration {
     $this->RunExtraMethods("_save", $opts);
     $this->saves($opts);
     foreach ($this->getAttributes() as $key => &$value) {
+      /*
       if (is_arrayish($value)) {
         $this->attributes[$key] = json_encode($value, static::$jsonopts);
       }
+      */
     }
     if ($this->useBuildFillableOptions) {
       foreach ($this->fillableOptions as $field => $value) {
