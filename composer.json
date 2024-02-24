@@ -21,7 +21,7 @@
     "kint-php/kint": "dev-master"
   },
   "require-dev": {
-    "ccampbell/chromephp": "*",
+    "ccampbell/chromephp": "*"
   },
   "autoload": {
     "psr-4": {
