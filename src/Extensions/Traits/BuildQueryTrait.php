@@ -876,7 +876,7 @@ trait BuildQueryTrait {
       }
     }
     //pkdebug("End of BuildQuerySets - this matchobs: ", $this->matchObjArr, "Query to SQL:", $query->toSql());
-    pkdebug("End of BuildQuerySets - Query to SQL:", $query->toSql());
+    //pkdebug("End of BuildQuerySets - Query to SQL:", $query->toSql());
     return $query;
   }
 

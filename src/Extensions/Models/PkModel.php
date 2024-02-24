@@ -680,10 +680,10 @@ abstract class PkModel extends Model {
       'dateTimeTz', 'decimal', 'double', 'enum', 'float', 'increments', 'integer',
       'ipAddress', 'json', 'jsonb', 'longText', 'macAddress', 'mediumIncrements',
       'mediumInteger', 'mediumText', 'morphs', 'nullableTimestamps', 'rememberToken',
-      'smallIncrements', 'smallInteger', 'softDeletes', 'string', 'string', 'text',
+      'smallIncrements', 'smallInteger', 'softDeletes', 'string',  'text',
       'time', 'timeTz', 'tinyInteger', 'timestamp', 'timestampTz', 'timestamps',
       'timestampsTz', 'unsignedBigInteger', 'unsignedInteger', 'unsignedMediumInteger',
-      'unsignedSmallInteger', 'unsignedTinyInteger', 'uuid',
+      'unsignedSmallInteger', 'unsignedTinyInteger', 'uuid', 'point', 'polygon',
     ];
     /*
     if (!defined('DEBUG')) define('DEBUG', true);

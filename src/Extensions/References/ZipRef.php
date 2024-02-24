@@ -5,12 +5,18 @@ namespace PkExtensions\References;
 
 use PkExtensions\PkRefManager;
 use PkExtensions\PkTestGenerator;
+//use PkExtensions\References\GeoData;
+
+//$reqUsCities = require __DIR__ . '/US_cities.php';
+//$reqUsCities = include __DIR__ . '/US_cities.php';
+//require __DIR__ . '/_cities.php';
 
 class ZipRef extends PkRefManager {
   public static $milesperlat = 69;
   public static $milesperlong = 57;
 
   /**
+   * OLD very primative estimates. See below for better implementations
    * @param null $withinmiles
    * @param int $ofzip
    * @return typeReturns rows of California zips, optionally within miles of zip
@@ -54,6 +60,38 @@ class ZipRef extends PkRefManager {
     return $assoclocs;
   }
 
+  /** Converts postal code to lat/lng
+   * @param string $zip - postal code
+   * @param string $cc - country code - default US
+   * @return float array lat/lng or null
+  */
+  public static function zipToGeo(string|int $zip, string $cc='us') : array|null {
+    $cc = strtolower($cc);
+    if ($cc === 'us') { // Just some California zips for now
+      $fUsCities = GeoData::getUsCities();
+      //foreach ($ca_cities as $row) {
+
+      //foreach ($US_cities as $row) {
+      //foreach ($reqUsCities as $row) {
+      foreach ($fUsCities as $row) {
+        if ($row[0] == $zip) {
+          $ziprow = $row;
+          break;
+        }
+      }
+      if (!$ziprow) {
+        pkwarn("Zip [$zip] not found for country [$cc]");
+        return null;
+      }
+      $point = [$ziprow[3], $ziprow[4]];
+      return $point;
+    }
+    pkwarn("Contry code [$cc] not supported");
+    return null;
+  }
+
+
+
   /**Takes a single index location (ca_cities) row & returns as a meaningful
    * associative array of zip, city, state, latitude, longitude
    */
@@ -61,6 +99,8 @@ class ZipRef extends PkRefManager {
       return ['zip'=>$location[0], 'state'=>$location[1], 'city'=>$location[2],
           'latitude'=>$location[3], 'longitude'=>$location[4]];
   }
+
+
 
   public static function randLocation($items = -1) {
     $rawLocations = PkTestGenerator::randData(static::$ca_cities, $items);

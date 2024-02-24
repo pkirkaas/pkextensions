@@ -238,8 +238,8 @@ abstract class PkController extends BaseController {
    */
   public function processSubmit($opts = null, $inits = null) {
     try {
-      if ($this->ShouldProcessSubmit($opts) !== true) { //return null;
-        pkdebug("Failed ShouldProcessSubmit");
+      if ($this->shouldProcessSubmit($opts) !== true) { //return null;
+        //pkdebug("Failed ShouldProcessSubmit");
         return null;
       }
     } catch (\Throwable $e) {

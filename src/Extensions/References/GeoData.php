@@ -1,6 +1,15 @@
 <?php
+namespace PkExtensions\References;
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
-$cities = [[35004,"AL","Acmar",33.584132,-86.51557],
+// 2024 - Estimate 41,683 zips in US, this has about 29,000
+
+class GeoData {
+
+public static function getUsCities() {
+  return static::$UsCities;
+}
+
+public static $UsCities = [[35004,"AL","Acmar",33.584132,-86.51557],
 [35005,"AL","Adamsville",33.588437,-86.959727],
 [35006,"AL","Adger",33.434277,-87.167455],
 [35007,"AL","Keystone",33.236868,-86.812861],
@@ -29472,4 +29481,5 @@ $cities = [[35004,"AL","Acmar",33.584132,-86.51557],
 [83127,"WY","Thayne",42.933026,-111.011354],
 ];
 
-return $cities;
+
+}

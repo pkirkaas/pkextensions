@@ -16,7 +16,8 @@
     "php": ">8",
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
-    "laravelcollective/html": "^6"
+    "laravelcollective/html": "^6",
+    "matanyadaev/laravel-eloquent-spatial": "dev-master"
   },
   "require-dev": {
     "ccampbell/chromephp": "*",

@@ -172,7 +172,56 @@ class TimeLogger {
 }
 
 
+/** Takes 2 points as float arrays of lat/lng & returns distance in meters
+ */
+function geoDistMt(array $pt1, array $pt2): float|null {
+  $pt1 = normGeoPt($pt1);
+  $pt2 = normGeoPt($pt2);
+  if (($pt1 === null) || ($pt2 === null)) {
+    return null;
+  }
+  $lat1 = $pt1[0];
+  $lat2 = $pt2[0];
+  $lng1 = $pt1[1];
+  $lng2 = $pt2[1];
+  if (($pt1[0] === $pt2[0]) && ($pt1[1] === $pt2[1])) {
+    return 0;
+  }
 
+  //Lifted
+
+	$p1 = deg2rad($lat1);
+	$p2 = deg2rad($lat2);
+	$dp = deg2rad($lat2 - $lat1);
+	$dl = deg2rad($lng2 - $lng1);
+	$a = (sin($dp/2) * sin($dp/2)) + (cos($p1) * cos($p2) * sin($dl/2) * sin($dl/2));
+	$c = 2 * atan2(sqrt($a),sqrt(1-$a));
+	$r = 6371008; // Earth's average radius, in meters
+	$d = $r * $c;
+	return $d; // distance, in meters
+}
+
+function geoDistMiles(array $pt1, array $pt2) : float|null {
+  $distMt = geoDistMt($pt1, $pt2);
+  if ($distMt === null) {
+    return null;
+  }
+  return $distMt / 1609.34;
+}
+
+/**
+ * Takes an array & returns an array of floats if valid lat/lng,
+ * else null
+ * Lat between +/- 90, lng +/- 180
+ */
+function normGeoPt(array $pt) : array|null {
+  $lat = floatval($pt[0]);
+  $lng = floatval($pt[1]);
+  if (($lat >= -90) && ($lat <= 90) && ($lng >= -180) && ($lng <= 180)) { 
+    return [$lat, $lng];
+  }
+  return null;
+}
 
 
 
