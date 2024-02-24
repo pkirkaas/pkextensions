@@ -2,6 +2,9 @@
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 
 // Mods for BS 5 2024
+.dropdown:hover > .dropdown-menu {
+  top: 3em;
+}
 
 input.form-control[type="checkbox"] {
   color: green;
@@ -141,7 +144,7 @@ body nav.navbar.pk-top-menu {
   //    padding: .5em 0;
     }
     &:hover {
-      color: white;
+      color: $nav-link-color-hover;
       text-shadow:0 0 1px white;
       cursor: pointer;
     }
