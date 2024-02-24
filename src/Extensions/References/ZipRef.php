@@ -90,6 +90,16 @@ class ZipRef extends PkRefManager {
     return null;
   }
 
+  /**
+   * 
+   */
+  public static function distBetweenZipsMt($zip1, $zip2, $cc='us') {
+    $pt1 = static::zipToGeo($zip1, $cc);
+    $pt2 = static::zipToGeo($zip2, $cc);
+    $dist = geoDistMt($pt1, $pt2);
+    return $dist;
+  }
+
 
 
   /**Takes a single index location (ca_cities) row & returns as a meaningful

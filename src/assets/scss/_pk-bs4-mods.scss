@@ -1,6 +1,19 @@
 /** Mods/add-ons to default BS 4 */
 /**Copyight (C) 2016 by Paul Kirkaas - All Rights Reserved */
 
+// Mods for BS 5 2024
+
+input.form-control[type="checkbox"] {
+  color: green;
+  background: white;
+  font-weight: bold;
+}
+input.form-control[type="checkbox"]:checked {
+  color: red;
+  background: blue;
+  font-weight: bold;
+}
+
 .form-control {
   height: auto;
 }

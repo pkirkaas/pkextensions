@@ -103,7 +103,8 @@ $checkbox-width: 2rem !default;
 
 // Search/criteria styles
 $dont-care-back: #ccc !default;
-$do-care-back: #fff !default;
+//$do-care-back: #fff !default;
+$do-care-back: #eef !default;
 
 select.search-crit.dont-care {
   background-color: $dont-care-back;
@@ -136,6 +137,10 @@ div.search div.multiselect.form-control label {
   text-align: left;
 }
 
+div.search div.multiselect.form-control.disabled {
+  display: none;
+}
+
 select.form-control.search-crit {
   text-align-last: center;
   display: inline-block;
@@ -152,6 +157,7 @@ div.search {
     border: solid blue 1px;
     border-radius: .5em;
     text-align: center;
+    width: auto;
 
   > label {
     //font-size: 1.2rem;
@@ -288,6 +294,7 @@ $page-template-subtitle-radius: $page-template-title-radius !default;
 $site-lbl-color: #fff !default;
 $site-lbl-background-color: #008 !default;
 $site-val-color: #422 !default;
+$site-val-background-color: rgba(255,255,128,.5) !default;
 $site-negative-value-color: #a22 !default;
 
 .pk-lbl {
@@ -297,6 +304,7 @@ $site-negative-value-color: #a22 !default;
 
 .pk-val {
   color: $site-val-color;
+  background-color: $site-val-background-color;
   //font-weight: bold;
 }
 
@@ -340,6 +348,8 @@ input.pk-inp {
   &:disabled:hover, &:disabled {
   color: $pk-inp-disabled-color;
   background: $pk-inp-disabled-background;
+  // 2024 - after update to BS5 - form utilities no longer supported
+  display: none;
 }
 }
 

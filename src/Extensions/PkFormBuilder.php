@@ -158,6 +158,7 @@ class PkFormBuilder extends FormBuilder {
       $options=['class'=>$options];
     }
     $wrapperclass = unsetret($options,'wrapperclass',  ' form-control ');
+    //$wrapperclass = unsetret($options,'wrapperclass', );
     $allclass = unsetret($options, 'allclass' );
     //unset($options['wrapperclass']);
     //unset($options['allclass']);

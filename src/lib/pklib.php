@@ -203,12 +203,30 @@ function geoDistMt(array $pt1, array $pt2): float|null {
 
 function geoDistMiles(array $pt1, array $pt2) : float|null {
   $distMt = geoDistMt($pt1, $pt2);
-  if ($distMt === null) {
-    return null;
-  }
-  return $distMt / 1609.34;
+  return mtToMiles($distMt);
 }
 
+function geoDistKm(array $pt1, array $pt2) : float|null {
+  $distMt = geoDistMt($pt1, $pt2);
+  return mtToKm($distMt);
+}
+
+/**
+ * Meters to Kilometers, else null
+ */
+function mtToKm($dist) {
+  if ($dist !== null) {
+    $dist = $dist/1000;
+  }
+  return $dist;
+}
+
+function mtToMiles($dist) {
+  if ($dist !== null) {
+    $dist = $dist / 1609.34;
+  }
+  return $dist;
+}
 /**
  * Takes an array & returns an array of floats if valid lat/lng,
  * else null
