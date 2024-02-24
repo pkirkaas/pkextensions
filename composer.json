@@ -17,11 +17,11 @@
     "jenssegers/agent": "*",
     "ezyang/htmlpurifier": "*",
     "laravelcollective/html": "^6",
-    "matanyadaev/laravel-eloquent-spatial": "dev-master"
+    "matanyadaev/laravel-eloquent-spatial": "dev-master",
+    "kint-php/kint": "dev-master"
   },
   "require-dev": {
     "ccampbell/chromephp": "*",
-    "kint-php/kint": "dev-master"
   },
   "autoload": {
     "psr-4": {
