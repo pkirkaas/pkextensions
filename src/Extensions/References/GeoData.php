@@ -9,6 +9,15 @@ public static function getUsCities() {
   return static::$UsCities;
 }
 
+public static function getCaZips() {
+  $caZipRows = array_filter(static::$UsCities, function($row) {
+    return $row[1] === "CA";
+  });
+  $caZips = array_map(function($row) {
+    return $row[0];}, $caZipRows);
+  return array_values($caZips);
+}
+
 public static $UsCities = [[35004,"AL","Acmar",33.584132,-86.51557],
 [35005,"AL","Adamsville",33.588437,-86.959727],
 [35006,"AL","Adger",33.434277,-87.167455],
