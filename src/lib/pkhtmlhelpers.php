@@ -237,7 +237,7 @@ function checkBox($value) {
  * of assoc arrays, with all the labels of $list, and checked boxes
  * for the ones that are matched in the values. 
  * @param array $values
- * @param array $list
+ * @param array $list - assoc arr of vals to labels/descs
  * @param string $checkKey
  * @param string $labelKey
  */
@@ -253,6 +253,21 @@ function checkArray($values, $list, $compact= false, $opts=[]){
       $ret[] = $row;
     }
   }
+  return $ret;
+}
+
+/**
+ * @param array $values - php array of stringish
+ * @param string $cssClass 
+ * @param string $cssStyle  
+ * @return string HTML string of divs for each element in arr.
+ */
+function arrToDivs($arr, $cssClass='', $cssStyle='') {
+  $ret = "\n";
+  foreach ($arr as $el) {
+    $ret .= "<div class='$cssClass' style='$cssStyle'>$el</div>\n";
+  }
+  $ret .= "\n";
   return $ret;
 }
 

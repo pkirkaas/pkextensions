@@ -221,6 +221,19 @@ function mtToKm($dist) {
   return $dist;
 }
 
+/**
+ * Probably missing an obvious/existing approach -
+ * Takes an indexed array of keys, and associative arr of keys to descs,
+ * and returns arr of descs for the keys
+ */
+function keysToDescs($keys, $map) {
+  $ret = [];
+  foreach ($keys as $key) {
+    $ret[] = $map[$key];
+  }
+  return $ret;
+}
+
 function mtToMiles($dist) {
   if ($dist !== null) {
     $dist = $dist / 1609.34;
